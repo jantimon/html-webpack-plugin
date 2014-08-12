@@ -5,6 +5,8 @@
     <title>React Starter</title>
   </head>
   <body>
-    <script src="{%=o.htmlWebpackPlugin.assets.main%}"></script>
+    {% for (var chunk in o.htmlWebpackPlugin.assets) { %}
+    <script src="{%=o.htmlWebpackPlugin.assets[chunk]%}"></script>
+    {% } %}
   </body>
 </html>

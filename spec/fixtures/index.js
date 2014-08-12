@@ -1,1 +1,1 @@
-document.body.textContent = "Hello world";
+document.body.textContent = helloText();
