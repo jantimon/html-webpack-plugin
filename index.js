@@ -27,7 +27,14 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginJson = function(webpackStatsJson) {
   var json = {};
   json.assets = {};
   for (var chunk in webpackStatsJson.assetsByChunkName) {
-    json.assets[chunk] = webpackStatsJson.assetsByChunkName[chunk];
+    var chunkValue = webpackStatsJson.assetsByChunkName[chunk];
+
+    // Webpack outputs an array for each chunk when using sourcemaps
+    if (chunkValue instanceof Array) {
+      // Is the main bundle always the first element?
+      chunkValue = chunkValue[0];
+    }
+    json.assets[chunk] = chunkValue;
   }
 
   return json;
