@@ -2,7 +2,8 @@ var fs = require('fs');
 var path = require('path');
 var tmpl = require('blueimp-tmpl').tmpl;
 
-function HtmlWebpackPlugin() {
+function HtmlWebpackPlugin(options) {
+  this.options = options || {};
 }
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
@@ -13,8 +14,12 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     templateParams.webpack = webpackStatsJson;
     templateParams.htmlWebpackPlugin = self.htmlWebpackPluginJson(webpackStatsJson);
 
-    var htmlTemplate = fs.readFileSync(path.join(__dirname, 'default_index.html'), 'utf8');
-    fs.writeFileSync(path.join(compiler.options.output.path, 'index.html'), tmpl(htmlTemplate, templateParams));
+    var templateFile = self.options.template;
+    if (!templateFile) {
+      templateFile = path.join(__dirname, 'default_index.html');
+    }
+    var htmlTemplateContent = fs.readFileSync(templateFile, 'utf8');
+    fs.writeFileSync(path.join(compiler.options.output.path, 'index.html'), tmpl(htmlTemplateContent, templateParams));
   });
 };
 

@@ -6,9 +6,10 @@ var HtmlWebpackPlugin = require('../index.js');
 
 var OUTPUT_DIR = path.join(__dirname, '..', 'dist');
 
-function testHtmlPlugin(webpackConfig, expectedResults, done) {
+function testHtmlPlugin(webpackConfig, htmlPluginOptions, expectedResults, done) {
   var outputHtmlFile = path.join(OUTPUT_DIR, 'index.html');
-  webpackConfig.plugins = [new HtmlWebpackPlugin()];
+  var htmlPlugin = htmlPluginOptions ? new HtmlWebpackPlugin(htmlPluginOptions) : new HtmlWebpackPlugin();
+  webpackConfig.plugins = [htmlPlugin];
   webpack(webpackConfig, function(err, stats) {
     expect(err).toBeFalsy();
     expect(stats.hasErrors()).toBe(false);
@@ -32,7 +33,7 @@ describe('HtmlWebpackPlugin', function() {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       }
-    }, ['<script src="index_bundle.js"'], done);
+    }, null, ['<script src="index_bundle.js"'], done);
 
   });
 
@@ -46,6 +47,20 @@ describe('HtmlWebpackPlugin', function() {
         path: OUTPUT_DIR,
         filename: '[name]_bundle.js'
       }
-    }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], done);
+    }, null, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], done);
+  });
+
+  it('allows you to specify your own HTML template', function(done) {
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures', 'index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      }
+    },
+    {template: path.join(__dirname, 'fixtures', 'test.html')},
+    ['<script src="app_bundle.js"', 'Some unique text'], done);
   });
 });
