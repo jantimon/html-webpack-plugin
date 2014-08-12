@@ -93,5 +93,17 @@ describe('HtmlWebpackPlugin', function() {
     }, [/<script src="index_bundle_[0-9a-f]+\.js"/], done);
   });
 
+  it('prepends the webpack public path to script src', function(done) {
+    testHtmlPlugin({
+      devtool: 'sourcemap',
+      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        publicPath: 'http://cdn.example.com/assets/'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, ['<script src="http://cdn.example.com/assets/index_bundle.js"'], done);
+  });
 
 });

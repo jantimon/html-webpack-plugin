@@ -10,9 +10,10 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
   compiler.plugin('done', function(stats) {
     var webpackStatsJson = stats.toJson();
+    console.log(JSON.stringify(webpackStatsJson, null, 2));
     var templateParams = {};
     templateParams.webpack = webpackStatsJson;
-    templateParams.htmlWebpackPlugin = self.htmlWebpackPluginJson(webpackStatsJson);
+    templateParams.htmlWebpackPlugin = self.htmlWebpackPluginJson(compiler, webpackStatsJson);
 
     var templateFile = self.options.template;
     if (!templateFile) {
@@ -23,7 +24,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
   });
 };
 
-HtmlWebpackPlugin.prototype.htmlWebpackPluginJson = function(webpackStatsJson) {
+HtmlWebpackPlugin.prototype.htmlWebpackPluginJson = function(compiler, webpackStatsJson) {
   var json = {};
   json.assets = {};
   for (var chunk in webpackStatsJson.assetsByChunkName) {
@@ -33,6 +34,10 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginJson = function(webpackStatsJson) {
     if (chunkValue instanceof Array) {
       // Is the main bundle always the first element?
       chunkValue = chunkValue[0];
+    }
+
+    if (compiler.options.output.publicPath) {
+      chunkValue = compiler.options.output.publicPath + chunkValue;
     }
     json.assets[chunk] = chunkValue;
   }
