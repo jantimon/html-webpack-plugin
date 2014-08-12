@@ -13,7 +13,12 @@ function testHtmlPlugin(webpackConfig, expectedResults, done) {
     expect(stats.hasErrors()).toBe(false);
     var htmlContent = fs.readFileSync(outputHtmlFile).toString();
     for (var i = 0; i < expectedResults.length; i++) {
-      expect(htmlContent).toContain(expectedResults[i]);
+      var expectedResult = expectedResults[i];
+      if (expectedResult instanceof RegExp) {
+        expect(htmlContent).toMatch(expectedResult);
+      } else {
+        expect(htmlContent).toContain(expectedResult);
+      }
     }
     done();
   });
@@ -75,5 +80,18 @@ describe('HtmlWebpackPlugin', function() {
       plugins: [new HtmlWebpackPlugin()]
     }, ['<script src="index_bundle.js"'], done);
   });
+
+  it('handles hashes in bundle filenames', function(done) {
+    testHtmlPlugin({
+      devtool: 'sourcemap',
+      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle_[hash].js'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, [/<script src="index_bundle_[0-9a-f]+\.js"/], done);
+  });
+
 
 });
