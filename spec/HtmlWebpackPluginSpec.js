@@ -83,7 +83,6 @@ describe('HtmlWebpackPlugin', function() {
 
   it('handles hashes in bundle filenames', function(done) {
     testHtmlPlugin({
-      devtool: 'sourcemap',
       entry: path.join(__dirname, 'fixtures', 'index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -95,7 +94,6 @@ describe('HtmlWebpackPlugin', function() {
 
   it('prepends the webpack public path to script src', function(done) {
     testHtmlPlugin({
-      devtool: 'sourcemap',
       entry: path.join(__dirname, 'fixtures', 'index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -108,7 +106,6 @@ describe('HtmlWebpackPlugin', function() {
 
   it('handles subdirectories in the webpack output bundles', function(done) {
     testHtmlPlugin({
-      devtool: 'sourcemap',
       entry: path.join(__dirname, 'fixtures', 'index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -118,7 +115,6 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<script src="assets/index_bundle.js"'], done);
 
     testHtmlPlugin({
-      devtool: 'sourcemap',
       entry: path.join(__dirname, 'fixtures', 'index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -129,5 +125,15 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<script src="http://cdn.example.com/assets/index_bundle.js"'], done);
   });
 
+  it('allows you to configure the title of the generated HTML page', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({title: 'My Cool App'})]
+    }, ['<title>My Cool App</title>'], done);
+  });
 
 });

@@ -12,7 +12,9 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     var webpackStatsJson = stats.toJson();
     var templateParams = {};
     templateParams.webpack = webpackStatsJson;
-    templateParams.htmlWebpackPlugin = self.htmlWebpackPluginJson(compiler, webpackStatsJson);
+    templateParams.htmlWebpackPlugin = {};
+    templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginAssets(compiler, webpackStatsJson);
+    templateParams.htmlWebpackPlugin.options = self.options;
 
     var templateFile = self.options.template;
     if (!templateFile) {
@@ -23,9 +25,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
   });
 };
 
-HtmlWebpackPlugin.prototype.htmlWebpackPluginJson = function(compiler, webpackStatsJson) {
-  var json = {};
-  json.assets = {};
+HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compiler, webpackStatsJson) {
+  var assets = {};
   for (var chunk in webpackStatsJson.assetsByChunkName) {
     var chunkValue = webpackStatsJson.assetsByChunkName[chunk];
 
@@ -38,10 +39,10 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginJson = function(compiler, webpackSt
     if (compiler.options.output.publicPath) {
       chunkValue = compiler.options.output.publicPath + chunkValue;
     }
-    json.assets[chunk] = chunkValue;
+    assets[chunk] = chunkValue;
   }
 
-  return json;
+  return assets;
 };
 
 module.exports = HtmlWebpackPlugin;
