@@ -10,7 +10,6 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
   compiler.plugin('done', function(stats) {
     var webpackStatsJson = stats.toJson();
-    console.log(JSON.stringify(webpackStatsJson, null, 2));
     var templateParams = {};
     templateParams.webpack = webpackStatsJson;
     templateParams.htmlWebpackPlugin = self.htmlWebpackPluginJson(compiler, webpackStatsJson);

@@ -106,4 +106,28 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<script src="http://cdn.example.com/assets/index_bundle.js"'], done);
   });
 
+  it('handles subdirectories in the webpack output bundles', function(done) {
+    testHtmlPlugin({
+      devtool: 'sourcemap',
+      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: path.join('assets', 'index_bundle.js')
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, ['<script src="assets/index_bundle.js"'], done);
+
+    testHtmlPlugin({
+      devtool: 'sourcemap',
+      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: path.join('assets', 'index_bundle.js'),
+        publicPath: 'http://cdn.example.com/'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, ['<script src="http://cdn.example.com/assets/index_bundle.js"'], done);
+  });
+
+
 });
