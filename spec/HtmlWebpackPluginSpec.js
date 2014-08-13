@@ -6,12 +6,12 @@ var HtmlWebpackPlugin = require('../index.js');
 
 var OUTPUT_DIR = path.join(__dirname, '..', 'dist');
 
-function testHtmlPlugin(webpackConfig, expectedResults, done) {
-  var outputHtmlFile = path.join(OUTPUT_DIR, 'index.html');
+function testHtmlPlugin(webpackConfig, expectedResults, done, outputFile) {
+  outputFile = outputFile || 'index.html';
   webpack(webpackConfig, function(err, stats) {
     expect(err).toBeFalsy();
     expect(stats.hasErrors()).toBe(false);
-    var htmlContent = fs.readFileSync(outputHtmlFile).toString();
+    var htmlContent = fs.readFileSync(path.join(OUTPUT_DIR, outputFile)).toString();
     for (var i = 0; i < expectedResults.length; i++) {
       var expectedResult = expectedResults[i];
       if (expectedResult instanceof RegExp) {
@@ -109,7 +109,7 @@ describe('HtmlWebpackPlugin', function() {
       entry: path.join(__dirname, 'fixtures', 'index.js'),
       output: {
         path: OUTPUT_DIR,
-        filename: path.join('assets', 'index_bundle.js')
+        filename: 'assets/index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin()]
     }, ['<script src="assets/index_bundle.js"'], done);
@@ -120,7 +120,7 @@ describe('HtmlWebpackPlugin', function() {
       entry: path.join(__dirname, 'fixtures', 'index.js'),
       output: {
         path: OUTPUT_DIR,
-        filename: path.join('assets', 'index_bundle.js'),
+        filename: 'assets/index_bundle.js',
         publicPath: 'http://cdn.example.com/'
       },
       plugins: [new HtmlWebpackPlugin()]
@@ -136,6 +136,28 @@ describe('HtmlWebpackPlugin', function() {
       },
       plugins: [new HtmlWebpackPlugin({title: 'My Cool App'})]
     }, ['<title>My Cool App</title>'], done);
+  });
+
+  it('allows you to configure the output filename', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({filename: 'test.html'})]
+    }, ['<script src="index_bundle.js"'], done, 'test.html');
+  });
+
+  it('allows you to configure the output filename with a path', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({filename: 'assets/test.html'})]
+    }, ['<script src="index_bundle.js"'], done, 'assets/test.html');
   });
 
 });

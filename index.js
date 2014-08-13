@@ -23,8 +23,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
 
     var htmlTemplateContent = fs.readFileSync(templateFile, 'utf8');
     var html = tmpl(htmlTemplateContent, templateParams);
-    var outputPath = path.join(compiler.options.output.path, 'index.html');
-    compiler.assets['index.html'] = {
+    var outputFilename = self.options.filename || 'index.html';
+    compiler.assets[outputFilename] = {
       source: function() {
         return html;
       },
