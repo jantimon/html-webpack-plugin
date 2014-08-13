@@ -1,7 +1,7 @@
 {
   "name": "html-webpack-plugin",
-  "version": "0.1.0",
-  "description": "Generates HTML files to serve your webpack bundles",
+  "version": "0.2.0",
+  "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "main": "index.js",
   "scripts": {
     "test": "node_modules/.bin/jshint *.js spec && node_modules/.bin/jasmine-node --captureExceptions spec"

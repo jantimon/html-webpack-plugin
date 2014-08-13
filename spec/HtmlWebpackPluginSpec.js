@@ -113,7 +113,9 @@ describe('HtmlWebpackPlugin', function() {
       },
       plugins: [new HtmlWebpackPlugin()]
     }, ['<script src="assets/index_bundle.js"'], done);
+  });
 
+  it('handles subdirectories in the webpack output bundles along with a public path', function(done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures', 'index.js'),
       output: {

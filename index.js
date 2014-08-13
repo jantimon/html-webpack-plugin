@@ -8,8 +8,8 @@ function HtmlWebpackPlugin(options) {
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
-  compiler.plugin('done', function(stats) {
-    var webpackStatsJson = stats.toJson();
+  compiler.plugin('after-emit', function(compiler, callback) {
+    var webpackStatsJson = compiler.getStats().toJson();
     var templateParams = {};
     templateParams.webpack = webpackStatsJson;
     templateParams.htmlWebpackPlugin = {};
@@ -20,8 +20,11 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     if (!templateFile) {
       templateFile = path.join(__dirname, 'default_index.html');
     }
+
     var htmlTemplateContent = fs.readFileSync(templateFile, 'utf8');
-    fs.writeFileSync(path.join(compiler.options.output.path, 'index.html'), tmpl(htmlTemplateContent, templateParams));
+    var html = tmpl(htmlTemplateContent, templateParams);
+    var outputPath = path.join(compiler.options.output.path, 'index.html');
+    this.outputFileSystem.writeFile(outputPath, html, callback);
   });
 };
 
