@@ -134,5 +134,7 @@ template is rendered. This variable has the following attributes:
      the plugin. In addition to the options actually used by this plugin,
      you can use this hash to pass arbitrary data through to your template.
 
-- `webpack`: holds the webpack [stats](https://github.com/webpack/docs/wiki/node.js-api#stats)
-  object, as returned by `stats.toJson()`.
+- `webpack`: the webpack [stats](https://github.com/webpack/docs/wiki/node.js-api#stats)
+  object. Note that this is the stats object as it was at the time the HTML template
+  was emitted and as such may not have the full set of stats that are available
+  after the wepback run is complete.
