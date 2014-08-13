@@ -4,7 +4,7 @@ var webpack = require('webpack');
 var rm_rf = require('rimraf');
 var HtmlWebpackPlugin = require('../index.js');
 
-var OUTPUT_DIR = path.join(__dirname, '..', 'dist');
+var OUTPUT_DIR = path.join(__dirname, '../dist');
 
 function testHtmlPlugin(webpackConfig, expectedResults, done, outputFile) {
   outputFile = outputFile || 'index.html';
@@ -31,7 +31,7 @@ describe('HtmlWebpackPlugin', function() {
 
   it('generates a default index.html file for a single entry point', function(done) {
     testHtmlPlugin({
-      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
@@ -44,8 +44,8 @@ describe('HtmlWebpackPlugin', function() {
   it('generates a default index.html file with multiple entry points', function(done) {
     testHtmlPlugin({
       entry: {
-        util: path.join(__dirname, 'fixtures', 'util.js'),
-        app: path.join(__dirname, 'fixtures', 'index.js')
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
       },
       output: {
         path: OUTPUT_DIR,
@@ -58,13 +58,13 @@ describe('HtmlWebpackPlugin', function() {
   it('allows you to specify your own HTML template', function(done) {
     testHtmlPlugin({
       entry: {
-        app: path.join(__dirname, 'fixtures', 'index.js')
+        app: path.join(__dirname, 'fixtures/index.js')
       },
       output: {
         path: OUTPUT_DIR,
         filename: '[name]_bundle.js'
       },
-      plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures', 'test.html')})]
+      plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/test.html')})]
     },
     ['<script src="app_bundle.js"', 'Some unique text'], done);
   });
@@ -72,7 +72,7 @@ describe('HtmlWebpackPlugin', function() {
   it('works with source maps', function(done) {
     testHtmlPlugin({
       devtool: 'sourcemap',
-      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
@@ -83,7 +83,7 @@ describe('HtmlWebpackPlugin', function() {
 
   it('handles hashes in bundle filenames', function(done) {
     testHtmlPlugin({
-      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle_[hash].js'
@@ -94,7 +94,7 @@ describe('HtmlWebpackPlugin', function() {
 
   it('prepends the webpack public path to script src', function(done) {
     testHtmlPlugin({
-      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js',
@@ -106,7 +106,7 @@ describe('HtmlWebpackPlugin', function() {
 
   it('handles subdirectories in the webpack output bundles', function(done) {
     testHtmlPlugin({
-      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'assets/index_bundle.js'
@@ -117,7 +117,7 @@ describe('HtmlWebpackPlugin', function() {
 
   it('handles subdirectories in the webpack output bundles along with a public path', function(done) {
     testHtmlPlugin({
-      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'assets/index_bundle.js',
@@ -129,7 +129,7 @@ describe('HtmlWebpackPlugin', function() {
 
   it('allows you to configure the title of the generated HTML page', function(done) {
     testHtmlPlugin({
-      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
@@ -140,7 +140,7 @@ describe('HtmlWebpackPlugin', function() {
 
   it('allows you to configure the output filename', function(done) {
     testHtmlPlugin({
-      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
@@ -151,13 +151,32 @@ describe('HtmlWebpackPlugin', function() {
 
   it('allows you to configure the output filename with a path', function(done) {
     testHtmlPlugin({
-      entry: path.join(__dirname, 'fixtures', 'index.js'),
+      entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({filename: 'assets/test.html'})]
     }, ['<script src="index_bundle.js"'], done, 'assets/test.html');
+  });
+
+  it('allows you write multiple HTML files', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        new HtmlWebpackPlugin({
+          filename: 'test.html',
+          template: path.join(__dirname, 'fixtures/test.html')
+        })
+      ]
+    }, ['<script src="index_bundle.js"'], done);
+
+    expect(fs.existsSync(path.join(__dirname, 'fixtures/test.html'))).toBe(true);
   });
 
 });

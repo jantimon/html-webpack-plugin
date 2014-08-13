@@ -77,6 +77,27 @@ Here's an example webpack config illustrating how to use these options:
 }
 ```
 
+Generating Multiple HTML Files
+------------------------------
+To generate more than one HTML file, declare the plugin more than
+once in your plugins array:
+```javascript
+{
+  entry: 'index.js',
+  output: {
+    path: 'dist',
+    filename: 'index_bundle.js'
+  },
+  plugins: [
+    new HtmlWebpackPlugin(), // Generates default index.html
+    new HtmlWebpackPlugin({  // Also generate a test.html
+      filename: 'test.html',
+      template: 'src/assets/test.html'
+    })
+  ]
+}
+```
+
 Writing Your Own Templates
 --------------------------
 If the default generated HTML doesn't meet your needs you can supply
@@ -100,7 +121,7 @@ HTML as well as the body. Your template might look like this:
 </html>
 ```
 
-To use this template, simply configure the plugin like this:
+To use this template, configure the plugin like this:
 ```javascript
 {
   entry: 'index.js',
