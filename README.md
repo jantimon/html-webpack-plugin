@@ -1,4 +1,4 @@
-html-webpack-plugin
+HTML Webpack Plugin
 ===================
 
 This is a [webpack](http://webpack.github.io/) plugin that simplifies creation of HTML files to serve your
@@ -22,20 +22,18 @@ bundles in the body.
 
 For example, this webpack config...
 ```javascript
-{
-  entry: {
-    util: 'util.js',
-    app: 'index.js'
-  },
+var HtmlWebpackPlugin = require('html-webpack-plugin')
+var webpackConfig = {
+  entry: 'index.js',
   output: {
     path: 'dist',
-    filename: '[name]_bundle.js'
+    filename: 'index_bundle.js'
   },
   plugins: [new HtmlWebpackPlugin()]
 }
 ```
 
-... generates a file `dist/index.html` containing the following:
+generates a file `dist/index.html` containing the following:
 ```html
 <!DOCTYPE html>
 <html>
@@ -44,8 +42,38 @@ For example, this webpack config...
     <title>Webpack App</title>
   </head>
   <body>
-    <script src="util_bundle.js"></script>
-    <script src="app_bundle.js"></script>
+    <script src="index_bundle.js"></script>
   </body>
 </html>
 ```
+
+If you have multiple webpack entry points, they will all be included with `script`
+tags in the generated HTML.
+
+
+Configuration
+-------------
+You can pass a hash of configuration options to `HtmlWebpackPlugin`.
+Allowed values are as follows:
+
+- `title`: The title to use for the generated HTML document.
+
+Here's an example webpack config illustrating how to use these options:
+```javascript
+{
+  entry: 'index.js',
+  output: {
+    path: 'dist',
+    filename: 'index_bundle.js'
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: 'My App'
+    })
+  ]
+}
+```
+
+Writing Your Own Templates
+--------------------------
+TODO
