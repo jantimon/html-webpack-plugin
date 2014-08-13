@@ -1,3 +1,1 @@
-function helloText() {
-  return "Hello world";
-}
+document.body.innerHTML = document.body.innerHTML + "<p>util.js</p>";

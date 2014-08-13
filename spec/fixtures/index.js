@@ -1,1 +1,1 @@
-document.body.textContent = helloText();
+document.body.innerHTML = document.body.innerHTML + "<p>index.js</p>";

@@ -8,7 +8,7 @@ function HtmlWebpackPlugin(options) {
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
-  compiler.plugin('after-emit', function(compiler, callback) {
+  compiler.plugin('emit', function(compiler, callback) {
     var webpackStatsJson = compiler.getStats().toJson();
     var templateParams = {};
     templateParams.webpack = webpackStatsJson;
@@ -24,7 +24,15 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     var htmlTemplateContent = fs.readFileSync(templateFile, 'utf8');
     var html = tmpl(htmlTemplateContent, templateParams);
     var outputPath = path.join(compiler.options.output.path, 'index.html');
-    this.outputFileSystem.writeFile(outputPath, html, callback);
+    compiler.assets['index.html'] = {
+      source: function() {
+        return html;
+      },
+      size: function() {
+        return html.length;
+      }
+    };
+    callback();
   });
 };
 
