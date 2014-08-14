@@ -1,6 +1,6 @@
 {
   "name": "html-webpack-plugin",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "main": "index.js",
   "scripts": {
