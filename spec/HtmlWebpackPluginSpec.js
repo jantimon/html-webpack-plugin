@@ -83,6 +83,23 @@ describe('HtmlWebpackPlugin', function() {
     ['<script src="app_bundle.js"'], null, done);
   });
 
+  it('registers a webpack error both template and template content are specified', function(done) {
+    webpack({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        template: path.join(__dirname, 'fixtures/test.html'),
+        templateContent: 'whatever'
+      })]
+    }, function(err, stats) {
+      expect(stats.hasErrors()).toBe(true);
+      expect(stats.toJson().errors[0]).toContain('HtmlWebpackPlugin');
+      done();
+    });
+  });
 
   it('works with source maps', function(done) {
     testHtmlPlugin({
