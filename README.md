@@ -137,6 +137,19 @@ To use this template, configure the plugin like this:
 }
 ```
 
+Alternatively, if you already have your template's content in a String, you
+can pass it to the plugin using the `templateContent` option:
+```javascript
+plugins: [
+  new HtmlWebpackPlugin({
+    templateContent: templateContentString
+  })
+]
+```
+
+Note the plugin will throw an error if you specify both `template` _and_
+`templateContent`.
+
 The `o` variable in the template is the data that is passed in when the
 template is rendered. This variable has the following attributes:
 - `htmlWebpackPlugin`: data specific to this plugin
