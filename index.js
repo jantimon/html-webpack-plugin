@@ -21,18 +21,23 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
       templateFile = path.join(__dirname, 'default_index.html');
     }
 
-    var htmlTemplateContent = fs.readFileSync(templateFile, 'utf8');
-    var html = tmpl(htmlTemplateContent, templateParams);
-    var outputFilename = self.options.filename || 'index.html';
-    compiler.assets[outputFilename] = {
-      source: function() {
-        return html;
-      },
-      size: function() {
-        return html.length;
+    fs.readFile(templateFile, 'utf8', function(err, htmlTemplateContent) {
+      if (err) {
+        compiler.errors.push(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + templateFile + '"'));
+      } else {
+        var html = tmpl(htmlTemplateContent, templateParams);
+        var outputFilename = self.options.filename || 'index.html';
+        compiler.assets[outputFilename] = {
+          source: function() {
+            return html;
+          },
+          size: function() {
+            return html.length;
+          }
+        };
       }
-    };
-    callback();
+      callback();
+    });
   });
 };
 
