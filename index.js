@@ -16,29 +16,39 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginAssets(compiler, webpackStatsJson);
     templateParams.htmlWebpackPlugin.options = self.options;
 
-    var templateFile = self.options.template;
-    if (!templateFile) {
-      templateFile = path.join(__dirname, 'default_index.html');
-    }
+    var outputFilename = self.options.filename || 'index.html';
 
-    fs.readFile(templateFile, 'utf8', function(err, htmlTemplateContent) {
-      if (err) {
-        compiler.errors.push(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + templateFile + '"'));
-      } else {
-        var html = tmpl(htmlTemplateContent, templateParams);
-        var outputFilename = self.options.filename || 'index.html';
-        compiler.assets[outputFilename] = {
-          source: function() {
-            return html;
-          },
-          size: function() {
-            return html.length;
-          }
-        };
-      }
+    if (self.options.templateContent) {
+      self.emitHtml(compiler, self.options.templateContent, templateParams, outputFilename);
       callback();
-    });
+    } else {
+      var templateFile = self.options.template;
+      if (!templateFile) {
+        templateFile = path.join(__dirname, 'default_index.html');
+      }
+
+      fs.readFile(templateFile, 'utf8', function(err, htmlTemplateContent) {
+        if (err) {
+          compiler.errors.push(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + templateFile + '"'));
+        } else {
+          self.emitHtml(compiler, htmlTemplateContent, templateParams, outputFilename);
+        }
+        callback();
+      });
+    }
   });
+};
+
+HtmlWebpackPlugin.prototype.emitHtml = function(compiler, htmlTemplateContent, templateParams, outputFilename) {
+  var html = tmpl(htmlTemplateContent, templateParams);
+  compiler.assets[outputFilename] = {
+    source: function() {
+      return html;
+    },
+    size: function() {
+      return html.length;
+    }
+  };
 };
 
 HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compiler, webpackStatsJson) {

@@ -55,7 +55,7 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
   });
 
-  it('allows you to specify your own HTML template', function(done) {
+  it('allows you to specify your own HTML template file', function(done) {
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -68,6 +68,21 @@ describe('HtmlWebpackPlugin', function() {
     },
     ['<script src="app_bundle.js"', 'Some unique text'], null, done);
   });
+
+  it('allows you to specify your own HTML template string', function(done) {
+    testHtmlPlugin({
+      entry: {app: path.join(__dirname, 'fixtures/index.js')},
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'app_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        templateContent: fs.readFileSync(path.join(__dirname, 'fixtures/test.html'), 'utf8')
+      })]
+    },
+    ['<script src="app_bundle.js"'], null, done);
+  });
+
 
   it('works with source maps', function(done) {
     testHtmlPlugin({
