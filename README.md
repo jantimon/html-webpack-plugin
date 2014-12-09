@@ -59,6 +59,7 @@ Allowed values are as follows:
 - `title`: The title to use for the generated HTML document.
 - `filename`: The file to write the HTML to. Defaults to `index.html`.
    You can specify a subdirectory here too (eg: `assets/admin.html`).
+- `tagRegexp`: The regular expression to use different tags from default "{%" and "%}".
 
 Here's an example webpack config illustrating how to use these options:
 ```javascript
