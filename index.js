@@ -29,6 +29,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
       if (!templateFile) {
         templateFile = path.join(__dirname, 'default_index.html');
       }
+      compiler.fileDependencies.push(templateFile);
 
       fs.readFile(templateFile, 'utf8', function(err, htmlTemplateContent) {
         if (err) {
