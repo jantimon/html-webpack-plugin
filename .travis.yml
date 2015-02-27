@@ -1,0 +1,11 @@
+sudo: false
+language: node_js
+node_js:
+- '0.12'
+- '0.10'
+- 'iojs-1'
+before_install:
+- npm install -g "npm@>=1.4.6"
+after_success:
+- npm install coveralls
+- cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js

@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <title>{%=o.htmlWebpackPlugin.options.title || 'Webpack App'%}</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <title><%=title%></title>
   </head>
   <body>
-    {% for (var chunk in o.htmlWebpackPlugin.assets) { %}
-    <script src="{%=o.htmlWebpackPlugin.assets[chunk]%}"></script>
-    {% } %}
+    <!-- Load all the assets from webpack. -->
+    <% _.forEach(paths, function(path) { %>
+      <script src="<%=path%>"></script>
+    <% }); %>
   </body>
 </html>

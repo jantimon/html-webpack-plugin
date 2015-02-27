@@ -1,0 +1,46 @@
+{
+	"env": {
+		"node": true
+	},
+
+	"plugins": [
+		"nodeca"
+	],
+
+	"rules": {
+		"brace-style": [2, "1tbs"],
+		"default-case": 2,
+		"camelcase": 2,
+		"consistent-this": [2, "self"],
+		"dot-notation": 0,
+		"eol-last": 2,
+		"func-names": 2,
+		"func-style": [2, "declaration"],
+		"guard-for-in": 2,
+		"new-cap": 0,
+		"no-floating-decimal": 2,
+		"no-lonely-if": 2,
+		"no-mixed-spaces-and-tabs": [2, true],
+		"no-nested-ternary": 2,
+		"no-use-before-define": 2,
+		"no-undefined": 2,
+		"no-underscore-dangle": 0,
+		"nodeca/indent": [2, "tabs", 1],
+		"nodeca/no-lodash-aliases": 2,
+		"quotes": [2, "single"],
+		"radix": 2,
+		"space-after-keywords": [2, "always"],
+		"valid-jsdoc": [2, {
+			"prefer": {
+				"return": "returns"
+			}
+		}],
+		"wrap-iife": 2,
+		"yoda": [0, "always"]
+	},
+
+	"globals": {
+		"console": false,
+		"Promise": true
+	}
+}
