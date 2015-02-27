@@ -1,78 +1,79 @@
-var fs = require('fs');
-var path = require('path');
-var tmpl = require('blueimp-tmpl').tmpl;
 
+'use strict';
+
+// Imports
+var _ = require('lodash'),
+	path = require('path'),
+	fs = require('fs'),
+	minify = require('html-minifier');
+
+// Defaults
+var def = fs.readFileSync(path.join(__dirname, 'default_index.html'));
+
+/**
+ * @constructor
+ * @param {Object} options Initial configuration.
+ */
 function HtmlWebpackPlugin(options) {
-  this.options = options || {};
+	this.options = _.assign({
+		filename: 'index.html',
+		template: def,
+		title: 'Webpack App'
+	}, options);
+	this.template = _.template(this.options.template);
 }
 
-HtmlWebpackPlugin.prototype.apply = function(compiler) {
-  var self = this;
-  compiler.plugin('emit', function(compiler, callback) {
-    var webpackStatsJson = compiler.getStats().toJson();
-    var templateParams = {};
-    templateParams.webpack = webpackStatsJson;
-    templateParams.htmlWebpackPlugin = {};
-    templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginAssets(compiler, webpackStatsJson);
-    templateParams.htmlWebpackPlugin.options = self.options;
+HtmlWebpackPlugin.prototype.apply = function apply(source) {
+	var self = this, options = self.options;
 
-    var outputFilename = self.options.filename || 'index.html';
-
-    if (self.options.templateContent && self.options.template) {
-      compiler.errors.push(new Error('HtmlWebpackPlugin: cannot specify both template and templateContent options'));
-      callback();
-    } else if (self.options.templateContent) {
-      self.emitHtml(compiler, self.options.templateContent, templateParams, outputFilename);
-      callback();
-    } else {
-      var templateFile = self.options.template;
-      if (!templateFile) {
-        templateFile = path.join(__dirname, 'default_index.html');
-      }
-      compiler.fileDependencies.push(templateFile);
-
-      fs.readFile(templateFile, 'utf8', function(err, htmlTemplateContent) {
-        if (err) {
-          compiler.errors.push(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + templateFile + '"'));
-        } else {
-          self.emitHtml(compiler, htmlTemplateContent, templateParams, outputFilename);
-        }
-        callback();
-      });
-    }
-  });
+	source.plugin('emit', function onEmit(compiler, callback) {
+		var stats = compiler.getStats().toJson();
+		var html = self.process(compiler, stats);
+		compiler.assets[options.filename] = {
+			source: function getSource() {
+				return html;
+			},
+			size: function getSize() {
+				return html.length;
+			}
+		};
+		callback();
+	});
 };
 
-HtmlWebpackPlugin.prototype.emitHtml = function(compiler, htmlTemplateContent, templateParams, outputFilename) {
-  var html = tmpl(htmlTemplateContent, templateParams);
-  compiler.assets[outputFilename] = {
-    source: function() {
-      return html;
-    },
-    size: function() {
-      return html.length;
-    }
-  };
+HtmlWebpackPlugin.prototype.process = function process(compiler, stats) {
+	var context = _.assign({
+		assets: stats.assetsByChunkName,
+		paths: _.flatten([
+			_.values(compiler.options.resolve.externals),
+			this.paths(compiler, stats)
+		])
+	}, this.options);
+	return minify.minify(this.template(context), {
+		removeComments: true,
+		collapseWhitespace: true,
+		removeEmptyAttributes: true,
+		minifyJS: true,
+		minifyCSS: true
+	});
 };
 
-HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compiler, webpackStatsJson) {
-  var assets = {};
-  for (var chunk in webpackStatsJson.assetsByChunkName) {
-    var chunkValue = webpackStatsJson.assetsByChunkName[chunk];
-
-    // Webpack outputs an array for each chunk when using sourcemaps
-    if (chunkValue instanceof Array) {
-      // Is the main bundle always the first element?
-      chunkValue = chunkValue[0];
-    }
-
-    if (compiler.options.output.publicPath) {
-      chunkValue = compiler.options.output.publicPath + chunkValue;
-    }
-    assets[chunk] = chunkValue;
-  }
-
-  return assets;
+HtmlWebpackPlugin.prototype.paths = function paths(compiler, stats) {
+	var root = compiler.options.output.publicPath || '';
+	return _.chain(stats.chunks)
+		.sort(function orderEntryLast(a, b) {
+			if (a.entry !== b.entry) {
+				return b.entry ? 1 : -1;
+			} else {
+				return b.id - a.id;
+			}
+		})
+		.pluck('files')
+		.flatten()
+		.map(function rebasePath(path) {
+			return root + path;
+		})
+		.value();
 };
 
 module.exports = HtmlWebpackPlugin;
