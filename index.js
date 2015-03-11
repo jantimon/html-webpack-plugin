@@ -45,9 +45,14 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
   });
 };
 
-HtmlWebpackPlugin.prototype.emitHtml = function(compiler, htmlTemplateContent, templateParams, outputFilename) {
-  var html = tmpl(htmlTemplateContent, templateParams);
-  compiler.assets[outputFilename] = {
+HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent, templateParams, outputFilename) {
+  var html;
+  try {
+   html = tmpl(htmlTemplateContent, templateParams);
+  } catch(e) {
+    compilation.errors.push(new Error('HtmlWebpackPlugin: template error ' + e));
+  }
+  compilation.assets[outputFilename] = {
     source: function() {
       return html;
     },
