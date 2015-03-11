@@ -8,34 +8,34 @@ function HtmlWebpackPlugin(options) {
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
-  compiler.plugin('emit', function(compiler, callback) {
-    var webpackStatsJson = compiler.getStats().toJson();
+  compiler.plugin('emit', function(compilation, callback) {
+    var webpackStatsJson = compilation.getStats().toJson();
     var templateParams = {};
     templateParams.webpack = webpackStatsJson;
     templateParams.htmlWebpackPlugin = {};
-    templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginAssets(compiler, webpackStatsJson);
+    templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginAssets(compilation, webpackStatsJson);
     templateParams.htmlWebpackPlugin.options = self.options;
 
     var outputFilename = self.options.filename || 'index.html';
 
     if (self.options.templateContent && self.options.template) {
-      compiler.errors.push(new Error('HtmlWebpackPlugin: cannot specify both template and templateContent options'));
+      compilation.errors.push(new Error('HtmlWebpackPlugin: cannot specify both template and templateContent options'));
       callback();
     } else if (self.options.templateContent) {
-      self.emitHtml(compiler, self.options.templateContent, templateParams, outputFilename);
+      self.emitHtml(compilation, self.options.templateContent, templateParams, outputFilename);
       callback();
     } else {
       var templateFile = self.options.template;
       if (!templateFile) {
         templateFile = path.join(__dirname, 'default_index.html');
       }
-      compiler.fileDependencies.push(templateFile);
+      compilation.fileDependencies.push(templateFile);
 
       fs.readFile(templateFile, 'utf8', function(err, htmlTemplateContent) {
         if (err) {
-          compiler.errors.push(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + templateFile + '"'));
+          compilation.errors.push(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + templateFile + '"'));
         } else {
-          self.emitHtml(compiler, htmlTemplateContent, templateParams, outputFilename);
+          self.emitHtml(compilation, htmlTemplateContent, templateParams, outputFilename);
         }
         callback();
       });
@@ -55,7 +55,8 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compiler, htmlTemplateContent, t
   };
 };
 
-HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compiler, webpackStatsJson) {
+
+HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson) {
   var assets = {};
   for (var chunk in webpackStatsJson.assetsByChunkName) {
     var chunkValue = webpackStatsJson.assetsByChunkName[chunk];
@@ -66,8 +67,8 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compiler, webpack
       chunkValue = chunkValue[0];
     }
 
-    if (compiler.options.output.publicPath) {
-      chunkValue = compiler.options.output.publicPath + chunkValue;
+    if (compilation.options.output.publicPath) {
+      chunkValue = compilation.options.output.publicPath + chunkValue;
     }
     assets[chunk] = chunkValue;
   }
