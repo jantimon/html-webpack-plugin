@@ -15,7 +15,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     templateParams.webpack = webpackStatsJson;
     templateParams.hash = webpackStatsJson.hash;
     templateParams.htmlWebpackPlugin = {};
-    templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginAssets(compilation, webpackStatsJson);
+    templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson);
+    templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson);
     templateParams.htmlWebpackPlugin.options = self.options;
 
     var outputFilename = self.options.filename || 'index.html';
@@ -66,7 +67,7 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
 HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson) {
   var assets = {
     // Will contain all js & css files by chunk
-    chunks: [],
+    chunks: {},
     // Will contain all js files
     js: [],
     // Will contain all css files
@@ -102,5 +103,19 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
 
   return assets;
 };
+
+/**
+ * A helper to support the templates written for html-webpack-plugin <= 1.1.0
+ */
+HtmlWebpackPlugin.prototype.htmlWebpackPluginLegacyAssets = function(compilation, webpackStatsJson) {
+  var assets = this.htmlWebpackPluginAssets(compilation, webpackStatsJson);
+  var legacyAssets = {};
+  Object.keys(assets.chunks).forEach(function(chunkName){
+    legacyAssets[chunkName] = assets.chunks[chunkName].entry;
+  });
+  return legacyAssets;
+};
+
+
 
 module.exports = HtmlWebpackPlugin;

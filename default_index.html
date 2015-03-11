@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html{% if(o.htmlWebpackPlugin.assets.manifest) { %} manifest="{%= o.htmlWebpackPlugin.assets.manifest + '?' + o.hash %}"{% } %}>
+<html{% if(o.htmlWebpackPlugin.files.manifest) { %} manifest="{%= o.htmlWebpackPlugin.files.manifest + '?' + o.hash %}"{% } %}>
   <head>
     <meta charset="UTF-8">
     <title>{%=o.htmlWebpackPlugin.options.title || 'Webpack App'%}</title>
-    {% for (var css in o.htmlWebpackPlugin.assets.css) { %}
-    <link href="{%=o.htmlWebpackPlugin.assets.css[css] + '?' + o.hash %}" rel="stylesheet">
+    {% for (var css in o.htmlWebpackPlugin.files.css) { %}
+    <link href="{%=o.htmlWebpackPlugin.files.css[css] + '?' + o.hash %}" rel="stylesheet">
     {% } %}
   </head>
   <body>
-    {% for (var chunk in o.htmlWebpackPlugin.assets.chunks) { %}
-    <script src="{%=o.htmlWebpackPlugin.assets.chunks[chunk].entry + '?' + o.hash %}"></script>
+    {% for (var chunk in o.htmlWebpackPlugin.files.chunks) { %}
+    <script src="{%=o.htmlWebpackPlugin.files.chunks[chunk].entry + '?' + o.hash %}"></script>
     {% } %}
   </body>
 </html>

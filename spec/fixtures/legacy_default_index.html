@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>{%=o.htmlWebpackPlugin.options.title || 'Webpack App'%}</title>
+  </head>
+  <body>
+    {% for (var chunk in o.htmlWebpackPlugin.assets) { %}
+    <script src="{%=o.htmlWebpackPlugin.assets[chunk]%}"></script>
+    {% } %}
+  </body>
+</html>

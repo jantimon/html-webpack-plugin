@@ -83,6 +83,34 @@ describe('HtmlWebpackPlugin', function() {
     ['<script src="app_bundle.js'], null, done);
   });
 
+  it('allows you to use the deprecated assets object', function (done) {
+    testHtmlPlugin({
+        entry: {
+          app: path.join(__dirname, 'fixtures/index.js')
+        },
+        output: {
+          path: OUTPUT_DIR,
+          filename: '[name]_bundle.js'
+        },
+        plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/legacy.html')})]
+      },
+      ['<script src="app_bundle.js', 'Some unique text'], null, done);
+  });
+
+  it('allows you to use the deprecated default_index file', function (done) {
+    testHtmlPlugin({
+        entry: {
+          app: path.join(__dirname, 'fixtures/index.js')
+        },
+        output: {
+          path: OUTPUT_DIR,
+          filename: '[name]_bundle.js'
+        },
+        plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/legacy_default_index.html')})]
+      },
+      ['<script src="app_bundle.js'], null, done);
+  });
+
   it('registers a webpack error both template and template content are specified', function(done) {
     webpack({
       entry: path.join(__dirname, 'fixtures/index.js'),
