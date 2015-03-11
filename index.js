@@ -57,20 +57,40 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compiler, htmlTemplateContent, t
 
 
 HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson) {
-  var assets = {};
+  var assets = {
+    // Will contain all js & css files by chunk
+    chunks: [],
+    // Will contain all js files
+    js: [],
+    // Will contain all css files
+    css: [],
+    // Will contain the html5 appcache manifest files if it exists
+    manifest: Object.keys(compilation.assets).filter(function(assetFile){
+      return path.extname(assetFile) === '.appcache';
+    })[0]
+  };
+  var publicPath = compilation.options.output.publicPath || '';
+
   for (var chunk in webpackStatsJson.assetsByChunkName) {
-    var chunkValue = webpackStatsJson.assetsByChunkName[chunk];
+    assets.chunks[chunk] = {};
+
+    // Prepend the public path to all chunk files
+    var chunkFiles = [].concat(webpackStatsJson.assetsByChunkName[chunk]).map(function(chunkFile) {
+      return publicPath + chunkFile;
+    });
 
     // Webpack outputs an array for each chunk when using sourcemaps
-    if (chunkValue instanceof Array) {
-      // Is the main bundle always the first element?
-      chunkValue = chunkValue[0];
-    }
+    // But we need only the entry file
+    var entry = chunkFiles[0];
+    assets.chunks[chunk].entry = entry;
+    assets.js.push(entry);
 
-    if (compilation.options.output.publicPath) {
-      chunkValue = compilation.options.output.publicPath + chunkValue;
-    }
-    assets[chunk] = chunkValue;
+    // Gather all css files
+    var css = chunkFiles.filter(function(chunkFile){
+      return path.extname(chunkFile) === '.css';
+    });
+    assets.chunks[chunk].css = css;
+    assets.css = assets.css.concat(css);
   }
 
   return assets;
