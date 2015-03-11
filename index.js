@@ -1,3 +1,4 @@
+/*jshint -W083 */
 var fs = require('fs');
 var path = require('path');
 var tmpl = require('blueimp-tmpl').tmpl;
