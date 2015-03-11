@@ -12,6 +12,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     var webpackStatsJson = compilation.getStats().toJson();
     var templateParams = {};
     templateParams.webpack = webpackStatsJson;
+    templateParams.hash = webpackStatsJson.hash;
     templateParams.htmlWebpackPlugin = {};
     templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginAssets(compilation, webpackStatsJson);
     templateParams.htmlWebpackPlugin.options = self.options;
