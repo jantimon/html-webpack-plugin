@@ -85,6 +85,57 @@ describe('HtmlWebpackPlugin', function() {
     ['<script src="app_bundle.js'], null, done);
   });
 
+  it('allows you to append the assets to a given html file', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        append: true,
+        template: path.join(__dirname, 'fixtures/test.html')
+      })]
+    }, ['<script src="util_bundle.js?%hash%"', '<script src="app_bundle.js?%hash%"'], null, done);
+  });
+
+  it('allows you to append the assets to a html string', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        append: ['util', 'app'],
+        templateContent: fs.readFileSync(path.join(__dirname, 'fixtures/test.html'), 'utf8')
+      })]
+    }, ['<script src="util_bundle.js?%hash%"', '<script src="app_bundle.js?%hash%"'], null, done);
+  });
+
+  it('allows you to append a specified asset to a given html file', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        append: ['app'],
+        template: path.join(__dirname, 'fixtures/test.html')
+      })]
+    }, ['<script src="app_bundle.js?%hash%"'], null, done);
+  });
+
   it('allows you to use the deprecated assets object', function (done) {
     testHtmlPlugin({
         entry: {

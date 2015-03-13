@@ -55,6 +55,10 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
   } catch(e) {
     compilation.errors.push(new Error('HtmlWebpackPlugin: template error ' + e));
   }
+  // Append/Inject link and script elements into an existing html file
+  if (this.options.append) {
+    html = this.appendAssetsToHtml(html, templateParams, this.options.append);
+  }
   compilation.assets[outputFilename] = {
     source: function() {
       return html;
@@ -124,6 +128,51 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
   assets.css = _.uniq(assets.css);
 
   return assets;
+};
+
+/**
+ * Inject the assets into the given html string
+ */
+HtmlWebpackPlugin.prototype.appendAssetsToHtml = function(html, templateParams, chunks) {
+  var assets = templateParams.htmlWebpackPlugin.files;
+  // If chunks is set to true append all chunks
+  if (chunks === true) {
+    chunks = Object.keys(assets.chunks);
+  }
+  // Gather all css and script files
+  var styles = [];
+  var scripts = [];
+  chunks.forEach(function(chunkName) {
+    styles = styles.concat(assets.chunks[chunkName].css);
+    scripts.push(assets.chunks[chunkName].entry);
+  });
+  // Turn script files into script tags
+  scripts = scripts.map(function(scriptPath) {
+    return '<script src="' + scriptPath + '?' + templateParams.hash + '"></script>';
+  });
+  // Turn css files into link tags
+  styles = styles.map(function(stylePath) {
+    return '<link href="' + stylePath + '?' + templateParams.hash + '" rel="stylesheet">';
+  });
+  // Append scripts
+  html = html.replace(/(<\/body>)/i, function (match, start) {
+    return scripts.join('') + match;
+  });
+  // Append styles
+  html = html.replace(/(<\/head>)/i, function (match, start) {
+    return styles.join('') + match;
+  });
+  // Append manifest
+  if (assets.manifest) {
+    html = html.replace(/(<html.*)(>)/i, function (match, start, end) {
+      // Don't append a manifest if a manifest was already specified
+      if (match.test(/\smanifest\s*=/)) {
+        return match;
+      }
+      return start + ' manifest="' + assets.manifest + '?' + templateParams.hash + '"' + end;
+    });
+  }
+  return html;
 };
 
 /**
