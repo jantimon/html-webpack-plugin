@@ -97,7 +97,7 @@ describe('HtmlWebpackPlugin', function() {
       },
       plugins: [new HtmlWebpackPlugin({
         append: true,
-        template: path.join(__dirname, 'fixtures/test.html')
+        template: path.join(__dirname, 'fixtures/plain.html')
       })]
     }, ['<script src="util_bundle.js?%hash%"', '<script src="app_bundle.js?%hash%"'], null, done);
   });
@@ -114,7 +114,7 @@ describe('HtmlWebpackPlugin', function() {
       },
       plugins: [new HtmlWebpackPlugin({
         append: ['util', 'app'],
-        templateContent: fs.readFileSync(path.join(__dirname, 'fixtures/test.html'), 'utf8')
+        templateContent: fs.readFileSync(path.join(__dirname, 'fixtures/plain.html'), 'utf8')
       })]
     }, ['<script src="util_bundle.js?%hash%"', '<script src="app_bundle.js?%hash%"'], null, done);
   });
@@ -131,7 +131,7 @@ describe('HtmlWebpackPlugin', function() {
       },
       plugins: [new HtmlWebpackPlugin({
         append: ['app'],
-        template: path.join(__dirname, 'fixtures/test.html')
+        template: path.join(__dirname, 'fixtures/plain.html')
       })]
     }, ['<script src="app_bundle.js?%hash%"'], null, done);
   });
