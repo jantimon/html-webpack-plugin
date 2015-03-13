@@ -83,6 +83,22 @@ describe('HtmlWebpackPlugin', function() {
     ['<script src="app_bundle.js"'], null, done);
   });
 
+  it('allows you to specify your own HTML template function', function(done) {
+    testHtmlPlugin({
+      entry: {app: path.join(__dirname, 'fixtures/index.js')},
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'app_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        templateContent: function() {
+          return fs.readFileSync(path.join(__dirname, 'fixtures/test.html'), 'utf8');
+        }
+      })]
+    },
+    ['<script src="app_bundle.js"'], null, done);
+  });
+
   it('registers a webpack error both template and template content are specified', function(done) {
     webpack({
       entry: path.join(__dirname, 'fixtures/index.js'),

@@ -22,7 +22,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
       compiler.errors.push(new Error('HtmlWebpackPlugin: cannot specify both template and templateContent options'));
       callback();
     } else if (self.options.templateContent) {
-      self.emitHtml(compiler, self.options.templateContent, templateParams, outputFilename);
+      var templateContent = typeof self.options.templateContent === 'function' ? self.options.templateContent(templateParams, compiler) : self.options.templateContent;
+      self.emitHtml(compiler, templateContent, templateParams, outputFilename);
       callback();
     } else {
       var templateFile = self.options.template;
