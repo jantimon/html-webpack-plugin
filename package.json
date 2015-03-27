@@ -4,7 +4,7 @@
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "main": "index.js",
   "scripts": {
-    "test": "jshint *.js spec && jasmine-node --captureExceptions spec"
+    "test": "jshint -c .jshintrc *.js spec && jasmine-node --captureExceptions spec"
   },
   "repository": {
     "type": "git",
