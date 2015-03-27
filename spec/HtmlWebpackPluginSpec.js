@@ -85,7 +85,7 @@ describe('HtmlWebpackPlugin', function() {
     ['<script src="app_bundle.js'], null, done);
   });
 
-  it('allows you to append the assets to a given html file', function (done) {
+  it('allows you to inject the assets into a given html file', function (done) {
     testHtmlPlugin({
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
@@ -96,13 +96,13 @@ describe('HtmlWebpackPlugin', function() {
         filename: '[name]_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({
-        append: true,
+        inject: true,
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
     }, ['<script src="util_bundle.js?%hash%"', '<script src="app_bundle.js?%hash%"'], null, done);
   });
 
-  it('allows you to append the assets to a html string', function (done) {
+  it('allows you to inject the assets into a html string', function (done) {
     testHtmlPlugin({
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
@@ -113,13 +113,13 @@ describe('HtmlWebpackPlugin', function() {
         filename: '[name]_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({
-        append: ['util', 'app'],
+        inject: ['util', 'app'],
         templateContent: fs.readFileSync(path.join(__dirname, 'fixtures/plain.html'), 'utf8')
       })]
     }, ['<script src="util_bundle.js?%hash%"', '<script src="app_bundle.js?%hash%"'], null, done);
   });
 
-  it('allows you to append a specified asset to a given html file', function (done) {
+  it('allows you to inject a specified asset into a given html file', function (done) {
     testHtmlPlugin({
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
@@ -130,7 +130,7 @@ describe('HtmlWebpackPlugin', function() {
         filename: '[name]_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({
-        append: ['app'],
+        inject: ['app'],
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
     }, ['<script src="app_bundle.js?%hash%"'], null, done);

@@ -32,7 +32,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     } else {
       var templateFile = self.options.template;
       if (!templateFile) {
-        templateFile = path.join(__dirname, 'default_index.html');
+        // Use a special index file to prevent double script / style injection if the `inject` option is truthy
+        templateFile = path.join(__dirname, self.options.inject ? 'default_inject_index.html' : 'default_index.html');
       }
       compilation.fileDependencies.push(templateFile);
 
@@ -55,9 +56,9 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
   } catch(e) {
     compilation.errors.push(new Error('HtmlWebpackPlugin: template error ' + e));
   }
-  // Append/Inject link and script elements into an existing html file
-  if (this.options.append) {
-    html = this.appendAssetsToHtml(html, templateParams, this.options.append);
+  // Inject link and script elements into an existing html file
+  if (this.options.inject) {
+    html = this.injectAssetsIntoHtml(html, templateParams, this.options.inject);
   }
   compilation.assets[outputFilename] = {
     source: function() {
@@ -131,11 +132,11 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
 };
 
 /**
- * Inject the assets into the given html string
+ * Injects the assets into the given html string
  */
-HtmlWebpackPlugin.prototype.appendAssetsToHtml = function(html, templateParams, chunks) {
+HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams, chunks) {
   var assets = templateParams.htmlWebpackPlugin.files;
-  // If chunks is set to true append all chunks
+  // If chunks is set to true inject all chunks
   if (chunks === true) {
     chunks = Object.keys(assets.chunks);
   }
@@ -154,18 +155,18 @@ HtmlWebpackPlugin.prototype.appendAssetsToHtml = function(html, templateParams, 
   styles = styles.map(function(stylePath) {
     return '<link href="' + stylePath + '?' + templateParams.hash + '" rel="stylesheet">';
   });
-  // Append scripts
-  html = html.replace(/(<\/body>)/i, function (match, start) {
+  // Append scripts to body element
+  html = html.replace(/(<\/body>)/i, function (match) {
     return scripts.join('') + match;
   });
-  // Append styles
-  html = html.replace(/(<\/head>)/i, function (match, start) {
+  // Append styles to head element
+  html = html.replace(/(<\/head>)/i, function (match) {
     return styles.join('') + match;
   });
-  // Append manifest
+  // Inject manifest into the opening html tag
   if (assets.manifest) {
     html = html.replace(/(<html.*)(>)/i, function (match, start, end) {
-      // Don't append a manifest if a manifest was already specified
+      // Append the manifest only if no manifest was specified
       if (match.test(/\smanifest\s*=/)) {
         return match;
       }
