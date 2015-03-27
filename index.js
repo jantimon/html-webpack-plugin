@@ -149,11 +149,11 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
   });
   // Turn script files into script tags
   scripts = scripts.map(function(scriptPath) {
-    return '<script src="' + scriptPath + '?' + templateParams.hash + '"></script>';
+    return '<script src="' + scriptPath + templateParams.htmlWebpackPlugin.querystring + '"></script>';
   });
   // Turn css files into link tags
   styles = styles.map(function(stylePath) {
-    return '<link href="' + stylePath + '?' + templateParams.hash + '" rel="stylesheet">';
+    return '<link href="' + stylePath + templateParams.htmlWebpackPlugin.querystring + '" rel="stylesheet">';
   });
   // Append scripts to body element
   html = html.replace(/(<\/body>)/i, function (match) {
@@ -170,7 +170,7 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
       if (match.test(/\smanifest\s*=/)) {
         return match;
       }
-      return start + ' manifest="' + assets.manifest + '?' + templateParams.hash + '"' + end;
+      return start + ' manifest="' + assets.manifest + templateParams.htmlWebpackPlugin.querystring + '"' + end;
     });
   }
   return html;

@@ -99,7 +99,7 @@ describe('HtmlWebpackPlugin', function() {
         inject: true,
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
-    }, ['<script src="util_bundle.js?%hash%"', '<script src="app_bundle.js?%hash%"'], null, done);
+    }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
   });
 
   it('allows you to inject the assets into a html string', function (done) {
@@ -116,7 +116,7 @@ describe('HtmlWebpackPlugin', function() {
         inject: ['util', 'app'],
         templateContent: fs.readFileSync(path.join(__dirname, 'fixtures/plain.html'), 'utf8')
       })]
-    }, ['<script src="util_bundle.js?%hash%"', '<script src="app_bundle.js?%hash%"'], null, done);
+    }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
   });
 
   it('allows you to inject a specified asset into a given html file', function (done) {
@@ -133,7 +133,7 @@ describe('HtmlWebpackPlugin', function() {
         inject: ['app'],
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
-    }, ['<script src="app_bundle.js?%hash%"'], null, done);
+    }, ['<script src="app_bundle.js"'], null, done);
   });
 
   it('allows you to use the deprecated assets object', function (done) {
@@ -229,6 +229,17 @@ describe('HtmlWebpackPlugin', function() {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({hash: true})]
+    }, ['<script src="index_bundle.js?%hash%"'], null, done);
+  });
+
+  it('allows to append hashes to the assets', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({hash: true, inject: true})]
     }, ['<script src="index_bundle.js?%hash%"'], null, done);
   });
 
