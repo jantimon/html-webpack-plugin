@@ -113,10 +113,10 @@ HTML as well as the body. Your template might look like this:
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
     <title>My App</title>
-    <script src="{%=o.htmlWebpackPlugin.assets.head%}"></script>
+    <script src="{%=o.htmlWebpackPlugin.files.chunks.head.entry%}"></script>
   </head>
   <body>
-    <script src="{%=o.htmlWebpackPlugin.assets.main%}"></script>
+    <script src="{%=o.htmlWebpackPlugin.files.chunks.main.entry%}"></script>
   </body>
 </html>
 ```
@@ -153,14 +153,24 @@ Note the plugin will throw an error if you specify both `template` _and_
 The `o` variable in the template is the data that is passed in when the
 template is rendered. This variable has the following attributes:
 - `htmlWebpackPlugin`: data specific to this plugin
-  - `htmlWebpackPlugin.assets`: a massaged representation of the
+  - `htmlWebpackPlugin.files`: a massaged representation of the
     `assetsByChunkName` attribute of webpack's [stats](https://github.com/webpack/docs/wiki/node.js-api#stats)
     object. It contains a mapping from entry point name to the bundle filename, eg:
     ```json
     "htmlWebpackPlugin": {
-      "assets": {
-        "head": "assets/head_bundle.js",
-        "main": "assets/main_bundle.js"
+      "files": {
+        "css": [ "main.css" ],
+        "js": [ "assets/head_bundle.js", "assets/main_bundle.js"]
+        "chunks": {
+          "head": {
+            "entry": "assets/head_bundle.js",
+            "css": [ "main.css" ]
+          },
+          "main": {
+            "entry": "assets/main_bundle.js",
+            "css": []
+          },
+        }
       }
     }
     ```

@@ -1,3 +1,4 @@
+'use strict';
 var fs = require('fs');
 var path = require('path');
 var tmpl = require('blueimp-tmpl').tmpl;
@@ -8,34 +9,37 @@ function HtmlWebpackPlugin(options) {
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
-  compiler.plugin('emit', function(compiler, callback) {
-    var webpackStatsJson = compiler.getStats().toJson();
+  compiler.plugin('emit', function(compilation, callback) {
+    var webpackStatsJson = compilation.getStats().toJson();
     var templateParams = {};
     templateParams.webpack = webpackStatsJson;
     templateParams.htmlWebpackPlugin = {};
-    templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginAssets(compiler, webpackStatsJson);
+    templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson);
+    templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson);
     templateParams.htmlWebpackPlugin.options = self.options;
+    // If the hash option is true append the webpack hash to all assets
+    templateParams.htmlWebpackPlugin.querystring = self.options.hash ? '?' + webpackStatsJson.hash : '';
 
     var outputFilename = self.options.filename || 'index.html';
 
     if (self.options.templateContent && self.options.template) {
-      compiler.errors.push(new Error('HtmlWebpackPlugin: cannot specify both template and templateContent options'));
+      compilation.errors.push(new Error('HtmlWebpackPlugin: cannot specify both template and templateContent options'));
       callback();
     } else if (self.options.templateContent) {
-      self.emitHtml(compiler, self.options.templateContent, templateParams, outputFilename);
+      self.emitHtml(compilation, self.options.templateContent, templateParams, outputFilename);
       callback();
     } else {
       var templateFile = self.options.template;
       if (!templateFile) {
         templateFile = path.join(__dirname, 'default_index.html');
       }
-      compiler.fileDependencies.push(templateFile);
+      compilation.fileDependencies.push(templateFile);
 
       fs.readFile(templateFile, 'utf8', function(err, htmlTemplateContent) {
         if (err) {
-          compiler.errors.push(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + templateFile + '"'));
+          compilation.errors.push(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + templateFile + '"'));
         } else {
-          self.emitHtml(compiler, htmlTemplateContent, templateParams, outputFilename);
+          self.emitHtml(compilation, htmlTemplateContent, templateParams, outputFilename);
         }
         callback();
       });
@@ -43,9 +47,14 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
   });
 };
 
-HtmlWebpackPlugin.prototype.emitHtml = function(compiler, htmlTemplateContent, templateParams, outputFilename) {
-  var html = tmpl(htmlTemplateContent, templateParams);
-  compiler.assets[outputFilename] = {
+HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent, templateParams, outputFilename) {
+  var html;
+  try {
+   html = tmpl(htmlTemplateContent, templateParams);
+  } catch(e) {
+    compilation.errors.push(new Error('HtmlWebpackPlugin: template error ' + e));
+  }
+  compilation.assets[outputFilename] = {
     source: function() {
       return html;
     },
@@ -55,24 +64,59 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compiler, htmlTemplateContent, t
   };
 };
 
-HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compiler, webpackStatsJson) {
-  var assets = {};
+
+HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson) {
+  var assets = {
+    // Will contain all js & css files by chunk
+    chunks: {},
+    // Will contain all js files
+    js: [],
+    // Will contain all css files
+    css: [],
+    // Will contain the html5 appcache manifest files if it exists
+    manifest: Object.keys(compilation.assets).filter(function(assetFile){
+      return path.extname(assetFile) === '.appcache';
+    })[0]
+  };
+  var publicPath = compilation.options.output.publicPath || '';
+
   for (var chunk in webpackStatsJson.assetsByChunkName) {
-    var chunkValue = webpackStatsJson.assetsByChunkName[chunk];
+    assets.chunks[chunk] = {};
+
+    // Prepend the public path to all chunk files
+    var chunkFiles = [].concat(webpackStatsJson.assetsByChunkName[chunk]).map(function(chunkFile) {
+      return publicPath + chunkFile;
+    });
 
     // Webpack outputs an array for each chunk when using sourcemaps
-    if (chunkValue instanceof Array) {
-      // Is the main bundle always the first element?
-      chunkValue = chunkValue[0];
-    }
+    // But we need only the entry file
+    var entry = chunkFiles[0];
+    assets.chunks[chunk].entry = entry;
+    assets.js.push(entry);
 
-    if (compiler.options.output.publicPath) {
-      chunkValue = compiler.options.output.publicPath + chunkValue;
-    }
-    assets[chunk] = chunkValue;
+    // Gather all css files
+    var css = chunkFiles.filter(function(chunkFile){
+      return path.extname(chunkFile) === '.css';
+    });
+    assets.chunks[chunk].css = css;
+    assets.css = assets.css.concat(css);
   }
 
   return assets;
 };
+
+/**
+ * A helper to support the templates written for html-webpack-plugin <= 1.1.0
+ */
+HtmlWebpackPlugin.prototype.htmlWebpackPluginLegacyAssets = function(compilation, webpackStatsJson) {
+  var assets = this.htmlWebpackPluginAssets(compilation, webpackStatsJson);
+  var legacyAssets = {};
+  Object.keys(assets.chunks).forEach(function(chunkName){
+    legacyAssets[chunkName] = assets.chunks[chunkName].entry;
+  });
+  return legacyAssets;
+};
+
+
 
 module.exports = HtmlWebpackPlugin;

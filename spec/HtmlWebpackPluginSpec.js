@@ -1,3 +1,4 @@
+'use strict';
 var path = require('path');
 var fs = require('fs');
 var webpack = require('webpack');
@@ -17,7 +18,7 @@ function testHtmlPlugin(webpackConfig, expectedResults, outputFile, done) {
       if (expectedResult instanceof RegExp) {
         expect(htmlContent).toMatch(expectedResult);
       } else {
-        expect(htmlContent).toContain(expectedResult);
+        expect(htmlContent).toContain(expectedResult.replace('%hash%', stats.hash));
       }
     }
     done();
@@ -66,7 +67,7 @@ describe('HtmlWebpackPlugin', function() {
       },
       plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/test.html')})]
     },
-    ['<script src="app_bundle.js"', 'Some unique text'], null, done);
+    ['<script src="app_bundle.js', 'Some unique text'], null, done);
   });
 
   it('allows you to specify your own HTML template string', function(done) {
@@ -80,7 +81,35 @@ describe('HtmlWebpackPlugin', function() {
         templateContent: fs.readFileSync(path.join(__dirname, 'fixtures/test.html'), 'utf8')
       })]
     },
-    ['<script src="app_bundle.js"'], null, done);
+    ['<script src="app_bundle.js'], null, done);
+  });
+
+  it('allows you to use the deprecated assets object', function (done) {
+    testHtmlPlugin({
+        entry: {
+          app: path.join(__dirname, 'fixtures/index.js')
+        },
+        output: {
+          path: OUTPUT_DIR,
+          filename: '[name]_bundle.js'
+        },
+        plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/legacy.html')})]
+      },
+      ['<script src="app_bundle.js', 'Some unique text'], null, done);
+  });
+
+  it('allows you to use the deprecated default_index file', function (done) {
+    testHtmlPlugin({
+        entry: {
+          app: path.join(__dirname, 'fixtures/index.js')
+        },
+        output: {
+          path: OUTPUT_DIR,
+          filename: '[name]_bundle.js'
+        },
+        plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/legacy_default_index.html')})]
+      },
+      ['<script src="app_bundle.js'], null, done);
   });
 
   it('registers a webpack error both template and template content are specified', function(done) {
@@ -121,7 +150,18 @@ describe('HtmlWebpackPlugin', function() {
         filename: 'index_bundle_[hash].js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, [/<script src="index_bundle_[0-9a-f]+\.js"/], null, done);
+    }, [/<script src="index_bundle_[0-9a-f]+\.js/], null, done);
+  });
+
+  it('allows to append hashes to the assets', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({hash: true})]
+    }, ['<script src="index_bundle.js?%hash%"'], null, done);
   });
 
   it('prepends the webpack public path to script src', function(done) {
@@ -194,7 +234,9 @@ describe('HtmlWebpackPlugin', function() {
 
   it('allows you write multiple HTML files', function(done) {
     testHtmlPlugin({
-      entry: path.join(__dirname, 'fixtures/index.js'),
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
