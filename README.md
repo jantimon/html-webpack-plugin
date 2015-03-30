@@ -38,7 +38,7 @@ This will generate a file `dist/index.html` containing the following:
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <meta charset="UTF-8">
     <title>Webpack App</title>
   </head>
   <body>
@@ -50,6 +50,10 @@ This will generate a file `dist/index.html` containing the following:
 If you have multiple webpack entry points, they will all be included with `script`
 tags in the generated HTML.
 
+If you have any css assets in webpack's output (for example, css extracted
+with the [ExtractTextPlugin](https://github.com/webpack/extract-text-webpack-plugin))
+then these will be included with `<link>` tags in the HTML head.
+
 
 Configuration
 -------------
@@ -59,6 +63,8 @@ Allowed values are as follows:
 - `title`: The title to use for the generated HTML document.
 - `filename`: The file to write the HTML to. Defaults to `index.html`.
    You can specify a subdirectory here too (eg: `assets/admin.html`).
+- `hash`: if `true` then append a unique webpack compilation hash to all
+  included scripts and css files. This is useful for cache busting.
 
 Here's an example webpack config illustrating how to use these options:
 ```javascript
@@ -66,7 +72,8 @@ Here's an example webpack config illustrating how to use these options:
   entry: 'index.js',
   output: {
     path: 'dist',
-    filename: 'index_bundle.js'
+    filename: 'index_bundle.js',
+    hash: true
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -147,6 +154,17 @@ plugins: [
 ]
 ```
 
+The `templateContent` option can also be a function:
+```javascript
+plugins: [
+  new HtmlWebpackPlugin({
+    templateContent: function(templateParams, webpackCompiler) {
+      // Return your template content synchronously here
+    }
+  })
+]
+```
+
 Note the plugin will throw an error if you specify both `template` _and_
 `templateContent`.
 
@@ -160,7 +178,7 @@ template is rendered. This variable has the following attributes:
     "htmlWebpackPlugin": {
       "files": {
         "css": [ "main.css" ],
-        "js": [ "assets/head_bundle.js", "assets/main_bundle.js"]
+        "js": [ "assets/head_bundle.js", "assets/main_bundle.js"],
         "chunks": {
           "head": {
             "entry": "assets/head_bundle.js",
@@ -176,6 +194,11 @@ template is rendered. This variable has the following attributes:
     ```
     If you've set a publicPath in your webpack config this will be reflected
     correctly in this assets hash.
+
+  - `htmlWebpackPlugin.querystring`: a unique compilation query string
+    (eg: `?6682424b6ad9eb93151b`) that can be appended to the URL of included
+    scripts and css for cache busting. Only set if `hash: true` is set in
+    the plugin options.
 
   - `htmlWebpackPlugin.options`: the options hash that was passed to
      the plugin. In addition to the options actually used by this plugin,
