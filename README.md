@@ -185,3 +185,6 @@ template is rendered. This variable has the following attributes:
   object. Note that this is the stats object as it was at the time the HTML template
   was emitted and as such may not have the full set of stats that are available
   after the wepback run is complete.
+
+- `webpackConfig`: the webpack configuration that was used for this compilation. This
+  can be used, for example, to get the `publicPath` (`webpackConfig.output.publicPath`).

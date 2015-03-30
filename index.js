@@ -17,8 +17,10 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson);
     templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson);
     templateParams.htmlWebpackPlugin.options = self.options;
+
     // If the hash option is true append the webpack hash to all assets
     templateParams.htmlWebpackPlugin.querystring = self.options.hash ? '?' + webpackStatsJson.hash : '';
+    templateParams.webpackConfig = compilation.options;
 
     var outputFilename = self.options.filename || 'index.html';
 

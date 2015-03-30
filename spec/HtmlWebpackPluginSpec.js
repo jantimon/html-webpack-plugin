@@ -284,4 +284,19 @@ describe('HtmlWebpackPlugin', function() {
     });
   });
 
+  it('exposes the webpack configuration to templates', function(done) {
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        publicPath: 'https://cdn.com',
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/webpackconfig.html')})]
+    },
+    ['Public path is https://cdn.com'], null, done);
+  });
+
 });

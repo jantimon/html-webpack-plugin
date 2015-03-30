@@ -87,7 +87,9 @@
       // jasmine helpers
       "expect": false,
       "describe": false,
+      "ddescribe": false,
       "beforeEach": false,
-      "it": false
+      "it": false,
+      "iit": false
     }
 }
