@@ -57,6 +57,11 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
   } catch(e) {
     compilation.errors.push(new Error('HtmlWebpackPlugin: template error ' + e));
   }
+  if (templateParams.htmlWebpackPlugin.options.minify) {
+    var minify = require('html-minifier').minify;
+    var minify_options = templateParams.htmlWebpackPlugin.options.minify.constructor === Object ? templateParams.htmlWebpackPlugin.options.minify : {};
+    html = minify(html, minify_options);
+  }
   compilation.assets[outputFilename] = {
     source: function() {
       return html;
