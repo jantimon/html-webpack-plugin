@@ -111,7 +111,9 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
 
     // Gather all css files
     var css = chunkFiles.filter(function(chunkFile){
-      return path.extname(chunkFile) === '.css';
+      // Some chunks may contain content hash in their names, for ex. 'main.css?1e7cac4e4d8b52fd5ccd2541146ef03f'.
+      // We must proper handle such cases, so we use regexp testing here
+      return /^.css/.test(path.extname(chunkFile));
     });
     assets.chunks[chunkName].css = css;
     assets.css = assets.css.concat(css);
