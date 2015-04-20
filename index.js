@@ -1,6 +1,7 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
+var _ = require('lodash');
 var tmpl = require('blueimp-tmpl').tmpl;
 
 function HtmlWebpackPlugin(options) {
@@ -83,27 +84,41 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
   };
   var publicPath = compilation.options.output.publicPath || '';
 
-  for (var chunk in webpackStatsJson.assetsByChunkName) {
-    assets.chunks[chunk] = {};
+  var chunks = webpackStatsJson.chunks.sort(function orderEntryLast(a, b) {
+    if (a.entry !== b.entry) {
+      return b.entry ? 1 : -1;
+    } else {
+      return b.id - a.id;
+    }
+  });
+
+  for (var i = 0; i < chunks.length; i++) {
+    var chunk = chunks[i];
+    var chunkName = chunk.names[0];
+    assets.chunks[chunkName] = {};
 
     // Prepend the public path to all chunk files
-    var chunkFiles = [].concat(webpackStatsJson.assetsByChunkName[chunk]).map(function(chunkFile) {
+    var chunkFiles = [].concat(chunk.files).map(function(chunkFile) {
       return publicPath + chunkFile;
     });
 
     // Webpack outputs an array for each chunk when using sourcemaps
     // But we need only the entry file
     var entry = chunkFiles[0];
-    assets.chunks[chunk].entry = entry;
+    assets.chunks[chunkName].entry = entry;
     assets.js.push(entry);
 
     // Gather all css files
     var css = chunkFiles.filter(function(chunkFile){
       return path.extname(chunkFile) === '.css';
     });
-    assets.chunks[chunk].css = css;
+    assets.chunks[chunkName].css = css;
     assets.css = assets.css.concat(css);
   }
+
+  // Duplicate css assets can occur on occasion if more than one chunk
+  // requires the same css.
+  assets.css = _.uniq(assets.css);
 
   return assets;
 };

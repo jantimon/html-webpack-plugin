@@ -17,3 +17,4 @@ v1.2.0
   details. This new attribute deprecates the old `o.htmlWebpackPlugin.assets` attribute.
 * The `templateContent` option can now be a function that returns the template string to use
 * Expose webpack configuration to templates (`o.webpackConfig`)
+* Sort chunks to honour dependencies between them (useful for use with CommonsChunkPlugin).

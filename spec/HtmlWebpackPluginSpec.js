@@ -3,6 +3,7 @@ var path = require('path');
 var fs = require('fs');
 var webpack = require('webpack');
 var rm_rf = require('rimraf');
+var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
 var HtmlWebpackPlugin = require('../index.js');
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
@@ -297,6 +298,30 @@ describe('HtmlWebpackPlugin', function() {
       plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/webpackconfig.html')})]
     },
     ['Public path is https://cdn.com'], null, done);
+  });
+
+  it('works with commons chunk plugin', function(done) {
+    testHtmlPlugin({
+      debug: true,
+      verbose: true,
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        index: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new CommonsChunkPlugin({
+          name: 'common',
+          filename: "common_bundle.js",
+        }),
+        new HtmlWebpackPlugin()
+      ]
+    }, [
+      /<script src="common_bundle.js">[\s\S]*<script src="util_bundle.js">/,
+      /<script src="common_bundle.js"[\s\S]*<script src="index_bundle.js">/], null, done);
   });
 
 });
