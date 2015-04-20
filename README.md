@@ -195,11 +195,6 @@ template is rendered. This variable has the following attributes:
     If you've set a publicPath in your webpack config this will be reflected
     correctly in this assets hash.
 
-  - `htmlWebpackPlugin.querystring`: a unique compilation query string
-    (eg: `?6682424b6ad9eb93151b`) that can be appended to the URL of included
-    scripts and css for cache busting. Only set if `hash: true` is set in
-    the plugin options.
-
   - `htmlWebpackPlugin.options`: the options hash that was passed to
      the plugin. In addition to the options actually used by this plugin,
      you can use this hash to pass arbitrary data through to your template.

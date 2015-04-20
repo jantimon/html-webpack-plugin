@@ -16,11 +16,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     templateParams.webpack = webpackStatsJson;
     templateParams.htmlWebpackPlugin = {};
     templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson);
-    templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson);
+    templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.hash);
     templateParams.htmlWebpackPlugin.options = self.options;
-
-    // If the hash option is true append the webpack hash to all assets
-    templateParams.htmlWebpackPlugin.querystring = self.options.hash ? '?' + webpackStatsJson.hash : '';
     templateParams.webpackConfig = compilation.options;
 
     var outputFilename = self.options.filename || 'index.html';
@@ -69,7 +66,10 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
 };
 
 
-HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson) {
+HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, appendHash) {
+  var publicPath = compilation.options.output.publicPath || '';
+  var queryString = appendHash ? '?' + webpackStatsJson.hash : '';
+
   var assets = {
     // Will contain all js & css files by chunk
     chunks: {},
@@ -80,9 +80,10 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
     // Will contain the html5 appcache manifest files if it exists
     manifest: Object.keys(compilation.assets).filter(function(assetFile){
       return path.extname(assetFile) === '.appcache';
+    }).map(function(assetFile) {
+      return assetFile + queryString;
     })[0]
   };
-  var publicPath = compilation.options.output.publicPath || '';
 
   var chunks = webpackStatsJson.chunks.sort(function orderEntryLast(a, b) {
     if (a.entry !== b.entry) {
@@ -99,7 +100,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
 
     // Prepend the public path to all chunk files
     var chunkFiles = [].concat(chunk.files).map(function(chunkFile) {
-      return publicPath + chunkFile;
+      return publicPath + chunkFile + queryString;
     });
 
     // Webpack outputs an array for each chunk when using sourcemaps
