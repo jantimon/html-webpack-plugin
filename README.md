@@ -78,7 +78,7 @@ Here's an example webpack config illustrating how to use these options:
   plugins: [
     new HtmlWebpackPlugin({
       title: 'My App',
-      filename 'assets/admin.html'
+      filename: 'assets/admin.html'
     })
   ]
 }
