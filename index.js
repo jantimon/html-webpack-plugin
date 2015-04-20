@@ -111,7 +111,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
     assets.chunks[chunkName] = {};
 
     // Prepend the public path to all chunk files
-    var chunkFiles = [].concat(webpackStatsJson.assetsByChunkName[chunkName]).map(function(chunkFile) {
+    var chunkFiles = [].concat(chunk.files).map(function(chunkFile) {
       return publicPath + chunkFile;
     });
 
