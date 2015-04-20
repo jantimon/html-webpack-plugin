@@ -16,7 +16,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     templateParams.webpack = webpackStatsJson;
     templateParams.htmlWebpackPlugin = {};
     templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson);
-    templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.hash);
+    templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.chunks, self.options.excludeChunks);
     templateParams.htmlWebpackPlugin.options = self.options;
     templateParams.webpackConfig = compilation.options;
 
@@ -58,7 +58,7 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
   }
   // Inject link and script elements into an existing html file
   if (this.options.inject) {
-    html = this.injectAssetsIntoHtml(html, templateParams, this.options.inject);
+    html = this.injectAssetsIntoHtml(html, templateParams);
   }
   compilation.assets[outputFilename] = {
     source: function() {
@@ -71,9 +71,8 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
 };
 
 
-HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, appendHash) {
+HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, includedChunks, excludedChunks) {
   var publicPath = compilation.options.output.publicPath || '';
-  var queryString = appendHash ? '?' + webpackStatsJson.hash : '';
 
   var assets = {
     // Will contain all js & css files by chunk
@@ -85,8 +84,6 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
     // Will contain the html5 appcache manifest files if it exists
     manifest: Object.keys(compilation.assets).filter(function(assetFile){
       return path.extname(assetFile) === '.appcache';
-    }).map(function(assetFile) {
-      return assetFile + queryString;
     })[0]
   };
 
@@ -101,11 +98,21 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
   for (var i = 0; i < chunks.length; i++) {
     var chunk = chunks[i];
     var chunkName = chunk.names[0];
+
+    // Skip if the chunks should be filtered and the given chunk was not added explicity
+    if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
+      continue;
+    }
+    // Skip if the chunks should be filtered and the given chunk was excluded explicity
+    if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) {
+      continue;
+    }
+
     assets.chunks[chunkName] = {};
 
     // Prepend the public path to all chunk files
-    var chunkFiles = [].concat(chunk.files).map(function(chunkFile) {
-      return publicPath + chunkFile + queryString;
+    var chunkFiles = [].concat(webpackStatsJson.assetsByChunkName[chunkName]).map(function(chunkFile) {
+      return publicPath + chunkFile;
     });
 
     // Append a hash for cache busting
@@ -141,12 +148,10 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
 /**
  * Injects the assets into the given html string
  */
-HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams, chunks) {
+HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams) {
   var assets = templateParams.htmlWebpackPlugin.files;
-  // If chunks is set to true inject all chunks
-  if (chunks === true) {
-    chunks = Object.keys(assets.chunks);
-  }
+  var chunks = Object.keys(assets.chunks);
+
   // Gather all css and script files
   var styles = [];
   var scripts = [];

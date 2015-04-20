@@ -113,7 +113,8 @@ describe('HtmlWebpackPlugin', function() {
         filename: '[name]_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({
-        inject: ['util', 'app'],
+        inject: true,
+        chunks: ['util', 'app'],
         templateContent: fs.readFileSync(path.join(__dirname, 'fixtures/plain.html'), 'utf8')
       })]
     }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
@@ -130,7 +131,26 @@ describe('HtmlWebpackPlugin', function() {
         filename: '[name]_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({
-        inject: ['app'],
+        inject: true,
+        chunks: ['app'],
+        template: path.join(__dirname, 'fixtures/plain.html')
+      })]
+    }, ['<script src="app_bundle.js"'], null, done);
+  });
+
+  it('allows you to inject a specified asset into a given html file', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: true,
+        excludeChunks: ['util'],
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
     }, ['<script src="app_bundle.js"'], null, done);
