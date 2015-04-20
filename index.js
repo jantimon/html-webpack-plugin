@@ -108,6 +108,13 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
       return publicPath + chunkFile + queryString;
     });
 
+    // Append a hash for cache busting
+    if (this.options.hash) {
+      chunkFiles = chunkFiles.map(function(chunkFile) {
+        return chunkFile + (chunkFile.indexOf('?') === -1 ? '?' : '&') + webpackStatsJson.hash;
+      });
+    }
+
     // Webpack outputs an array for each chunk when using sourcemaps
     // But we need only the entry file
     var entry = chunkFiles[0];
@@ -118,7 +125,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
     var css = chunkFiles.filter(function(chunkFile){
       // Some chunks may contain content hash in their names, for ex. 'main.css?1e7cac4e4d8b52fd5ccd2541146ef03f'.
       // We must proper handle such cases, so we use regexp testing here
-      return /^.css/.test(path.extname(chunkFile));
+      return /^.css($|\?)/.test(path.extname(chunkFile));
     });
     assets.chunks[chunkName].css = css;
     assets.css = assets.css.concat(css);
@@ -149,11 +156,11 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
   });
   // Turn script files into script tags
   scripts = scripts.map(function(scriptPath) {
-    return '<script src="' + scriptPath + templateParams.htmlWebpackPlugin.querystring + '"></script>';
+    return '<script src="' + scriptPath + '"></script>';
   });
   // Turn css files into link tags
   styles = styles.map(function(stylePath) {
-    return '<link href="' + stylePath + templateParams.htmlWebpackPlugin.querystring + '" rel="stylesheet">';
+    return '<link href="' + stylePath + '" rel="stylesheet">';
   });
   // Append scripts to body element
   html = html.replace(/(<\/body>)/i, function (match) {
@@ -170,7 +177,7 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
       if (match.test(/\smanifest\s*=/)) {
         return match;
       }
-      return start + ' manifest="' + assets.manifest + templateParams.htmlWebpackPlugin.querystring + '"' + end;
+      return start + ' manifest="' + assets.manifest + '"' + end;
     });
   }
   return html;
