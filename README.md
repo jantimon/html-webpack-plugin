@@ -211,7 +211,7 @@ template is rendered. This variable has the following attributes:
 Filtering chunks
 ----------------
 
-To include only certain chunks you can limit the chunks beeing used:
+To include only certain chunks you can limit the chunks being used:
 
 ```javascript
 plugins: [

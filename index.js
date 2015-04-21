@@ -72,6 +72,7 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
 
 
 HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, includedChunks, excludedChunks) {
+  var self = this;
   var publicPath = compilation.options.output.publicPath || '';
 
   var assets = {
@@ -86,6 +87,11 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
       return path.extname(assetFile) === '.appcache';
     })[0]
   };
+
+  // Append a hash for cache busting
+  if (this.options.hash) {
+    assets.manifest = self.appendHash(assets.manifest, webpackStatsJson.hash);
+  }
 
   var chunks = webpackStatsJson.chunks.sort(function orderEntryLast(a, b) {
     if (a.entry !== b.entry) {
@@ -118,7 +124,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
     // Append a hash for cache busting
     if (this.options.hash) {
       chunkFiles = chunkFiles.map(function(chunkFile) {
-        return chunkFile + (chunkFile.indexOf('?') === -1 ? '?' : '&') + webpackStatsJson.hash;
+        return self.appendHash(chunkFile, webpackStatsJson.hash);
       });
     }
 
@@ -200,6 +206,15 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginLegacyAssets = function(compilation
   return legacyAssets;
 };
 
+/**
+ * Appends a cache busting hash
+ */
+HtmlWebpackPlugin.prototype.appendHash = function (url, hash) {
+  if (!url) {
+    return url;
+  }
+  return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
+};
 
 
 module.exports = HtmlWebpackPlugin;
