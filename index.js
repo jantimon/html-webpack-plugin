@@ -16,7 +16,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     templateParams.webpack = webpackStatsJson;
     templateParams.htmlWebpackPlugin = {};
     templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson);
-    templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.hash);
+    templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.chunks, self.options.excludeChunks);
     templateParams.htmlWebpackPlugin.options = self.options;
     templateParams.webpackConfig = compilation.options;
 
@@ -32,7 +32,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     } else {
       var templateFile = self.options.template;
       if (!templateFile) {
-        templateFile = path.join(__dirname, 'default_index.html');
+        // Use a special index file to prevent double script / style injection if the `inject` option is truthy
+        templateFile = path.join(__dirname, self.options.inject ? 'default_inject_index.html' : 'default_index.html');
       }
       compilation.fileDependencies.push(templateFile);
 
@@ -55,6 +56,10 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
   } catch(e) {
     compilation.errors.push(new Error('HtmlWebpackPlugin: template error ' + e));
   }
+  // Inject link and script elements into an existing html file
+  if (this.options.inject) {
+    html = this.injectAssetsIntoHtml(html, templateParams);
+  }
   compilation.assets[outputFilename] = {
     source: function() {
       return html;
@@ -66,9 +71,9 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
 };
 
 
-HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, appendHash) {
+HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, includedChunks, excludedChunks) {
+  var self = this;
   var publicPath = compilation.options.output.publicPath || '';
-  var queryString = appendHash ? '?' + webpackStatsJson.hash : '';
 
   var assets = {
     // Will contain all js & css files by chunk
@@ -80,10 +85,13 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
     // Will contain the html5 appcache manifest files if it exists
     manifest: Object.keys(compilation.assets).filter(function(assetFile){
       return path.extname(assetFile) === '.appcache';
-    }).map(function(assetFile) {
-      return assetFile + queryString;
     })[0]
   };
+
+  // Append a hash for cache busting
+  if (this.options.hash) {
+    assets.manifest = self.appendHash(assets.manifest, webpackStatsJson.hash);
+  }
 
   var chunks = webpackStatsJson.chunks.sort(function orderEntryLast(a, b) {
     if (a.entry !== b.entry) {
@@ -96,12 +104,29 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
   for (var i = 0; i < chunks.length; i++) {
     var chunk = chunks[i];
     var chunkName = chunk.names[0];
+
+    // Skip if the chunks should be filtered and the given chunk was not added explicity
+    if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
+      continue;
+    }
+    // Skip if the chunks should be filtered and the given chunk was excluded explicity
+    if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) {
+      continue;
+    }
+
     assets.chunks[chunkName] = {};
 
     // Prepend the public path to all chunk files
     var chunkFiles = [].concat(chunk.files).map(function(chunkFile) {
-      return publicPath + chunkFile + queryString;
+      return publicPath + chunkFile;
     });
+
+    // Append a hash for cache busting
+    if (this.options.hash) {
+      chunkFiles = chunkFiles.map(function(chunkFile) {
+        return self.appendHash(chunkFile, webpackStatsJson.hash);
+      });
+    }
 
     // Webpack outputs an array for each chunk when using sourcemaps
     // But we need only the entry file
@@ -111,7 +136,9 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
 
     // Gather all css files
     var css = chunkFiles.filter(function(chunkFile){
-      return path.extname(chunkFile) === '.css';
+      // Some chunks may contain content hash in their names, for ex. 'main.css?1e7cac4e4d8b52fd5ccd2541146ef03f'.
+      // We must proper handle such cases, so we use regexp testing here
+      return /^.css($|\?)/.test(path.extname(chunkFile));
     });
     assets.chunks[chunkName].css = css;
     assets.css = assets.css.concat(css);
@@ -122,6 +149,49 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
   assets.css = _.uniq(assets.css);
 
   return assets;
+};
+
+/**
+ * Injects the assets into the given html string
+ */
+HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams) {
+  var assets = templateParams.htmlWebpackPlugin.files;
+  var chunks = Object.keys(assets.chunks);
+
+  // Gather all css and script files
+  var styles = [];
+  var scripts = [];
+  chunks.forEach(function(chunkName) {
+    styles = styles.concat(assets.chunks[chunkName].css);
+    scripts.push(assets.chunks[chunkName].entry);
+  });
+  // Turn script files into script tags
+  scripts = scripts.map(function(scriptPath) {
+    return '<script src="' + scriptPath + '"></script>';
+  });
+  // Turn css files into link tags
+  styles = styles.map(function(stylePath) {
+    return '<link href="' + stylePath + '" rel="stylesheet">';
+  });
+  // Append scripts to body element
+  html = html.replace(/(<\/body>)/i, function (match) {
+    return scripts.join('') + match;
+  });
+  // Append styles to head element
+  html = html.replace(/(<\/head>)/i, function (match) {
+    return styles.join('') + match;
+  });
+  // Inject manifest into the opening html tag
+  if (assets.manifest) {
+    html = html.replace(/(<html.*)(>)/i, function (match, start, end) {
+      // Append the manifest only if no manifest was specified
+      if (match.test(/\smanifest\s*=/)) {
+        return match;
+      }
+      return start + ' manifest="' + assets.manifest + '"' + end;
+    });
+  }
+  return html;
 };
 
 /**
@@ -136,6 +206,15 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginLegacyAssets = function(compilation
   return legacyAssets;
 };
 
+/**
+ * Appends a cache busting hash
+ */
+HtmlWebpackPlugin.prototype.appendHash = function (url, hash) {
+  if (!url) {
+    return url;
+  }
+  return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
+};
 
 
 module.exports = HtmlWebpackPlugin;

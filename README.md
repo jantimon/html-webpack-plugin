@@ -154,7 +154,7 @@ plugins: [
 ]
 ```
 
-The `templateContent` option can also be a function:
+The `templateContent` option can also be a function to use another template language like jade:
 ```javascript
 plugins: [
   new HtmlWebpackPlugin({
@@ -206,3 +206,28 @@ template is rendered. This variable has the following attributes:
 
 - `webpackConfig`: the webpack configuration that was used for this compilation. This
   can be used, for example, to get the `publicPath` (`webpackConfig.output.publicPath`).
+
+
+Filtering chunks
+----------------
+
+To include only certain chunks you can limit the chunks being used:
+
+```javascript
+plugins: [
+  new HtmlWebpackPlugin({
+    chunks: ['app']
+  })
+]
+```
+
+It is also possible to exclude certain chunks by setting the `excludeChunks` option:
+
+```javascript
+plugins: [
+  new HtmlWebpackPlugin({
+    excludeChunks: ['dev-helper']
+  })
+]
+```
+
