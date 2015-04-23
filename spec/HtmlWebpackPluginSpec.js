@@ -263,6 +263,86 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<script src="index_bundle.js?%hash%"'], null, done);
   });
 
+  it('should work with the css extract plugin', function (done) {
+    var ExtractTextPlugin = require("extract-text-webpack-plugin");
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        new ExtractTextPlugin("styles.css")
+      ]
+    }, ['<link href="styles.css"'], null, done);
+  });
+
+  it('should allow to add cache hashes to with the css assets', function (done) {
+    var ExtractTextPlugin = require("extract-text-webpack-plugin");
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({hash: true}),
+        new ExtractTextPlugin("styles.css")
+      ]
+    }, ['<link href="styles.css?%hash%"'], null, done);
+  });
+
+  it('should inject css files when using the extract text plugin', function (done) {
+    var ExtractTextPlugin = require("extract-text-webpack-plugin");
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({inject: true}),
+        new ExtractTextPlugin("styles.css")
+      ]
+    }, ['<link href="styles.css"'], null, done);
+  });
+
+  it('should allow to add cache hashes to with injected css assets', function (done) {
+    var ExtractTextPlugin = require("extract-text-webpack-plugin");
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({hash: true, inject: true}),
+        new ExtractTextPlugin("styles.css")
+      ]
+    }, ['<link href="styles.css?%hash%"'], null, done);
+  });
+
   it('prepends the webpack public path to script src', function(done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),
