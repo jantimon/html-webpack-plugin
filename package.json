@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "blueimp-tmpl": "~2.5.4",
+    "html-minifier": "^0.7.1",
     "lodash": "~3.6.0"
   }
 }
