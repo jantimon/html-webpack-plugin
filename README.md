@@ -84,6 +84,10 @@ Allowed values are as follows:
 - `title`: The title to use for the generated HTML document.
 - `filename`: The file to write the HTML to. Defaults to `index.html`.
    You can specify a subdirectory here too (eg: `assets/admin.html`).
+- `template`: A html template (supports [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).
+- `templateContent`: A html string or a function returning the html  (supports [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).  
+- `inject`: Inject all assets into the given `template` or `templateContent`. 
+- `minify`: Set to true or pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
 - `hash`: if `true` then append a unique webpack compilation hash to all
   included scripts and css files. This is useful for cache busting.
 
