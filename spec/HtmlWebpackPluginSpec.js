@@ -486,4 +486,93 @@ describe('HtmlWebpackPlugin', function() {
       /<script src="common_bundle.js"[\s\S]*<script src="index_bundle.js">/], null, done);
   });
 
+  it('adds a favicon', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/favicon.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [{ test: /\.ico$/, loader: 'file' }]
+      },
+      plugins: [
+        new HtmlWebpackPlugin()
+      ]
+    }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+  });
+
+  it('adds a favicon with inject enabled', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/favicon.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [{ test: /\.ico$/, loader: 'file' }]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          inject: true,
+          template: path.join(__dirname, 'fixtures/plain.html')
+        })
+      ]
+    }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+  });
+
+  it('adds an apple touch icon', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/appleTouchIcon.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [{ test: /\.png$/, loader: 'file' }]
+      },
+      plugins: [
+        new HtmlWebpackPlugin()
+      ]
+    }, [/<link rel="apple-touch-icon" href="[^"]+\.png">/], null, done);
+  });
+
+  it('adds an apple touch icon with inject enabled', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/appleTouchIcon.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [{ test: /\.png$/, loader: 'file' }]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          inject: true,
+          template: path.join(__dirname, 'fixtures/plain.html')
+        })
+      ]
+    }, [/<link rel="apple-touch-icon" href="[^"]+\.png">/], null, done);
+  });
+
+  it('adds any requested asset to extraFiles', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/appleTouchIcon.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [{ test: /\.png$/, loader: 'file' }]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          extraFiles: ['cat.png'],
+          template: path.join(__dirname, 'fixtures/extraFiles.html')
+        })
+      ]
+    }, [/<img src="[^"]+\.png" alt="kewt kitten"\/>/], null, done);
+  });
+
 });
