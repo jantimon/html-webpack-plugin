@@ -54,6 +54,27 @@ If you have any css assets in webpack's output (for example, css extracted
 with the [ExtractTextPlugin](https://github.com/webpack/extract-text-webpack-plugin))
 then these will be included with `<link>` tags in the HTML head.
 
+Icons - Favicon & Apple Touch Icon
+----------------------------------
+
+The plugin will automatically pick up if there is a file named `favicon.ico`
+or `apple-touch-icon.png` included in the build, and automatically add them
+to the HTML.
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Webpack App</title>
+    <link rel="shortcut icon" href="0a31c912c8b55c756f7a969982b1ff91.ico">
+    <link rel="apple-touch-icon" href="2805113e07a3cf668e68442009c97e93.png">
+  </head>
+  <body>
+    <script src="index_bundle.js"></script>
+  </body>
+</html>
+```
 
 Configuration
 -------------

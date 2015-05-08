@@ -1,6 +1,10 @@
 Change History
 ==============
 
+HEAD
+----
+* Add `favicon.ico` and `apple-touch-icon.png` to the HTML
+
 v1.2.0
 ------
 * Set charset using HTML5 meta attribute
