@@ -80,16 +80,5 @@
     "shelljs"       : false,    // ShellJS
     "worker"        : false,    // Web Workers
     "wsh"           : false,    // Windows Scripting Host
-    "yui"           : false,    // Yahoo User Interface
-
-    // Custom Globals
-    "globals"       : {
-      // jasmine helpers
-      "expect": false,
-      "describe": false,
-      "ddescribe": false,
-      "beforeEach": false,
-      "it": false,
-      "iit": false
-    }
+    "yui"           : false    // Yahoo User Interface
 }

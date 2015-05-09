@@ -1,8 +1,11 @@
+/* jshint expr:true */
+
 'use strict';
 var path = require('path');
 var fs = require('fs');
 var webpack = require('webpack');
 var rm_rf = require('rimraf');
+var expect = require('chai').expect;
 var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
 var HtmlWebpackPlugin = require('../index.js');
 
@@ -11,26 +14,26 @@ var OUTPUT_DIR = path.join(__dirname, '../dist');
 function testHtmlPlugin(webpackConfig, expectedResults, outputFile, done, expectErrors, expectWarnings) {
   outputFile = outputFile || 'index.html';
   webpack(webpackConfig, function(err, stats) {
-    expect(err).toBeFalsy();
+    expect(err).to.not.be.ok;
     var compilationErrors = (stats.compilation.errors || []).join('\n');
     if (expectErrors) {
-      expect(compilationErrors).not.toBe('');
+      expect(compilationErrors).not.to.equal('');
     } else {
-      expect(compilationErrors).toBe('');
+      expect(compilationErrors).to.equal('');
     }
     var compilationWarnings = (stats.compilation.warnings || []).join('\n');
     if (expectWarnings) {
-      expect(compilationWarnings).not.toBe('');
+      expect(compilationWarnings).not.to.equal('');
     } else {
-      expect(compilationWarnings).toBe('');
-    }    
+      expect(compilationWarnings).to.equal('');
+    }
     var htmlContent = fs.readFileSync(path.join(OUTPUT_DIR, outputFile)).toString();
     for (var i = 0; i < expectedResults.length; i++) {
       var expectedResult = expectedResults[i];
       if (expectedResult instanceof RegExp) {
-        expect(htmlContent).toMatch(expectedResult);
+        expect(htmlContent).to.match(expectedResult);
       } else {
-        expect(htmlContent).toContain(expectedResult.replace('%hash%', stats.hash));
+        expect(htmlContent).to.contain(expectedResult.replace('%hash%', stats.hash));
       }
     }
     done();
@@ -257,8 +260,8 @@ describe('HtmlWebpackPlugin', function() {
         templateContent: 'whatever'
       })]
     }, function(err, stats) {
-      expect(stats.hasErrors()).toBe(true);
-      expect(stats.toJson().errors[0]).toContain('HtmlWebpackPlugin');
+      expect(stats.hasErrors()).to.be.true;
+      expect(stats.toJson().errors[0]).to.contain('HtmlWebpackPlugin');
       done();
     });
   });
@@ -474,7 +477,7 @@ describe('HtmlWebpackPlugin', function() {
       ]
     }, ['<script src="index_bundle.js"'], null, done);
 
-    expect(fs.existsSync(path.join(__dirname, 'fixtures/test.html'))).toBe(true);
+    expect(fs.existsSync(path.join(__dirname, 'fixtures/test.html'))).to.be.true;
   });
 
   it('registers a webpack error if the template cannot be opened', function(done) {
@@ -486,8 +489,8 @@ describe('HtmlWebpackPlugin', function() {
       },
       plugins: [new HtmlWebpackPlugin({template: 'fixtures/does_not_exist.html'})]
     }, function(err, stats) {
-      expect(stats.hasErrors()).toBe(true);
-      expect(stats.toJson().errors[0]).toContain('HtmlWebpackPlugin');
+      expect(stats.hasErrors()).to.be.true;
+      expect(stats.toJson().errors[0]).to.contain('HtmlWebpackPlugin');
       done();
     });
   });
