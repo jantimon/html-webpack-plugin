@@ -70,6 +70,32 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
   };
 };
 
+HtmlWebpackPlugin.prototype.getAssetPathFromModuleName = function(publicPath, modules) {
+  var filenameRegexp = [/^favicon\.ico($|\?)/, /^apple-touch-icon\.png($|\?)/];
+
+  return _.chain(modules)
+    .filter(function (module) {
+      // If the module failed to load, skip it to properly propagate the error
+      if (module.failed) {
+        return false;
+      }
+
+      var basename = path.basename(module.name);
+      return _.some(filenameRegexp, function(regexp) {
+        return regexp.test(basename);
+      });
+    })
+    .map(function (module) {
+      // If the assets is not base64-encoded
+      if (module.assets.length) {
+        return [path.parse(module.name).name, publicPath + module.assets[0]];
+      }
+
+      return [path.parse(module.name).name, module.source.substring(18, module.source.length - 1)];
+    })
+    .zipObject()
+    .value();
+};
 
 HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, includedChunks, excludedChunks) {
   var self = this;
@@ -148,6 +174,11 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
   // requires the same css.
   assets.css = _.uniq(assets.css);
 
+  assets.extraFiles = self.getAssetPathFromModuleName(publicPath, webpackStatsJson.modules);
+
+  assets.favicon = assets.extraFiles.favicon;
+  assets.appleTouchIcon = assets.extraFiles['apple-touch-icon'];
+
   return assets;
 };
 
@@ -173,6 +204,14 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
   styles = styles.map(function(stylePath) {
     return '<link href="' + stylePath + '" rel="stylesheet">';
   });
+  // If there is an apple touch icon present, add it above any link-tags
+  if (assets.appleTouchIcon) {
+    styles.unshift('<link rel="apple-touch-icon" href="' + assets.appleTouchIcon + '">');
+  }
+  // If there is a favicon present, add it above any link-tags
+  if (assets.favicon) {
+    styles.unshift('<link rel="shortcut icon" href="' + assets.favicon + '">');
+  }
   // Append scripts to body element
   html = html.replace(/(<\/body>)/i, function (match) {
     return scripts.join('') + match;
