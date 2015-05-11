@@ -2,6 +2,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('lodash');
+var async = require('async');
 var tmpl = require('blueimp-tmpl').tmpl;
 
 function HtmlWebpackPlugin(options) {
@@ -10,45 +11,84 @@ function HtmlWebpackPlugin(options) {
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
-  compiler.plugin('emit', function(compilation, callback) {
+  compiler.plugin('emit', function(compilation, compileCallback) {
     var webpackStatsJson = compilation.getStats().toJson();
-    var templateParams = {};
-    templateParams.webpack = webpackStatsJson;
-    templateParams.htmlWebpackPlugin = {};
-    templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson);
-    templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.chunks, self.options.excludeChunks);
-    templateParams.htmlWebpackPlugin.options = self.options;
-    templateParams.webpackConfig = compilation.options;
 
-    var outputFilename = self.options.filename || 'index.html';
-
-    if (self.options.templateContent && self.options.template) {
-      compilation.errors.push(new Error('HtmlWebpackPlugin: cannot specify both template and templateContent options'));
-      callback();
-    } else if (self.options.templateContent) {
-      var templateContent = typeof self.options.templateContent === 'function' ? self.options.templateContent(templateParams, compiler) : self.options.templateContent;
-      self.emitHtml(compilation, templateContent, templateParams, outputFilename);
-      callback();
-    } else {
-      var templateFile = self.options.template;
-      if (!templateFile) {
-        // Use a special index file to prevent double script / style injection if the `inject` option is truthy
-        templateFile = path.join(__dirname, self.options.inject ? 'default_inject_index.html' : 'default_index.html');
-      }
-      compilation.fileDependencies.push(templateFile);
-
-      fs.readFile(templateFile, 'utf8', function(err, htmlTemplateContent) {
-        if (err) {
-          compilation.errors.push(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + templateFile + '"'));
+    async.waterfall([
+      // Add the favicon
+      function(callback) {
+        if (self.options.favicon) {
+          self.addFileToAssets(compilation, self.options.favicon, callback);
         } else {
-          self.emitHtml(compilation, htmlTemplateContent, templateParams, outputFilename);
+          callback(null);
         }
-        callback();
-      });
-    }
+      },
+      // Generate the html
+      function(callback) {
+        var templateParams = {};
+        templateParams.webpack = webpackStatsJson;
+        templateParams.htmlWebpackPlugin = {};
+        templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson);
+        templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.chunks, self.options.excludeChunks);
+        templateParams.htmlWebpackPlugin.options = self.options;
+        templateParams.webpackConfig = compilation.options;
+        var outputFilename = self.options.filename || 'index.html';
+        self.getTemplateContent(compilation, templateParams, function(err, htmlTemplateContent) {
+          if (!err) {
+            self.emitHtml(compilation, htmlTemplateContent, templateParams, outputFilename);
+          }
+          callback();
+        });
+      }
+    ], compileCallback);
+
   });
 };
 
+/**
+ * Retrieves the html source depending on `this.options`.
+ * Supports:
+ * + options.fileContent as string
+ * + options.fileContent as sync function
+ * + options.fileContent as async function
+ * + options.template as template path
+ * Calls the callback with (`err`, `htmlTemplateContent`).
+ */
+HtmlWebpackPlugin.prototype.getTemplateContent = function(compilation, templateParams, callback) {
+  var self = this;
+  if (self.options.templateContent && self.options.template) {
+    var err = new Error('HtmlWebpackPlugin: cannot specify both template and templateContent options');
+    compilation.errors.push(err);
+    callback(err);
+  } else if (typeof self.options.templateContent === 'function') {
+    // allow to specify a sync or an async function to generate the template content
+    var result = self.options.templateContent(templateParams, compilation, callback);
+    // if it return a result expect it to be sync
+    if (result !== undefined) {
+      callback(null, result);
+    }
+  } else if (self.options.templateContent) {
+    // Use template content as string
+    callback(null, self.options.templateContent);
+  } else {
+    var templateFile = self.options.template;
+    if (!templateFile) {
+      // Use a special index file to prevent double script / style injection if the `inject` option is truthy
+      templateFile = path.join(__dirname, self.options.inject ? 'default_inject_index.html' : 'default_index.html');
+    }
+    compilation.fileDependencies.push(templateFile);
+    fs.readFile(templateFile, 'utf8', function(err, htmlTemplateContent) {
+      if (err) {
+        compilation.errors.push(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + templateFile + '"'));
+      }
+      callback(err, htmlTemplateContent);
+    });
+  }
+};
+
+/*
+ * Compile the html template and push the result to the compilation assets
+ */
 HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent, templateParams, outputFilename) {
   var html;
   try {
@@ -70,31 +110,38 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
   };
 };
 
-HtmlWebpackPlugin.prototype.getAssetPathFromModuleName = function(publicPath, modules) {
-  var filenameRegexp = [/^favicon\.ico($|\?)/, /^apple-touch-icon\.png($|\?)/];
-
-  return _.chain(modules)
-    .filter(function (module) {
-      // If the module failed to load, skip it to properly propagate the error
-      if (module.failed) {
-        return false;
-      }
-
-      var basename = path.basename(module.name);
-      return _.some(filenameRegexp, function(regexp) {
-        return regexp.test(basename);
+/*
+ * Pushes the content of the given filename to the compilation assets
+ */
+HtmlWebpackPlugin.prototype.addFileToAssets = function(compilation, filename, callback) {
+  async.parallel({
+    size: function(callback) {
+      fs.stat(filename, function(err, stats){
+        callback(err, err ? undefined : stats.size);
       });
-    })
-    .map(function (module) {
-      // If the assets is not base64-encoded
-      if (module.assets.length) {
-        return [path.parse(module.name).name, publicPath + module.assets[0]];
-      }
-
-      return [path.parse(module.name).name, module.source.substring(18, module.source.length - 1)];
-    })
-    .zipObject()
-    .value();
+    },
+    source: function(callback) {
+      fs.readFile(filename, function(err, data) {
+        callback(err, data);
+      });
+    }
+  }, function(err, results) {
+    if (err) {
+      err = new Error('HtmlWebpackPlugin: could not load file ' + filename);
+      compilation.errors.push(err);
+      callback(err);
+    } else {
+      compilation.assets[path.basename(filename)] = {
+        source: function() {
+          return results.source;
+        },
+        size: function() {
+          return results.size;
+        }
+      };
+      callback(null);
+    }
+  });
 };
 
 HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, includedChunks, excludedChunks) {
@@ -108,6 +155,8 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
     js: [],
     // Will contain all css files
     css: [],
+    // Will contain the path to the favicon if it exists
+    favicon: self.options.favicon ? publicPath + path.basename(self.options.favicon): undefined,
     // Will contain the html5 appcache manifest files if it exists
     manifest: Object.keys(compilation.assets).filter(function(assetFile){
       return path.extname(assetFile) === '.appcache';
@@ -117,6 +166,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
   // Append a hash for cache busting
   if (this.options.hash) {
     assets.manifest = self.appendHash(assets.manifest, webpackStatsJson.hash);
+    assets.favicon = self.appendHash(assets.favicon, webpackStatsJson.hash);
   }
 
   var chunks = webpackStatsJson.chunks.sort(function orderEntryLast(a, b) {
@@ -174,11 +224,6 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
   // requires the same css.
   assets.css = _.uniq(assets.css);
 
-  assets.extraFiles = self.getAssetPathFromModuleName(publicPath, webpackStatsJson.modules);
-
-  assets.favicon = assets.extraFiles.favicon;
-  assets.appleTouchIcon = assets.extraFiles['apple-touch-icon'];
-
   return assets;
 };
 
@@ -204,10 +249,6 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
   styles = styles.map(function(stylePath) {
     return '<link href="' + stylePath + '" rel="stylesheet">';
   });
-  // If there is an apple touch icon present, add it above any link-tags
-  if (assets.appleTouchIcon) {
-    styles.unshift('<link rel="apple-touch-icon" href="' + assets.appleTouchIcon + '">');
-  }
   // If there is a favicon present, add it above any link-tags
   if (assets.favicon) {
     styles.unshift('<link rel="shortcut icon" href="' + assets.favicon + '">');

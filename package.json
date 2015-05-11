@@ -39,6 +39,7 @@
     "webpack": "^1.8.11"
   },
   "dependencies": {
+    "async": "^0.9.0",
     "blueimp-tmpl": "~2.5.4",
     "html-minifier": "^0.7.2",
     "lodash": "~3.8.0"

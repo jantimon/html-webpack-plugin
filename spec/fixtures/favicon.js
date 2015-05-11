@@ -1,1 +1,0 @@
-require('./favicon.ico');
