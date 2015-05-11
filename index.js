@@ -6,6 +6,14 @@ var tmpl = require('blueimp-tmpl').tmpl;
 
 function HtmlWebpackPlugin(options) {
   this.options = options || {};
+  this.options.extraFiles = _.chain(['favicon.ico', 'apple-touch-icon.png'])
+    .concat(this.options.extraFiles)
+    .compact()
+    .uniq()
+    .map(function (filename) {
+      return new RegExp(/^/.source + filename + /($|\?)/.source);
+    })
+    .value();
 }
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
@@ -16,7 +24,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     templateParams.webpack = webpackStatsJson;
     templateParams.htmlWebpackPlugin = {};
     templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson);
-    templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.chunks, self.options.excludeChunks);
+    templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.chunks, self.options.excludeChunks, self.options.extraFiles);
     templateParams.htmlWebpackPlugin.options = self.options;
     templateParams.webpackConfig = compilation.options;
 
@@ -70,8 +78,36 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
   };
 };
 
+HtmlWebpackPlugin.prototype.getAssetPathFromModuleName = function(filenameRegexp, publicPath, modules) {
+  return _.chain(modules)
+    .filter(function (module) {
+      // If the module failed to load, skip it to properly propagate the error
+      if (module.failed) {
+        return false;
+      }
 
-HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, includedChunks, excludedChunks) {
+      var basename = path.basename(module.name);
+      return _.some(filenameRegexp, function(regexp) {
+        return regexp.test(basename);
+      });
+    })
+    .map(function (module) {
+      // If the assets is not base64-encoded
+      if (module.assets.length) {
+        return [path.parse(module.name).name, publicPath + module.assets[0]];
+      }
+
+      var result = '';
+
+      // Eval the module, but instead of exporting it, assign it to result
+      eval(module.source.replace('module.exports', 'result')); // jshint ignore:line
+      return [path.parse(module.name).name, result];
+    })
+    .zipObject()
+    .value();
+};
+
+HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, includedChunks, excludedChunks, extraFiles) {
   var self = this;
   var publicPath = compilation.options.output.publicPath || '';
 
@@ -148,6 +184,13 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
   // requires the same css.
   assets.css = _.uniq(assets.css);
 
+  if (extraFiles) {
+    assets.extraFiles = self.getAssetPathFromModuleName(extraFiles, publicPath, webpackStatsJson.modules);
+
+    assets.favicon = assets.extraFiles.favicon;
+    assets.appleTouchIcon = assets.extraFiles['apple-touch-icon'];
+  }
+
   return assets;
 };
 
@@ -173,6 +216,14 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
   styles = styles.map(function(stylePath) {
     return '<link href="' + stylePath + '" rel="stylesheet">';
   });
+  // If there is a favicon present, add it above any link-tags
+  if (assets.favicon) {
+    styles.unshift('<link rel="shortcut icon" href="' + assets.favicon + '">');
+  }
+  // If there is an apple touch icon present, add it above any link-tags
+  if (assets.appleTouchIcon) {
+    styles.unshift('<link rel="apple-touch-icon" href="' + assets.appleTouchIcon + '">');
+  }
   // Append scripts to body element
   html = html.replace(/(<\/body>)/i, function (match) {
     return scripts.join('') + match;

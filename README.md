@@ -54,6 +54,27 @@ If you have any css assets in webpack's output (for example, css extracted
 with the [ExtractTextPlugin](https://github.com/webpack/extract-text-webpack-plugin))
 then these will be included with `<link>` tags in the HTML head.
 
+Icons - Favicon & Apple Touch Icon
+----------------------------------
+
+The plugin will automatically pick up if there is a file named `favicon.ico`
+or `apple-touch-icon.png` included in the build, and automatically add them
+to the HTML.
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Webpack App</title>
+    <link rel="shortcut icon" href="0a31c912c8b55c756f7a969982b1ff91.ico">
+    <link rel="apple-touch-icon" href="2805113e07a3cf668e68442009c97e93.png">
+  </head>
+  <body>
+    <script src="index_bundle.js"></script>
+  </body>
+</html>
+```
 
 Configuration
 -------------
@@ -65,6 +86,9 @@ Allowed values are as follows:
    You can specify a subdirectory here too (eg: `assets/admin.html`).
 - `hash`: if `true` then append a unique webpack compilation hash to all
   included scripts and css files. This is useful for cache busting.
+- `extraFiles`: An array of extra files, or a string with a single file,
+to include for easy access in a template. Note: this will only have an
+effect in your own templates. See [example](#extra-files).
 
 Here's an example webpack config illustrating how to use these options:
 ```javascript
@@ -231,3 +255,42 @@ plugins: [
 ]
 ```
 
+
+Extra Files
+-----------
+
+To add any extra files for usage in your template, simply add them to `extraFiles`. It can either be a single file, or an array of files.
+
+```js
+plugins: [
+  new HtmlWebpackPlugin({
+    extraFiles: 'cat.png',
+    template: 'extraFiles.html'
+  })
+]
+```
+
+The file will then be available in the template, under the object `htmlWebpackPlugin.files.extraFiles.cat`.
+The name of the object will be the filename without the extension, so watch out for collisions.
+
+If the template looks like this:
+
+```html
+<!DOCTYPE html>
+<html>
+  <body>
+    <img src="{%=o.htmlWebpackPlugin.files.extraFiles.cat%}" alt="kewt kitten"/>
+  </body>
+</html>
+```
+
+It will result in the following output-html:
+
+```html
+<!DOCTYPE html>
+<html>
+  <body>
+    <img src="82ad978dbbb32d586fa123b28e03fc37.png" alt="kewt kitten"/>
+  </body>
+</html>
+```

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <title>Test</title>
+  </head>
+  <body>
+    <p>Some unique text</p>
+    {% if (o.htmlWebpackPlugin.files.extraFiles.cat) { %}
+    <img src="{%=o.htmlWebpackPlugin.files.extraFiles.cat%}" alt="kewt kitten"/>
+    {% } %}
+  </body>
+</html>
