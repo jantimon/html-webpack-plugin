@@ -1,9 +1,10 @@
 Change History
 ==============
 
-HEAD
+v1.4.0
 ----
-* Add `favicon.ico` and `apple-touch-icon.png` to the HTML
+* Add `favicon.ico` option
+* Add html minifcation
 
 v1.2.0
 ------
