@@ -8,11 +8,11 @@ var HtmlWebpackPlugin = require('../index.js');
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
 
-function testHtmlPlugin(webpackConfig, expectedResults, outputFile, done) {
+function testHtmlPlugin(webpackConfig, expectedResults, outputFile, done, hasErrors) {
   outputFile = outputFile || 'index.html';
   webpack(webpackConfig, function(err, stats) {
     expect(err).toBeFalsy();
-    expect(stats.hasErrors()).toBe(false);
+    expect(stats.hasErrors()).toBe(!!hasErrors);
     var htmlContent = fs.readFileSync(path.join(OUTPUT_DIR, outputFile)).toString();
     for (var i = 0; i < expectedResults.length; i++) {
       var expectedResult = expectedResults[i];
@@ -493,9 +493,6 @@ describe('HtmlWebpackPlugin', function() {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
-      module: {
-        loaders: [{ test: /\.ico$/, loader: 'file' }]
-      },
       plugins: [
         new HtmlWebpackPlugin({
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
@@ -511,17 +508,29 @@ describe('HtmlWebpackPlugin', function() {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
-      module: {
-        loaders: [{ test: /\.ico$/, loader: 'file' }]
+      plugins: [
+        new HtmlWebpackPlugin({
+          inject: true,
+          favicon: path.join(__dirname, 'fixtures/favicon.ico')
+        })
+      ]
+    }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+  });
+
+  it('shows an error if the favicon could not be load', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
       },
       plugins: [
         new HtmlWebpackPlugin({
           inject: true,
-          favicon: path.join(__dirname, 'fixtures/favicon.ico'),
-          template: path.join(__dirname, 'fixtures/plain.html')
+          favicon: path.join(__dirname, 'fixtures/does_not_exist.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+    }, ['Error: HtmlWebpackPlugin: could not load file'], null, done, true);
   });
 
 });

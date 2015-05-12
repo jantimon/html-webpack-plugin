@@ -2,8 +2,9 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('lodash');
-var async = require('async');
 var tmpl = require('blueimp-tmpl').tmpl;
+var Promise = require('bluebird');
+Promise.promisifyAll(fs);
 
 function HtmlWebpackPlugin(options) {
   this.options = options || {};
@@ -13,18 +14,16 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
   compiler.plugin('emit', function(compilation, compileCallback) {
     var webpackStatsJson = compilation.getStats().toJson();
-
-    async.waterfall([
+    var outputFilename = self.options.filename || 'index.html';
+    Promise.resolve()
       // Add the favicon
-      function(callback) {
+      .then(function(callback) {
         if (self.options.favicon) {
-          self.addFileToAssets(compilation, self.options.favicon, callback);
-        } else {
-          callback(null);
+          return self.addFileToAssets(compilation, self.options.favicon, callback);
         }
-      },
+      })
       // Generate the html
-      function(callback) {
+      .then(function() {
         var templateParams = {};
         templateParams.webpack = webpackStatsJson;
         templateParams.htmlWebpackPlugin = {};
@@ -32,16 +31,27 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
         templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.chunks, self.options.excludeChunks);
         templateParams.htmlWebpackPlugin.options = self.options;
         templateParams.webpackConfig = compilation.options;
-        var outputFilename = self.options.filename || 'index.html';
-        self.getTemplateContent(compilation, templateParams, function(err, htmlTemplateContent) {
-          if (!err) {
-            self.emitHtml(compilation, htmlTemplateContent, templateParams, outputFilename);
-          }
-          callback();
+        // Get/generate html
+        return self.getTemplateContent(compilation, templateParams)
+          .then(function(htmlTemplateContent) {
+            // Compile and add html to compilation
+            return self.emitHtml(compilation, htmlTemplateContent, templateParams, outputFilename);
         });
-      }
-    ], compileCallback);
-
+      })
+      // In case anything went wrong let the user know
+      .catch(function(err) {
+        compilation.errors.push(err);
+        compilation.assets[outputFilename] = {
+          source: function() {
+            return err.toString();
+          },
+          size: function() {
+            return err.toString().length;
+          }
+        };
+      })
+      // Tell the compiler to proceed
+      .finally(compileCallback);
   });
 };
 
@@ -52,38 +62,41 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
  * + options.fileContent as sync function
  * + options.fileContent as async function
  * + options.template as template path
- * Calls the callback with (`err`, `htmlTemplateContent`).
+ * Returns a Promise
  */
-HtmlWebpackPlugin.prototype.getTemplateContent = function(compilation, templateParams, callback) {
+HtmlWebpackPlugin.prototype.getTemplateContent = function(compilation, templateParams) {
   var self = this;
+  // If config is invalid
   if (self.options.templateContent && self.options.template) {
-    var err = new Error('HtmlWebpackPlugin: cannot specify both template and templateContent options');
-    compilation.errors.push(err);
-    callback(err);
-  } else if (typeof self.options.templateContent === 'function') {
-    // allow to specify a sync or an async function to generate the template content
-    var result = self.options.templateContent(templateParams, compilation, callback);
-    // if it return a result expect it to be sync
-    if (result !== undefined) {
-      callback(null, result);
-    }
-  } else if (self.options.templateContent) {
-    // Use template content as string
-    callback(null, self.options.templateContent);
-  } else {
-    var templateFile = self.options.template;
-    if (!templateFile) {
-      // Use a special index file to prevent double script / style injection if the `inject` option is truthy
-      templateFile = path.join(__dirname, self.options.inject ? 'default_inject_index.html' : 'default_index.html');
-    }
-    compilation.fileDependencies.push(templateFile);
-    fs.readFile(templateFile, 'utf8', function(err, htmlTemplateContent) {
-      if (err) {
-        compilation.errors.push(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + templateFile + '"'));
+    return Promise.reject(new Error('HtmlWebpackPlugin: cannot specify both template and templateContent options'));
+  }
+  // If a function is passed
+  if (typeof self.options.templateContent === 'function') {
+    return Promise.fromNode(function(callback) {
+      // allow to specify a sync or an async function to generate the template content
+      var result = self.options.templateContent(templateParams, compilation, callback);
+      // if it return a result expect it to be sync
+      if (result !== undefined) {
+        callback(null, result);
       }
-      callback(err, htmlTemplateContent);
     });
   }
+  // If a string is passed
+  if (self.options.templateContent) {
+    return Promise.resolve(self.options.templateContent);
+  }
+  // If templateContent is empty use the tempalte option
+  var templateFile = self.options.template;
+  if (!templateFile) {
+    // Use a special index file to prevent double script / style injection if the `inject` option is truthy
+    templateFile = path.join(__dirname, self.options.inject ? 'default_inject_index.html' : 'default_index.html');
+  }
+  compilation.fileDependencies.push(templateFile);
+  return fs.readFileAsync(templateFile, 'utf8')
+    // If the file could not be read log a error
+    .catch(function() {
+      return Promise.reject(new Error('HtmlWebpackPlugin: Unable to read HTML template "' + templateFile + '"'));
+    });
 };
 
 /*
@@ -92,9 +105,9 @@ HtmlWebpackPlugin.prototype.getTemplateContent = function(compilation, templateP
 HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent, templateParams, outputFilename) {
   var html;
   try {
-   html = tmpl(htmlTemplateContent, templateParams);
+    html = tmpl(htmlTemplateContent, templateParams);
   } catch(e) {
-    compilation.errors.push(new Error('HtmlWebpackPlugin: template error ' + e));
+    return Promise.reject(new Error('HtmlWebpackPlugin: template error ' + e));
   }
   // Inject link and script elements into an existing html file
   if (this.options.inject) {
@@ -113,34 +126,24 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
 /*
  * Pushes the content of the given filename to the compilation assets
  */
-HtmlWebpackPlugin.prototype.addFileToAssets = function(compilation, filename, callback) {
-  async.parallel({
-    size: function(callback) {
-      fs.stat(filename, function(err, stats){
-        callback(err, err ? undefined : stats.size);
-      });
-    },
-    source: function(callback) {
-      fs.readFile(filename, function(err, data) {
-        callback(err, data);
-      });
-    }
-  }, function(err, results) {
-    if (err) {
-      err = new Error('HtmlWebpackPlugin: could not load file ' + filename);
-      compilation.errors.push(err);
-      callback(err);
-    } else {
-      compilation.assets[path.basename(filename)] = {
-        source: function() {
-          return results.source;
-        },
-        size: function() {
-          return results.size;
-        }
-      };
-      callback(null);
-    }
+HtmlWebpackPlugin.prototype.addFileToAssets = function(compilation, filename) {
+  return Promise.props({
+    size: fs.statAsync(filename),
+    source: fs.readFileAsync(filename)
+  })
+  .catch(function() {
+    return Promise.reject(new Error('HtmlWebpackPlugin: could not load file ' + filename));
+  })
+  .then(function(results) {
+    compilation.fileDependencies.push(filename);
+    compilation.assets[path.basename(filename)] = {
+      source: function() {
+        return results.source;
+      },
+      size: function() {
+        return results.size;
+      }
+    };
   });
 };
 
