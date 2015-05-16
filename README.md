@@ -168,7 +168,7 @@ Or the async version:
 plugins: [
   new HtmlWebpackPlugin({
     templateContent: function(templateParams, compilation, callback) {
-      // Return your template content synchronously here
+      // Return your template content asynchronously here
       callback(null, '..');
     }
   })
