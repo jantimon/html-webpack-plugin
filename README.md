@@ -231,3 +231,17 @@ plugins: [
 ]
 ```
 
+Passing custom compiler
+-----------------------
+
+In case you want to use something else than blueimp for templating, you can overwrite the template compiler like this:
+
+```javascript
+plugins: [
+  new HtmlWebpackPlugin({
+    compile: function(template, data) {
+      return Handlebars.compile(template)(data);
+    }
+  })
+]
+```

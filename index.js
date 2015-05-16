@@ -52,7 +52,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
 HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent, templateParams, outputFilename) {
   var html;
   try {
-   html = tmpl(htmlTemplateContent, templateParams);
+    html = (this.options.compile || tmpl)(htmlTemplateContent, templateParams);
   } catch(e) {
     compilation.errors.push(new Error('HtmlWebpackPlugin: template error ' + e));
   }
