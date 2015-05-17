@@ -24,13 +24,23 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
       })
       // Generate the html
       .then(function() {
-        var templateParams = {};
-        templateParams.webpack = webpackStatsJson;
-        templateParams.htmlWebpackPlugin = {};
-        templateParams.htmlWebpackPlugin.assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson);
-        templateParams.htmlWebpackPlugin.files = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.chunks, self.options.excludeChunks);
-        templateParams.htmlWebpackPlugin.options = self.options;
-        templateParams.webpackConfig = compilation.options;
+        var templateParams = {
+          webpack: webpackStatsJson,
+          webpackConfig: compilation.options,
+          htmlWebpackPlugin: {
+            files: self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.chunks, self.options.excludeChunks),
+            options: self.options,
+          }
+        };
+        // Deprecate templateParams.htmlWebpackPlugin.assets
+        var assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson);
+        Object.defineProperty(templateParams.htmlWebpackPlugin, 'assets', {
+          get: function() {
+            compilation.errors.push('htmlWebpackPlugin.assets is deprecated - please use htmlWebpackPlugin.files instead');
+            return assets;
+          }
+        });
+
         // Get/generate html
         return self.getTemplateContent(compilation, templateParams)
           .then(function(htmlTemplateContent) {
@@ -110,7 +120,7 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
   } catch(e) {
     return Promise.reject(new Error('HtmlWebpackPlugin: template error ' + e));
   }
- 
+
   // Inject link and script elements into an existing html file
   if (this.options.inject) {
     html = this.injectAssetsIntoHtml(html, templateParams);
