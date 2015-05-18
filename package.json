@@ -43,6 +43,6 @@
     "bluebird": "^2.9.34",
     "blueimp-tmpl": "^2.5.4",
     "html-minifier": "^0.7.2",
-    "lodash": "^3.10.0"
+    "lodash": "~3.9.3"
   }
 }
