@@ -23,6 +23,7 @@ function HtmlWebpackPlugin(options) {
     inject: true,
     compile: true,
     favicon: false,
+    minify: false,
     chunks: 'all',
     excludeChunks: [],
     title: 'Webpack App'
@@ -142,13 +143,26 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function(html, compilation) {
         }
       };
       if (self.options.compile === true) {
-        html = tmpl(html, templateParams);
+        return tmpl(html, templateParams);
+      } else {
+        return html;
       }
     })
     // Inject
-    .then(function() {
+    .then(function(html) {
       if (self.options.inject) {
         return self.injectAssetsIntoHtml(html, assets);
+      } else {
+        return html;
+      }
+    })
+    // Minify
+    .then(function(html) {
+      if (self.options.minify) {
+        var minify = require('html-minifier').minify;
+        // If `options.minify` is set to true use the default minify options
+        var minifyOptions = _.isObject(self.options.minify) ? self.options.minify : {};
+        return minify(html, minifyOptions);
       } else {
         return html;
       }
