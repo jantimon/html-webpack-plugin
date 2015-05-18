@@ -8,11 +8,16 @@ var HtmlWebpackPlugin = require('../index.js');
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
 
-function testHtmlPlugin(webpackConfig, expectedResults, outputFile, done) {
+function testHtmlPlugin(webpackConfig, expectedResults, outputFile, done, expectErrors) {
   outputFile = outputFile || 'index.html';
   webpack(webpackConfig, function(err, stats) {
     expect(err).toBeFalsy();
-    expect(stats.hasErrors()).toBe(false);
+    var compilationErrors = (stats.compilation.errors || []).join('\n');
+    if (expectErrors) {
+      expect(compilationErrors).not.toBe('');
+    } else {
+      expect(compilationErrors).toBe('');
+    }
     var htmlContent = fs.readFileSync(path.join(OUTPUT_DIR, outputFile)).toString();
     for (var i = 0; i < expectedResults.length; i++) {
       var expectedResult = expectedResults[i];
@@ -167,10 +172,10 @@ describe('HtmlWebpackPlugin', function() {
         },
         plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/legacy.html')})]
       },
-      ['<script src="app_bundle.js', 'Some unique text'], null, done);
+      ['<script src="app_bundle.js', 'Some unique text'], null, done, true);
   });
 
-  it('allows you to use the deprecated default_index file', function (done) {
+  it('allows you to use a deprecated legacy_index template', function (done) {
     testHtmlPlugin({
         entry: {
           app: path.join(__dirname, 'fixtures/index.js')
@@ -181,7 +186,7 @@ describe('HtmlWebpackPlugin', function() {
         },
         plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/legacy_default_index.html')})]
       },
-      ['<script src="app_bundle.js'], null, done);
+      ['<script src="app_bundle.js'], null, done, true);
   });
 
   it('allows you to specify your own HTML template function', function(done) {
@@ -484,6 +489,53 @@ describe('HtmlWebpackPlugin', function() {
     }, [
       /<script src="common_bundle.js">[\s\S]*<script src="util_bundle.js">/,
       /<script src="common_bundle.js"[\s\S]*<script src="index_bundle.js">/], null, done);
+  });
+
+  it('adds a favicon', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          favicon: path.join(__dirname, 'fixtures/favicon.ico')
+        })
+      ]
+    }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+  });
+
+  it('adds a favicon with inject enabled', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          inject: true,
+          favicon: path.join(__dirname, 'fixtures/favicon.ico')
+        })
+      ]
+    }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+  });
+
+  it('shows an error if the favicon could not be load', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          inject: true,
+          favicon: path.join(__dirname, 'fixtures/does_not_exist.ico')
+        })
+      ]
+    }, ['Error: HtmlWebpackPlugin: could not load file'], null, done, true);
   });
 
 });

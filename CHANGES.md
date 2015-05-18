@@ -1,6 +1,11 @@
 Change History
 ==============
 
+v1.4.0
+----
+* Add `favicon.ico` option
+* Add html minifcation
+
 v1.2.0
 ------
 * Set charset using HTML5 meta attribute

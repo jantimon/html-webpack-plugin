@@ -54,7 +54,6 @@ If you have any css assets in webpack's output (for example, css extracted
 with the [ExtractTextPlugin](https://github.com/webpack/extract-text-webpack-plugin))
 then these will be included with `<link>` tags in the HTML head.
 
-
 Configuration
 -------------
 You can pass a hash of configuration options to `HtmlWebpackPlugin`.
@@ -63,6 +62,11 @@ Allowed values are as follows:
 - `title`: The title to use for the generated HTML document.
 - `filename`: The file to write the HTML to. Defaults to `index.html`.
    You can specify a subdirectory here too (eg: `assets/admin.html`).
+- `template`: A html template (supports [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).
+- `templateContent`: A html string or a function returning the html  (supports [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).  
+- `inject`: Inject all assets into the given `template` or `templateContent`.
+- `favicon`: Adds the given favicon path to the output html.
+- `minify`: Set to true or pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
 - `hash`: if `true` then append a unique webpack compilation hash to all
   included scripts and css files. This is useful for cache busting.
 
@@ -108,40 +112,29 @@ once in your plugins array:
 Writing Your Own Templates
 --------------------------
 If the default generated HTML doesn't meet your needs you can supply
-your own [blueimp template](https://github.com/blueimp/JavaScript-Templates).
-The [default template](https://github.com/ampedandwired/html-webpack-plugin/blob/master/default_index.html)
-is a good starting point for writing your own.
+your own template. The easiest way is to use the `inject` option and pass a custom html file.
+The html-webpack-plugin will automatically inject all necessary css, js, manifest
+and favicon files into the markup.
 
-Let's say for example you wanted to put a webpack bundle into the head of your
-HTML as well as the body. Your template might look like this:
+```javascript
+plugins: [
+  new HtmlWebpackPlugin({
+    inject: true,
+    template: 'my-index.html'
+  })
+]
+```
+
 ```html
 <!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
     <title>My App</title>
-    <script src="{%=o.htmlWebpackPlugin.files.chunks.head.entry%}"></script>
   </head>
   <body>
-    <script src="{%=o.htmlWebpackPlugin.files.chunks.main.entry%}"></script>
   </body>
 </html>
-```
-
-To use this template, configure the plugin like this:
-```javascript
-{
-  entry: 'index.js',
-  output: {
-    path: 'dist',
-    filename: 'index_bundle.js'
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: 'src/assets/my_template.html'
-    })
-  ]
-}
 ```
 
 Alternatively, if you already have your template's content in a String, you
@@ -149,17 +142,34 @@ can pass it to the plugin using the `templateContent` option:
 ```javascript
 plugins: [
   new HtmlWebpackPlugin({
+    inject: true,
     templateContent: templateContentString
   })
 ]
 ```
 
+You can use the [blueimp template](https://github.com/blueimp/JavaScript-Templates) syntax out of the box.
+If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/ampedandwired/html-webpack-plugin/blob/master/default_index.html)
+as a starting point for writing your own.
+
 The `templateContent` option can also be a function to use another template language like jade:
 ```javascript
 plugins: [
   new HtmlWebpackPlugin({
-    templateContent: function(templateParams, webpackCompiler) {
+    templateContent: function(templateParams, compilation) {
       // Return your template content synchronously here
+      return '..';
+    }
+  })
+]
+```
+Or the async version:
+```javascript
+plugins: [
+  new HtmlWebpackPlugin({
+    templateContent: function(templateParams, compilation, callback) {
+      // Return your template content asynchronously here
+      callback(null, '..');
     }
   })
 ]
