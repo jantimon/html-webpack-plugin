@@ -161,34 +161,6 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<script src="app_bundle.js"'], null, done);
   });
 
-  it('allows you to use the deprecated assets object', function (done) {
-    testHtmlPlugin({
-        entry: {
-          app: path.join(__dirname, 'fixtures/index.js')
-        },
-        output: {
-          path: OUTPUT_DIR,
-          filename: '[name]_bundle.js'
-        },
-        plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/legacy.html')})]
-      },
-      ['<script src="app_bundle.js', 'Some unique text'], null, done, true);
-  });
-
-  it('allows you to use a deprecated legacy_index template', function (done) {
-    testHtmlPlugin({
-        entry: {
-          app: path.join(__dirname, 'fixtures/index.js')
-        },
-        output: {
-          path: OUTPUT_DIR,
-          filename: '[name]_bundle.js'
-        },
-        plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/legacy_default_index.html')})]
-      },
-      ['<script src="app_bundle.js'], null, done, true);
-  });
-
   it('allows you to specify your own HTML template function', function(done) {
     testHtmlPlugin({
       entry: {app: path.join(__dirname, 'fixtures/index.js')},
@@ -435,21 +407,6 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<script src="index_bundle.js"'], null, done);
 
     expect(fs.existsSync(path.join(__dirname, 'fixtures/test.html'))).toBe(true);
-  });
-
-  it('registers a webpack error if the template cannot be opened', function(done) {
-    webpack({
-      entry: path.join(__dirname, 'fixtures/index.js'),
-      output: {
-        path: OUTPUT_DIR,
-        filename: 'index_bundle.js'
-      },
-      plugins: [new HtmlWebpackPlugin({template: 'fixtures/does_not_exist.html'})]
-    }, function(err, stats) {
-      expect(stats.hasErrors()).toBe(true);
-      expect(stats.toJson().errors[0]).toContain('HtmlWebpackPlugin');
-      done();
-    });
   });
 
   it('exposes the webpack configuration to templates', function(done) {
