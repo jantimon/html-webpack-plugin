@@ -8,7 +8,14 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      favicon: 'favicon.ico'
+      favicon: 'favicon.ico',
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        conservativeCollapse: false,
+        minifyJS: true,
+        minifyCSS: true
+      }
     })
   ]
 };
