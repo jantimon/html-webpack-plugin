@@ -31,6 +31,12 @@ function HtmlWebpackPlugin(options) {
   if(this.options.template.indexOf('!') === -1) {
     this.options.template = 'raw!' + this.options.template;
   }
+  // Resolve tempalte path
+  this.options.template = this.options.template.replace(
+    /(\!)(\.+\/[^\!\?]+)($|\?.+$)/,
+    function(match, prefix, filepath, postfix) {
+      return prefix + path.resolve(filepath) + postfix;
+    });
 }
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
@@ -47,7 +53,9 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     // Create an additional child compiler which takes the template
     // and turns it into an Node.JS html factory.
     // This allows us to use loaders during the compilation
-    var childCompiler = compilation.createChildCompiler('html-webpack-plugin', outputOptions);
+    var compilerName = 'html-webpack-plugin for "' + path.basename(outputOptions.filename) + '"';
+    var childCompiler = compilation.createChildCompiler(compilerName, outputOptions);
+    // Inherit the loader configuration
     childCompiler.apply(new NodeTemplatePlugin(outputOptions));
     childCompiler.apply(new LibraryTemplatePlugin('result', 'var'));
     childCompiler.apply(new NodeTargetPlugin());
@@ -106,7 +114,12 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilationResu
   // Strip the leading 'var '
   var source = compilationResult.source().substr(3);
   // Evaluate code and cast to string
-  var newSource = vm.runInThisContext(source);
+  var newSource;
+  try {
+    newSource = vm.runInThisContext(source);
+  } catch (e) {
+    return Promise.reject(e);
+  }
   return typeof newSource === 'string' ?
     Promise.resolve(newSource) :
     Promise.reject('The loader "' + this.options.template + '" didn\'t return html.');
