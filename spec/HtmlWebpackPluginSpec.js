@@ -76,20 +76,6 @@ describe('HtmlWebpackPlugin', function() {
     ['<script src="app_bundle.js', 'Some unique text'], null, done);
   });
 
-  it('allows you to specify your own HTML template string', function(done) {
-    testHtmlPlugin({
-      entry: {app: path.join(__dirname, 'fixtures/index.js')},
-      output: {
-        path: OUTPUT_DIR,
-        filename: 'app_bundle.js'
-      },
-      plugins: [new HtmlWebpackPlugin({
-        templateContent: fs.readFileSync(path.join(__dirname, 'fixtures/test.html'), 'utf8')
-      })]
-    },
-    ['<script src="app_bundle.js'], null, done);
-  });
-
   it('allows you to inject the assets into a given html file', function (done) {
     testHtmlPlugin({
       entry: {
@@ -103,24 +89,6 @@ describe('HtmlWebpackPlugin', function() {
       plugins: [new HtmlWebpackPlugin({
         inject: true,
         template: path.join(__dirname, 'fixtures/plain.html')
-      })]
-    }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
-  });
-
-  it('allows you to inject the assets into a html string', function (done) {
-    testHtmlPlugin({
-      entry: {
-        util: path.join(__dirname, 'fixtures/util.js'),
-        app: path.join(__dirname, 'fixtures/index.js')
-      },
-      output: {
-        path: OUTPUT_DIR,
-        filename: '[name]_bundle.js'
-      },
-      plugins: [new HtmlWebpackPlugin({
-        inject: true,
-        chunks: ['util', 'app'],
-        templateContent: fs.readFileSync(path.join(__dirname, 'fixtures/plain.html'), 'utf8')
       })]
     }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
   });
@@ -175,24 +143,6 @@ describe('HtmlWebpackPlugin', function() {
       })]
     },
     ['<script src="app_bundle.js"'], null, done);
-  });
-
-  it('registers a webpack error both template and template content are specified', function(done) {
-    webpack({
-      entry: path.join(__dirname, 'fixtures/index.js'),
-      output: {
-        path: OUTPUT_DIR,
-        filename: 'index_bundle.js'
-      },
-      plugins: [new HtmlWebpackPlugin({
-        template: path.join(__dirname, 'fixtures/test.html'),
-        templateContent: 'whatever'
-      })]
-    }, function(err, stats) {
-      expect(stats.hasErrors()).toBe(true);
-      expect(stats.toJson().errors[0]).toContain('HtmlWebpackPlugin');
-      done();
-    });
   });
 
   it('works with source maps', function(done) {
