@@ -29,7 +29,7 @@ function HtmlWebpackPlugin(options) {
   }, options);
   // If the template doesn't use a loader use the raw loader
   if(this.options.template.indexOf('!') === -1) {
-    this.options.template = 'raw!' + this.options.template;
+    this.options.template = 'raw!' + path.resolve(this.options.template);
   }
   // Resolve tempalte path
   this.options.template = this.options.template.replace(
@@ -41,44 +41,17 @@ function HtmlWebpackPlugin(options) {
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
-  compiler.plugin('make', function(compilation, compilerCallback) {
-    // The entry file is just an empty helper as the dynamic template
-    // require is added in "loader.js"
-    var entryFilename = path.resolve(__dirname, 'html-webpack-plugin-entry.js');
-    var entryRequest = require.resolve('./loader.js') + '?' + escape(JSON.stringify(self.options.template)) + '!' + entryFilename;
-    var outputOptions = {
-      filename: self.options.filename,
-      publicPath: compilation.outputOptions.publicPath
-    };
-    // Create an additional child compiler which takes the template
-    // and turns it into an Node.JS html factory.
-    // This allows us to use loaders during the compilation
-    var compilerName = 'html-webpack-plugin for "' + path.basename(outputOptions.filename) + '"';
-    var childCompiler = compilation.createChildCompiler(compilerName, outputOptions);
-    // Inherit the loader configuration
-    childCompiler.apply(new NodeTemplatePlugin(outputOptions));
-    childCompiler.apply(new LibraryTemplatePlugin('result', 'var'));
-    childCompiler.apply(new NodeTargetPlugin());
-    childCompiler.apply(new SingleEntryPlugin(this.context, entryRequest));
-    // Create a subCache (copied from https://github.com/SanderSpies/extract-text-webpack-plugin/blob/master/loader.js)
-    var subCache = 'HtmlWebpackPlugin-' + self.options.filename;
-    childCompiler.plugin('compilation', function(compilation) {
-      if(compilation.cache) {
-        if(!compilation.cache[subCache]) {
-          compilation.cache[subCache] = {};
-        }
-        compilation.cache = compilation.cache[subCache];
-      }
-    });
-    childCompiler.runAsChild(compilerCallback);
-  });
-
-  // Once everything is compiled we evaluate the html factory
-  // and replace it with its content
   compiler.plugin('emit', function(compilation, callback) {
-    self.evaluateCompilationResult(compilation.assets[self.options.filename])
+    // Compile the template
+    self.compileTemplate(self.options.template, self.options.filename, compilation)
+      .then(function(resultAsset) {
+        // Once everything is compiled evaluate the html factory
+        // and replace it with its content
+        return self.evaluateCompilationResult(resultAsset);
+      })
       .then(function(html) {
-        // Add the assets to the resulting html
+        // Add the stylesheets, scripts and so on to the resulting html
+        // and process the blueimp template
         return self.postProcessHtml(html, compilation);
       })
       .catch(function(err) {
@@ -101,6 +74,50 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
         callback();
       });
     });
+};
+
+/**
+ * Compiles the template into a nodejs factory, adds its to the compilation.assets
+ * and returns a promise of the result asset object.
+ */
+HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename, compilation) {
+  // The entry file is just an empty helper as the dynamic template
+  // require is added in "loader.js"
+  var entryFilename = path.resolve(__dirname, 'html-webpack-plugin-entry.js');
+  var entryRequest = require.resolve('./loader.js') + '?' + escape(JSON.stringify(template)) + '!' + entryFilename;
+  var outputOptions = {
+    filename: outputFilename,
+    publicPath: compilation.outputOptions.publicPath
+  };
+  // Create an additional child compiler which takes the template
+  // and turns it into an Node.JS html factory.
+  // This allows us to use loaders during the compilation
+  var compilerName = 'html-webpack-plugin for "' + path.basename(outputOptions.filename) + '"';
+  var childCompiler = compilation.createChildCompiler(compilerName, outputOptions);
+  childCompiler.apply(new NodeTemplatePlugin(outputOptions));
+  childCompiler.apply(new LibraryTemplatePlugin('result', 'var'));
+  childCompiler.apply(new NodeTargetPlugin());
+  childCompiler.apply(new SingleEntryPlugin(this.context, entryRequest));
+  // Create a subCache (copied from https://github.com/SanderSpies/extract-text-webpack-plugin/blob/master/loader.js)
+  var subCache = 'HtmlWebpackPlugin-' + outputFilename;
+  childCompiler.plugin('compilation', function(compilation) {
+    if(compilation.cache) {
+      if(!compilation.cache[subCache]) {
+        compilation.cache[subCache] = {};
+      }
+      compilation.cache = compilation.cache[subCache];
+    }
+  });
+  // Compile and return a promise
+  return new Promise(function (resolve, reject) {
+    childCompiler.runAsChild(function(err){
+      if (err) {
+        reject(err);
+      } else {
+        resolve(compilation.assets[outputFilename]);
+      }
+    });
+  });
 };
 
 /**
