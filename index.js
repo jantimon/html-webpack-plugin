@@ -32,7 +32,7 @@ function HtmlWebpackPlugin(options) {
   if(this.options.template.indexOf('!') === -1) {
     this.options.template = 'raw!' + path.resolve(this.options.template);
   }
-  // Resolve tempalte path
+  // Resolve template path
   this.options.template = this.options.template.replace(
     /(\!)(\.+\/[^\!\?]+)($|\?.+$)/,
     function(match, prefix, filepath, postfix) {
