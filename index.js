@@ -95,7 +95,7 @@ HtmlWebpackPlugin.prototype.getTemplateContent = function(compilation, templateP
   if (self.options.templateContent) {
     return Promise.resolve(self.options.templateContent);
   }
-  // If templateContent is empty use the tempalte option
+  // If templateContent is empty use the template option
   var templateFile = self.options.template;
   if (!templateFile) {
     // Use a special index file to prevent double script / style injection if the `inject` option is truthy
