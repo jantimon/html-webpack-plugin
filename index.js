@@ -85,7 +85,7 @@ HtmlWebpackPlugin.prototype.getTemplateContent = function(compilation, templateP
     return Promise.fromNode(function(callback) {
       // allow to specify a sync or an async function to generate the template content
       var result = self.options.templateContent(templateParams, compilation, callback);
-      // if it return a result expect it to be sync
+      // if it returns a result expect it to be sync
       if (result !== undefined) {
         callback(null, result);
       }
