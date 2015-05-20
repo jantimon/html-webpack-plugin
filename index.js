@@ -1,4 +1,3 @@
-/* global escape */
 'use strict';
 var vm = require('vm');
 var fs = require('fs');
@@ -41,7 +40,14 @@ function HtmlWebpackPlugin(options) {
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
+
   compiler.plugin('emit', function(compilation, callback) {
+    // Get all chunks
+    var chunks = self.filterChunks(compilation.getStats().toJson(), self.options.chunks, self.options.excludeChunks);
+    // Skip if no new files were added
+    if (self.didChunkFilesChange(chunks) === false) {
+      return callback();
+    }
     // Compile the template
     self.compileTemplate(self.options.template, self.options.filename, compilation)
       .then(function(resultAsset) {
@@ -52,7 +58,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
       .then(function(html) {
         // Add the stylesheets, scripts and so on to the resulting html
         // and process the blueimp template
-        return self.postProcessHtml(html, compilation);
+        return self.postProcessHtml(html, chunks, compilation);
       })
       .catch(function(err) {
         // In case anything went wrong the promise is resolved
@@ -77,14 +83,27 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
 };
 
 /**
+ * Checks wether files were added or removed since the last call
+ */
+HtmlWebpackPlugin.prototype.didChunkFilesChange = function(chunks) {
+  var files = _.flatten(chunks.map(function(chunk) {
+    return chunk.files;
+  }));
+  if(_.difference(files, this.filesOfLastRun).length > 0) {
+    this.filesOfLastRun = files;
+    return true;
+  }
+  return false;
+};
+
+/**
  * Compiles the template into a nodejs factory, adds its to the compilation.assets
  * and returns a promise of the result asset object.
  */
 HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename, compilation) {
   // The entry file is just an empty helper as the dynamic template
   // require is added in "loader.js"
-  var entryFilename = path.resolve(__dirname, 'html-webpack-plugin-entry.js');
-  var entryRequest = require.resolve('./loader.js') + '?' + escape(JSON.stringify(template)) + '!' + entryFilename;
+  var entryRequest = template;
   var outputOptions = {
     filename: outputFilename,
     publicPath: compilation.outputOptions.publicPath
@@ -110,7 +129,7 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
   });
   // Compile and return a promise
   return new Promise(function (resolve, reject) {
-    childCompiler.runAsChild(function(err){
+    childCompiler.runAsChild(function(err) {
       if (err) {
         reject(err);
       } else {
@@ -147,10 +166,10 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilationResu
  *
  * Returns a promise
  */
-HtmlWebpackPlugin.prototype.postProcessHtml = function(html, compilation) {
+HtmlWebpackPlugin.prototype.postProcessHtml = function(html, chunks, compilation) {
   var self = this;
   var webpackStatsJson = compilation.getStats().toJson();
-  var assets = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.chunks, self.options.excludeChunks);
+  var assets = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, chunks);
   return Promise.resolve()
     // Favicon
     .then(function() {
@@ -224,7 +243,37 @@ HtmlWebpackPlugin.prototype.addFileToAssets = function(filename, compilation) {
   });
 };
 
-HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, includedChunks, excludedChunks) {
+/**
+ * Return all chunks from the compilation result which match the exclude and include filters
+ */
+HtmlWebpackPlugin.prototype.filterChunks = function (webpackStatsJson, includedChunks, excludedChunks) {
+  var chunks = webpackStatsJson.chunks.filter(function(chunk){
+    var chunkName = chunk.names;
+    // This chunk doesn't have a name. This script can't handled it.
+    if(chunkName === undefined) {
+      return false;
+    }
+    // Skip if the chunks should be filtered and the given chunk was not added explicity
+    if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
+      return false;
+    }
+    // Skip if the chunks should be filtered and the given chunk was excluded explicity
+    if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) {
+      return false;
+    }
+    // Add otherwise
+    return true;
+  });
+  return chunks.sort(function orderEntryLast(a, b) {
+    if (a.entry !== b.entry) {
+      return b.entry ? 1 : -1;
+    } else {
+      return b.id - a.id;
+    }
+  });
+};
+
+HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, chunks) {
   var self = this;
 
   // Use the configured public path or build a relative path
@@ -255,31 +304,9 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
     assets.favicon = self.appendHash(assets.favicon, webpackStatsJson.hash);
   }
 
-  var chunks = webpackStatsJson.chunks.sort(function orderEntryLast(a, b) {
-    if (a.entry !== b.entry) {
-      return b.entry ? 1 : -1;
-    } else {
-      return b.id - a.id;
-    }
-  });
-
   for (var i = 0; i < chunks.length; i++) {
     var chunk = chunks[i];
     var chunkName = chunk.names[0];
-
-    // This chunk doesn't have a name. This script can't handled it.
-    if(chunkName === undefined) {
-      continue;
-    }
-
-    // Skip if the chunks should be filtered and the given chunk was not added explicity
-    if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
-      continue;
-    }
-    // Skip if the chunks should be filtered and the given chunk was excluded explicity
-    if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) {
-      continue;
-    }
 
     assets.chunks[chunkName] = {};
 
