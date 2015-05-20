@@ -40,16 +40,19 @@ function HtmlWebpackPlugin(options) {
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
+  var compilationPromise;
+  self.context = compiler.context;
+
+  compiler.plugin('this-compilation', function(compilation, callback) {
+    // Compile the template
+    compilationPromise = self.compileTemplate(self.options.template, self.options.filename, compilation);
+    compilationPromise.finally(callback);
+  });
 
   compiler.plugin('emit', function(compilation, callback) {
     // Get all chunks
     var chunks = self.filterChunks(compilation.getStats().toJson(), self.options.chunks, self.options.excludeChunks);
-    // Skip if no new files were added
-    if (self.didChunkFilesChange(chunks) === false) {
-      return callback();
-    }
-    // Compile the template
-    self.compileTemplate(self.options.template, self.options.filename, compilation)
+    compilationPromise
       .then(function(resultAsset) {
         // Once everything is compiled evaluate the html factory
         // and replace it with its content
@@ -83,17 +86,12 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
 };
 
 /**
- * Checks wether files were added or removed since the last call
+ * Returns the child compiler name
  */
-HtmlWebpackPlugin.prototype.didChunkFilesChange = function(chunks) {
-  var files = _.flatten(chunks.map(function(chunk) {
-    return chunk.files;
-  }));
-  if(!this.filesOfLastRun || _.difference(files, this.filesOfLastRun).length > 0) {
-    this.filesOfLastRun = files;
-    return true;
-  }
-  return false;
+HtmlWebpackPlugin.prototype.getCompilerName = function() {
+  var absolutePath = path.resolve(this.context, this.options.filename);
+  var relativePath = path.relative(this.context, absolutePath);
+  return 'html-webpack-plugin for "' + (absolutePath.length < relativePath.length ? absolutePath : relativePath) + '"';
 };
 
 /**
@@ -103,7 +101,6 @@ HtmlWebpackPlugin.prototype.didChunkFilesChange = function(chunks) {
 HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename, compilation) {
   // The entry file is just an empty helper as the dynamic template
   // require is added in "loader.js"
-  var entryRequest = template;
   var outputOptions = {
     filename: outputFilename,
     publicPath: compilation.outputOptions.publicPath
@@ -111,25 +108,25 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
   // Create an additional child compiler which takes the template
   // and turns it into an Node.JS html factory.
   // This allows us to use loaders during the compilation
-  var compilerName = 'html-webpack-plugin for "' + path.basename(outputOptions.filename) + '"';
+  var compilerName = this.getCompilerName();
   var childCompiler = compilation.createChildCompiler(compilerName, outputOptions);
   childCompiler.apply(new NodeTemplatePlugin(outputOptions));
   childCompiler.apply(new LibraryTemplatePlugin('result', 'var'));
   childCompiler.apply(new NodeTargetPlugin());
-  childCompiler.apply(new SingleEntryPlugin(this.context, entryRequest));
+  childCompiler.apply(new SingleEntryPlugin(this.context, template));
   // Create a subCache (copied from https://github.com/SanderSpies/extract-text-webpack-plugin/blob/master/loader.js)
-  var subCache = 'HtmlWebpackPlugin-' + outputFilename;
   childCompiler.plugin('compilation', function(compilation) {
     if(compilation.cache) {
-      if(!compilation.cache[subCache]) {
-        compilation.cache[subCache] = {};
+      if(!compilation.cache[compilerName]) {
+        compilation.cache[compilerName] = {};
       }
-      compilation.cache = compilation.cache[subCache];
+      compilation.cache = compilation.cache[compilerName];
     }
   });
   // Compile and return a promise
   return new Promise(function (resolve, reject) {
     childCompiler.runAsChild(function(err) {
+      // Resolve / reject the promise
       if (err) {
         reject(err);
       } else {
