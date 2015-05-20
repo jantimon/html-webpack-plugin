@@ -89,7 +89,7 @@ HtmlWebpackPlugin.prototype.didChunkFilesChange = function(chunks) {
   var files = _.flatten(chunks.map(function(chunk) {
     return chunk.files;
   }));
-  if(_.difference(files, this.filesOfLastRun).length > 0) {
+  if(!this.filesOfLastRun || _.difference(files, this.filesOfLastRun).length > 0) {
     this.filesOfLastRun = files;
     return true;
   }
@@ -248,9 +248,9 @@ HtmlWebpackPlugin.prototype.addFileToAssets = function(filename, compilation) {
  */
 HtmlWebpackPlugin.prototype.filterChunks = function (webpackStatsJson, includedChunks, excludedChunks) {
   var chunks = webpackStatsJson.chunks.filter(function(chunk){
-    var chunkName = chunk.names;
+    var chunkName = chunk.names[0];
     // This chunk doesn't have a name. This script can't handled it.
-    if(chunkName === undefined) {
+    if (chunkName === undefined) {
       return false;
     }
     // Skip if the chunks should be filtered and the given chunk was not added explicity
