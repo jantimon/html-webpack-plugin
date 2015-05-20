@@ -20,6 +20,10 @@ module.exports = {
       template: 'html!./template.html'
     }),
     new HtmlWebpackPlugin({
+      filename: 'no-loader.html',
+      template: 'template.html'
+    }),
+    new HtmlWebpackPlugin({
       title: 'HtmlWebpackPlugin example',
       favicon: 'favicon.ico',
       filename: 'index.min.html',
