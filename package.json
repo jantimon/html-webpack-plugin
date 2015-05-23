@@ -9,7 +9,8 @@
     "default_inject_index.html"
   ],
   "scripts": {
-    "test": "jshint -c .jshintrc *.js spec && jasmine-node --captureExceptions spec"
+    "pretest": "jshint *.js spec",
+    "test": "jasmine-node --captureExceptions spec"
   },
   "repository": {
     "type": "git",
