@@ -8,7 +8,7 @@ var HtmlWebpackPlugin = require('../index.js');
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
 
-function testHtmlPlugin(webpackConfig, expectedResults, outputFile, done, expectErrors) {
+function testHtmlPlugin(webpackConfig, expectedResults, outputFile, done, expectErrors, expectWarnings) {
   outputFile = outputFile || 'index.html';
   webpack(webpackConfig, function(err, stats) {
     expect(err).toBeFalsy();
@@ -18,6 +18,12 @@ function testHtmlPlugin(webpackConfig, expectedResults, outputFile, done, expect
     } else {
       expect(compilationErrors).toBe('');
     }
+    var compilationWarnings = (stats.compilation.warnings || []).join('\n');
+    if (expectWarnings) {
+      expect(compilationWarnings).not.toBe('');
+    } else {
+      expect(compilationWarnings).toBe('');
+    }    
     var htmlContent = fs.readFileSync(path.join(OUTPUT_DIR, outputFile)).toString();
     for (var i = 0; i < expectedResults.length; i++) {
       var expectedResult = expectedResults[i];
@@ -172,7 +178,7 @@ describe('HtmlWebpackPlugin', function() {
         },
         plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/legacy.html')})]
       },
-      ['<script src="app_bundle.js', 'Some unique text'], null, done, true);
+      ['<script src="app_bundle.js', 'Some unique text'], null, done, false, true);
   });
 
   it('allows you to use a deprecated legacy_index template', function (done) {
@@ -186,7 +192,7 @@ describe('HtmlWebpackPlugin', function() {
         },
         plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/legacy_default_index.html')})]
       },
-      ['<script src="app_bundle.js'], null, done, true);
+      ['<script src="app_bundle.js'], null, done, false, true);
   });
 
   it('allows you to specify your own HTML template function', function(done) {
