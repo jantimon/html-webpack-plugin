@@ -273,18 +273,30 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
   styles = styles.map(function(stylePath) {
     return '<link href="' + stylePath + '" rel="stylesheet">';
   });
-  // If there is a favicon present, add it above any link-tags
+  // Injections
+  var head = [];
+  var body = [];
+
+  // If there is a favicon present, add it to the head
   if (assets.favicon) {
-    styles.unshift('<link rel="shortcut icon" href="' + assets.favicon + '">');
+    head.push('<link rel="shortcut icon" href="' + assets.favicon + '">');
   }
-  // Append scripts to body element
-  html = html.replace(/(<\/body>)/i, function (match) {
-    return scripts.join('') + match;
-  });
-  // Append styles to head element
+  // Add styles to the head
+  head = head.concat(styles);
+  // Add scripts to body or head
+  if (this.options.inject === 'head') {
+    head = body.concat(scripts);
+  } else {
+    body = body.concat(scripts);
+  }
+  // Append assets to head element
   html = html.replace(/(<\/head>)/i, function (match) {
-    return styles.join('') + match;
+    return head.join('') + match;
   });
+  // Append assets to body element
+    html = html.replace(/(<\/body>)/i, function (match) {
+      return body.join('') + match;
+    });
   // Inject manifest into the opening html tag
   if (assets.manifest) {
     html = html.replace(/(<html.*)(>)/i, function (match, start, end) {
