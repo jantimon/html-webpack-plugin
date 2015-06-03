@@ -14,26 +14,10 @@ module.exports = {
     ]
   },
   plugins: [
-    new HtmlWebpackPlugin(),
-    new HtmlWebpackPlugin({
-      filename: 'html-loader.html',
-      template: 'html!./template.html'
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'no-loader.html',
-      template: 'template.html'
-    }),
     new HtmlWebpackPlugin({
       title: 'HtmlWebpackPlugin example',
       favicon: 'favicon.ico',
-      filename: 'index.min.html',
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        conservativeCollapse: false,
-        minifyJS: true,
-        minifyCSS: true
-      }
+      filename: 'favicon.html'
     }),
     new ExtractTextPlugin('styles.css')
   ]
