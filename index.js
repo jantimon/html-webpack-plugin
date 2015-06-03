@@ -2,7 +2,6 @@
 var vm = require('vm');
 var fs = require('fs');
 var _ = require('lodash');
-var tmpl = require('blueimp-tmpl').tmpl;
 var Promise = require('bluebird');
 var path = require('path');
 Promise.promisifyAll(fs);
@@ -26,13 +25,13 @@ function HtmlWebpackPlugin(options) {
     excludeChunks: [],
     title: 'Webpack App'
   }, options);
-  // If the template doesn't use a loader use the raw loader
+  // If the template doesn't use a loader use the blueimp template loader
   if(this.options.template.indexOf('!') === -1) {
-    this.options.template = 'raw!' + path.resolve(this.options.template);
+    this.options.template = 'blueimp-tmpl!' + path.resolve(this.options.template);
   }
   // Resolve template path
   this.options.template = this.options.template.replace(
-    /(\!)(\.+\/[^\!\?]+)($|\?.+$)/,
+    /(\!)([^\/\\][^\!\?]+|[^\/\\!?])($|\?.+$)/,
     function(match, prefix, filepath, postfix) {
       return prefix + path.resolve(filepath) + postfix;
     });
@@ -52,16 +51,37 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
   compiler.plugin('emit', function(compilation, callback) {
     // Get all chunks
     var chunks = self.filterChunks(compilation.getStats().toJson(), self.options.chunks, self.options.excludeChunks);
-    compilationPromise
+    // Get assets
+    var assets = self.htmlWebpackPluginAssets(compilation, chunks);
+    Promise.resolve()
+      // Favicon
+      .then(function() {
+        if (self.options.favicon) {
+          return self.addFileToAssets(self.options.favicon, compilation)
+            .then(function(faviconBasename){
+              assets.favicon = faviconBasename;
+            });
+        }
+      })
+      // Wait for the compilation to finish
+      .then(function() {
+        return compilationPromise;
+      })
       .then(function(resultAsset) {
         // Once everything is compiled evaluate the html factory
         // and replace it with its content
-        return self.evaluateCompilationResult(resultAsset);
+        return self.evaluateCompilationResult(compilation, resultAsset);
+      })
+      // Execute the template
+      .then(function(compilationResult) {
+        // If the loader result is a function execute it to retreive the html
+        // otherwise use the returned html
+        return typeof compilationResult !== 'function' ? compilationResult :
+          self.executeTemplate(compilationResult, chunks, assets, compilation);
       })
       .then(function(html) {
         // Add the stylesheets, scripts and so on to the resulting html
-        // and process the blueimp template
-        return self.postProcessHtml(html, chunks, compilation);
+        return self.postProcessHtml(html, assets);
       })
       .catch(function(err) {
         // In case anything went wrong the promise is resolved
@@ -140,7 +160,7 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
  * Evaluates the child compilation result
  * Returns a promise
  */
-HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilationResult) {
+HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, compilationResult) {
   if(!compilationResult) {
     return Promise.reject('The child compilation didn\'t provide a result');
   }
@@ -151,9 +171,10 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilationResu
   try {
     newSource = vm.runInThisContext(source);
   } catch (e) {
+    compilation.errors.push(new Error('Template compilation failed: ' + e));
     return Promise.reject(e);
   }
-  return typeof newSource === 'string' ?
+  return typeof newSource === 'string' || typeof newSource === 'function' ?
     Promise.resolve(newSource) :
     Promise.reject('The loader "' + this.options.template + '" didn\'t return html.');
 };
@@ -163,38 +184,40 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilationResu
  *
  * Returns a promise
  */
-HtmlWebpackPlugin.prototype.postProcessHtml = function(html, chunks, compilation) {
+HtmlWebpackPlugin.prototype.executeTemplate = function(templateFunction, chunks, assets, compilation) {
   var self = this;
-  var webpackStatsJson = compilation.getStats().toJson();
-  var assets = self.htmlWebpackPluginAssets(compilation, webpackStatsJson, chunks);
   return Promise.resolve()
-    // Favicon
-    .then(function() {
-      if (self.options.favicon) {
-        return self.addFileToAssets(self.options.favicon, compilation)
-          .then(function(faviconBasename){
-            assets.favicon = faviconBasename;
-          });
-      }
-    })
     // Template processing
     .then(function() {
       var templateParams = {
-        webpack: webpackStatsJson,
+        webpack: compilation.getStats().toJson(),
         webpackConfig: compilation.options,
         htmlWebpackPlugin: {
           files: assets,
           options: self.options,
         }
       };
-      if (self.options.compile === true) {
-        return tmpl(html, templateParams);
-      } else {
-        return html;
+      var html = '';
+      try {
+        html = templateFunction(templateParams);
+      } catch (e) {
+        compilation.errors.push(new Error('Template execution failed: ' + e));
+        return Promise.reject(e);
       }
-    })
+      return html;
+    });
+};
+
+/**
+ * Html post processing
+ *
+ * Returns a promise
+ */
+HtmlWebpackPlugin.prototype.postProcessHtml = function(html, assets) {
+  var self = this;
+  return Promise.resolve()
     // Inject
-    .then(function(html) {
+    .then(function() {
       if (self.options.inject) {
         return self.injectAssetsIntoHtml(html, assets);
       } else {
@@ -207,10 +230,13 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function(html, chunks, compilation
         var minify = require('html-minifier').minify;
         // If `options.minify` is set to true use the default minify options
         var minifyOptions = _.isObject(self.options.minify) ? self.options.minify : {};
-        return minify(html, minifyOptions);
-      } else {
-        return html;
+        try {
+          minify(html, minifyOptions);
+        } catch(e) {
+          Promise.reject(e);
+        }
       }
+      return html;
     });
 };
 
@@ -270,8 +296,9 @@ HtmlWebpackPlugin.prototype.filterChunks = function (webpackStatsJson, includedC
   });
 };
 
-HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, chunks) {
+HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, chunks) {
   var self = this;
+  var webpackStatsJson = compilation.getStats().toJson();
 
   // Use the configured public path or build a relative path
   var publicPath = typeof compilation.options.output.publicPath !== 'undefined' ?
