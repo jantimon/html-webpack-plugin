@@ -123,7 +123,8 @@ and favicon files into the markup.
 plugins: [
   new HtmlWebpackPlugin({
     inject: true,
-    template: 'my-index.html'
+    template: 'my-index.html',
+    title: 'Custom template',
   })
 ]
 ```
@@ -133,7 +134,7 @@ plugins: [
 <html>
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-    <title>My App</title>
+    <title>{%=o.htmlWebpackPlugin.options.title}</title>
   </head>
   <body>
   </body>
