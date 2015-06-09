@@ -36,7 +36,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
         var assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson);
         Object.defineProperty(templateParams.htmlWebpackPlugin, 'assets', {
           get: function() {
-            compilation.warnings.push(new Error('HtmlWebPackPlugin: htmlWebpackPlugin.assets is deprecated - please use htmlWebpackPlugin.files instead'));
+            compilation.warnings.push(new Error('HtmlWebPackPlugin: htmlWebpackPlugin.assets is deprecated - please use inject or htmlWebpackPlugin.files instead' +
+              '\nsee: https://github.com/ampedandwired/html-webpack-plugin/issues/52'));
             return assets;
           }
         });
