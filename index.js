@@ -123,7 +123,7 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
   }
 
   // Inject link and script elements into an existing html file
-  if (this.options.inject) {
+  if (this.options.inject || this.options.reload) {
     html = this.injectAssetsIntoHtml(html, templateParams);
   }
 
@@ -261,7 +261,8 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
 
   // Gather all css and script files
   var styles = [];
-  var scripts = [];
+  var scripts = this.options.reload ? [this.options.reload] : [];
+
   chunks.forEach(function(chunkName) {
     styles = styles.concat(assets.chunks[chunkName].css);
     scripts.push(assets.chunks[chunkName].entry);
