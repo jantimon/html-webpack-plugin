@@ -300,7 +300,7 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
     });
   // Inject manifest into the opening html tag
   if (assets.manifest) {
-    html = html.replace(/(<html.*)(>)/i, function (match, start, end) {
+    html = html.replace(/(<html[^>]*)(>)/i, function (match, start, end) {
       // Append the manifest only if no manifest was specified
       if (/\smanifest\s*=/.test(match)) {
         return match;
