@@ -122,12 +122,14 @@ and favicon files into the markup.
 ```javascript
 plugins: [
   new HtmlWebpackPlugin({
-    inject: true,
-    template: 'my-index.html',
-    title: 'Custom template',
+    title: 'Custom template', 
+    template: 'my-index.html', // Load a custom template
+    inject: 'body' // Inject all scripts into the body
   })
 ]
 ```
+
+`my-index.html`:
 
 ```html
 <!DOCTYPE html>
