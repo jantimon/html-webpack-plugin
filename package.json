@@ -1,6 +1,6 @@
 {
   "name": "html-webpack-plugin",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "main": "index.js",
   "files": [
@@ -43,6 +43,6 @@
     "bluebird": "^2.9.25",
     "blueimp-tmpl": "~2.5.4",
     "html-minifier": "^0.7.2",
-    "lodash": "~3.8.0"
+    "lodash": "~3.9.3"
   }
 }
