@@ -23,8 +23,9 @@ function testHtmlPlugin(webpackConfig, expectedResults, outputFile, done, expect
       expect(compilationWarnings).not.toBe('');
     } else {
       expect(compilationWarnings).toBe('');
-    }    
+    }
     var htmlContent = fs.readFileSync(path.join(OUTPUT_DIR, outputFile)).toString();
+
     for (var i = 0; i < expectedResults.length; i++) {
       var expectedResult = expectedResults[i];
       if (expectedResult instanceof RegExp) {
@@ -50,7 +51,7 @@ describe('HtmlWebpackPlugin', function() {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="index_bundle.js"'], null, done);
+    }, [/<body>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/body>/], null, done);
 
   });
 

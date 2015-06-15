@@ -206,6 +206,11 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
     var chunk = chunks[i];
     var chunkName = chunk.names[0];
 
+    // This chunk doesn't have a name. This script can't handled it.
+    if(chunkName === undefined) {
+      continue;
+    }
+
     // Skip if the chunks should be filtered and the given chunk was not added explicity
     if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
       continue;
