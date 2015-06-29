@@ -3,6 +3,9 @@ var loaderUtils = require('loader-utils');
 
 module.exports = function (source) {
   'use strict';
+  if (this.cacheable) {
+    this.cacheable();
+  }
   var allLoadersButThisOne = this.loaders.filter(function(loader) {
     return loader.module !== module.exports;
   });
@@ -11,9 +14,6 @@ module.exports = function (source) {
     return source;
   }
   // Use underscore for a minimalistic loader
-  if (this.cacheable) {
-    this.cacheable();
-  }
   var options = loaderUtils.parseQuery(this.query);
   var template = _.template(source, options);
   return 'module.exports = ' + template;
