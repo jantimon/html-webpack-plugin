@@ -5,7 +5,7 @@ HTML Webpack Plugin
 This is a [webpack](http://webpack.github.io/) plugin that simplifies creation of HTML files to serve your
 webpack bundles. This is especially useful for webpack bundles that include
 a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you or supply
-your own template (using [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).
+your own template (using lodash/ejs templates.
 
 Installation
 ------------
@@ -70,7 +70,7 @@ Allowed values are as follows:
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
   included scripts and css files. This is useful for cache busting.
 - `chunks`: Allows you to add only some chunks (e.g. only the unit-test chunk)
-- `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk) 
+- `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk)
 
 Here's an example webpack config illustrating how to use these options:
 ```javascript
@@ -121,7 +121,7 @@ and favicon files into the markup.
 ```javascript
 plugins: [
   new HtmlWebpackPlugin({
-    title: 'Custom template', 
+    title: 'Custom template',
     template: 'my-index.html', // Load a custom template
     inject: 'body' // Inject all scripts into the body
   })
@@ -135,7 +135,7 @@ plugins: [
 <html>
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-    <title>{%=o.htmlWebpackPlugin.options.title}</title>
+    <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
   </body>
@@ -153,7 +153,7 @@ plugins: [
 ]
 ```
 
-You can use the [blueimp template](https://github.com/blueimp/JavaScript-Templates) syntax out of the box.
+You can use the lodash/ejs syntax out of the box.
 If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/ampedandwired/html-webpack-plugin/blob/master/default_index.html)
 as a starting point for writing your own.
 
