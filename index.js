@@ -42,7 +42,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var compilationPromise;
   self.context = compiler.context;
 
-  compiler.plugin('this-compilation', function(compilation, callback) {
+  compiler.plugin('make', function(compilation, callback) {
     // Compile the template
     compilationPromise = self.compileTemplate(self.options.template, self.options.filename, compilation);
     compilationPromise.finally(callback);
