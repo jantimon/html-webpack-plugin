@@ -171,7 +171,15 @@ HtmlWebpackPlugin.prototype.addFileToAssets = function(compilation, filename) {
 
 HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, includedChunks, excludedChunks) {
   var self = this;
-  var publicPath = compilation.options.output.publicPath || '';
+  
+  // Use the configured public path or build a relative path
+  var publicPath = typeof compilation.options.output.publicPath !== 'undefined' ?
+      compilation.options.output.publicPath : 
+      path.relative(path.dirname(self.options.filename), '.');
+
+  if (publicPath.length && publicPath.substr(-1, 1) !== '/') {
+    publicPath += '/';
+  }
 
   var assets = {
     // Will contain all js & css files by chunk

@@ -446,7 +446,7 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<script src="index_bundle.js"'], 'test.html', done);
   });
 
-  it('allows you to configure the output filename with a path', function(done) {
+  it('will try to use a relative name if the filename is in a subdirectory', function(done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
@@ -454,7 +454,18 @@ describe('HtmlWebpackPlugin', function() {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({filename: 'assets/test.html'})]
-    }, ['<script src="index_bundle.js"'], 'assets/test.html', done);
+    }, ['<script src="../index_bundle.js"'], 'assets/test.html', done);
+  });
+
+  it('will try to use a relative name if the filename and the script are in a subdirectory', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'assets/index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({filename: 'assets/demo/test.html'})]
+    }, ['<script src="../../assets/index_bundle.js"'], 'assets/demo/test.html', done);
   });
 
   it('allows you write multiple HTML files', function(done) {
