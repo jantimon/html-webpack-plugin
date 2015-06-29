@@ -15,7 +15,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'blueimp-tmpl!template.html'
+      template: 'template.html'
     }),
     new ExtractTextPlugin('styles.css')
   ]
