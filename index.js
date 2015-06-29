@@ -27,7 +27,7 @@ function HtmlWebpackPlugin(options) {
   }, options);
   // If the template doesn't use a loader use the blueimp template loader
   if(this.options.template.indexOf('!') === -1) {
-    this.options.template = 'blueimp-tmpl!' + path.resolve(this.options.template);
+    this.options.template = require.resolve('./loader.js') + '!' + path.resolve(this.options.template);
   }
   // Resolve template path
   this.options.template = this.options.template.replace(
