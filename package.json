@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "bluebird": "^2.9.25",
-    "blueimp-tmpl": "~2.5.4",
+    "blueimp-tmpl": "^2.5.4",
     "html-minifier": "^0.7.2",
     "lodash": "~3.9.3"
   }
