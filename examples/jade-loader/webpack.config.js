@@ -10,14 +10,15 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
-      { test: /\.png$/, loader: 'file-loader' }
+      { test: /\.png$/, loader: 'file-loader' },
+      { test: /\.jade$/, loader: 'jade'}
     ]
   },
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'jade-loader.html',
       favicon: 'favicon.ico',
-      template: 'jade!./template.jade'
+      template: 'template.jade'
     }),
     new ExtractTextPlugin('styles.css')
   ]
