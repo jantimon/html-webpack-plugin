@@ -6,8 +6,10 @@ var Promise = require('bluebird');
 var path = require('path');
 Promise.promisifyAll(fs);
 
+var webpack = require('webpack');
 var NodeTemplatePlugin = require('webpack/lib/node/NodeTemplatePlugin');
 var NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
+var LoaderTargetPlugin = require('webpack/lib/LoaderTargetPlugin');
 var LibraryTemplatePlugin = require('webpack/lib/LibraryTemplatePlugin');
 var SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 
@@ -141,10 +143,15 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
   // This allows us to use loaders during the compilation
   var compilerName = this.getCompilerName();
   var childCompiler = compilation.createChildCompiler(compilerName, outputOptions);
-  childCompiler.apply(new NodeTemplatePlugin(outputOptions));
-  childCompiler.apply(new LibraryTemplatePlugin('result', 'var'));
-  childCompiler.apply(new NodeTargetPlugin());
-  childCompiler.apply(new SingleEntryPlugin(this.context, template));
+  childCompiler.apply(
+    new NodeTemplatePlugin(outputOptions),
+    new NodeTargetPlugin(),
+    new LibraryTemplatePlugin('result', 'var'),
+    new SingleEntryPlugin(this.context, template),
+    new LoaderTargetPlugin('node'),
+    new webpack.DefinePlugin({ HTML_WEBPACK_PLUGIN : 'true' })
+  );
+
   // Create a subCache (copied from https://github.com/SanderSpies/extract-text-webpack-plugin/blob/master/loader.js)
   childCompiler.plugin('compilation', function(compilation) {
     if(compilation.cache) {
@@ -189,7 +196,12 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, co
   try {
     newSource = vm.runInThisContext(source);
   } catch (e) {
-    compilation.errors.push(new Error('Template compilation failed: ' + e));
+    var syntaxError = require('syntax-error')(source);
+    var errorMessage = 'Template compilation failed: ' + e + 
+      (syntaxError ? '\n' + syntaxError + '\n\n\n' + source.split('\n').map(function(row, i) {
+        return (1 + i) + '  - ' + row;
+      }).join('\n') : '');
+    compilation.errors.push(new Error(errorMessage));
     return Promise.reject(e);
   }
   return typeof newSource === 'string' || typeof newSource === 'function' ?

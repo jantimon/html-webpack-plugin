@@ -46,6 +46,7 @@
     "blueimp-tmpl": "^2.5.4",
     "html-minifier": "^0.7.2",
     "loader-utils": "^0.2.10",
-    "lodash": "~3.9.3"
+    "lodash": "~3.9.3",
+    "syntax-error": "^1.1.4"
   }
 }
