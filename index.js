@@ -44,7 +44,14 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
 
   compiler.plugin('make', function(compilation, callback) {
     // Compile the template
-    compilationPromise = self.compileTemplate(self.options.template, self.options.filename, compilation);
+    compilationPromise = self.compileTemplate(self.options.template, self.options.filename, compilation)
+      .catch(function(err) {
+        // In case anything went wrong the promise is resolved
+        // with the error message and an error is logged
+        var errorMessage = "HtmlWebpackPlugin Error: " + err;
+        compilation.errors.push(new Error(errorMessage));
+        return errorMessage;
+      });
     compilationPromise.finally(callback);
   });
 
@@ -68,6 +75,10 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
         return compilationPromise;
       })
       .then(function(resultAsset) {
+        // Allow to use a custom function / string instead
+        if (self.options.templateContent) {
+          return self.options.templateContent;
+        }
         // Once everything is compiled evaluate the html factory
         // and replace it with its content
         return self.evaluateCompilationResult(compilation, resultAsset);
@@ -145,10 +156,13 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
   });
   // Compile and return a promise
   return new Promise(function (resolve, reject) {
-    childCompiler.runAsChild(function(err) {
+    childCompiler.runAsChild(function(err, entries, childCompilation) {
       // Resolve / reject the promise
-      if (err) {
-        reject(err);
+      if (childCompilation.errors.length) {
+        var errorDetails = childCompilation.errors.map(function(error) {
+            return error.message + (error.error ? ':\n' + error.error: '');
+          }).join('\n');
+        reject(new Error('Child compilation failed:\n' + errorDetails));
       } else {
         resolve(compilation.assets[outputFilename]);
       }
@@ -163,6 +177,10 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
 HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, compilationResult) {
   if(!compilationResult) {
     return Promise.reject('The child compilation didn\'t provide a result');
+  }
+  if(typeof source === 'string') {
+    // If the compilation result is already evaluted return it
+    return Promise.resolve(source);
   }
   // Strip the leading 'var '
   var source = compilationResult.source().substr(3);
