@@ -196,6 +196,7 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, co
   try {
     newSource = vm.runInThisContext(source);
   } catch (e) {
+    // Log syntax error
     var syntaxError = require('syntax-error')(source);
     var errorMessage = 'Template compilation failed: ' + e + 
       (syntaxError ? '\n' + syntaxError + '\n\n\n' + source.split('\n').map(function(row, i) {
