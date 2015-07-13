@@ -245,6 +245,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
     // Webpack outputs an array for each chunk when using sourcemaps
     // But we need only the entry file
     var entry = chunkFiles[0];
+    assets.chunks[chunkName].size = chunk.size;
     assets.chunks[chunkName].entry = entry;
     assets.js.push(entry);
 
