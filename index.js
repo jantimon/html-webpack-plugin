@@ -300,7 +300,7 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
   head = head.concat(styles);
   // Add scripts to body or head
   if (this.options.inject === 'head') {
-    head = body.concat(scripts);
+    head = head.concat(scripts);
   } else {
     body = body.concat(scripts);
   }
