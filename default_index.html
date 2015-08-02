@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     {% if (o.htmlWebpackPlugin.options.responsive) { %}
-    '<meta name="viewport" content="width=device-width, initial-scale=1">'
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     {% } %}
     <title>{%=o.htmlWebpackPlugin.options.title || 'Webpack App'%}</title>
     {% if (o.htmlWebpackPlugin.files.favicon) { %}
