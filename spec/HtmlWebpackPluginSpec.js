@@ -25,7 +25,6 @@ function testHtmlPlugin(webpackConfig, expectedResults, outputFile, done, expect
       expect(compilationWarnings).toBe('');
     }
     var htmlContent = fs.readFileSync(path.join(OUTPUT_DIR, outputFile)).toString();
-
     for (var i = 0; i < expectedResults.length; i++) {
       var expectedResult = expectedResults[i];
       if (expectedResult instanceof RegExp) {
@@ -541,6 +540,19 @@ describe('HtmlWebpackPlugin', function() {
     }, [
       /<script src="common_bundle.js">[\s\S]*<script src="util_bundle.js">/,
       /<script src="common_bundle.js"[\s\S]*<script src="index_bundle.js">/], null, done);
+  });
+
+  it('adds a responsive meta header', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        responsive: true
+      })]
+    }, ['<meta name="viewport" content="width=device-width, initial-scale=1">'], null, done);
   });
 
   it('adds a favicon', function(done) {
