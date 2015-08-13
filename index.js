@@ -262,7 +262,7 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function(html, assets) {
         // If `options.minify` is set to true use the default minify options
         var minifyOptions = _.isObject(self.options.minify) ? self.options.minify : {};
         try {
-          minify(html, minifyOptions);
+          return minify(html, minifyOptions);
         } catch(e) {
           Promise.reject(e);
         }
