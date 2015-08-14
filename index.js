@@ -130,9 +130,7 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
   // Minify the html output
   if (this.options.minify) {
     var minify = require('html-minifier').minify;
-    // If `options.minify` is set to true use the default minify options
-    var minifyOptions = _.isObject(this.options.minify) ? this.options.minify : {};
-    html = minify(html, minifyOptions);
+    html = minify(html, this.options.minify);
   }
 
   compilation.assets[outputFilename] = {
