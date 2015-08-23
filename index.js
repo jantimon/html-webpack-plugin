@@ -198,7 +198,7 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, co
   } catch (e) {
     // Log syntax error
     var syntaxError = require('syntax-error')(source);
-    var errorMessage = 'Template compilation failed: ' + e + 
+    var errorMessage = 'Template compilation failed: ' + e +
       (syntaxError ? '\n' + syntaxError + '\n\n\n' + source.split('\n').map(function(row, i) {
         return (1 + i) + '  - ' + row;
       }).join('\n') : '');
@@ -259,10 +259,8 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function(html, assets) {
     .then(function(html) {
       if (self.options.minify) {
         var minify = require('html-minifier').minify;
-        // If `options.minify` is set to true use the default minify options
-        var minifyOptions = _.isObject(self.options.minify) ? self.options.minify : {};
         try {
-          return minify(html, minifyOptions);
+          return minify(html, this.options.minify);
         } catch(e) {
           Promise.reject(e);
         }
@@ -434,7 +432,7 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, assets) {
   head = head.concat(styles);
   // Add scripts to body or head
   if (this.options.inject === 'head') {
-    head = body.concat(scripts);
+    head = head.concat(scripts);
   } else {
     body = body.concat(scripts);
   }
