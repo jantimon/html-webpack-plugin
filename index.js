@@ -48,13 +48,9 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     // Compile the template
     compilationPromise = self.compileTemplate(self.options.template, self.options.filename, compilation)
       .catch(function(err) {
-        // In case anything went wrong the promise is resolved
-        // with the error message and an error is logged
-        var errorMessage = "HtmlWebpackPlugin Error: " + err;
-        compilation.errors.push(new Error(errorMessage));
-        return errorMessage;
-      });
-    compilationPromise.finally(callback);
+        return new Error(err);
+      })
+      .finally(callback);
   });
 
   compiler.plugin('emit', function(compilation, callback) {
@@ -77,6 +73,9 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
         return compilationPromise;
       })
       .then(function(resultAsset) {
+        if (resultAsset instanceof Error) {
+          return Promise.reject(resultAsset);
+        }
         // Allow to use a custom function / string instead
         if (self.options.templateContent) {
           return self.options.templateContent;
@@ -99,7 +98,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
       .catch(function(err) {
         // In case anything went wrong the promise is resolved
         // with the error message and an error is logged
-        var errorMessage = "HtmlWebpackPlugin Error: " + err;
+        var errorMessage = "HtmlWebpackPlugin " + err;
         compilation.errors.push(new Error(errorMessage));
         return errorMessage;
       })
@@ -165,11 +164,12 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
   return new Promise(function (resolve, reject) {
     childCompiler.runAsChild(function(err, entries, childCompilation) {
       // Resolve / reject the promise
-      if (childCompilation.errors.length) {
+      if (childCompilation.errors && childCompilation.errors.length) {
         var errorDetails = childCompilation.errors.map(function(error) {
             return error.message + (error.error ? ':\n' + error.error: '');
           }).join('\n');
-        reject(new Error('Child compilation failed:\n' + errorDetails));
+
+        reject('Child compilation failed:\n' + errorDetails);
       } else {
         resolve(compilation.assets[outputFilename]);
       }

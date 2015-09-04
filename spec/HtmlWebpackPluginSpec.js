@@ -502,4 +502,19 @@ describe('HtmlWebpackPlugin', function() {
     }, ['Error: HtmlWebpackPlugin: could not load file'], null, done, true);
   });
 
+  it('shows an error when a template fails to load', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          template: path.join(__dirname, 'fixtures/non-existing-template.html')
+        })
+      ]
+    }, ["HtmlWebpackPlugin Error: Child compilation failed:\nEntry module not found: Error: Cannot resolve 'file' or 'directory'"], null, done, true);
+  });
+
 });
