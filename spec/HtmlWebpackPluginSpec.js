@@ -74,6 +74,40 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
   });
 
+  it('allows you to use a custom loader', function(done) {
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: false,
+        template: 'underscore-template-loader!' + path.join(__dirname, 'fixtures/underscore.html')
+      })]
+    },
+    ['<script src="app_bundle.js', 'Some unique text'], null, done);
+  });
+
+  it('works when using html-loader', function(done) {
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: true,
+        template: 'html-loader!' + path.join(__dirname, 'fixtures/plain.html')
+      })]
+    },
+    ['<script src="app_bundle.js"'], null, done);
+  });
+
   it('allows you to specify your own HTML template file', function(done) {
     testHtmlPlugin({
       entry: {
@@ -173,6 +207,23 @@ describe('HtmlWebpackPlugin', function() {
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
     }, ['<script src="app_bundle.js"'], null, done);
+  });
+
+  it('allows you to disable injection', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: false,
+        template: path.join(__dirname, 'fixtures/plain.html')
+      })]
+    }, ['<body>\n</body>'], null, done);
   });
 
   it('allows you to specify your own HTML template function', function(done) {

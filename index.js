@@ -31,12 +31,6 @@ function HtmlWebpackPlugin(options) {
   if(this.options.template.indexOf('!') === -1) {
     this.options.template = require.resolve('./loader.js') + '!' + path.resolve(this.options.template);
   }
-  // Resolve template path
-  this.options.template = this.options.template.replace(
-    /(\!)([^\/\\][^\!\?]+|[^\/\\!?])($|\?.+$)/,
-    function(match, prefix, filepath, postfix) {
-      return prefix + path.resolve(filepath) + postfix;
-    });
 }
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
@@ -184,10 +178,6 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
 HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, compilationResult) {
   if(!compilationResult) {
     return Promise.reject('The child compilation didn\'t provide a result');
-  }
-  if(typeof source === 'string') {
-    // If the compilation result is already evaluted return it
-    return Promise.resolve(source);
   }
   // Strip the leading 'var '
   var source = compilationResult.source().substr(3);
