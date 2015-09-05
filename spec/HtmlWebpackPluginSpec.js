@@ -553,6 +553,37 @@ describe('HtmlWebpackPlugin', function() {
     }, ['Error: HtmlWebpackPlugin: could not load file'], null, done, true);
   });
 
+  it('adds a manifest', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          manifest: path.join(__dirname, 'fixtures/manifest.json')
+        })
+      ]
+    }, ['<html manifest="manifest.json">'], null, done);
+  });
+
+  it('does not add a manifest if already present', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          template: path.join(__dirname, 'fixtures/plain.html'),
+          manifest: path.join(__dirname, 'fixtures/manifest.json')
+        })
+      ]
+    }, ['<html lang="en" manifest="foo.appcache">'], null, done);
+  });
+
   it('shows an error when a template fails to load', function(done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),

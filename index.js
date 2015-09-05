@@ -53,12 +53,18 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
     // Get assets
     var assets = self.htmlWebpackPluginAssets(compilation, chunks);
     Promise.resolve()
-      // Favicon
+      // Favicon and manifest
       .then(function() {
         if (self.options.favicon) {
           return self.addFileToAssets(self.options.favicon, compilation)
             .then(function(faviconBasename){
               assets.favicon = faviconBasename;
+            });
+        }
+        if (self.options.manifest) {
+          return self.addFileToAssets(self.options.manifest, compilation)
+            .then(function(manifestBasename){
+              assets.manifest = manifestBasename;
             });
         }
       })
