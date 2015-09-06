@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/ampedandwired/html-webpack-plugin",
   "devDependencies": {
+    "appcache-webpack-plugin": "^0.2.0",
     "css-loader": "^0.15.4",
     "extract-text-webpack-plugin": "^0.8.2",
     "file-loader": "^0.8.4",
