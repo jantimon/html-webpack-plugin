@@ -4,6 +4,7 @@ var fs = require('fs');
 var webpack = require('webpack');
 var rm_rf = require('rimraf');
 var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
+var AppCachePlugin = require('appcache-webpack-plugin');
 var HtmlWebpackPlugin = require('../index.js');
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
@@ -583,11 +584,10 @@ describe('HtmlWebpackPlugin', function() {
         filename: 'index_bundle.js'
       },
       plugins: [
-        new HtmlWebpackPlugin({
-          manifest: path.join(__dirname, 'fixtures/manifest.json')
-        })
+        new AppCachePlugin({settings: ['prefer-online']}),
+        new HtmlWebpackPlugin()
       ]
-    }, ['<html manifest="manifest.json">'], null, done);
+    }, ['<html manifest="manifest.appcache">'], null, done);
   });
 
   it('does not add a manifest if already present', function(done) {
@@ -598,9 +598,9 @@ describe('HtmlWebpackPlugin', function() {
         filename: 'index_bundle.js'
       },
       plugins: [
+        new AppCachePlugin({settings: ['prefer-online']}),
         new HtmlWebpackPlugin({
           template: path.join(__dirname, 'fixtures/plain.html'),
-          manifest: path.join(__dirname, 'fixtures/manifest.json')
         })
       ]
     }, ['<html lang="en" manifest="foo.appcache">'], null, done);
