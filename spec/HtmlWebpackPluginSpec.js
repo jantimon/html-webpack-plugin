@@ -74,7 +74,7 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
   });
 
-  it('allows you to use a custom loader', function(done) {
+  it('allows you to specify a custom loader', function(done) {
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -86,6 +86,28 @@ describe('HtmlWebpackPlugin', function() {
       plugins: [new HtmlWebpackPlugin({
         inject: false,
         template: 'underscore-template-loader!' + path.join(__dirname, 'fixtures/underscore.html')
+      })]
+    },
+    ['<script src="app_bundle.js', 'Some unique text'], null, done);
+  });
+
+  it('uses a custom loader from webpacks config', function(done) {
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      module: {
+        loaders: [
+          {test: /\.html$/, loader: 'underscore-template-loader'}
+        ]
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: false,
+        template: path.join(__dirname, 'fixtures/underscore.html')
       })]
     },
     ['<script src="app_bundle.js', 'Some unique text'], null, done);
