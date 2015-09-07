@@ -3,8 +3,7 @@ var path = require('path');
 var fs = require('fs');
 var webpack = require('webpack');
 var rm_rf = require('rimraf');
-var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
-var AppCachePlugin = require('appcache-webpack-plugin');
+var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 var HtmlWebpackPlugin = require('../index.js');
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
@@ -86,10 +85,27 @@ describe('HtmlWebpackPlugin', function() {
       },
       plugins: [new HtmlWebpackPlugin({
         inject: false,
-        template: 'underscore-template-loader!' + path.join(__dirname, 'fixtures/underscore.html')
+        template: 'underscore-template-loader!' + path.join(__dirname, 'fixtures/test.html')
       })]
     },
     ['<script src="app_bundle.js', 'Some unique text'], null, done);
+  });
+
+  it('should pass through loader errors', function(done) {
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: false,
+        template: path.join(__dirname, 'fixtures/invalid.html')
+      })]
+    },
+    ['HtmlWebpackPlugin ReferenceError: foo is not defined'], null, done, true);
   });
 
   it('uses a custom loader from webpacks config', function(done) {
@@ -108,7 +124,7 @@ describe('HtmlWebpackPlugin', function() {
       },
       plugins: [new HtmlWebpackPlugin({
         inject: false,
-        template: path.join(__dirname, 'fixtures/underscore.html')
+        template: path.join(__dirname, 'fixtures/test.html')
       })]
     },
     ['<script src="app_bundle.js', 'Some unique text'], null, done);
@@ -140,7 +156,10 @@ describe('HtmlWebpackPlugin', function() {
         path: OUTPUT_DIR,
         filename: '[name]_bundle.js'
       },
-      plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/test.html')})]
+      plugins: [new HtmlWebpackPlugin({
+        template: path.join(__dirname, 'fixtures/test.html'),
+        inject: false
+      })]
     },
     ['<script src="app_bundle.js', 'Some unique text'], null, done);
   });
@@ -258,7 +277,7 @@ describe('HtmlWebpackPlugin', function() {
       },
       plugins: [new HtmlWebpackPlugin({
         templateContent: function() {
-          return fs.readFileSync(path.join(__dirname, 'fixtures/test.html'), 'utf8');
+          return fs.readFileSync(path.join(__dirname, 'fixtures/plain.html'), 'utf8');
         }
       })]
     },
@@ -577,6 +596,7 @@ describe('HtmlWebpackPlugin', function() {
   });
 
   it('adds a manifest', function(done) {
+    var AppCachePlugin = require('appcache-webpack-plugin');
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
@@ -591,6 +611,7 @@ describe('HtmlWebpackPlugin', function() {
   });
 
   it('does not add a manifest if already present', function(done) {
+    var AppCachePlugin = require('appcache-webpack-plugin');
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
