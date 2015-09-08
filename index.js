@@ -31,6 +31,12 @@ function HtmlWebpackPlugin(options) {
   if(this.options.template.indexOf('!') === -1) {
     this.options.template = require.resolve('./loader.js') + '!' + path.resolve(this.options.template);
   }
+  // Resolve template path
+  this.options.template = this.options.template.replace(
+    /(\!)([^\/\\][^\!\?]+|[^\/\\!?])($|\?.+$)/,
+    function(match, prefix, filepath, postfix) {
+      return prefix + path.resolve(filepath) + postfix;
+    });
 }
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
