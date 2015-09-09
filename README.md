@@ -14,6 +14,12 @@ Install the plugin with npm:
 $ npm install html-webpack-plugin --save-dev
 ```
 
+There is also a [2.0 beta branch](https://github.com/ampedandwired/html-webpack-plugin/tree/feature/loaders) which allows using loaders for templates.
+For further information on the 2.0 see its [pull-request](https://github.com/ampedandwired/html-webpack-plugin/pull/41) 
+```shell
+$ npm install html-webpack-plugin@2 --save-dev
+```
+
 
 Basic Usage
 -----------
