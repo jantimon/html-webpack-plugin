@@ -11,7 +11,7 @@ Installation
 ------------
 Install the plugin with npm:
 ```shell
-$ npm install html-webpack-plugin --save-dev
+$ npm install html-webpack-plugin@2 --save-dev
 ```
 
 
