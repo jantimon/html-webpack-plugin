@@ -627,6 +627,20 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<html lang="en" manifest="foo.appcache">'], null, done);
   });
 
+  it('works with webpack bannerplugin', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new webpack.BannerPlugin('Copyright and such.'),
+        new HtmlWebpackPlugin()
+      ]
+    }, ['<html'], null, done);
+  });
+
   it('shows an error when a template fails to load', function(done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),

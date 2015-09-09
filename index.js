@@ -185,8 +185,16 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, co
   if(!compilationResult) {
     return Promise.reject('The child compilation didn\'t provide a result');
   }
-  // Strip the leading 'var '
-  var source = compilationResult.source().substr(3);
+  var source = compilationResult.source();
+  // Strip the leading 'var ' if present.
+  // If webpack.BannerPlugin is used, `source` starts with given comment.
+  if (_.startsWith(source, 'var')) {
+    source = source.substr(3);
+  } else {
+    // Replace first matching result variable, so that only a function is left.
+    source = source.replace('var result =', '');
+  }
+
   // Evaluate code and cast to string
   var newSource;
   try {
