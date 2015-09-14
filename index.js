@@ -1,6 +1,7 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
+ var urlModule = require('url');
 var _ = require('lodash');
 var tmpl = require('blueimp-tmpl').tmpl;
 var Promise = require('bluebird');
@@ -101,6 +102,8 @@ HtmlWebpackPlugin.prototype.getTemplateContent = function(compilation, templateP
   if (!templateFile) {
     // Use a special index file to prevent double script / style injection if the `inject` option is truthy
     templateFile = path.join(__dirname, self.options.inject ? 'default_inject_index.html' : 'default_index.html');
+  } else {
+    templateFile = path.join(templateFile);
   }
   compilation.fileDependencies.push(templateFile);
   return fs.readFileAsync(templateFile, 'utf8')
@@ -176,7 +179,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
       path.relative(path.dirname(self.options.filename), '.');
 
   if (publicPath.length && publicPath.substr(-1, 1) !== '/') {
-    publicPath += '/';
+    publicPath = urlModule.resolve(publicPath + '/', '.') + '/';
   }
 
   var assets = {
