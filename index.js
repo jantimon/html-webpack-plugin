@@ -103,7 +103,7 @@ HtmlWebpackPlugin.prototype.getTemplateContent = function(compilation, templateP
     // Use a special index file to prevent double script / style injection if the `inject` option is truthy
     templateFile = path.join(__dirname, self.options.inject ? 'default_inject_index.html' : 'default_index.html');
   } else {
-    templateFile = path.join(templateFile);
+    templateFile = path.normalize(templateFile);
   }
   compilation.fileDependencies.push(templateFile);
   return fs.readFileAsync(templateFile, 'utf8')
