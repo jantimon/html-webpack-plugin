@@ -145,7 +145,7 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
   childCompiler.apply(
     new NodeTemplatePlugin(outputOptions),
     new NodeTargetPlugin(),
-    new LibraryTemplatePlugin('result', 'var'),
+    new LibraryTemplatePlugin('HTML_WEBPACK_PLUGIN_RESULT', 'var'),
     new SingleEntryPlugin(this.context, template),
     new LoaderTargetPlugin('node'),
     new webpack.DefinePlugin({ HTML_WEBPACK_PLUGIN : 'true' })
@@ -186,14 +186,8 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, co
     return Promise.reject('The child compilation didn\'t provide a result');
   }
   var source = compilationResult.source();
-  // Strip the leading 'var ' if present.
-  // If webpack.BannerPlugin is used, `source` starts with given comment.
-  if (_.startsWith(source, 'var')) {
-    source = source.substr(3);
-  } else {
-    // Replace first matching result variable, so that only a function is left.
-    source = source.replace('var result =', '');
-  }
+  // Replace first matching result variable, so that only a function is left.
+  source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
 
   // Evaluate code and cast to string
   var newSource;
