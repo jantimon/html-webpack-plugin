@@ -186,7 +186,8 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, co
     return Promise.reject('The child compilation didn\'t provide a result');
   }
   var source = compilationResult.source();
-  // Replace first matching result variable, so that only a function is left.
+  // The LibraryTemplatePlugin stores the template result in a local variable.
+  // To extract the result during the evaluation this part has to be removed.
   source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
 
   // Evaluate code and cast to string
