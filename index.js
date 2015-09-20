@@ -4,6 +4,7 @@ var fs = require('fs');
 var _ = require('lodash');
 var Promise = require('bluebird');
 var path = require('path');
+var urlModule = require('url');
 Promise.promisifyAll(fs);
 
 var webpack = require('webpack');
@@ -334,7 +335,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, chun
       path.relative(path.dirname(self.options.filename), '.');
 
   if (publicPath.length && publicPath.substr(-1, 1) !== '/') {
-    publicPath += '/';
+    publicPath = urlModule.resolve(publicPath + '/', '.');
   }
 
   var assets = {
