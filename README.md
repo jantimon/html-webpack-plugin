@@ -4,8 +4,8 @@ HTML Webpack Plugin
 
 This is a [webpack](http://webpack.github.io/) plugin that simplifies creation of HTML files to serve your
 webpack bundles. This is especially useful for webpack bundles that include
-a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you or supply
-your own template (using lodash/ejs templates.
+a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you, supply
+your own template using lodash templates or use your own loader.
 
 Installation
 ------------
@@ -13,7 +13,6 @@ Install the plugin with npm:
 ```shell
 $ npm install html-webpack-plugin@2 --save-dev
 ```
-
 
 Basic Usage
 -----------
@@ -142,6 +141,23 @@ plugins: [
 </html>
 ```
 
+If you already have a template loader, you can use it to parse the template.
+
+```javascript
+module: {
+  loaders: [
+    { test: /\.hbs$/, loader: "handlebars" }
+  ]
+},
+plugins: [
+  new HtmlWebpackPlugin({
+    title: 'Custom template using Handlebars',
+    template: 'my-index.hbs',
+    inject: 'body'
+  })
+]
+```
+
 Alternatively, if you already have your template's content in a String, you
 can pass it to the plugin using the `templateContent` option:
 ```javascript
@@ -153,7 +169,7 @@ plugins: [
 ]
 ```
 
-You can use the lodash/ejs syntax out of the box.
+You can use the lodash syntax out of the box.
 If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/ampedandwired/html-webpack-plugin/blob/master/default_index.html)
 as a starting point for writing your own.
 
