@@ -299,8 +299,14 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
   }
   // Add styles to the head
   head = head.concat(styles);
-  // Add scripts to body or head
-  if (this.options.inject === 'head') {
+  // Add scripts to body, head or referenced positions
+  if (this.options.inject === 'reference') {
+    // Append assets to referenced position
+    // Test regex here https://regex101.com/r/sV6bM4/1
+    html = html.replace(/(<!--\s*webpack\s*scripts\s*here\s*-->)/gmi, function () {
+      return scripts;
+    });
+  } else if (this.options.inject === 'head') {
     head = head.concat(scripts);
   } else {
     body = body.concat(scripts);
