@@ -131,6 +131,23 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
   });
 
+  it('allows you to inject the assets into the referenced position of the given template', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: 'reference',
+        template: path.join(__dirname, 'fixtures/plain_referenced.html')
+      })]
+    }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
+  });
+
   it('allows you to inject the assets into the body of the given template', function (done) {
     testHtmlPlugin({
       entry: {
