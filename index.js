@@ -335,7 +335,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, chun
       path.relative(path.dirname(self.options.filename), '.');
 
   if (publicPath.length && publicPath.substr(-1, 1) !== '/') {
-    publicPath = urlModule.resolve(publicPath, '.')  + '/';
+    publicPath = path.join(urlModule.resolve(publicPath + '/', '.'), '/');
   }
 
   var assets = {
