@@ -283,11 +283,11 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
   });
   // Turn script files into script tags
   scripts = scripts.map(function(scriptPath) {
-    return '<script src="' + scriptPath + '"></script>';
+    return '<script src="' + scriptPath + '"></script>\n';
   });
   // Turn css files into link tags
   styles = styles.map(function(stylePath) {
-    return '<link href="' + stylePath + '" rel="stylesheet">';
+    return '<link href="' + stylePath + '" rel="stylesheet">\n';
   });
   // Injections
   var head = [];
@@ -295,7 +295,7 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
 
   // If there is a favicon present, add it to the head
   if (assets.favicon) {
-    head.push('<link rel="shortcut icon" href="' + assets.favicon + '">');
+    head.push('<link rel="shortcut icon" href="' + assets.favicon + '">\n');
   }
   // Add styles to the head
   head = head.concat(styles);
