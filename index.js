@@ -259,9 +259,9 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function(html, assets) {
       if (self.options.minify) {
         var minify = require('html-minifier').minify;
         try {
-          return minify(html, this.options.minify);
+          return minify(html, self.options.minify);
         } catch(e) {
-          Promise.reject(e);
+          return Promise.reject(e);
         }
       }
       return html;
