@@ -304,6 +304,18 @@ describe('HtmlWebpackPlugin', function() {
     }, [/<script src="index_bundle_[0-9a-f]+\.js/], null, done);
   });
 
+  it('handles hashes in publicPath', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        publicPath: 'assets/[hash]/'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, [/<script src="assets\/[0-9a-f]+\/index_bundle\.js/], null, done);
+  });
+
   it('allows to append hashes to the assets', function(done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),
