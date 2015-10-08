@@ -260,7 +260,6 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function(html, assets) {
         var minify = require('html-minifier').minify;
         return minify(html, self.options.minify);
       }
-
       return html;
     });
 };
