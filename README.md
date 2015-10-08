@@ -1,5 +1,5 @@
 HTML Webpack Plugin
-=================== 
+===================
 [![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/ampedandwired/html-webpack-plugin.svg)](https://david-dm.org/ampedandwired/html-webpack-plugin) [![bitHound Score](https://www.bithound.io/github/ampedandwired/html-webpack-plugin/badges/score.svg)](https://www.bithound.io/github/ampedandwired/html-webpack-plugin) [![Build status](https://travis-ci.org/ampedandwired/html-webpack-plugin.svg)](https://travis-ci.org/ampedandwired/html-webpack-plugin)
 
 This is a [webpack](http://webpack.github.io/) plugin that simplifies creation of HTML files to serve your
@@ -77,7 +77,8 @@ Allowed values are as follows:
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
   included scripts and css files. This is useful for cache busting.
 - `chunks`: Allows you to add only some chunks (e.g. only the unit-test chunk)
-- `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk) 
+- `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk)
+- `reload`: Set to a url (typically `http://localhost:8080/webpack-dev-server.js` per [the documentation](http://webpack.github.io/docs/webpack-dev-server.html#hot-mode)) to inject a reload script into the `index.html`
 
 Here's an example webpack config illustrating how to use these options:
 ```javascript
@@ -252,4 +253,3 @@ plugins: [
   })
 ]
 ```
-

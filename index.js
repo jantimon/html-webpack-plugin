@@ -126,7 +126,7 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
   }
 
   // Inject link and script elements into an existing html file
-  if (this.options.inject) {
+  if (this.options.inject || this.options.reload) {
     html = this.injectAssetsIntoHtml(html, templateParams);
   }
 
@@ -276,7 +276,8 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
 
   // Gather all css and script files
   var styles = [];
-  var scripts = [];
+  var scripts = this.options.reload ? [this.options.reload] : [];
+
   chunks.forEach(function(chunkName) {
     styles = styles.concat(assets.chunks[chunkName].css);
     scripts.push(assets.chunks[chunkName].entry);
@@ -306,13 +307,9 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
     body = body.concat(scripts);
   }
   // Append assets to head element
-  html = html.replace(/(<\/head>)/i, function (match) {
-    return head.join('') + match;
-  });
+  html = appendAssets(html, head, /(<\/head>)/i);
   // Append assets to body element
-    html = html.replace(/(<\/body>)/i, function (match) {
-      return body.join('') + match;
-    });
+  html = appendAssets(html, body, /(<\/body>)/i);
   // Inject manifest into the opening html tag
   if (assets.manifest) {
     html = html.replace(/(<html[^>]*)(>)/i, function (match, start, end) {
@@ -348,5 +345,19 @@ HtmlWebpackPlugin.prototype.appendHash = function (url, hash) {
   return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
 };
 
+// private
+//
+function appendAssets(html, tags, re) {
+  if (tags.length > 0) {
+    return html.replace(re, function (match) {
+      return prettify(tags, match);
+    });
+  }
+  return html;
+}
+
+function prettify(tags, match) {
+  return '\t' + tags.join('\n\t\t') + '\n\t' + match;
+}
 
 module.exports = HtmlWebpackPlugin;

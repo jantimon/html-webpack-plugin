@@ -619,4 +619,18 @@ describe('HtmlWebpackPlugin', function() {
     }, ['Error: HtmlWebpackPlugin: could not load file'], null, done, true);
   });
 
+  it('allows you to specify reload as url', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          reload: 'http://reload'
+        })
+      ]
+    }, ['<script src="http://reload"></script>'], null, done);
+  });
 });
