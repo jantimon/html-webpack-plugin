@@ -29,12 +29,12 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
           webpack: webpackStatsJson,
           webpackConfig: compilation.options,
           htmlWebpackPlugin: {
-            files: self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.chunks, self.options.excludeChunks),
+            files: self.htmlWebpackPluginAssets(compilation, webpackStatsJson, self.options.chunks, self.options.excludeChunks, outputFilename),
             options: self.options,
           }
         };
         // Deprecate templateParams.htmlWebpackPlugin.assets
-        var assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson);
+        var assets = self.htmlWebpackPluginLegacyAssets(compilation, webpackStatsJson, outputFilename);
         Object.defineProperty(templateParams.htmlWebpackPlugin, 'assets', {
           get: function() {
             compilation.warnings.push(new Error('HtmlWebPackPlugin: htmlWebpackPlugin.assets is deprecated - please use inject or htmlWebpackPlugin.files instead' +
@@ -170,7 +170,7 @@ HtmlWebpackPlugin.prototype.addFileToAssets = function(compilation, filename) {
   });
 };
 
-HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, includedChunks, excludedChunks) {
+HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, includedChunks, excludedChunks, outputFilename) {
   var self = this;
 
   // Use the configured public path or build a relative path
@@ -233,7 +233,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
 
     // Prepend the public path to all chunk files
     var chunkFiles = [].concat(chunk.files).map(function(chunkFile) {
-      return publicPath + chunkFile;
+      return path.relative(path.dirname(outputFilename), chunkFile);
     });
 
     // Append a hash for cache busting
@@ -329,8 +329,8 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, templateParams
 /**
  * A helper to support the templates written for html-webpack-plugin <= 1.1.0
  */
-HtmlWebpackPlugin.prototype.htmlWebpackPluginLegacyAssets = function(compilation, webpackStatsJson) {
-  var assets = this.htmlWebpackPluginAssets(compilation, webpackStatsJson);
+HtmlWebpackPlugin.prototype.htmlWebpackPluginLegacyAssets = function(compilation, webpackStatsJson, outputFilename) {
+  var assets = this.htmlWebpackPluginAssets(compilation, webpackStatsJson, outputFilename);
   var legacyAssets = {};
   Object.keys(assets.chunks).forEach(function(chunkName){
     legacyAssets[chunkName] = assets.chunks[chunkName].entry;
