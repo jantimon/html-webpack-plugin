@@ -1,7 +1,7 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
- var urlModule = require('url');
+var urlModule = require('url');
 var _ = require('lodash');
 var tmpl = require('blueimp-tmpl').tmpl;
 var Promise = require('bluebird');
@@ -132,8 +132,13 @@ HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent
 
   // Minify the html output
   if (this.options.minify) {
-    var minify = require('html-minifier').minify;
-    html = minify(html, this.options.minify);
+    if (_.isObject(this.options.minify)) {
+      var minify = require('html-minifier').minify;
+      html = minify(html, this.options.minify);
+    } else {
+      compilation.warnings.push(new Error('HtmlWebPackPlugin: The option "minify" passed is not an object. Output is NOT minified.' +
+      ' See https://github.com/kangax/html-minifier#options-quick-reference for valid options.'));
+    }
   }
 
   compilation.assets[outputFilename] = {
