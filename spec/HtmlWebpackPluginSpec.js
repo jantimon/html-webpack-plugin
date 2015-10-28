@@ -464,6 +464,17 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<title>My Cool App</title>'], null, done);
   });
 
+  it('allows you to configure initial body contents of the generated HTML page', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({body: '<div id="app"></div>'})]
+    }, ['<div id="app"></div>'], null, done);
+  });
+
   it('allows you to configure the output filename', function(done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),
