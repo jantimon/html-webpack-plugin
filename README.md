@@ -67,6 +67,7 @@ You can pass a hash of configuration options to `HtmlWebpackPlugin`.
 Allowed values are as follows:
 
 - `title`: The title to use for the generated HTML document.
+- `body`: Initial content for the generated HTML document's `<body>`.
 - `filename`: The file to write the HTML to. Defaults to `index.html`.
    You can specify a subdirectory here too (eg: `assets/admin.html`).
 - `template`: A html template (supports [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).
@@ -91,6 +92,7 @@ Here's an example webpack config illustrating how to use these options:
   plugins: [
     new HtmlWebpackPlugin({
       title: 'My App',
+      body: '<div id="app"></div>',
       filename: 'assets/admin.html'
     })
   ]
