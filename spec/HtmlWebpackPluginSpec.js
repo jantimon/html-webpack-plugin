@@ -619,4 +619,50 @@ describe('HtmlWebpackPlugin', function() {
     }, ['Error: HtmlWebpackPlugin: could not load file'], null, done, true);
   });
 
+  it('should short the chunks', function(done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        index: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new CommonsChunkPlugin({
+          name: 'common',
+          filename: "common_bundle.js",
+        }),
+        new HtmlWebpackPlugin({
+          sortChunks: 'auto'
+        })
+      ]
+    }, [
+      /<script src="common_bundle.js">[\s\S]*<script src="util_bundle.js">/,
+      /<script src="common_bundle.js"[\s\S]*<script src="index_bundle.js">/], null, done);
+  });
+
+  it('should short the chunks with specific order', function(done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        index: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          sortChunks: function(a, b) {
+            if(a.id < b.id) {return 1;}
+            if(a.id > b.id) {return -1;}
+            return 0;
+          }
+        })
+      ]
+    }, [/<script src="util_bundle.js">[\s\S]*<script src="index_bundle.js">/,], null, done);
+  });
+
 });
