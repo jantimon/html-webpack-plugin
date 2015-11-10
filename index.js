@@ -220,6 +220,11 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
       continue;
     }
 
+    // Skip not initial chunks
+    if (!chunk.initial) {
+      continue;
+    }
+
     // Skip if the chunks should be filtered and the given chunk was not added explicity
     if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
       continue;
