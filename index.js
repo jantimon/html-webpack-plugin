@@ -117,7 +117,16 @@ HtmlWebpackPlugin.prototype.getTemplateContent = function(compilation, templateP
  * Compile the html template and push the result to the compilation assets
  */
 HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent, templateParams, outputFilename) {
-  var html;
+  var tplBasePAth = this.options.includeBasePath,
+    html;
+
+  // blueimp-tmpl fix for server-side rendering
+  // https://github.com/blueimp/JavaScript-Templates#server-side
+  tmpl.load = function (id) {
+    var file = path.join(tplBasePAth, id + ".html");
+    return fs.readFileSync(file, "utf8");
+  };
+
   // blueimp-tmpl processing
   try {
     html = tmpl(htmlTemplateContent, templateParams);
