@@ -71,7 +71,7 @@ Allowed values are as follows:
    You can specify a subdirectory here too (eg: `assets/admin.html`).
 - `template`: A html template (supports [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).
 - `templateContent`: A html string or a function returning the html  (supports [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).  
-- `includeBasePath`: base path to the html files call via include helper
+- `includeBasePath`: base path used to load files via the blueimp include helper
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
