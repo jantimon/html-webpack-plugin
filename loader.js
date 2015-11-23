@@ -1,8 +1,9 @@
+'use strict';
+
 var _ = require('lodash');
 var loaderUtils = require('loader-utils');
 
 module.exports = function (source) {
-  'use strict';
   if (this.cacheable) {
     this.cacheable();
   }
