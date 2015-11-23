@@ -300,6 +300,10 @@ HtmlWebpackPlugin.prototype.filterChunks = function (webpackStatsJson, includedC
     if (chunkName === undefined) {
       return false;
     }
+    // Skip if the chunk should be lazy loaded
+    if (!chunk.initial) {
+      return false;
+    }
     // Skip if the chunks should be filtered and the given chunk was not added explicity
     if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
       return false;
