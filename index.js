@@ -203,13 +203,20 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
     assets.favicon = self.appendHash(assets.favicon, webpackStatsJson.hash);
   }
 
-  var chunks = webpackStatsJson.chunks.sort(function orderEntryLast(a, b) {
-    if (a.entry !== b.entry) {
-      return b.entry ? 1 : -1;
-    } else {
-      return b.id - a.id;
-    }
-  });
+  var chunks = webpackStatsJson.chunks;
+  var sortChunks = this.options.sortChunks || 'auto';
+
+  if (sortChunks === 'auto') {
+    chunks.sort(function orderEntryLast(a, b) {
+      if (a.entry !== b.entry) {
+        return b.entry ? 1 : -1;
+      } else {
+        return b.id - a.id;
+      }
+    });
+  } else {
+    chunks.sort(this.options.sortChunks);
+  }
 
   for (var i = 0; i < chunks.length; i++) {
     var chunk = chunks[i];

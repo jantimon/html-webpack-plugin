@@ -77,6 +77,7 @@ Allowed values are as follows:
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
   included scripts and css files. This is useful for cache busting.
 - `chunks`: Allows you to add only some chunks (e.g. only the unit-test chunk)
+- `sortChunks`: Allows you to sort chunks default value is `auto` or user defined function 
 - `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk) 
 
 Here's an example webpack config illustrating how to use these options:
