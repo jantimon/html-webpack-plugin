@@ -170,6 +170,32 @@ HtmlWebpackPlugin.prototype.addFileToAssets = function(compilation, filename) {
   });
 };
 
+/**
+ * Helper to sort chunks
+ */
+HtmlWebpackPlugin.prototype.sortChunks = function(chunks, sortMode) {
+  // Sort mode auto by default: 
+  if (typeof sortMode === 'undefined' || sortMode === 'auto') {
+    return chunks.sort(function orderEntryLast(a, b) {
+      if (a.entry !== b.entry) {
+        return b.entry ? 1 : -1;
+      } else {
+        return b.id - a.id;
+      }
+    });
+  }
+  // Disabled sorting:
+  if (sortMode === 'none') {
+    return chunks;
+  }
+  // Custom function
+  if (typeof sortMode === 'function') {
+    return chunks.sort(sortMode);
+  }
+  // Invalid sort mode
+  throw new Error('"' + sortMode + '" is not a valid chunk sort mode');
+};
+
 HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webpackStatsJson, includedChunks, excludedChunks) {
   var self = this;
 
@@ -203,13 +229,8 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, webp
     assets.favicon = self.appendHash(assets.favicon, webpackStatsJson.hash);
   }
 
-  var chunks = webpackStatsJson.chunks.sort(function orderEntryLast(a, b) {
-    if (a.entry !== b.entry) {
-      return b.entry ? 1 : -1;
-    } else {
-      return b.id - a.id;
-    }
-  });
+  // Get sorted chunks
+  var chunks = HtmlWebpackPlugin.prototype.sortChunks(webpackStatsJson.chunks, this.options.chunksSortMode);
 
   for (var i = 0; i < chunks.length; i++) {
     var chunk = chunks[i];
