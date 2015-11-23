@@ -30,6 +30,7 @@
   "homepage": "https://github.com/ampedandwired/html-webpack-plugin",
   "devDependencies": {
     "css-loader": "^0.23.0",
+    "es6-promise": "^3.0.2",
     "extract-text-webpack-plugin": "^0.9.1",
     "file-loader": "^0.8.4",
     "jasmine-node": "^1.14.5",
