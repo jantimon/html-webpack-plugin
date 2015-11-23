@@ -56,6 +56,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
   compiler.plugin('emit', function(compilation, callback) {
     // Get all chunks
     var chunks = self.filterChunks(compilation.getStats().toJson(), self.options.chunks, self.options.excludeChunks);
+    // Sort chunks
+    chunks = self.sortChunks(chunks, self.options.chunksSortMode);
     // Get assets
     var assets = self.htmlWebpackPluginAssets(compilation, chunks);
     Promise.resolve()
@@ -291,10 +293,36 @@ HtmlWebpackPlugin.prototype.addFileToAssets = function(filename, compilation) {
 };
 
 /**
+ * Helper to sort chunks
+ */
+HtmlWebpackPlugin.prototype.sortChunks = function(chunks, sortMode) {
+  // Sort mode auto by default: 
+  if (typeof sortMode === 'undefined' || sortMode === 'auto') {
+    return chunks.sort(function orderEntryLast(a, b) {
+      if (a.entry !== b.entry) {
+        return b.entry ? 1 : -1;
+      } else {
+        return b.id - a.id;
+      }
+    });
+  }
+  // Disabled sorting:
+  if (sortMode === 'none') {
+    return chunks;
+  }
+  // Custom function
+  if (typeof sortMode === 'function') {
+    return chunks.sort(sortMode);
+  }
+  // Invalid sort mode
+  throw new Error('"' + sortMode + '" is not a valid chunk sort mode');
+};
+
+/**
  * Return all chunks from the compilation result which match the exclude and include filters
  */
 HtmlWebpackPlugin.prototype.filterChunks = function (webpackStatsJson, includedChunks, excludedChunks) {
-  var chunks = webpackStatsJson.chunks.filter(function(chunk){
+  return webpackStatsJson.chunks.filter(function(chunk){
     var chunkName = chunk.names[0];
     // This chunk doesn't have a name. This script can't handled it.
     if (chunkName === undefined) {
@@ -314,13 +342,6 @@ HtmlWebpackPlugin.prototype.filterChunks = function (webpackStatsJson, includedC
     }
     // Add otherwise
     return true;
-  });
-  return chunks.sort(function orderEntryLast(a, b) {
-    if (a.entry !== b.entry) {
-      return b.entry ? 1 : -1;
-    } else {
-      return b.id - a.id;
-    }
   });
 };
 
