@@ -117,13 +117,13 @@ HtmlWebpackPlugin.prototype.getTemplateContent = function(compilation, templateP
  * Compile the html template and push the result to the compilation assets
  */
 HtmlWebpackPlugin.prototype.emitHtml = function(compilation, htmlTemplateContent, templateParams, outputFilename) {
-  var tplBasePAth = this.options.includeBasePath,
+  var templateBasePath = this.options.templateBasePath,
     html;
 
   // blueimp-tmpl fix for server-side rendering
   // https://github.com/blueimp/JavaScript-Templates#server-side
   tmpl.load = function (id) {
-    var file = path.join(tplBasePAth, id + ".html");
+    var file = path.join(templateBasePath, id + ".html");
     return fs.readFileSync(file, "utf8");
   };
 
@@ -183,7 +183,7 @@ HtmlWebpackPlugin.prototype.addFileToAssets = function(compilation, filename) {
  * Helper to sort chunks
  */
 HtmlWebpackPlugin.prototype.sortChunks = function(chunks, sortMode) {
-  // Sort mode auto by default: 
+  // Sort mode auto by default:
   if (typeof sortMode === 'undefined' || sortMode === 'auto') {
     return chunks.sort(function orderEntryLast(a, b) {
       if (a.entry !== b.entry) {
