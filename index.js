@@ -5,6 +5,10 @@ var path = require('path');
 var _ = require('lodash');
 var tmpl = require('blueimp-tmpl').tmpl;
 var Promise = require('bluebird');
+Promise.config({
+  // Disable warnings
+  warnings: false
+});
 Promise.promisifyAll(fs);
 
 function HtmlWebpackPlugin(options) {
