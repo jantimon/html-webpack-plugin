@@ -1,5 +1,5 @@
 HTML Webpack Plugin
-=================== 
+===================
 [![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/ampedandwired/html-webpack-plugin.svg)](https://david-dm.org/ampedandwired/html-webpack-plugin) [![bitHound Score](https://www.bithound.io/github/ampedandwired/html-webpack-plugin/badges/score.svg)](https://www.bithound.io/github/ampedandwired/html-webpack-plugin) [![Build status](https://travis-ci.org/ampedandwired/html-webpack-plugin.svg)](https://travis-ci.org/ampedandwired/html-webpack-plugin)
 
 This is a [webpack](http://webpack.github.io/) plugin that simplifies creation of HTML files to serve your
@@ -15,7 +15,7 @@ $ npm install html-webpack-plugin --save-dev
 ```
 
 There is also a [2.0 beta branch](https://github.com/ampedandwired/html-webpack-plugin/tree/feature/loaders) which allows using loaders for templates.
-For further information on 2.0 see the according [pull-request](https://github.com/ampedandwired/html-webpack-plugin/pull/41) 
+For further information on 2.0 see the according [pull-request](https://github.com/ampedandwired/html-webpack-plugin/pull/41)
 ```shell
 $ npm install html-webpack-plugin@2 --save-dev
 ```
@@ -71,13 +71,14 @@ Allowed values are as follows:
    You can specify a subdirectory here too (eg: `assets/admin.html`).
 - `template`: A html template (supports [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).
 - `templateContent`: A html string or a function returning the html  (supports [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).  
+- `templateBasePath`: base path to the html files call via include helper
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
   included scripts and css files. This is useful for cache busting.
 - `chunks`: Allows you to add only some chunks (e.g. only the unit-test chunk)
-- `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk) 
+- `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk)
 - `chunksSortMode`: Allows to controll how chunks should be sorted before they are included to the html. Allowed values: 'none' | 'default' | {function} - default: 'auto'
 
 Here's an example webpack config illustrating how to use these options:
@@ -129,7 +130,7 @@ and favicon files into the markup.
 ```javascript
 plugins: [
   new HtmlWebpackPlugin({
-    title: 'Custom template', 
+    title: 'Custom template',
     template: 'my-index.html', // Load a custom template
     inject: 'body' // Inject all scripts into the body
   })
@@ -253,4 +254,3 @@ plugins: [
   })
 ]
 ```
-
