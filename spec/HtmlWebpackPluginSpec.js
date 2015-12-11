@@ -1,6 +1,6 @@
 'use strict';
 
-// Workaround for css-loader issue 
+// Workaround for css-loader issue
 // https://github.com/webpack/css-loader/issues/144
 if (!global.Promise) {
   require('es6-promise').polyfill();
@@ -279,7 +279,7 @@ describe('HtmlWebpackPlugin', function() {
       },
       plugins: [new HtmlWebpackPlugin({
         templateContent: '{% include("plain", {}); %}',
-        includeBasePath: path.join(__dirname, 'fixtures')
+        templateBasePath: path.join(__dirname, 'fixtures')
       })]
     },
     [fs.readFileSync(path.join(__dirname, 'fixtures/plain.html')) + ''],
