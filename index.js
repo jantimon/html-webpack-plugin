@@ -20,6 +20,7 @@ function HtmlWebpackPlugin(options) {
     filename: 'index.html',
     hash: false,
     inject: true,
+    injectDivWithId: false,
     compile: true,
     favicon: false,
     minify: false,
@@ -296,7 +297,7 @@ HtmlWebpackPlugin.prototype.addFileToAssets = function(filename, compilation) {
  * Helper to sort chunks
  */
 HtmlWebpackPlugin.prototype.sortChunks = function(chunks, sortMode) {
-  // Sort mode auto by default: 
+  // Sort mode auto by default:
   if (typeof sortMode === 'undefined' || sortMode === 'auto') {
     return chunks.sort(function orderEntryLast(a, b) {
       if (a.entry !== b.entry) {
@@ -455,6 +456,10 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, assets) {
     head = head.concat(scripts);
   } else {
     body = body.concat(scripts);
+  }
+  // Add a div with given ID to body
+  if (this.options.injectDivWithId) {
+    body.unshift('<div id="' + this.options.injectDivWithId + '"></div>');
   }
   // Append assets to head element
   html = html.replace(/(<\/head>)/i, function (match) {
