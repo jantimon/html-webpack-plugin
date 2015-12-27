@@ -1,6 +1,6 @@
 'use strict';
 
-// Workaround for css-loader issue 
+// Workaround for css-loader issue
 // https://github.com/webpack/css-loader/issues/144
 if (!global.Promise) {
   require('es6-promise').polyfill();
@@ -707,6 +707,21 @@ describe('HtmlWebpackPlugin', function() {
         })
       ]
     }, [/<script src="a_bundle.js">.+<script src="b_bundle.js">.+<script src="c_bundle.js">/], null, done);
+  });
+
+  it('should inject a div with a given ID', function(done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          injectDivWithId: 'container'
+        })
+      ]
+    }, ['<div id="container"></div>'], null, done);
   });
 
 });
