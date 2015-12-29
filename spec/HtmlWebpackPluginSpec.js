@@ -511,9 +511,10 @@ describe('HtmlWebpackPlugin', function() {
           template: path.join(__dirname, 'fixtures/test.html')
         })
       ]
-    }, ['<script src="index_bundle.js"'], null, done);
-
-    expect(fs.existsSync(path.join(__dirname, 'fixtures/test.html'))).toBe(true);
+    }, ['<script src="index_bundle.js"'], null, function () {
+      expect(fs.existsSync(path.join(OUTPUT_DIR, './test.html'))).toBe(true);
+      done();
+    });
   });
 
   it('should inject js css files even if the html file is incomplete', function (done) {
