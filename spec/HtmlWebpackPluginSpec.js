@@ -1,6 +1,6 @@
 'use strict';
 
-// Workaround for css-loader issue 
+// Workaround for css-loader issue
 // https://github.com/webpack/css-loader/issues/144
 if (!global.Promise) {
   require('es6-promise').polyfill();
@@ -311,7 +311,7 @@ describe('HtmlWebpackPlugin', function() {
         filename: 'index_bundle_[hash].js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, [/<script src="index_bundle_[0-9a-f]+\.js/], null, done);
+    }, [/<script src="index_bundle_[0-9a-f]+\.js"*/], null, done);
   });
 
   it('allows to append hashes to the assets', function(done) {
@@ -514,6 +514,26 @@ describe('HtmlWebpackPlugin', function() {
     }, ['<script src="index_bundle.js"'], null, done);
 
     expect(fs.existsSync(path.join(__dirname, 'fixtures/test.html'))).toBe(true);
+  });
+
+  it('should inject js css files even if the html file is incomplete', function (done) {
+    var ExtractTextPlugin = require("extract-text-webpack-plugin");
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/empty_html.html')}),
+        new ExtractTextPlugin("styles.css")
+      ]
+    }, ['<link href="styles.css"', '<script src="index_bundle.js"'], null, done);
   });
 
   it('exposes the webpack configuration to templates', function(done) {

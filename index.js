@@ -442,8 +442,11 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, assets) {
     return '<link href="' + stylePath + '" rel="stylesheet">';
   });
   // Injections
+  var htmlRegExp = /(<html[^>]*>)/i;
   var head = [];
+  var headRegExp = /(<\/head>)/i;
   var body = [];
+  var bodyRegExp = /(<\/body>)/i;
 
   // If there is a favicon present, add it to the head
   if (assets.favicon) {
@@ -457,14 +460,37 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, assets) {
   } else {
     body = body.concat(scripts);
   }
-  // Append assets to head element
-  html = html.replace(/(<\/head>)/i, function (match) {
-    return head.join('') + match;
-  });
-  // Append assets to body element
-    html = html.replace(/(<\/body>)/i, function (match) {
-      return body.join('') + match;
+
+  if (body.length) {
+    if(bodyRegExp.test(html)) {
+      // Append assets to body element
+      html = html.replace(bodyRegExp, function (match) {
+        return body.join('') + match;
+      });
+    } else {
+      // Append scripts to the end of the file if no <body> element exists:
+      html += body.join('');
+    }
+  }
+
+  if (head.length) {
+    // Create a head tag if none exists
+    if (!headRegExp.test(html)) {
+      if (!htmlRegExp.test(html)) {
+        html = '<head></head>' + html;
+      } else {
+        html = html.replace(htmlRegExp, function(match) {
+          return match + '<head></head>';
+        });
+      }
+    }
+
+    // Append assets to head element
+    html = html.replace(headRegExp, function (match) {
+      return head.join('') + match;
     });
+  }
+
   // Inject manifest into the opening html tag
   if (assets.manifest) {
     html = html.replace(/(<html[^>]*)(>)/i, function (match, start, end) {
