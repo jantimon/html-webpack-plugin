@@ -14,6 +14,10 @@ module.exports = function (source) {
   if (allLoadersButThisOne.length > 0) {
     return source;
   }
+  // Skip .js files
+  if (/\.js$/.test(this.request)) {
+    return source;
+  }
   // Use underscore for a minimalistic loader
   var options = loaderUtils.parseQuery(this.query);
   var template = _.template(source, options);

@@ -11,14 +11,12 @@ module.exports = {
     loaders: [
       { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
       { test: /\.png$/, loader: 'file-loader' },
-      { test: /\.html$/, loader: 'html-loader' },
+      { test: /\.html$/, loader: 'html-loader' }
     ]
   },
   plugins: [
     new HtmlWebpackPlugin({
-      filename: 'html-loader.html',
-      favicon: 'favicon.ico',
-      template: 'template.html'
+      template: 'template.js'
     }),
     new ExtractTextPlugin('styles.css')
   ]

@@ -23,6 +23,7 @@ function HtmlWebpackPlugin(options) {
     compile: true,
     favicon: false,
     minify: false,
+    cache: true,
     chunks: 'all',
     excludeChunks: [],
     title: 'Webpack App'
@@ -84,7 +85,10 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
         }
         // Once everything is compiled evaluate the html factory
         // and replace it with its content
-        return self.evaluateCompilationResult(compilation, resultAsset);
+        if (self.built || !self.options.cache) {
+          self.evaluatedCompilationResult = self.evaluateCompilationResult(compilation, resultAsset);
+        }
+        return self.evaluatedCompilationResult;
       })
       // Execute the template
       .then(function(compilationResult) {
@@ -153,15 +157,6 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
     new webpack.DefinePlugin({ HTML_WEBPACK_PLUGIN : 'true' })
   );
 
-  // Create a subCache (copied from https://github.com/SanderSpies/extract-text-webpack-plugin/blob/master/loader.js)
-  childCompiler.plugin('compilation', function(compilation) {
-    if(compilation.cache) {
-      if(!compilation.cache[compilerName]) {
-        compilation.cache[compilerName] = {};
-      }
-      compilation.cache = compilation.cache[compilerName];
-    }
-  });
   // Compile and return a promise
   return new Promise(function (resolve, reject) {
     childCompiler.runAsChild(function(err, entries, childCompilation) {
@@ -173,10 +168,12 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
 
         reject('Child compilation failed:\n' + errorDetails);
       } else {
-        resolve(compilation.assets[outputFilename]);
+        this.built = this.hash !== entries[0].hash;
+        this.hash = entries[0].hash;
+        resolve(childCompilation.assets[outputFilename]);
       }
-    });
-  });
+    }.bind(this));
+  }.bind(this));
 };
 
 /**
@@ -187,6 +184,7 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, co
   if(!compilationResult) {
     return Promise.reject('The child compilation didn\'t provide a result');
   }
+
   var source = compilationResult.source();
   // The LibraryTemplatePlugin stores the template result in a local variable.
   // To extract the result during the evaluation this part has to be removed.
@@ -247,6 +245,9 @@ HtmlWebpackPlugin.prototype.executeTemplate = function(templateFunction, chunks,
  */
 HtmlWebpackPlugin.prototype.postProcessHtml = function(html, assets) {
   var self = this;
+  if (typeof html !== 'string') {
+    return Promise.reject('Expected html to be a string but got ' + JSON.stringify(html));
+  }
   return Promise.resolve()
     // Inject
     .then(function() {
@@ -296,7 +297,7 @@ HtmlWebpackPlugin.prototype.addFileToAssets = function(filename, compilation) {
  * Helper to sort chunks
  */
 HtmlWebpackPlugin.prototype.sortChunks = function(chunks, sortMode) {
-  // Sort mode auto by default: 
+  // Sort mode auto by default:
   if (typeof sortMode === 'undefined' || sortMode === 'auto') {
     return chunks.sort(function orderEntryLast(a, b) {
       if (a.entry !== b.entry) {
