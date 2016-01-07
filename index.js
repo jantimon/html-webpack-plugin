@@ -55,12 +55,22 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
   });
 
   compiler.plugin('emit', function(compilation, callback) {
+    var applyPluginsAsyncWaterfall = Promise.promisify(compilation.applyPluginsAsyncWaterfall, {context: compilation});
     // Get all chunks
     var chunks = self.filterChunks(compilation.getStats().toJson(), self.options.chunks, self.options.excludeChunks);
     // Sort chunks
     chunks = self.sortChunks(chunks, self.options.chunksSortMode);
     // Get assets
     var assets = self.htmlWebpackPluginAssets(compilation, chunks);
+
+    // If the template and the assets did not change we don't have to emit the html
+    var assetJson = JSON.stringify(assets);
+    if (self.options.cache && !self.built && assetJson === self.assetJson) {
+      return callback();
+    } else {
+      self.assetJson = assetJson;
+    }
+
     Promise.resolve()
       // Favicon
       .then(function() {
@@ -75,9 +85,9 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
       .then(function() {
         return compilationPromise;
       })
-      .then(function(resultAsset) {
-        if (resultAsset instanceof Error) {
-          return Promise.reject(resultAsset);
+      .then(function(compiledTemplate) {
+        if (compiledTemplate instanceof Error) {
+          return Promise.reject(compiledTemplate);
         }
         // Allow to use a custom function / string instead
         if (self.options.templateContent) {
@@ -85,10 +95,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
         }
         // Once everything is compiled evaluate the html factory
         // and replace it with its content
-        if (self.built || !self.options.cache) {
-          self.evaluatedCompilationResult = self.evaluateCompilationResult(compilation, resultAsset);
-        }
-        return self.evaluatedCompilationResult;
+        return self.evaluateCompilationResult(compilation, compiledTemplate);
       })
       // Execute the template
       .then(function(compilationResult) {
@@ -99,13 +106,11 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
       })
       // Allow plugins to change the html before assets are injected
       .then(function(html) {
-        return new Promise(function(resolve){
-          var pluginArgs = {html: html, assets: assets, plugin: self};
-          compilation.applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-processing', pluginArgs,
-          function() {
-            resolve(pluginArgs.html);
+        var pluginArgs = {html: html, assets: assets, plugin: self};
+        return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-processing', pluginArgs)
+          .then(function() {
+            return pluginArgs.html;
           });
-        });
       })
       .then(function(html) {
         // Add the stylesheets, scripts and so on to the resulting html
@@ -113,13 +118,11 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
       })
       // Allow plugins to change the html after assets are injected
       .then(function(html) {
-        return new Promise(function(resolve){
-          var pluginArgs = {html: html, assets: assets, plugin: self};
-          compilation.applyPluginsAsyncWaterfall('html-webpack-plugin-after-html-processing', pluginArgs,
-          function() {
-            resolve(pluginArgs.html);
+        var pluginArgs = {html: html, assets: assets, plugin: self};
+        return applyPluginsAsyncWaterfall('html-webpack-plugin-after-html-processing', pluginArgs)
+          .then(function() {
+            return pluginArgs.html;
           });
-        });
       })
       .catch(function(err) {
         // In case anything went wrong the promise is resolved
@@ -138,6 +141,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
             return html.length;
           }
         };
+      })
+      .then(function(){
         // Let other plugins know that we are done:
         compilation.applyPluginsAsyncWaterfall('html-webpack-plugin-after-emit', {
           html: compilation.assets[self.options.filename],
@@ -167,6 +172,7 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
     filename: outputFilename,
     publicPath: compilation.outputOptions.publicPath
   };
+  var cachedAsset = compilation.assets[outputOptions.filename];
   // Create an additional child compiler which takes the template
   // and turns it into an Node.JS html factory.
   // This allows us to use loaders during the compilation
@@ -184,6 +190,10 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
   // Compile and return a promise
   return new Promise(function (resolve, reject) {
     childCompiler.runAsChild(function(err, entries, childCompilation) {
+      compilation.assets[outputOptions.filename] = cachedAsset;
+      if (cachedAsset === undefined) {
+        delete compilation.assets[outputOptions.filename];
+      }
       // Resolve / reject the promise
       if (childCompilation.errors && childCompilation.errors.length) {
         var errorDetails = childCompilation.errors.map(function(error) {
@@ -194,7 +204,7 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
       } else {
         this.built = this.hash !== entries[0].hash;
         this.hash = entries[0].hash;
-        resolve(childCompilation.assets[outputFilename]);
+        resolve(childCompilation.assets[outputOptions.filename]);
       }
     }.bind(this));
   }.bind(this));
