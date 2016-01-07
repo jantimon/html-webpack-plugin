@@ -1,6 +1,6 @@
 {
   "name": "html-webpack-plugin",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "main": "index.js",
   "files": [
@@ -31,25 +31,25 @@
   "homepage": "https://github.com/ampedandwired/html-webpack-plugin",
   "devDependencies": {
     "appcache-webpack-plugin": "^1.2.1",
-    "css-loader": "^0.23.0",
+    "css-loader": "^0.23.1",
     "es6-promise": "^3.0.2",
-    "extract-text-webpack-plugin": "^0.9.1",
-    "file-loader": "^0.8.4",
-    "html-loader": "^0.3.0",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.8.5",
+    "html-loader": "^0.4.0",
     "jade-loader": "^0.8.0",
     "jasmine-node": "^1.14.5",
-    "jshint": "^2.9.1-rc1",
-    "rimraf": "^2.4.4",
+    "jshint": "^2.9.1-rc2",
+    "rimraf": "^2.5.0",
     "style-loader": "^0.13.0",
     "underscore-template-loader": "^0.5.2",
-    "url-loader": "^0.5.6",
-    "webpack": "^1.12.8"
+    "url-loader": "^0.5.7",
+    "webpack": "^1.12.10"
   },
   "dependencies": {
-    "loader-utils": "^0.2.11",
+    "loader-utils": "^0.2.12",
     "syntax-error": "^1.1.4",
-    "bluebird": "^3.0.5",
-    "html-minifier": "^1.0.0",
+    "bluebird": "^3.1.1",
+    "html-minifier": "^1.1.1",
     "lodash": "^3.10.1"
   }
 }
