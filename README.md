@@ -263,3 +263,20 @@ plugins: [
 ]
 ```
 
+Events
+------
+
+To allow other plugins to alter the html this plugin executes the following events:
+
+ * `html-webpack-plugin-before-html-processing`
+ * `html-webpack-plugin-after-html-processing`
+ * `html-webpack-plugin-after-emit`
+
+Usage:
+
+```
+  compilation.plugin('html-webpack-plugin-before-html-processing', function(htmlPluginData, callback) {
+    htmlPluginData.html += 'The magic footer';
+    callback();
+  });
+```

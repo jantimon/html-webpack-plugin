@@ -97,9 +97,29 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
         return typeof compilationResult !== 'function' ? compilationResult :
           self.executeTemplate(compilationResult, chunks, assets, compilation);
       })
+      // Allow plugins to change the html before assets are injected
+      .then(function(html) {
+        return new Promise(function(resolve){
+          var pluginArgs = {html: html, assets: assets, plugin: self};
+          compilation.applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-processing', pluginArgs,
+          function() {
+            resolve(pluginArgs.html);
+          });
+        });
+      })
       .then(function(html) {
         // Add the stylesheets, scripts and so on to the resulting html
         return self.postProcessHtml(html, assets);
+      })
+      // Allow plugins to change the html after assets are injected
+      .then(function(html) {
+        return new Promise(function(resolve){
+          var pluginArgs = {html: html, assets: assets, plugin: self};
+          compilation.applyPluginsAsyncWaterfall('html-webpack-plugin-after-html-processing', pluginArgs,
+          function() {
+            resolve(pluginArgs.html);
+          });
+        });
       })
       .catch(function(err) {
         // In case anything went wrong the promise is resolved
@@ -118,7 +138,11 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
             return html.length;
           }
         };
-        callback();
+        // Let other plugins know that we are done:
+        compilation.applyPluginsAsyncWaterfall('html-webpack-plugin-after-emit', {
+          html: compilation.assets[self.options.filename],
+          plugin: self
+        }, callback);
       });
     });
 };
@@ -424,21 +448,12 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, chun
  * Injects the assets into the given html string
  */
 HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function(html, assets) {
-  var chunks = Object.keys(assets.chunks);
-
-  // Gather all css and script files
-  var styles = [];
-  var scripts = [];
-  chunks.forEach(function(chunkName) {
-    styles = styles.concat(assets.chunks[chunkName].css);
-    scripts.push(assets.chunks[chunkName].entry);
-  });
   // Turn script files into script tags
-  scripts = scripts.map(function(scriptPath) {
+  var scripts = assets.js.map(function(scriptPath) {
     return '<script src="' + scriptPath + '"></script>';
   });
   // Turn css files into link tags
-  styles = styles.map(function(stylePath) {
+  var styles = assets.css.map(function(stylePath) {
     return '<link href="' + stylePath + '" rel="stylesheet">';
   });
   // Injections

@@ -551,6 +551,159 @@ describe('HtmlWebpackPlugin', function() {
     ['Public path is https://cdn.com'], null, done);
   });
 
+  it('fires the html-webpack-plugin-before-html-processing event', function(done) {
+    var eventFired = false;
+    var examplePlugin = {
+      apply: function(compiler) {
+        compiler.plugin('compilation', function(compilation) {
+          compilation.plugin('html-webpack-plugin-before-html-processing', function(object, callback) {
+            eventFired = true;
+            callback();
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    },[], null, function() {
+      expect(eventFired).toBe(true);
+      done();
+    });
+  });
+
+  it('fires the html-webpack-plugin-after-html-processing event', function(done) {
+    var eventFired = false;
+    var examplePlugin = {
+      apply: function(compiler) {
+        compiler.plugin('compilation', function(compilation) {
+          compilation.plugin('html-webpack-plugin-after-html-processing', function(object, callback) {
+            eventFired = true;
+            callback();
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    },[], null, function() {
+      expect(eventFired).toBe(true);
+      done();
+    });
+  });
+
+  it('fires the html-webpack-plugin-after-emit event', function(done) {
+    var eventFired = false;
+    var examplePlugin = {
+      apply: function(compiler) {
+        compiler.plugin('compilation', function(compilation) {
+          compilation.plugin('html-webpack-plugin-after-emit', function(object, callback) {
+            eventFired = true;
+            callback();
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    },[], null, function() {
+      expect(eventFired).toBe(true);
+      done();
+    });
+  });
+
+  it('allows to modify the html during html-webpack-plugin-after-html-processing event', function(done) {
+    var eventFired = false;
+    var examplePlugin = {
+      apply: function(compiler) {
+        compiler.plugin('compilation', function(compilation) {
+          compilation.plugin('html-webpack-plugin-after-html-processing', function(object, callback) {
+            eventFired = true;
+            object.html += 'Injected by plugin';
+            callback();
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    },['Injected by plugin'], null, function() {
+      expect(eventFired).toBe(true);
+      done();
+    });
+  });
+
+  it('allows to modify the html during html-webpack-plugin-before-html-processing event', function(done) {
+    var eventFired = false;
+    var examplePlugin = {
+      apply: function(compiler) {
+        compiler.plugin('compilation', function(compilation) {
+          compilation.plugin('html-webpack-plugin-before-html-processing', function(object, callback) {
+            eventFired = true;
+            object.assets.js.push('funky-script.js');
+            object.html += 'Injected by plugin';
+            callback();
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    },['Injected by plugin', '<script src="funky-script.js"'], null, function() {
+      expect(eventFired).toBe(true);
+      done();
+    });
+  });
+
   it('works with commons chunk plugin', function(done) {
     testHtmlPlugin({
       debug: true,
