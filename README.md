@@ -7,19 +7,25 @@ webpack bundles. This is especially useful for webpack bundles that include
 a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you or supply
 your own template (using [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).
 
-Installation
-------------
-Install the plugin with npm:
-```shell
-$ npm install html-webpack-plugin --save-dev
-```
 
-There is also a [2.0 beta branch](https://github.com/ampedandwired/html-webpack-plugin/tree/feature/loaders) which allows using loaders for templates.
-For further information on 2.0 see the according [pull-request](https://github.com/ampedandwired/html-webpack-plugin/pull/41) 
+Version 2.x
+-----------
+
+HTML Webpack Plugin 2.x is in beta right now however we are planing to release it soon.
+
+Installation:
 ```shell
 $ npm install html-webpack-plugin@2 --save-dev
 ```
 
+Please take a look at the [HTML Webpack Plugin 2.x readme](https://github.com/ampedandwired/html-webpack-plugin/tree/feature/loaders)
+
+Installation
+------------
+Install the old version of the plugin with npm:
+```shell
+$ npm install html-webpack-plugin --save-dev
+```
 
 Basic Usage
 -----------
