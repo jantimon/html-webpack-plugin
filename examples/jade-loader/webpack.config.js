@@ -16,9 +16,10 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      filename: 'jade-loader.html',
+      filename: 'index.html',
       favicon: 'favicon.ico',
-      template: 'template.jade'
+      template: 'template.jade',
+      title: 'Jade demo'
     }),
     new ExtractTextPlugin('styles.css')
   ]

@@ -1,13 +1,12 @@
 {
   "name": "html-webpack-plugin",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "main": "index.js",
   "files": [
     "index.js",
     "loader.js",
-    "default_index.html",
-    "default_inject_index.html"
+    "default_index.html"
   ],
   "scripts": {
     "pretest": "jshint *.js spec",
@@ -21,7 +20,7 @@
     "webpack",
     "plugin",
     "html",
-    "generate"
+    "html-webpack-plugin"
   ],
   "author": "Charles Blaxland <charles.blaxland@gmail.com> (https://github.com/ampedandwired)",
   "license": "MIT",

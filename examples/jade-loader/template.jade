@@ -1,5 +1,8 @@
 doctype html
 html
   head
-    title my jade template
+    title= htmlWebpackPlugin.options.title
   body
+    #main
+      - locals.time = new Date();
+      include ./time.jade

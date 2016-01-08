@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Example template</title>
+  <title><%= htmlWebpackPlugin.options.title %></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-  <img src="logo.png">
+  <%= require('html!./partial.html') %>
 </body>
 </html>
