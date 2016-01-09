@@ -1,6 +1,6 @@
 'use strict';
 
-// Workaround for css-loader issue 
+// Workaround for css-loader issue
 // https://github.com/webpack/css-loader/issues/144
 if (!global.Promise) {
   require('es6-promise').polyfill();
@@ -520,9 +520,10 @@ describe('HtmlWebpackPlugin', function() {
           template: path.join(__dirname, 'fixtures/test.html')
         })
       ]
-    }, ['<script src="index_bundle.js"'], null, done);
-
-    expect(fs.existsSync(path.join(__dirname, 'fixtures/test.html'))).toBe(true);
+    }, ['<script src="index_bundle.js"'], null, function () {
+      done();
+      expect(fs.existsSync(path.join(OUTPUT_DIR, './test.html'))).toBe(true);
+    });
   });
 
   it('registers a webpack error if the template cannot be opened', function(done) {
