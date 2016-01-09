@@ -21,5 +21,5 @@ module.exports = function (source) {
   // Use underscore for a minimalistic loader
   var options = loaderUtils.parseQuery(this.query);
   var template = _.template(source, options);
-  return 'module.exports = ' + template;
+  return 'var _ = require("lodash"); module.exports = ' + template;
 };
