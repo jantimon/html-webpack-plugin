@@ -148,6 +148,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
           html: compilation.assets[self.options.filename],
           plugin: self
         }, callback);
+        return null;
       });
     });
 };
