@@ -28,7 +28,7 @@ function HtmlWebpackPlugin(options) {
     excludeChunks: [],
     title: 'Webpack App'
   }, options);
-  // If the template doesn't use a loader use the blueimp template loader
+  // If the template doesn't use a loader use the lodash template loader
   if(this.options.template.indexOf('!') === -1) {
     this.options.template = require.resolve('./loader.js') + '!' + path.resolve(this.options.template);
   }
