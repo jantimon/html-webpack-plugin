@@ -210,7 +210,7 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
                   return error.message + (error.error ? ':\n' + error.error: '');
                 }).join('\n');
 
-              reject('Child compilation failed:\n' + errorDetails);
+              reject(new Error('Child compilation failed:\n' + errorDetails));
             } else {
               self.built = self.hash !== entries[0].hash;
               self.hash = entries[0].hash;
@@ -228,7 +228,7 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
  */
 HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, compilationResult) {
   if(!compilationResult) {
-    return Promise.reject('The child compilation didn\'t provide a result');
+    return Promise.reject(new Error('The child compilation didn\'t provide a result'));
   }
 
   var source = compilationResult.source();
@@ -252,7 +252,7 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, co
   }
   return typeof newSource === 'string' || typeof newSource === 'function' ?
     Promise.resolve(newSource) :
-    Promise.reject('The loader "' + this.options.template + '" didn\'t return html.');
+    Promise.reject(new Error('The loader "' + this.options.template + '" didn\'t return html.'));
 };
 
 /**
@@ -292,7 +292,7 @@ HtmlWebpackPlugin.prototype.executeTemplate = function(templateFunction, chunks,
 HtmlWebpackPlugin.prototype.postProcessHtml = function(html, assets) {
   var self = this;
   if (typeof html !== 'string') {
-    return Promise.reject('Expected html to be a string but got ' + JSON.stringify(html));
+    return Promise.reject(new Error('Expected html to be a string but got ' + JSON.stringify(html)));
   }
   return Promise.resolve()
     // Inject
