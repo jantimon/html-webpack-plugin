@@ -13,6 +13,10 @@ var LoaderTargetPlugin = require('webpack/lib/LoaderTargetPlugin');
 var LibraryTemplatePlugin = require('webpack/lib/LibraryTemplatePlugin');
 var SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 
+var compileQueue = {
+  // template: promise
+};
+
 function HtmlWebpackPlugin(options) {
   // Default options
   this.options = _.extend({
@@ -189,26 +193,33 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
   );
 
   // Compile and return a promise
+  var self = this;
   return new Promise(function (resolve, reject) {
-    childCompiler.runAsChild(function(err, entries, childCompilation) {
-      compilation.assets[outputOptions.filename] = cachedAsset;
-      if (cachedAsset === undefined) {
-        delete compilation.assets[outputOptions.filename];
-      }
-      // Resolve / reject the promise
-      if (childCompilation.errors && childCompilation.errors.length) {
-        var errorDetails = childCompilation.errors.map(function(error) {
-            return error.message + (error.error ? ':\n' + error.error: '');
-          }).join('\n');
+    compileQueue[self.options.template] = (compileQueue[self.options.template] || Promise.resolve())
+      .then(function() {
+        return new Promise(function(queueResolve) {
+          childCompiler.runAsChild(function(err, entries, childCompilation) {
+            queueResolve();
+            compilation.assets[outputOptions.filename] = cachedAsset;
+            if (cachedAsset === undefined) {
+              delete compilation.assets[outputOptions.filename];
+            }
+            // Resolve / reject the promise
+            if (childCompilation.errors && childCompilation.errors.length) {
+              var errorDetails = childCompilation.errors.map(function(error) {
+                  return error.message + (error.error ? ':\n' + error.error: '');
+                }).join('\n');
 
-        reject('Child compilation failed:\n' + errorDetails);
-      } else {
-        this.built = this.hash !== entries[0].hash;
-        this.hash = entries[0].hash;
-        resolve(childCompilation.assets[outputOptions.filename]);
-      }
-    }.bind(this));
-  }.bind(this));
+              reject('Child compilation failed:\n' + errorDetails);
+            } else {
+              self.built = self.hash !== entries[0].hash;
+              self.hash = entries[0].hash;
+              resolve(childCompilation.assets[outputOptions.filename]);
+            }
+          });
+        });
+      });
+  });
 };
 
 /**
