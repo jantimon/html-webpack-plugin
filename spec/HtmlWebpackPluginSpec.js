@@ -507,13 +507,20 @@ describe('HtmlWebpackPlugin', function() {
       plugins: [
         new HtmlWebpackPlugin(),
         new HtmlWebpackPlugin({
-          filename: 'test.html',
+          filename: 'second-file.html',
+          template: path.join(__dirname, 'fixtures/test.html')
+        }),
+        new HtmlWebpackPlugin({
+          filename: 'third-file.html',
           template: path.join(__dirname, 'fixtures/test.html')
         })
       ]
-    }, ['<script src="index_bundle.js"'], null, done);
+    }, ['<script src="index_bundle.js"'], null, function(){
+      expect(fs.existsSync(path.join(OUTPUT_DIR, 'second-file.html'))).toBe(true);
+      expect(fs.existsSync(path.join(OUTPUT_DIR, 'third-file.html'))).toBe(true);
+      done();
+    });
 
-    expect(fs.existsSync(path.join(__dirname, 'fixtures/test.html'))).toBe(true);
   });
 
   it('should inject js css files even if the html file is incomplete', function (done) {
