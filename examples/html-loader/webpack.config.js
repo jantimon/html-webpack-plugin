@@ -16,7 +16,12 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      filename: 'html-loader.html',
+      filename: 'index.html',
+      favicon: 'favicon.ico',
+      template: 'template.html'
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'about.html',
       favicon: 'favicon.ico',
       template: 'template.html'
     }),

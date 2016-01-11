@@ -46,12 +46,20 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
   self.context = compiler.context;
 
   compiler.plugin('make', function(compilation, callback) {
-    // Compile the template
-    compilationPromise = self.compileTemplate(self.options.template, self.options.filename, compilation)
-      .catch(function(err) {
-        return new Error(err);
-      })
-      .finally(callback);
+    // Compile the template (queued)
+    compilationPromise = getNextCompilationSlot(compiler, function() {
+      return self.compileTemplate(self.options.template, self.options.filename, compilation)
+        .catch(function(err) {
+          return new Error(err);
+        })
+        .finally(callback);
+    });
+  });
+
+  compiler.plugin('after-compile', function(compilation, callback) {
+    // Clear the compilation queue
+    delete compiler.HtmlWebpackPluginQueue;
+    callback();
   });
 
   compiler.plugin('emit', function(compilation, callback) {
@@ -547,5 +555,14 @@ HtmlWebpackPlugin.prototype.appendHash = function (url, hash) {
   return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
 };
 
+/**
+ * Helper to prevent compilation in parallel
+ * Fixes an issue where incomplete cache modules were used
+ */
+function getNextCompilationSlot(compiler, newEntry) {
+  compiler.HtmlWebpackPluginQueue = (compiler.HtmlWebpackPluginQueue || Promise.resolve())
+    .then(newEntry);
+  return compiler.HtmlWebpackPluginQueue;
+}
 
 module.exports = HtmlWebpackPlugin;
