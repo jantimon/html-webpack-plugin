@@ -171,7 +171,7 @@ plugins: [
 ```
 
 You can use the lodash syntax out of the box.
-If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/ampedandwired/html-webpack-plugin/blob/master/default_index.html)
+If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/ampedandwired/html-webpack-plugin/blob/feature/loaders/default_index.html)
 as a starting point for writing your own.
 
 The `templateContent` option can also be a function to use another template language like jade:
