@@ -4,14 +4,9 @@ var fs = require('fs');
 var _ = require('lodash');
 var Promise = require('bluebird');
 var path = require('path');
+var childCompiler = require('./lib/compiler.js');
+var prettyError = require('./lib/errors.js');
 Promise.promisifyAll(fs);
-
-var webpack = require('webpack');
-var NodeTemplatePlugin = require('webpack/lib/node/NodeTemplatePlugin');
-var NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
-var LoaderTargetPlugin = require('webpack/lib/LoaderTargetPlugin');
-var LibraryTemplatePlugin = require('webpack/lib/LibraryTemplatePlugin');
-var SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 
 function HtmlWebpackPlugin(options) {
   // Default options
@@ -24,13 +19,14 @@ function HtmlWebpackPlugin(options) {
     favicon: false,
     minify: false,
     cache: true,
+    showErrors: true,
     chunks: 'all',
     excludeChunks: [],
     title: 'Webpack App'
   }, options);
   // If the template doesn't use a loader use the lodash template loader
   if(this.options.template.indexOf('!') === -1) {
-    this.options.template = require.resolve('./loader.js') + '!' + path.resolve(this.options.template);
+    this.options.template = require.resolve('./lib/loader.js') + '!' + path.resolve(this.options.template);
   }
   // Resolve template path
   this.options.template = this.options.template.replace(
@@ -42,17 +38,26 @@ function HtmlWebpackPlugin(options) {
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
+  var isCompilationCached = false;
   var compilationPromise;
-  self.context = compiler.context;
 
   compiler.plugin('make', function(compilation, callback) {
     // Compile the template (queued)
     compilationPromise = getNextCompilationSlot(compiler, function() {
-      return self.compileTemplate(self.options.template, self.options.filename, compilation)
+      return childCompiler.compileTemplate(self.options.template, compiler.context, self.options.filename, compilation)
         .catch(function(err) {
-          return new Error(err);
+          compilation.errors.push(prettyError(err, compiler.context).toString());
+          return {
+            content: self.options.showErrors ? prettyError(err, compiler.context).toJsonHtml() : 'ERROR',
+          };
         })
-        .finally(callback);
+        .then(function(compilationResult) {
+          // If the compilation change didnt change the cache is valid
+          isCompilationCached = compilationResult.hash && self.hash === compilationResult.hash;
+          self.hash = compilation.hash;
+          callback();
+          return compilationResult.content;
+        });
     });
   });
 
@@ -73,7 +78,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
 
     // If the template and the assets did not change we don't have to emit the html
     var assetJson = JSON.stringify(assets);
-    if (self.options.cache && !self.built && assetJson === self.assetJson) {
+    if (isCompilationCached && self.options.cache && assetJson === self.assetJson) {
       return callback();
     } else {
       self.assetJson = assetJson;
@@ -94,9 +99,6 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
         return compilationPromise;
       })
       .then(function(compiledTemplate) {
-        if (compiledTemplate instanceof Error) {
-          return Promise.reject(compiledTemplate);
-        }
         // Allow to use a custom function / string instead
         if (self.options.templateContent) {
           return self.options.templateContent;
@@ -135,9 +137,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
       .catch(function(err) {
         // In case anything went wrong the promise is resolved
         // with the error message and an error is logged
-        var errorMessage = "HtmlWebpackPlugin " + err;
-        compilation.errors.push(new Error(errorMessage));
-        return errorMessage;
+        compilation.errors.push(prettyError(err, compiler.context).toString());
+        return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
       })
       .then(function(html) {
         // Replace the compilation result with the evaluated html code
@@ -169,73 +170,14 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
 };
 
 /**
- * Returns the child compiler name
- */
-HtmlWebpackPlugin.prototype.getCompilerName = function() {
-  var absolutePath = path.resolve(this.context, this.options.filename);
-  var relativePath = path.relative(this.context, absolutePath);
-  return 'html-webpack-plugin for "' + (absolutePath.length < relativePath.length ? absolutePath : relativePath) + '"';
-};
-
-/**
- * Compiles the template into a nodejs factory, adds its to the compilation.assets
- * and returns a promise of the result asset object.
- */
-HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename, compilation) {
-  // The entry file is just an empty helper as the dynamic template
-  // require is added in "loader.js"
-  var outputOptions = {
-    filename: outputFilename,
-    publicPath: compilation.outputOptions.publicPath
-  };
-  var cachedAsset = compilation.assets[outputOptions.filename];
-  // Create an additional child compiler which takes the template
-  // and turns it into an Node.JS html factory.
-  // This allows us to use loaders during the compilation
-  var compilerName = this.getCompilerName();
-  var childCompiler = compilation.createChildCompiler(compilerName, outputOptions);
-  childCompiler.apply(
-    new NodeTemplatePlugin(outputOptions),
-    new NodeTargetPlugin(),
-    new LibraryTemplatePlugin('HTML_WEBPACK_PLUGIN_RESULT', 'var'),
-    new SingleEntryPlugin(this.context, template),
-    new LoaderTargetPlugin('node'),
-    new webpack.DefinePlugin({ HTML_WEBPACK_PLUGIN : 'true' })
-  );
-
-  // Compile and return a promise
-  return new Promise(function (resolve, reject) {
-    childCompiler.runAsChild(function(err, entries, childCompilation) {
-      compilation.assets[outputOptions.filename] = cachedAsset;
-      if (cachedAsset === undefined) {
-        delete compilation.assets[outputOptions.filename];
-      }
-      // Resolve / reject the promise
-      if (childCompilation.errors && childCompilation.errors.length) {
-        var errorDetails = childCompilation.errors.map(function(error) {
-            return error.message + (error.error ? ':\n' + error.error: '');
-          }).join('\n');
-
-        reject('Child compilation failed:\n' + errorDetails);
-      } else {
-        this.built = this.hash !== entries[0].hash;
-        this.hash = entries[0].hash;
-        resolve(childCompilation.assets[outputOptions.filename]);
-      }
-    }.bind(this));
-  }.bind(this));
-};
-
-/**
  * Evaluates the child compilation result
  * Returns a promise
  */
-HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, compilationResult) {
-  if(!compilationResult) {
+HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, source) {
+  if (!source) {
     return Promise.reject('The child compilation didn\'t provide a result');
   }
 
-  var source = compilationResult.source();
   // The LibraryTemplatePlugin stores the template result in a local variable.
   // To extract the result during the evaluation this part has to be removed.
   source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
@@ -243,15 +185,8 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, co
   // Evaluate code and cast to string
   var newSource;
   try {
-    newSource = vm.runInThisContext(source);
+    newSource = vm.runInNewContext(source, {HTML_WEBPACK_PLUGIN: true}, {filename: 'html-plugin-evaluation'});
   } catch (e) {
-    // Log syntax error
-    var syntaxError = require('syntax-error')(source);
-    var errorMessage = 'Template compilation failed: ' + e +
-      (syntaxError ? '\n' + syntaxError + '\n\n\n' + source.split('\n').map(function(row, i) {
-        return (1 + i) + '  - ' + row;
-      }).join('\n') : '');
-    compilation.errors.push(new Error(errorMessage));
     return Promise.reject(e);
   }
   return typeof newSource === 'string' || typeof newSource === 'function' ?
@@ -556,8 +491,8 @@ HtmlWebpackPlugin.prototype.appendHash = function (url, hash) {
 };
 
 /**
- * Helper to prevent compilation in parallel
- * Fixes an issue where incomplete cache modules were used
+ * Helper to prevent html-plugin compilation in parallel
+ * Fixes "No source available" where incomplete cache modules were used
  */
 function getNextCompilationSlot(compiler, newEntry) {
   compiler.HtmlWebpackPluginQueue = (compiler.HtmlWebpackPluginQueue || Promise.resolve())

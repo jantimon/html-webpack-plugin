@@ -14,6 +14,7 @@ module.exports = {
       { test: /\.html$/, loader: 'html-loader' }
     ]
   },
+  devtool: 'eval',
   plugins: [
     new HtmlWebpackPlugin({
       template: 'template.js'

@@ -14,6 +14,7 @@ module.exports = {
       { test: /\.jade$/, loader: 'jade'}
     ]
   },
+  devtool: 'eval',
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',

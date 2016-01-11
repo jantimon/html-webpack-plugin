@@ -112,7 +112,7 @@ describe('HtmlWebpackPlugin', function() {
         template: path.join(__dirname, 'fixtures/invalid.html')
       })]
     },
-    ['HtmlWebpackPlugin ReferenceError: foo is not defined'], null, done, true);
+    ['ReferenceError: foo is not defined'], null, done, true);
   });
 
   it('uses a custom loader from webpacks config', function(done) {
@@ -840,7 +840,7 @@ describe('HtmlWebpackPlugin', function() {
           template: path.join(__dirname, 'fixtures/non-existing-template.html')
         })
       ]
-    }, ["HtmlWebpackPlugin Error: Child compilation failed:\nEntry module not found: Error: Cannot resolve 'file' or 'directory'"], null, done, true);
+    }, ["Child compilation failed:\n  Entry module not found: Error: Cannot resolve 'file' or 'directory'"], null, done, true);
   });
 
   it('should short the chunks', function(done) {
