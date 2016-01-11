@@ -144,10 +144,18 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
       })
       .then(function(){
         // Let other plugins know that we are done:
-        compilation.applyPluginsAsyncWaterfall('html-webpack-plugin-after-emit', {
+        return applyPluginsAsyncWaterfall('html-webpack-plugin-after-emit', {
           html: compilation.assets[self.options.filename],
           plugin: self
-        }, callback);
+        });
+      })
+      // Let webpack continue with it
+      .finally(function(){
+        callback();
+        // Tell blue bird that we don't want to wait for callback.
+        // Fixes "Warning: a promise was created in a handler but none were returned from it"
+        // https://github.com/petkaantonov/bluebird/blob/master/docs/docs/warning-explanations.md#warning-a-promise-was-created-in-a-handler-but-none-were-returned-from-it
+        return null;
       });
     });
 };
