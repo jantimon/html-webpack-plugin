@@ -13,6 +13,10 @@ var LoaderTargetPlugin = require('webpack/lib/LoaderTargetPlugin');
 var LibraryTemplatePlugin = require('webpack/lib/LibraryTemplatePlugin');
 var SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 
+var compileQueue = {
+  // template: promise
+};
+
 function HtmlWebpackPlugin(options) {
   // Default options
   this.options = _.extend({
@@ -148,6 +152,7 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
           html: compilation.assets[self.options.filename],
           plugin: self
         }, callback);
+        return null;
       });
     });
 };
@@ -188,26 +193,33 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
   );
 
   // Compile and return a promise
+  var self = this;
   return new Promise(function (resolve, reject) {
-    childCompiler.runAsChild(function(err, entries, childCompilation) {
-      compilation.assets[outputOptions.filename] = cachedAsset;
-      if (cachedAsset === undefined) {
-        delete compilation.assets[outputOptions.filename];
-      }
-      // Resolve / reject the promise
-      if (childCompilation.errors && childCompilation.errors.length) {
-        var errorDetails = childCompilation.errors.map(function(error) {
-            return error.message + (error.error ? ':\n' + error.error: '');
-          }).join('\n');
+    compileQueue[self.options.template] = (compileQueue[self.options.template] || Promise.resolve())
+      .then(function() {
+        return new Promise(function(queueResolve) {
+          childCompiler.runAsChild(function(err, entries, childCompilation) {
+            queueResolve();
+            compilation.assets[outputOptions.filename] = cachedAsset;
+            if (cachedAsset === undefined) {
+              delete compilation.assets[outputOptions.filename];
+            }
+            // Resolve / reject the promise
+            if (childCompilation.errors && childCompilation.errors.length) {
+              var errorDetails = childCompilation.errors.map(function(error) {
+                  return error.message + (error.error ? ':\n' + error.error: '');
+                }).join('\n');
 
-        reject('Child compilation failed:\n' + errorDetails);
-      } else {
-        this.built = this.hash !== entries[0].hash;
-        this.hash = entries[0].hash;
-        resolve(childCompilation.assets[outputOptions.filename]);
-      }
-    }.bind(this));
-  }.bind(this));
+              reject(new Error('Child compilation failed:\n' + errorDetails));
+            } else {
+              self.built = self.hash !== entries[0].hash;
+              self.hash = entries[0].hash;
+              resolve(childCompilation.assets[outputOptions.filename]);
+            }
+          });
+        });
+      });
+  });
 };
 
 /**
@@ -216,7 +228,7 @@ HtmlWebpackPlugin.prototype.compileTemplate = function(template, outputFilename,
  */
 HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, compilationResult) {
   if(!compilationResult) {
-    return Promise.reject('The child compilation didn\'t provide a result');
+    return Promise.reject(new Error('The child compilation didn\'t provide a result'));
   }
 
   var source = compilationResult.source();
@@ -240,7 +252,7 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function(compilation, co
   }
   return typeof newSource === 'string' || typeof newSource === 'function' ?
     Promise.resolve(newSource) :
-    Promise.reject('The loader "' + this.options.template + '" didn\'t return html.');
+    Promise.reject(new Error('The loader "' + this.options.template + '" didn\'t return html.'));
 };
 
 /**
@@ -280,7 +292,7 @@ HtmlWebpackPlugin.prototype.executeTemplate = function(templateFunction, chunks,
 HtmlWebpackPlugin.prototype.postProcessHtml = function(html, assets) {
   var self = this;
   if (typeof html !== 'string') {
-    return Promise.reject('Expected html to be a string but got ' + JSON.stringify(html));
+    return Promise.reject(new Error('Expected html to be a string but got ' + JSON.stringify(html)));
   }
   return Promise.resolve()
     // Inject
