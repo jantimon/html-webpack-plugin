@@ -6,9 +6,7 @@
   "files": [
     "index.js",
     "default_index.html",
-    "lib/errors.js",
-    "lib/compiler.js",
-    "lib/loader.js"
+    "lib/"
   ],
   "scripts": {
     "pretest": "jshint *.js spec",
