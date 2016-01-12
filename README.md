@@ -276,9 +276,9 @@ To allow other plugins to alter the html this plugin executes the following even
 
 Usage:
 
-```
-  compilation.plugin('html-webpack-plugin-before-html-processing', function(htmlPluginData, callback) {
-    htmlPluginData.html += 'The magic footer';
-    callback();
-  });
+```javascript
+compilation.plugin('html-webpack-plugin-before-html-processing', function(htmlPluginData, callback) {
+  htmlPluginData.html += 'The magic footer';
+  callback();
+});
 ```
