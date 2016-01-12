@@ -1,12 +1,14 @@
 {
   "name": "html-webpack-plugin",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "main": "index.js",
   "files": [
     "index.js",
-    "loader.js",
-    "default_index.html"
+    "default_index.html",
+    "lib/errors.js",
+    "lib/compiler.js",
+    "lib/loader.js"
   ],
   "scripts": {
     "pretest": "jshint *.js spec",
