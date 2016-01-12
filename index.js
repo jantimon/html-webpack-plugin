@@ -138,6 +138,8 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
         // In case anything went wrong the promise is resolved
         // with the error message and an error is logged
         compilation.errors.push(prettyError(err, compiler.context).toString());
+        // Prevent caching
+        self.hash = null;
         return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
       })
       .then(function(html) {
