@@ -370,7 +370,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function(compilation, chun
     var chunkName = chunk.names[0];
 
     assets.chunks[chunkName] = {};
-    assets.chunks[chunkName].source = compilation.assets[chunk.files[0]].source.bind(compilation.assets[chunk.files[0]])
+    assets.chunks[chunkName].source = compilation.assets[chunk.files[0]].source.bind(compilation.assets[chunk.files[0]]);
 
     // Prepend the public path to all chunk files
     var chunkFiles = [].concat(chunk.files).map(function(chunkFile) {
