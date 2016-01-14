@@ -889,4 +889,18 @@ describe('HtmlWebpackPlugin', function() {
     }, [/<script src="a_bundle.js">.+<script src="b_bundle.js">.+<script src="c_bundle.js">/], null, done);
   });
 
+  it('allows you to insert compiled assets content into html template', function(done) {
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js'),
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        template: path.join(__dirname, 'fixtures/inline_compiled_assets.html'),
+      })]
+    }, ['webpackJsonp', 'module.exports = "common"'], null, done);
+  });
 });
