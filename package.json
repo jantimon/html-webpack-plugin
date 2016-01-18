@@ -31,6 +31,7 @@
   "devDependencies": {
     "appcache-webpack-plugin": "^1.2.1",
     "css-loader": "^0.23.1",
+    "dir-compare": "0.0.2",
     "es6-promise": "^3.0.2",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",

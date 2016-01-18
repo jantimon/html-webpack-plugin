@@ -20,9 +20,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'template.html',
-      minify:{    
-        removeComments:true,    
-        collapseWhitespace:true 
+      minify:{
+        removeComments:true,
+        collapseWhitespace:true
       }
     }),
     new ExtractTextPlugin('styles.css')

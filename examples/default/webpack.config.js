@@ -1,4 +1,4 @@
-var HtmlWebpackPlugin = require('..');
+var HtmlWebpackPlugin = require('../..');
 module.exports = {
   entry: './example.js',
   output: {
