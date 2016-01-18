@@ -24,22 +24,14 @@ function HtmlWebpackPlugin(options) {
     excludeChunks: [],
     title: 'Webpack App'
   }, options);
-  // If the template doesn't use a loader use the lodash template loader
-  if(this.options.template.indexOf('!') === -1) {
-    this.options.template = require.resolve('./lib/loader.js') + '!' + path.resolve(this.options.template);
-  }
-  // Resolve template path
-  this.options.template = this.options.template.replace(
-    /(\!)([^\/\\][^\!\?]+|[^\/\\!?])($|\?.+$)/,
-    function(match, prefix, filepath, postfix) {
-      return prefix + path.resolve(filepath) + postfix;
-    });
 }
 
 HtmlWebpackPlugin.prototype.apply = function(compiler) {
   var self = this;
   var isCompilationCached = false;
   var compilationPromise;
+
+  this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
 
   compiler.plugin('make', function(compilation, callback) {
     // Compile the template (queued)
@@ -258,6 +250,7 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function(html, assets) {
  * Pushes the content of the given filename to the compilation assets
  */
 HtmlWebpackPlugin.prototype.addFileToAssets = function(filename, compilation) {
+  filename = path.resolve(compilation.compiler.context, filename);
   return Promise.props({
     size: fs.statAsync(filename),
     source: fs.readFileAsync(filename)
@@ -490,6 +483,19 @@ HtmlWebpackPlugin.prototype.appendHash = function (url, hash) {
     return url;
   }
   return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
+};
+
+HtmlWebpackPlugin.prototype.getFullTemplatePath = function(template, context) {
+  // If the template doesn't use a loader use the lodash template loader
+  if(template.indexOf('!') === -1) {
+    template = require.resolve('./lib/loader.js') + '!' + path.resolve(context, template);
+  }
+  // Resolve template path
+  return template.replace(
+    /(\!)([^\/\\][^\!\?]+|[^\/\\!?])($|\?.+$)/,
+    function(match, prefix, filepath, postfix) {
+      return prefix + path.resolve(filepath) + postfix;
+    });
 };
 
 /**
