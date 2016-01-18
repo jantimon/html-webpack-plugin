@@ -11,7 +11,7 @@ Promise.promisifyAll(fs);
 function HtmlWebpackPlugin(options) {
   // Default options
   this.options = _.extend({
-    template: __dirname + '/default_index.html',
+    template: __dirname + '/default_index.ejs',
     filename: 'index.html',
     hash: false,
     inject: true,
