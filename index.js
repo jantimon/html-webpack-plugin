@@ -35,22 +35,20 @@ HtmlWebpackPlugin.prototype.apply = function(compiler) {
 
   compiler.plugin('make', function(compilation, callback) {
     // Compile the template (queued)
-    compilationPromise = getNextCompilationSlot(compiler, function() {
-      return childCompiler.compileTemplate(self.options.template, compiler.context, self.options.filename, compilation)
-        .catch(function(err) {
-          compilation.errors.push(prettyError(err, compiler.context).toString());
-          return {
-            content: self.options.showErrors ? prettyError(err, compiler.context).toJsonHtml() : 'ERROR',
-          };
-        })
-        .then(function(compilationResult) {
-          // If the compilation change didnt change the cache is valid
-          isCompilationCached = compilationResult.hash && self.hash === compilationResult.hash;
-          self.hash = compilation.hash;
-          callback();
-          return compilationResult.content;
-        });
-    });
+    compilationPromise = childCompiler.compileTemplate(self.options.template, compiler.context, self.options.filename, compilation)
+      .catch(function(err) {
+        compilation.errors.push(prettyError(err, compiler.context).toString());
+        return {
+          content: self.options.showErrors ? prettyError(err, compiler.context).toJsonHtml() : 'ERROR'
+        };
+      })
+      .then(function(compilationResult) {
+        // If the compilation change didnt change the cache is valid
+        isCompilationCached = compilationResult.hash && self.hash === compilationResult.hash;
+        self.hash = compilation.hash;
+        callback();
+        return compilationResult.content;
+      });
   });
 
   compiler.plugin('after-compile', function(compilation, callback) {
@@ -497,15 +495,5 @@ HtmlWebpackPlugin.prototype.getFullTemplatePath = function(template, context) {
       return prefix + path.resolve(filepath) + postfix;
     });
 };
-
-/**
- * Helper to prevent html-plugin compilation in parallel
- * Fixes "No source available" where incomplete cache modules were used
- */
-function getNextCompilationSlot(compiler, newEntry) {
-  compiler.HtmlWebpackPluginQueue = (compiler.HtmlWebpackPluginQueue || Promise.resolve())
-    .then(newEntry);
-  return compiler.HtmlWebpackPluginQueue;
-}
 
 module.exports = HtmlWebpackPlugin;
