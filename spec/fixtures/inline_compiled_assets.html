@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <title>inline compiled assets</title>
+  </head>
+  <body>
+    <script>
+      <%= htmlWebpackPlugin.files.chunks.app.source() %>
+    </script>
+  </body>
+</html>
