@@ -332,7 +332,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
   // Use the configured public path or build a relative path
   var publicPath = typeof compilation.options.output.publicPath !== 'undefined'
     ? compilation.options.output.publicPath
-    : path.relative(path.dirname(self.options.filename), '.');
+    : path.relative(path.dirname(self.options.filename), '.').split(path.sep).join('/');
 
   if (publicPath.length && publicPath.substr(-1, 1) !== '/') {
     publicPath += '/';
