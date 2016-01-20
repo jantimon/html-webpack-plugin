@@ -49,11 +49,12 @@
 	// Use the same template for the frontend code
 	var template = __webpack_require__(5);
 
-	setInterval(function() {
+	setInterval(function () {
 	  var div = document.getElementById('main');
-	  div.innerHTML = template({ time: new Date()});
+	  div.innerHTML = template({ time: new Date() });
 	  div.style.color = 'navy';
 	}, 1000);
+
 
 /***/ },
 /* 1 */
@@ -75,7 +76,7 @@
 	var jade_mixins = {};
 	var jade_interp;
 	;var locals_for_with = (locals || {});(function (time) {
-	buf.push("<!-- this partial is used for frontend and backend--><div class=\"time\"> <b>Current time</b><p>" + (jade.escape((jade_interp = time.toTimeString()) == null ? '' : jade_interp)) + "</p></div><img" + (jade.attr("src", "" + (__webpack_require__(8)) + "", true, true)) + ">");}.call(this,"time" in locals_for_with?locals_for_with.time:typeof time!=="undefined"?time:undefined));;return buf.join("");
+	buf.push("<!-- this partial is used for frontend and backend--><div class=\"time\"> <b>Current time</b><p>" + (jade.escape((jade_interp = time.toISOString()) == null ? '' : jade_interp)) + "</p></div><img" + (jade.attr("src", "" + (__webpack_require__(8)) + "", true, true)) + ">");}.call(this,"time" in locals_for_with?locals_for_with.time:typeof time!=="undefined"?time:undefined));;return buf.join("");
 	}
 
 /***/ },

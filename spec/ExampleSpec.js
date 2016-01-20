@@ -1,3 +1,4 @@
+/* global describe, it, expect */
 'use strict';
 
 // Workaround for css-loader issue
@@ -13,20 +14,20 @@ var fs = require('fs');
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
 
-function runExample(exampleName, done) {
+function runExample (exampleName, done) {
   var examplePath = path.resolve(__dirname, '..', 'examples', exampleName);
   var exampleOutput = path.join(OUTPUT_DIR, exampleName);
-  rm_rf(exampleOutput, function(){
-    var options = require (path.join(examplePath, 'webpack.config.js'));
+  rm_rf(exampleOutput, function () {
+    var options = require(path.join(examplePath, 'webpack.config.js'));
     options.context = examplePath;
     options.output.path = exampleOutput;
-    webpack(options, function(err) {
+    webpack(options, function (err) {
       var dircompare = require('dir-compare');
       var res = dircompare.compareSync(path.join(examplePath, 'dist'), exampleOutput, {compareSize: true});
 
-      res.diffSet.filter(function(diff) {
+      res.diffSet.filter(function (diff) {
         return diff.state === 'distinct';
-      }).forEach(function(diff) {
+      }).forEach(function (diff) {
         expect(fs.readFileSync(path.join(diff.path1, diff.name1)).toString())
           .toBe(fs.readFileSync(path.join(diff.path2, diff.name2)).toString());
       });
@@ -38,35 +39,32 @@ function runExample(exampleName, done) {
   });
 }
 
-describe('HtmlWebpackPlugin Examples', function() {
-
-  it('appcache example', function(done) {
+describe('HtmlWebpackPlugin Examples', function () {
+  it('appcache example', function (done) {
     runExample('appcache', done);
   });
 
-  it('custom-template example', function(done) {
+  it('custom-template example', function (done) {
     runExample('custom-template', done);
   });
 
-  it('default example', function(done) {
+  it('default example', function (done) {
     runExample('default', done);
   });
 
-  it('favicon example', function(done) {
+  it('favicon example', function (done) {
     runExample('favicon', done);
   });
 
-  it('html-loader example', function(done) {
+  it('html-loader example', function (done) {
     runExample('html-loader', done);
   });
 
-  it('jade-loader example', function(done) {
+  it('jade-loader example', function (done) {
     runExample('jade-loader', done);
   });
 
-  it('javascript example', function(done) {
+  it('javascript example', function (done) {
     runExample('javascript', done);
   });
-
-
 });

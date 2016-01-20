@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = "common";
+module.exports = 'common';

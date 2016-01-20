@@ -1,6 +1,8 @@
 HTML Webpack Plugin
 ===================
-[![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/ampedandwired/html-webpack-plugin.svg)](https://david-dm.org/ampedandwired/html-webpack-plugin) [![bitHound Score](https://www.bithound.io/github/ampedandwired/html-webpack-plugin/badges/score.svg)](https://www.bithound.io/github/ampedandwired/html-webpack-plugin) [![Build status](https://travis-ci.org/ampedandwired/html-webpack-plugin.svg)](https://travis-ci.org/ampedandwired/html-webpack-plugin)
+[![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/ampedandwired/html-webpack-plugin.svg)](https://david-dm.org/ampedandwired/html-webpack-plugin) [![Build status](https://travis-ci.org/ampedandwired/html-webpack-plugin.svg)](https://travis-ci.org/ampedandwired/html-webpack-plugin) [![Windows build status](https://ci.appveyor.com/api/projects/status/github/ampedandwired/html-webpack-plugin)]() [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
+
+[![NPM](https://nodei.co/npm/html-webpack-plugin.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/html-webpack-plugin/)
 
 This is a [webpack](http://webpack.github.io/) plugin that simplifies creation of HTML files to serve your
 webpack bundles. This is especially useful for webpack bundles that include
@@ -173,7 +175,7 @@ plugins: [
 ```
 
 You can use the lodash syntax out of the box.
-If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/ampedandwired/html-webpack-plugin/blob/feature/loaders/default_index.html)
+If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/ampedandwired/html-webpack-plugin/blob/master/default_index.ejs)
 as a starting point for writing your own.
 
 The `templateContent` option can also be a function to use another template language like jade:

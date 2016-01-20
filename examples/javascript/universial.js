@@ -5,6 +5,6 @@
 // HTML_WEBPACK_PLUGIN is set to true:
 var backend = typeof HTML_WEBPACK_PLUGIN !== 'undefined';
 
-module.exports = function() {
+module.exports = function () {
   return 'Hello World from ' + (backend ? 'backend' : 'frontend');
 };

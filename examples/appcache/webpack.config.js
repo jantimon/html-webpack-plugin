@@ -12,7 +12,7 @@ module.exports = {
     loaders: [
       { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
       { test: /\.png$/, loader: 'file-loader' },
-      { test: /\.html$/, loader: 'html-loader?-removeOptionalTags' },
+      { test: /\.html$/, loader: 'html-loader?-removeOptionalTags' }
     ]
   },
   plugins: [
@@ -20,11 +20,12 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'template.html',
-      minify:{
-        removeComments:true,
-        collapseWhitespace:true
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true
       }
     }),
     new ExtractTextPlugin('styles.css')
   ]
 };
+
