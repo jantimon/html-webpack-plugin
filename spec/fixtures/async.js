@@ -1,3 +1,2 @@
 'use strict';
-
-module.exports = "async";
+module.exports = 'async';

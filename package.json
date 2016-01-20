@@ -1,15 +1,15 @@
 {
   "name": "html-webpack-plugin",
-  "version": "1.7.0",
+  "version": "2.7.1",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "main": "index.js",
   "files": [
     "index.js",
-    "default_index.html",
-    "default_inject_index.html"
+    "default_index.ejs",
+    "lib/"
   ],
   "scripts": {
-    "pretest": "jshint *.js spec",
+    "pretest": "semistandard",
     "test": "jasmine-node --captureExceptions spec"
   },
   "repository": {
@@ -20,7 +20,7 @@
     "webpack",
     "plugin",
     "html",
-    "generate"
+    "html-webpack-plugin"
   ],
   "author": "Charles Blaxland <charles.blaxland@gmail.com> (https://github.com/ampedandwired)",
   "license": "MIT",
@@ -29,21 +29,27 @@
   },
   "homepage": "https://github.com/ampedandwired/html-webpack-plugin",
   "devDependencies": {
-    "css-loader": "^0.23.0",
+    "appcache-webpack-plugin": "^1.2.1",
+    "css-loader": "^0.23.1",
+    "dir-compare": "0.0.2",
     "es6-promise": "^3.0.2",
-    "extract-text-webpack-plugin": "^0.9.1",
-    "file-loader": "^0.8.4",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.8.5",
+    "html-loader": "^0.4.0",
+    "jade-loader": "^0.8.0",
     "jasmine-node": "^1.14.5",
-    "jshint": "^2.9.1-rc1",
-    "rimraf": "^2.4.4",
+    "rimraf": "^2.5.0",
+    "semistandard": "^7.0.5",
     "style-loader": "^0.13.0",
-    "url-loader": "^0.5.6",
-    "webpack": "^1.12.8"
+    "underscore-template-loader": "^0.5.2",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.12.10"
   },
   "dependencies": {
-    "bluebird": "^3.0.5",
-    "blueimp-tmpl": "^2.5.5",
-    "html-minifier": "^1.0.0",
-    "lodash": "^3.10.1"
+    "bluebird": "^3.1.1",
+    "html-minifier": "^1.1.1",
+    "loader-utils": "^0.2.12",
+    "lodash": "^3.10.1",
+    "pretty-error": "^2.0.0"
   }
 }

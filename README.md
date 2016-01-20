@@ -1,30 +1,19 @@
 HTML Webpack Plugin
-=================== 
-[![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/ampedandwired/html-webpack-plugin.svg)](https://david-dm.org/ampedandwired/html-webpack-plugin) [![bitHound Score](https://www.bithound.io/github/ampedandwired/html-webpack-plugin/badges/score.svg)](https://www.bithound.io/github/ampedandwired/html-webpack-plugin) [![Build status](https://travis-ci.org/ampedandwired/html-webpack-plugin.svg)](https://travis-ci.org/ampedandwired/html-webpack-plugin)
+===================
+[![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/ampedandwired/html-webpack-plugin.svg)](https://david-dm.org/ampedandwired/html-webpack-plugin) [![Build status](https://travis-ci.org/ampedandwired/html-webpack-plugin.svg)](https://travis-ci.org/ampedandwired/html-webpack-plugin) [![Windows build status](https://ci.appveyor.com/api/projects/status/github/ampedandwired/html-webpack-plugin?svg=true&branch=master)](https://ci.appveyor.com/project/jantimon/html-webpack-plugin) [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
+
+[![NPM](https://nodei.co/npm/html-webpack-plugin.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/html-webpack-plugin/)
 
 This is a [webpack](http://webpack.github.io/) plugin that simplifies creation of HTML files to serve your
 webpack bundles. This is especially useful for webpack bundles that include
-a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you or supply
-your own template (using [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).
-
-
-Version 2.x
------------
-
-HTML Webpack Plugin 2.x is in beta right now however we are planing to release it soon.
-
-Installation:
-```shell
-$ npm install html-webpack-plugin@2 --save-dev
-```
-
-Please take a look at the [HTML Webpack Plugin 2.x readme](https://github.com/ampedandwired/html-webpack-plugin/tree/feature/loaders)
+a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you, supply
+your own template using lodash templates or use your own loader.
 
 Installation
 ------------
-Install the old version of the plugin with npm:
+Install the plugin with npm:
 ```shell
-$ npm install html-webpack-plugin --save-dev
+$ npm install html-webpack-plugin@2 --save-dev
 ```
 
 Basic Usage
@@ -75,16 +64,17 @@ Allowed values are as follows:
 - `title`: The title to use for the generated HTML document.
 - `filename`: The file to write the HTML to. Defaults to `index.html`.
    You can specify a subdirectory here too (eg: `assets/admin.html`).
-- `template`: A html template (supports [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).
-- `templateContent`: A html string or a function returning the html  (supports [blueimp templates](https://github.com/blueimp/JavaScript-Templates)).  
+- `template`: Path to the template. Supports loaders e.g. `html!./index.html`.
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
   included scripts and css files. This is useful for cache busting.
+- `cache`: `true | false` if `true` (default) try to emit the file only if it was changed.
+- `showErrors`: `true | false` if `true` (default) errors details will be written into the html page.
 - `chunks`: Allows you to add only some chunks (e.g. only the unit-test chunk)
-- `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk) 
 - `chunksSortMode`: Allows to controll how chunks should be sorted before they are included to the html. Allowed values: 'none' | 'default' | {function} - default: 'auto'
+- `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk)
 
 Here's an example webpack config illustrating how to use these options:
 ```javascript
@@ -135,7 +125,7 @@ and favicon files into the markup.
 ```javascript
 plugins: [
   new HtmlWebpackPlugin({
-    title: 'Custom template', 
+    title: 'Custom template',
     template: 'my-index.html', // Load a custom template
     inject: 'body' // Inject all scripts into the body
   })
@@ -149,11 +139,28 @@ plugins: [
 <html>
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-    <title>{%= o.htmlWebpackPlugin.options.title %}</title>
+    <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
   </body>
 </html>
+```
+
+If you already have a template loader, you can use it to parse the template.
+
+```javascript
+module: {
+  loaders: [
+    { test: /\.hbs$/, loader: "handlebars" }
+  ]
+},
+plugins: [
+  new HtmlWebpackPlugin({
+    title: 'Custom template using Handlebars',
+    template: 'my-index.hbs',
+    inject: 'body'
+  })
+]
 ```
 
 Alternatively, if you already have your template's content in a String, you
@@ -167,8 +174,8 @@ plugins: [
 ]
 ```
 
-You can use the [blueimp template](https://github.com/blueimp/JavaScript-Templates) syntax out of the box.
-If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/ampedandwired/html-webpack-plugin/blob/master/default_index.html)
+You can use the lodash syntax out of the box.
+If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/ampedandwired/html-webpack-plugin/blob/master/default_index.ejs)
 as a starting point for writing your own.
 
 The `templateContent` option can also be a function to use another template language like jade:
@@ -260,3 +267,20 @@ plugins: [
 ]
 ```
 
+Events
+------
+
+To allow other plugins to alter the html this plugin executes the following events:
+
+ * `html-webpack-plugin-before-html-processing`
+ * `html-webpack-plugin-after-html-processing`
+ * `html-webpack-plugin-after-emit`
+
+Usage:
+
+```javascript
+compilation.plugin('html-webpack-plugin-before-html-processing', function(htmlPluginData, callback) {
+  htmlPluginData.html += 'The magic footer';
+  callback();
+});
+```
