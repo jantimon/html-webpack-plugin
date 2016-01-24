@@ -65,7 +65,7 @@ Although we did not specify any script tags or link tags they will be injected a
 </html>
 ```
 
-## Tempalting and variables
+## Templating and variables
 
 As of 2.x blueimp was replaced by lodash/underscore/ejs templates as they are more common.
 This also removes the `o` in template variables. ` <body class="{%= o.htmlWebpackPlugin.options.environment %}">` becomes `<body class="<%= htmlWebpackPlugin.options.environment %>">` it also allows to escape variables by using `<%-` instead of `<%=` to prevent unexpected behaviours: `<body class="<%- htmlWebpackPlugin.options.environment %>">` 
@@ -82,7 +82,7 @@ For the following example you would have to configure a html and url/file-loader
 ## Custom template engines
 
 Maybe you prefer jade or blueimp over underscore - or your project is using jade for the front end part.
-With 2.x you can use the webpack loaders either once only for the template as in the following example.
+With 2.x you can use the webpack loaders either once only for the template as in the following example
 where we use jade (requires the [jade-loader](https://github.com/webpack/jade-loader)):
 
 ```js
@@ -116,7 +116,7 @@ module.exports = {
 };
 ```
 
-Please note that if you specify the loader and use 'jade!template.jadde' webpack will try to apply the jade loader twice and fail.
+Please note that if you specify the loader and use 'jade!template.jade' webpack will try to apply the jade loader twice and fail.
 
 ## Isomorph apps
 
@@ -153,5 +153,5 @@ Using loaders inside a template.js
 ```
 
 Unfortunately `__dirname` does not work correctly.
-If someone know why I would love to merge a pull request. 
-A good start point might be here: https://github.com/webpack/webpack/issues/135
+If someone knows why I would love to merge a pull request.
+A good starting point might be here: https://github.com/webpack/webpack/issues/135
