@@ -19,7 +19,7 @@ $ npm install html-webpack-plugin@2 --save-dev
 Migration guide from 1.x
 ------------------------
 
-If you used the 1.x version please take a look at the (migration guide)[https://github.com/ampedandwired/html-webpack-plugin/blob/master/migration.md]
+If you used the 1.x version please take a look at the [migration guide](https://github.com/ampedandwired/html-webpack-plugin/blob/master/migration.md)
 In case I missed something please open a pull request for it.
 See also issue [#186](https://github.com/ampedandwired/html-webpack-plugin/issues/186)
 
