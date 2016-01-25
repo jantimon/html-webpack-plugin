@@ -107,7 +107,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       })
       // Allow plugins to change the html before assets are injected
       .then(function (html) {
-        var pluginArgs = {html: html, assets: assets, plugin: self};
+        var pluginArgs = {html: html, assets: assets, plugin: self, compilation: compilation};
         return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-processing', pluginArgs)
           .then(function () {
             return pluginArgs.html;
@@ -119,7 +119,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       })
       // Allow plugins to change the html after assets are injected
       .then(function (html) {
-        var pluginArgs = {html: html, assets: assets, plugin: self};
+        var pluginArgs = {html: html, assets: assets, plugin: self, compilation: compilation};
         return applyPluginsAsyncWaterfall('html-webpack-plugin-after-html-processing', pluginArgs)
           .then(function () {
             return pluginArgs.html;
@@ -148,7 +148,8 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         // Let other plugins know that we are done:
         return applyPluginsAsyncWaterfall('html-webpack-plugin-after-emit', {
           html: compilation.assets[self.options.filename],
-          plugin: self
+          plugin: self,
+          compilation: compilation
         });
       })
       // Let webpack continue with it
@@ -199,17 +200,9 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
   return Promise.resolve()
     // Template processing
     .then(function () {
-      var templateParams = {
-        webpack: compilation.getStats().toJson(),
-        webpackConfig: compilation.options,
-        htmlWebpackPlugin: {
-          files: assets,
-          options: self.options
-        }
-      };
       var html = '';
       try {
-        html = templateFunction(templateParams);
+        html = templateFunction(self.getTemplateParams(assets, compilation));
       } catch (e) {
         compilation.errors.push(new Error('Template execution failed: ' + e));
         return Promise.reject(e);
@@ -341,6 +334,8 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
   }
 
   var assets = {
+    // The public path
+    publicPath: publicPath,
     // Will contain all js & css files by chunk
     chunks: {},
     // Will contain all js files
@@ -497,6 +492,31 @@ HtmlWebpackPlugin.prototype.getFullTemplatePath = function (template, context) {
     function (match, prefix, filepath, postfix) {
       return prefix + path.resolve(filepath) + postfix;
     });
+};
+
+/**
+ * Returns the object which is available for the template during rendering
+ */
+HtmlWebpackPlugin.prototype.getTemplateParams = function (assets, compilation) {
+  var utils = {
+    getAssetSource: function (assetPath) {
+      var asset = compilation.assets[assetPath.substr(assets.publicPath.length)];
+      if (!asset) {
+        throw new Error('Could not retreive source for "' + assetPath + '"');
+      }
+      return asset.source();
+    }
+  };
+  return {
+    utils: utils,
+    compilation: compilation,
+    webpack: compilation.getStats().toJson(),
+    webpackConfig: compilation.options,
+    htmlWebpackPlugin: {
+      files: assets,
+      options: this.options
+    }
+  };
 };
 
 module.exports = HtmlWebpackPlugin;
