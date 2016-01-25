@@ -6,6 +6,7 @@ var Promise = require('bluebird');
 var path = require('path');
 var childCompiler = require('./lib/compiler.js');
 var prettyError = require('./lib/errors.js');
+var chunkSorter = require('./lib/chunksorter.js');
 Promise.promisifyAll(fs);
 
 function HtmlWebpackPlugin (options) {
@@ -287,6 +288,16 @@ HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
         return b.id - a.id;
       }
     });
+  }
+  // Sort mode 'dependency':
+  if (sortMode === 'dependency') {
+    var sortResult = chunkSorter().sortChunksByDependencies(chunks);
+
+    if (!sortResult) {
+      throw new Error('Chunk sorting based on dependencies failed. Please consider custom sort mode.');
+    }
+
+    return sortResult;
   }
   // Disabled sorting:
   if (sortMode === 'none') {
