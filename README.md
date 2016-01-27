@@ -133,13 +133,13 @@ and favicon files into the markup.
 plugins: [
   new HtmlWebpackPlugin({
     title: 'Custom template',
-    template: 'my-index.html', // Load a custom template
+    template: 'my-index.ejs', // Load a custom template
     inject: 'body' // Inject all scripts into the body
   })
 ]
 ```
 
-`my-index.html`:
+`my-index.ejs`:
 
 ```html
 <!DOCTYPE html>
@@ -154,6 +154,7 @@ plugins: [
 ```
 
 If you already have a template loader, you can use it to parse the template.
+Please note that this will also happen if you specifiy the html-loader and use `.html` file astemplate.
 
 ```javascript
 module: {
@@ -164,55 +165,15 @@ module: {
 plugins: [
   new HtmlWebpackPlugin({
     title: 'Custom template using Handlebars',
-    template: 'my-index.hbs',
-    inject: 'body'
-  })
-]
-```
-
-Alternatively, if you already have your template's content in a String, you
-can pass it to the plugin using the `templateContent` option:
-```javascript
-plugins: [
-  new HtmlWebpackPlugin({
-    inject: true,
-    templateContent: templateContentString
+    template: 'my-index.hbs'
   })
 ]
 ```
 
 You can use the lodash syntax out of the box.
-If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/ampedandwired/html-webpack-plugin/blob/master/default_index.ejs)
-as a starting point for writing your own.
+If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/jaketrent/html-webpack-template/blob/86f285d5c790a6c15263f5cc50fd666d51f974fd/index.html) of the [html-webpack-template project](https://github.com/jaketrent/html-webpack-template) as a starting point for writing your own.
 
-The `templateContent` option can also be a function to use another template language like jade:
-```javascript
-plugins: [
-  new HtmlWebpackPlugin({
-    templateContent: function(templateParams, compilation) {
-      // Return your template content synchronously here
-      return '..';
-    }
-  })
-]
-```
-Or the async version:
-```javascript
-plugins: [
-  new HtmlWebpackPlugin({
-    templateContent: function(templateParams, compilation, callback) {
-      // Return your template content asynchronously here
-      callback(null, '..');
-    }
-  })
-]
-```
-
-Note the plugin will throw an error if you specify both `template` _and_
-`templateContent`.
-
-The `o` variable in the template is the data that is passed in when the
-template is rendered. This variable has the following attributes:
+The following variables are available in the:
 - `htmlWebpackPlugin`: data specific to this plugin
   - `htmlWebpackPlugin.files`: a massaged representation of the
     `assetsByChunkName` attribute of webpack's [stats](https://github.com/webpack/docs/wiki/node.js-api#stats)
