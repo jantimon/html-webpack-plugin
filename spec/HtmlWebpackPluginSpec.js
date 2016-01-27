@@ -842,7 +842,7 @@ describe('HtmlWebpackPlugin', function () {
     }, ["Child compilation failed:\n  Entry module not found: Error: Cannot resolve 'file' or 'directory'"], null, done, true);
   });
 
-  it('should short the chunks', function (done) {
+  it('should sort the chunks', function (done) {
     testHtmlPlugin({
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
@@ -865,7 +865,7 @@ describe('HtmlWebpackPlugin', function () {
       /<script src="common_bundle.js">.+<script src="util_bundle.js">.+<script src="index_bundle.js">/], null, done);
   });
 
-  it('should short the chunks with custom (alphabetical) order', function (done) {
+  it('should sort the chunks in custom (alphabetical) order', function (done) {
     testHtmlPlugin({
       entry: {
         b: path.join(__dirname, 'fixtures/index.js'),
@@ -890,5 +890,33 @@ describe('HtmlWebpackPlugin', function () {
         })
       ]
     }, [/<script src="a_bundle.js">.+<script src="b_bundle.js">.+<script src="c_bundle.js">/], null, done);
+  });
+
+  it('should sort the chunks by chunk dependencies', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        theme: path.join(__dirname, 'fixtures/theme.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: 'css-loader' }
+        ]
+      },
+      plugins: [
+        new CommonsChunkPlugin({
+          name: 'common',
+          filename: 'common_bundle.js'
+        }),
+        new HtmlWebpackPlugin({
+          chunksSortMode: 'dependency'
+        })
+      ]
+    }, [
+      /<script src="common_bundle.js">.+<script src="theme_bundle.js">.+<script src="util_bundle.js">/], null, done);
   });
 });
