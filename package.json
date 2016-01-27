@@ -36,6 +36,7 @@
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
     "html-loader": "^0.4.0",
+    "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
     "jasmine-node": "^1.14.5",
     "rimraf": "^2.5.0",
