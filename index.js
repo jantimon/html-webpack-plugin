@@ -17,6 +17,7 @@ function HtmlWebpackPlugin (options) {
     hash: false,
     inject: true,
     compile: true,
+    bodyContent: '',
     favicon: false,
     minify: false,
     cache: true,

@@ -73,6 +73,7 @@ Allowed values are as follows:
    You can specify a subdirectory here too (eg: `assets/admin.html`).
 - `template`: Path to the template. Supports loaders e.g. `html!./index.html`.
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
+- `bodyContent`: Adds specified html content to body element e.g. `<div id="root"></div>`. 
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
