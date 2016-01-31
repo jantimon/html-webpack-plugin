@@ -356,6 +356,28 @@ describe('HtmlWebpackPlugin', function () {
     }, ['<link href="styles.css"'], null, done);
   });
 
+  it('should work with the css extract plugin while using a JavaScript template', function (done) {
+    var ExtractTextPlugin = require('extract-text-webpack-plugin');
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/dynamic-template/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          template: path.join(__dirname, 'fixtures/dynamic-template/index.html.js')
+        }),
+        new ExtractTextPlugin('styles.css')
+      ]
+    }, ['<link href="styles.css"'], null, done);
+  });
+
   it('should allow to add cache hashes to with the css assets', function (done) {
     var ExtractTextPlugin = require('extract-text-webpack-plugin');
     testHtmlPlugin({
