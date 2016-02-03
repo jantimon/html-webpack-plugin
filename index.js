@@ -45,17 +45,11 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       })
       .then(function (compilationResult) {
         // If the compilation change didnt change the cache is valid
-        isCompilationCached = compilationResult.hash && self.hash === compilationResult.hash;
-        self.hash = compilation.hash;
+        isCompilationCached = compilationResult.hash && self.childCompilerHash === compilationResult.hash;
+        self.childCompilerHash = compilationResult.hash;
         callback();
         return compilationResult.content;
       });
-  });
-
-  compiler.plugin('after-compile', function (compilation, callback) {
-    // Clear the compilation queue
-    delete compiler.HtmlWebpackPluginQueue;
-    callback();
   });
 
   compiler.plugin('emit', function (compilation, callback) {
@@ -68,7 +62,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
     var assets = self.htmlWebpackPluginAssets(compilation, chunks);
 
     // If the template and the assets did not change we don't have to emit the html
-    var assetJson = JSON.stringify(assets);
+    var assetJson = JSON.stringify(self.getAssetFiles(assets));
     if (isCompilationCached && self.options.cache && assetJson === self.assetJson) {
       return callback();
     } else {
@@ -484,6 +478,9 @@ HtmlWebpackPlugin.prototype.appendHash = function (url, hash) {
   return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
 };
 
+/**
+ * Helper to return the absolute template path with a fallback loader
+ */
 HtmlWebpackPlugin.prototype.getFullTemplatePath = function (template, context) {
   // If the template doesn't use a loader use the lodash template loader
   if (template.indexOf('!') === -1) {
@@ -495,6 +492,20 @@ HtmlWebpackPlugin.prototype.getFullTemplatePath = function (template, context) {
     function (match, prefix, filepath, postfix) {
       return prefix + path.resolve(filepath) + postfix;
     });
+};
+
+/**
+ * Helper to return a sorted unique array of all asset files out of the
+ * asset object
+ */
+HtmlWebpackPlugin.prototype.getAssetFiles = function (assets) {
+  var files = _.uniq(Object.keys(assets).filter(function (assetType) {
+    return assetType !== 'chunks' && assets[assetType];
+  }).reduce(function (files, assetType) {
+    return files.concat(assets[assetType]);
+  }, []));
+  files.sort();
+  return files;
 };
 
 module.exports = HtmlWebpackPlugin;
