@@ -280,28 +280,21 @@ HtmlWebpackPlugin.prototype.addFileToAssets = function (filename, compilation) {
  */
 HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
   // Sort mode auto by default:
-  if (typeof sortMode === 'undefined' || sortMode === 'auto') {
-    return chunkSorter.auto(chunks);
-  }
-  // Sort mode 'dependency':
-  if (sortMode === 'dependency') {
-    var sortResult = chunkSorter.dependency(chunks);
-
-    if (!sortResult) {
-      throw new Error('Chunk sorting based on dependencies failed. Please consider custom sort mode.');
-    }
-
-    return sortResult;
-  }
-  // Disabled sorting:
-  if (sortMode === 'none') {
-    return chunkSorter.none(chunks);
+  if (typeof sortMode === 'undefined') {
+    sortMode = 'auto';
   }
   // Custom function
   if (typeof sortMode === 'function') {
     return chunks.sort(sortMode);
   }
-  // Invalid sort mode
+  // Disabled sorting:
+  if (sortMode === 'none') {
+    return chunkSorter.none(chunks);
+  }
+  // Check if the given sort mode is a valid chunkSorter sort mode
+  if (typeof chunkSorter[sortMode] !== 'undefined') {
+    return chunkSorter[sortMode](chunks);
+  }
   throw new Error('"' + sortMode + '" is not a valid chunk sort mode');
 };
 
