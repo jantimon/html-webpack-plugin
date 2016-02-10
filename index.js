@@ -75,7 +75,11 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         if (self.options.favicon) {
           return self.addFileToAssets(self.options.favicon, compilation)
             .then(function (faviconBasename) {
-              assets.favicon = faviconBasename;
+              if (compilation.options.output.publicPath) {
+                assets.favicon = compilation.options.output.publicPath + faviconBasename;
+              } else {
+                assets.favicon = faviconBasename;
+              }
             });
         }
       })
