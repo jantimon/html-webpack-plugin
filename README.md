@@ -173,7 +173,7 @@ plugins: [
 You can use the lodash syntax out of the box.
 If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/jaketrent/html-webpack-template/blob/86f285d5c790a6c15263f5cc50fd666d51f974fd/index.html) of the [html-webpack-template project](https://github.com/jaketrent/html-webpack-template) as a starting point for writing your own.
 
-The following variables are available in the:
+The following variables are available in the template:
 - `htmlWebpackPlugin`: data specific to this plugin
   - `htmlWebpackPlugin.files`: a massaged representation of the
     `assetsByChunkName` attribute of webpack's [stats](https://github.com/webpack/docs/wiki/node.js-api#stats)
