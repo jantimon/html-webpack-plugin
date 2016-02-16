@@ -865,7 +865,7 @@ describe('HtmlWebpackPlugin', function () {
       /<script src="common_bundle.js">.+<script src="util_bundle.js">.+<script src="index_bundle.js">/], null, done);
   });
 
-  it('should sort the chunks in custom (alphabetical) order', function (done) {
+  it('should sort the chunks in custom (reverse alphabetical) order', function (done) {
     testHtmlPlugin({
       entry: {
         b: path.join(__dirname, 'fixtures/index.js'),
@@ -879,24 +879,24 @@ describe('HtmlWebpackPlugin', function () {
       plugins: [
         new HtmlWebpackPlugin({
           chunksSortMode: function (a, b) {
-            if (a.name < b.name) {
+            if (a.names[0] < b.names[0]) {
               return 1;
             }
-            if (a.name > b.name) {
+            if (a.names[0] > b.names[0]) {
               return -1;
             }
             return 0;
           }
         })
       ]
-    }, [/<script src="a_bundle.js">.+<script src="b_bundle.js">.+<script src="c_bundle.js">/], null, done);
+    }, [/<script src="c_bundle.js">.+<script src="b_bundle.js">.+<script src="a_bundle.js">/], null, done);
   });
 
   it('should sort the chunks by chunk dependencies', function (done) {
     testHtmlPlugin({
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
-        theme: path.join(__dirname, 'fixtures/theme.js')
+        aTheme: path.join(__dirname, 'fixtures/theme.js')
       },
       output: {
         path: OUTPUT_DIR,
@@ -917,6 +917,6 @@ describe('HtmlWebpackPlugin', function () {
         })
       ]
     }, [
-      /<script src="common_bundle.js">.+<script src="theme_bundle.js">.+<script src="util_bundle.js">/], null, done);
+      /<script src="common_bundle.js">.+<script src="aTheme_bundle.js">.+<script src="util_bundle.js">/], null, done);
   });
 });
