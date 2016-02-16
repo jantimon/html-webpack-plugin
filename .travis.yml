@@ -6,5 +6,5 @@ node_js:
 script:
   - npm test
   - npm rm webpack
-  - npm i webpack@2
+  - npm i webpack@beta
   - npm test
