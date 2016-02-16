@@ -356,6 +356,27 @@ describe('HtmlWebpackPlugin', function () {
     }, ['<link href="styles.css"'], null, done);
   });
 
+  it('should work with the css extract plugin on windows and protocol relative urls support (#205)', function (done) {
+    var ExtractTextPlugin = require('extract-text-webpack-plugin');
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        publicPath: '//localhost:8080/'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        new ExtractTextPlugin('styles.css')
+      ]
+    }, ['<link href="//localhost:8080/styles.css"'], null, done);
+  });
+
   it('should allow to add cache hashes to with the css assets', function (done) {
     var ExtractTextPlugin = require('extract-text-webpack-plugin');
     testHtmlPlugin({
