@@ -3,3 +3,8 @@ node_js:
   - "0.12"
   - "0.10"
   - "iojs"
+script:
+  - npm test
+  - npm rm webpack
+  - npm i webpack@2
+  - npm test
