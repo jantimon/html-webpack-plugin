@@ -72,12 +72,29 @@ This also removes the `o` in template variables. ` <body class="{%= o.htmlWebpac
 
 # Loaders in templates
 Loaders may now be used inside the template the same way as you would expect in your javascript files.
-For the following example you would have to configure a html and url/file-loader:
 
 ```html
 <link rel="apple-touch-icon" href="<%- require('../images/favicons/apple-icon-60x60.png') %>">
-<%= require('partial.html'); %>
+<%= require('partial.html') %>
 ```
+
+For the above example you would have to configure a [html](https://github.com/webpack/html-loader) and url/[file-loader](https://github.com/webpack/file-loader):
+
+```js
+module: {
+  loaders: [
+    {test: /\.png$/, loader: "file-loader"},
+    {
+      test: /\.html$/,
+      exclude: /index.html$/, // you need to exclude your base template (unless you do not want this plugin own templating feature)
+      loader: "html"
+    }
+  ]
+}
+```
+
+This configuration allows you to require partial html from your main `index.html` without being itself parsed by the html-loader instead of this html-webpack-plugin.
+
 
 ## Custom template engines
 
