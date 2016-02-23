@@ -378,6 +378,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
     var entry = chunkFiles[0];
     assets.chunks[chunkName].size = chunk.size;
     assets.chunks[chunkName].entry = entry;
+    assets.chunks[chunkName].hash = chunk.hash;
     assets.js.push(entry);
 
     // Gather all css files
