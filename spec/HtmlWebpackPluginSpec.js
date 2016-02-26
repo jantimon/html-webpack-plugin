@@ -38,17 +38,38 @@ function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expec
       return done();
     }
     var htmlContent = fs.readFileSync(path.join(OUTPUT_DIR, outputFile)).toString();
-
+    var chunksInfo;
     for (var i = 0; i < expectedResults.length; i++) {
       var expectedResult = expectedResults[i];
       if (expectedResult instanceof RegExp) {
         expect(htmlContent).toMatch(expectedResult);
+      } else if (typeof expectedResult === 'object') {
+        if (expectedResult.type === 'chunkhash') {
+          if (!chunksInfo) {
+            chunksInfo = getChunksInfoFromStats(stats);
+          }
+          var chunkhash = chunksInfo[expectedResult.chunkName].hash;
+          expect(htmlContent).toContain(expectedResult.containStr.replace('%chunkhash%', chunkhash));
+        }
       } else {
         expect(htmlContent).toContain(expectedResult.replace('%hash%', stats.hash));
       }
     }
     done();
   });
+}
+
+function getChunksInfoFromStats (stats) {
+  var chunks = stats.compilation.getStats().toJson().chunks;
+  var chunksInfo = {};
+  for (var i = 0; i < chunks.length; i++) {
+    var chunk = chunks[i];
+    var chunkName = chunk.names[0];
+    if (chunkName) {
+      chunksInfo[chunkName] = chunk;
+    }
+  }
+  return chunksInfo;
 }
 
 describe('HtmlWebpackPlugin', function () {
@@ -256,6 +277,26 @@ describe('HtmlWebpackPlugin', function () {
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
     }, ['<script src="app_bundle.js"'], null, done);
+  });
+
+  it('allows you to use chunkhash with asset into a given html file', function (done) {
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: false,
+        template: path.join(__dirname, 'fixtures/webpackconfig.html')
+      })]
+    }, [{
+      type: 'chunkhash',
+      chunkName: 'app',
+      containStr: '<script src="app_bundle.js?%chunkhash%"'
+    }], null, done);
   });
 
   it('allows you to disable injection', function (done) {
