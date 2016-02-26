@@ -86,7 +86,7 @@ module: {
     {test: /\.png$/, loader: "file-loader"},
     {
       test: /\.html$/,
-      exclude: /index.html$/, // you need to exclude your base template (unless you do not want this plugin own templating feature)
+      exclude: /index\.html$/, // you need to exclude your base template (unless you do not want this plugin own templating feature)
       loader: "html"
     }
   ]
