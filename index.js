@@ -96,9 +96,17 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         // and replace it with its content
         return self.evaluateCompilationResult(compilation, compiledTemplate);
       })
+      // Allow plugins to make changes to the assets before invoking the template
+      // This only makes sense to use if `inject` is `false`
+      .then(function (compilationResult) {
+        return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-generation', {assets: assets, plugin: self})
+          .then(function () {
+            return compilationResult;
+          });
+      })
       // Execute the template
       .then(function (compilationResult) {
-        // If the loader result is a function execute it to retreive the html
+        // If the loader result is a function execute it to retrieve the html
         // otherwise use the returned html
         return typeof compilationResult !== 'function'
           ? compilationResult
