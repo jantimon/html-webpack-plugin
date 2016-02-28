@@ -1,4 +1,4 @@
-/* global describe, it, beforeEach, expect */
+/* eslint-env jasmine */
 'use strict';
 
 // Workaround for css-loader issue
