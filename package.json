@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "pretest": "semistandard",
-    "test": "jasmine-node --captureExceptions spec"
+    "test": "jasmine"
   },
   "repository": {
     "type": "git",
@@ -38,7 +38,7 @@
     "html-loader": "^0.4.0",
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
-    "jasmine-node": "^1.14.5",
+    "jasmine": "^2.4.1",
     "rimraf": "^2.5.0",
     "semistandard": "^7.0.5",
     "style-loader": "^0.13.0",
