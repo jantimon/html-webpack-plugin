@@ -772,6 +772,40 @@ describe('HtmlWebpackPlugin', function () {
     });
   });
 
+  it('allows to modify the html during html-webpack-plugin-before-html-generation event', function (done) {
+    var eventFired = false;
+    var examplePlugin = {
+      apply: function (compiler) {
+        compiler.plugin('compilation', function (compilation) {
+          compilation.plugin('html-webpack-plugin-before-html-generation', function (object, callback) {
+            eventFired = true;
+            object.assets.js.push('funky-script.js');
+            callback();
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          inject: false,
+          template: 'underscore-template-loader!' + path.join(__dirname, 'fixtures/custom_file.html')
+        }),
+        examplePlugin
+      ]
+    }, ['<script src="funky-script.js"'], null, function () {
+      expect(eventFired).toBe(true);
+      done();
+    });
+  });
+
   it('works with commons chunk plugin', function (done) {
     testHtmlPlugin({
       debug: true,
