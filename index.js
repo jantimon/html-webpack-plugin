@@ -23,7 +23,8 @@ function HtmlWebpackPlugin (options) {
     showErrors: true,
     chunks: 'all',
     excludeChunks: [],
-    title: 'Webpack App'
+    title: 'Webpack App',
+    skipRecompiles: false
   }, options);
 }
 
@@ -35,6 +36,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
 
   compiler.plugin('make', function (compilation, callback) {
+    if (self.options.skipRecompiles && self.compiled) return callback();
     // Compile the template (queued)
     compilationPromise = childCompiler.compileTemplate(self.options.template, compiler.context, self.options.filename, compilation)
       .catch(function (err) {
@@ -53,6 +55,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   });
 
   compiler.plugin('emit', function (compilation, callback) {
+    if (self.options.skipRecompiles && self.compiled) return callback();
     var applyPluginsAsyncWaterfall = Promise.promisify(compilation.applyPluginsAsyncWaterfall, {context: compilation});
     // Get all chunks
     var chunks = self.filterChunks(compilation.getStats().toJson(), self.options.chunks, self.options.excludeChunks);
@@ -160,6 +163,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       })
       // Let webpack continue with it
       .finally(function () {
+        self.compiled = true;
         callback();
         // Tell blue bird that we don't want to wait for callback.
         // Fixes "Warning: a promise was created in a handler but none were returned from it"
