@@ -1047,4 +1047,20 @@ describe('HtmlWebpackPlugin', function () {
     }, [
       /<script src="common_bundle.js">.+<script src="aTheme_bundle.js">.+<script src="util_bundle.js">/], null, done);
   });
+
+  it('should add the webpack compilation object as a property of the templateParam object', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          template: path.join(__dirname, 'fixtures/templateParam.js'),
+          inject: false
+        })
+      ]
+    }, ['templateParams.compilation exists: true'], null, done);
+  });
 });

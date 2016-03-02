@@ -212,7 +212,8 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
         htmlWebpackPlugin: {
           files: assets,
           options: self.options
-        }
+        },
+        compilation: compilation
       };
       var html = '';
       try {

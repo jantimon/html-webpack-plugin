@@ -156,16 +156,16 @@ module.exports = '<html>...</html>';
 ```
 More advanced template.js
 ```js
-  module.exports = function(compilationResult, chunks, assets, compilation) {
+  module.exports = function(templateParams) {
       return '<html>..</html>';
   };
 ```
 Using loaders inside a template.js
 ```js
   // This function has to return a string or promised string:
-  module.exports = function(compilationResult, chunks, assets, compilation) {
+  module.exports = function(templateParams) {
       // Play around with the arguments and then use the webpack jade loader to load the jade:
-      return require('./template.jade')({assets: assets});
+      return require('./template.jade')({assets: templateParams.htmlWebpackPlugin.files});
   };
 ```
 
