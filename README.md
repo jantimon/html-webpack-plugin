@@ -31,7 +31,7 @@ bundles in the body using `script` tags. Just add the plugin to your webpack
 config as follows:
 
 ```javascript
-var HtmlWebpackPlugin = require('html-webpack-plugin')
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 var webpackConfig = {
   entry: 'index.js',
   output: {
@@ -39,7 +39,7 @@ var webpackConfig = {
     filename: 'index_bundle.js'
   },
   plugins: [new HtmlWebpackPlugin()]
-}
+};
 ```
 
 This will generate a file `dist/index.html` containing the following:
