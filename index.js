@@ -411,9 +411,10 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
  * Injects the assets into the given html string
  */
 HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
-  // Turn script files into script tags
+   // Turn script files into script tags
+  var asyncAttribute = this.options.async ? ' async' : '';
   var scripts = assets.js.map(function (scriptPath) {
-    return '<script src="' + scriptPath + '"></script>';
+    return '<script src="' + scriptPath + '"' + asyncAttribute + '></script>';
   });
   // Turn css files into link tags
   var styles = assets.css.map(function (stylePath) {

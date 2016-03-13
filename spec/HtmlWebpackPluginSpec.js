@@ -1063,4 +1063,17 @@ describe('HtmlWebpackPlugin', function () {
       ]
     }, ['templateParams.compilation exists: true'], null, done);
   });
+
+  it('marks script files as async if async flag set', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        async: true
+      })]
+    }, [/<body>[\s]*<script src="index_bundle.js" async><\/script>[\s]*<\/body>/], null, done);
+  });
 });
