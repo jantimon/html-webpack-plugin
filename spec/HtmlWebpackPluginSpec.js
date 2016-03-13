@@ -1063,4 +1063,24 @@ describe('HtmlWebpackPlugin', function () {
       ]
     }, ['templateParams.compilation exists: true'], null, done);
   });
+
+  it('in-lines styles if the "inline: styles" option is set', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: HtmlWebpackPlugin.inline() } // 'postcss-loader') } // 'raw') } // 'css-loader') }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          inline: 'styles'
+        })
+      ]
+    }, [/<style>[\s\S]*<\/style>/], null, done);
+  });
 });

@@ -7,6 +7,7 @@ var path = require('path');
 var childCompiler = require('./lib/compiler.js');
 var prettyError = require('./lib/errors.js');
 var chunkSorter = require('./lib/chunksorter.js');
+var inlineCssStore = require('./lib/inlineCssStore.js');
 Promise.promisifyAll(fs);
 
 function HtmlWebpackPlugin (options) {
@@ -419,6 +420,14 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
   var styles = assets.css.map(function (stylePath) {
     return '<link href="' + stylePath + '" rel="stylesheet">';
   });
+  // inline css?
+  var inlineCss = inlineCssStore.get();
+  if (inlineCss.length > 0) {
+    inlineCss = inlineCss.map(function (css) {
+      return '<style>' + css + '</style>';
+    });
+    styles = inlineCss.concat(styles);
+  }
   // Injections
   var htmlRegExp = /(<html[^>]*>)/i;
   var head = [];
@@ -520,6 +529,18 @@ HtmlWebpackPlugin.prototype.getAssetFiles = function (assets) {
   }, []));
   files.sort();
   return files;
+};
+
+/**
+ * Inject loader for in-line styles
+ */
+HtmlWebpackPlugin.inline = function (loaders) {
+  var myLoader = require.resolve('./lib/inlineCssLoader.js');
+  if (loaders) {
+    return [ myLoader ].concat(loaders).join('!');
+  } else {
+    return myLoader;
+  }
 };
 
 module.exports = HtmlWebpackPlugin;
