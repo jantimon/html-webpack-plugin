@@ -39,6 +39,8 @@
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
     "jasmine": "^2.4.1",
+    "postcss-loader": "^0.8.2",
+    "postcss-spiffing": "0.0.6",
     "rimraf": "^2.5.2",
     "semistandard": "^7.0.5",
     "style-loader": "^0.13.0",

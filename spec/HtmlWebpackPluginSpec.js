@@ -1064,7 +1064,7 @@ describe('HtmlWebpackPlugin', function () {
     }, ['templateParams.compilation exists: true'], null, done);
   });
 
-  it('in-lines styles if the "inline: styles" option is set', function (done) {
+  it('inlines a stylesheet if the inline loader is specified', function (done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
@@ -1073,14 +1073,73 @@ describe('HtmlWebpackPlugin', function () {
       },
       module: {
         loaders: [
-          { test: /\.css$/, loader: HtmlWebpackPlugin.inline() } // 'postcss-loader') } // 'raw') } // 'css-loader') }
+          { test: /\.css$/, loader: HtmlWebpackPlugin.inline() }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin()
+      ]
+    }, [/<style>[\s\S]*<\/style>/], null, done);
+  });
+
+  it('inlines multiple stylesheets if the inline loader is specified', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/british_theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: HtmlWebpackPlugin.inline() }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin()
+      ]
+    }, [/(<style>[\s\S]*<\/style>){2}/], null, done);
+  });
+
+  it('inlining works with postcss loader', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/british_theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: HtmlWebpackPlugin.inline('postcss-loader') }
+        ]
+      },
+      postcss: [
+        require('postcss-spiffing')
+      ],
+      plugins: [
+        new HtmlWebpackPlugin()
+      ]
+    }, [/color: gray/], null, done);
+  });
+
+  it('inlined stylesheets are minified if minify options are set', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/british_theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: HtmlWebpackPlugin.inline() }
         ]
       },
       plugins: [
         new HtmlWebpackPlugin({
-          inline: 'styles'
+          minify: {
+            minifyCSS: true
+          }
         })
       ]
-    }, [/<style>[\s\S]*<\/style>/], null, done);
+    }, [/(<style>.*<\/style>){2}/], null, done);
   });
 });

@@ -537,10 +537,11 @@ HtmlWebpackPlugin.prototype.getAssetFiles = function (assets) {
 HtmlWebpackPlugin.inline = function (loaders) {
   var myLoader = require.resolve('./lib/inlineCssLoader.js');
   if (loaders) {
-    return [ myLoader ].concat(loaders).join('!');
+    loaders = [ myLoader ].concat(loaders).join('!');
   } else {
-    return myLoader;
+    loaders = myLoader;
   }
+  return loaders;
 };
 
 module.exports = HtmlWebpackPlugin;
