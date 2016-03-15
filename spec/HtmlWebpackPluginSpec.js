@@ -394,7 +394,7 @@ describe('HtmlWebpackPlugin', function () {
         new HtmlWebpackPlugin(),
         new ExtractTextPlugin('styles.css')
       ]
-    }, ['<link href="styles.css"'], null, done);
+    }, ['<link href="styles.css" rel="stylesheet">'], null, done);
   });
 
   it('should work with the css extract plugin on windows and protocol relative urls support (#205)', function (done) {
@@ -476,6 +476,26 @@ describe('HtmlWebpackPlugin', function () {
         new ExtractTextPlugin('styles.css')
       ]
     }, ['<link href="styles.css?%hash%"'], null, done);
+  });
+
+  it('should output xhtml link stylesheet tag', function (done) {
+    var ExtractTextPlugin = require('extract-text-webpack-plugin');
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({xhtml: true}),
+        new ExtractTextPlugin('styles.css')
+      ]
+    }, ['<link href="styles.css" rel="stylesheet"/>'], null, done);
   });
 
   it('prepends the webpack public path to script src', function (done) {
@@ -891,6 +911,23 @@ describe('HtmlWebpackPlugin', function () {
         })
       ]
     }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+  });
+
+  it('adds a favicon with xhtml enabled', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          inject: true,
+          xhtml: true,
+          favicon: path.join(__dirname, 'fixtures/favicon.ico')
+        })
+      ]
+    }, [/<link rel="shortcut icon" href="[^"]+\.ico"\/>/], null, done);
   });
 
   it('shows an error if the favicon could not be load', function (done) {
