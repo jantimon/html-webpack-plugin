@@ -23,7 +23,8 @@ function HtmlWebpackPlugin (options) {
     showErrors: true,
     chunks: 'all',
     excludeChunks: [],
-    title: 'Webpack App'
+    title: 'Webpack App',
+    xhtml: false
   }, options);
 }
 
@@ -415,9 +416,11 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
   var scripts = assets.js.map(function (scriptPath) {
     return '<script src="' + scriptPath + '"></script>';
   });
+  // Make tags self-closing in case of xhtml
+  var xhtml = this.options.xhtml ? '/' : '';
   // Turn css files into link tags
   var styles = assets.css.map(function (stylePath) {
-    return '<link href="' + stylePath + '" rel="stylesheet">';
+    return '<link href="' + stylePath + '" rel="stylesheet"' + xhtml + '>';
   });
   // Injections
   var htmlRegExp = /(<html[^>]*>)/i;
@@ -428,7 +431,7 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
 
   // If there is a favicon present, add it to the head
   if (assets.favicon) {
-    head.push('<link rel="shortcut icon" href="' + assets.favicon + '">');
+    head.push('<link rel="shortcut icon" href="' + assets.favicon + '"' + xhtml + '>');
   }
   // Add styles to the head
   head = head.concat(styles);
