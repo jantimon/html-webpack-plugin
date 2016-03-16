@@ -23,7 +23,9 @@ function HtmlWebpackPlugin (options) {
     showErrors: true,
     chunks: 'all',
     excludeChunks: [],
-    title: 'Webpack App'
+    title: 'Webpack App',
+    asyncDefault: false,
+    asyncExceptions: []
   }, options);
 }
 
@@ -407,14 +409,28 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
   return assets;
 };
 
+HtmlWebpackPlugin.prototype.asyncAttribute = function (scriptPath) {
+  var ASYNC = ' async';
+  var SYNC = '';
+  for (var i = 0; i < this.options.asyncExceptions.length; i++) {
+    var exception = this.options.asyncExceptions[i];
+    if (exception === scriptPath) {
+      return this.options.asyncDefault ? SYNC : ASYNC;
+    } else if (exception instanceof RegExp && exception.test(scriptPath)) {
+      return this.options.asyncDefault ? SYNC : ASYNC;
+    }
+  }
+  return this.options.asyncDefault ? ASYNC : SYNC;
+};
+
 /**
  * Injects the assets into the given html string
  */
 HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
-   // Turn script files into script tags
-  var asyncAttribute = this.options.async ? ' async' : '';
+  var self = this;
+  // Turn script files into script tags
   var scripts = assets.js.map(function (scriptPath) {
-    return '<script src="' + scriptPath + '"' + asyncAttribute + '></script>';
+    return '<script src="' + scriptPath + '"' + self.asyncAttribute(scriptPath) + '></script>';
   });
   // Turn css files into link tags
   var styles = assets.css.map(function (stylePath) {

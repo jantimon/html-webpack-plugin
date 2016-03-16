@@ -73,8 +73,9 @@ Allowed values are as follows:
    You can specify a subdirectory here too (eg: `assets/admin.html`).
 - `template`: Path to the template. Supports loaders e.g. `html!./index.html`.
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
-- `async`: `true | false` if `true` the `async` attribute is added to `script` tags; default is
-`false'.
+- `asyncDefault`: `true | false` Default is `false' - see [Async](#async) section below.
+- `asyncExceptions`: array of `String`'s and/or `RegExp`'s defining scripts that do the opposite of
+the `asyncDefault` flag - see [Async](#async) section below.
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
@@ -254,4 +255,35 @@ compilation.plugin('html-webpack-plugin-before-html-processing', function(htmlPl
   htmlPluginData.html += 'The magic footer';
   callback();
 });
+```
+<a name="async"></a>
+Async
+-----
+
+`<script>` tags are by default added without the `async` attribute.  This can be changed by setting
+the `asyncDefault` option to `true`.
+
+However you may wish to combine sync and async scripts.  This can be done by adding the
+`asyncExceptions` option and defining an array of `String`s and/or `RegExp`s (you can have both) that match script names
+which should have the *opposite* of the `asyncDefault` option.  
+
+A contrived example where all but 'app_bundle.js' are marked as `async`:
+
+```javascript
+entry: {
+  util: 'util.js',
+  module1: 'module1.js',
+  module2: 'module2.js'
+  app: 'app.js'
+},
+output: {
+  filename: '[name]_bundle.js'
+},
+plugins: [ 
+  new HtmlWebpackPlugin({
+    asyncDefault: false,
+    asyncExceptions: [/module.*/,'util_bundle.js']
+  }) 
+]  
+
 ```

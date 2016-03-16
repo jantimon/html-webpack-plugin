@@ -1064,7 +1064,7 @@ describe('HtmlWebpackPlugin', function () {
     }, ['templateParams.compilation exists: true'], null, done);
   });
 
-  it('marks script files as async if async flag set', function (done) {
+  it('marks script file as async if async default set to true', function (done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
@@ -1072,8 +1072,67 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({
-        async: true
+        asyncDefault: true
       })]
     }, [/<body>[\s]*<script src="index_bundle.js" async><\/script>[\s]*<\/body>/], null, done);
+  });
+  it('marks script file as async if async default set to false but script file marked as exception', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        // asyncDefault default value is false
+        asyncExceptions: ['index_bundle.js']
+      })]
+    }, [/<body>[\s]*<script src="index_bundle.js" async><\/script>[\s]*<\/body>/], null, done);
+  });
+
+  it('does not mark script file as async if async default set to true but script file marked as exception', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        asyncDefault: true,
+        asyncExceptions: ['index_bundle.js']
+      })]
+    }, [/<body>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/body>/], null, done);
+  });
+
+  it('async exceptions work with regular expressions', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        // asyncDefault default value is false
+        asyncExceptions: [/in.*.js/]
+      })]
+    }, [/<body>[\s]*<script src="index_bundle.js" async><\/script>[\s]*<\/body>/], null, done);
+  });
+
+  it('selective async exceptions working (and supporting hashing)', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        hash: true,
+        asyncDefault: true,
+        asyncExceptions: ['wibble.js', /app.*/]
+      })]
+    }, ['<script src="util_bundle.js?%hash%" async', '<script src="app_bundle.js?%hash%"'], null, done);
   });
 });
