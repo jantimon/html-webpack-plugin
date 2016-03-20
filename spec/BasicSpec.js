@@ -1,3 +1,7 @@
+/*
+ * Integration and unit tests for all features but caching
+ */
+
 /* eslint-env jasmine */
 'use strict';
 

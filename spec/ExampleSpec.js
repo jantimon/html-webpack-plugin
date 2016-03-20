@@ -1,4 +1,9 @@
-/* global describe, it, expect */
+/*
+ * These integration tests compile all cases from the example folder
+ * and matches them against their dist folder
+ */
+
+ /* eslint-env jasmine */
 'use strict';
 
 // Workaround for css-loader issue
