@@ -1,6 +1,6 @@
 {
   "name": "html-webpack-plugin",
-  "version": "2.10.0",
+  "version": "2.11.0",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "main": "index.js",
   "files": [
@@ -9,6 +9,7 @@
     "lib/"
   ],
   "scripts": {
+    "prepublish": "npm run test",
     "pretest": "semistandard",
     "test": "jasmine"
   },

@@ -1,6 +1,11 @@
 Change History
 ==============
 
+v2.11.0
+----
+* Add `xhtml` option which is turned of by default. When activated it will inject self closed `<link href=".." />` tags instead of unclosed `<link href="..">` tags. https://github.com/ampedandwired/html-webpack-plugin/pull/255
+* Add support for webpack placeholders inside the public path e.g. `'/dist/[hash]/'`. https://github.com/ampedandwired/html-webpack-plugin/pull/249
+
 v2.10.0
 ----
 * Add `hash` field to the chunk object
@@ -10,15 +15,15 @@ v2.10.0
 
 v2.9.0
 ----
-* Fix favicon path (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/185, https://github.com/ampedandwired/html-webpack-plugin/issues/208, https://github.com/ampedandwired/html-webpack-plugin/pull/215)
+* Fix favicon path (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/185, https://github.com/ampedandwired/html-webpack-plugin/issues/208, https://github.com/ampedandwired/html-webpack-plugin/pull/215 )
 
 v2.8.2
 ----
-* Support relative URLs on Windows (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/205)
+* Support relative URLs on Windows (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/205 )
 
 v2.8.1
 ----
-* Caching improvements (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/204)
+* Caching improvements (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/204 )
 
 v2.8.0
 ----
@@ -49,11 +54,11 @@ v2.6.3
 
 v2.6.2
 ----
-* Fix `lodash` resolve error (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/172)
+* Fix `lodash` resolve error (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/172 )
 
 v2.6.1
 ----
-* Fix missing module (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/164)
+* Fix missing module (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/164 )
 
 v2.6.0
 ----
@@ -64,7 +69,7 @@ v2.6.0
 v2.5.0
 ----
 * Support `lodash` template's HTML _"escape"_ delimiter (`<%- %>`)
-* Fix bluebird warning (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/130)
+* Fix bluebird warning (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/130 )
 * Fix an issue where incomplete cache modules were used
 
 v2.4.0
@@ -77,7 +82,7 @@ v2.3.0
 
 v2.2.0
 ----
-* Inject css and js even if the html file is incomplete (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/135)
+* Inject css and js even if the html file is incomplete (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/135 )
 * Update dependencies
 
 v2.1.0
@@ -95,7 +100,7 @@ v2.0.3
 
 v2.0.2
 ----
-* Add support for loaders in templates (fixes https://github.com/ampedandwired/html-webpack-plugin/pull/41)
+* Add support for loaders in templates (fixes https://github.com/ampedandwired/html-webpack-plugin/pull/41 )
 * Remove `templateContent` option from configuration
 * Better error messages
 * Update dependencies
@@ -104,7 +109,7 @@ v2.0.2
 v1.7.0
 ----
 * Add `chunksSortMode` option to configuration to control how chunks should be sorted before they are included to the html
-* Don't insert async chunks into html (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/95)
+* Don't insert async chunks into html (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/95 )
 * Update dependencies
 
 v1.6.2
@@ -122,7 +127,7 @@ v1.6.1
 v1.6.0
 ----
 * Support placing templates in subfolders
-* Don't include chunks with undefined name (fixes https://github.com/ampedandwired/html-webpack-plugin/pull/60)
+* Don't include chunks with undefined name (fixes https://github.com/ampedandwired/html-webpack-plugin/pull/60 )
 * Don't include async chunks
 
 v1.5.2
@@ -131,7 +136,7 @@ v1.5.2
 
 v1.5.1
 ----
-* Fix error when manifest is specified (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/56)
+* Fix error when manifest is specified (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/56 )
 
 v1.5.0
 ----

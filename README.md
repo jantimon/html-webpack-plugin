@@ -13,11 +13,13 @@ Installation
 ------------
 Install the plugin with npm:
 ```shell
-$ npm install html-webpack-plugin@2 --save-dev
+$ npm install html-webpack-plugin --save-dev
 ```
 
 Migration guide from 1.x
 ------------------------
+
+[Changelog](https://github.com/ampedandwired/html-webpack-plugin/blob/master/CHANGELOG.md)
 
 If you used the 1.x version please take a look at the [migration guide](https://github.com/ampedandwired/html-webpack-plugin/blob/master/migration.md)
 In case I missed something please open a pull request for it.
