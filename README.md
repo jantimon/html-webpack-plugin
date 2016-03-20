@@ -256,3 +256,52 @@ compilation.plugin('html-webpack-plugin-before-html-processing', function(htmlPl
   callback();
 });
 ```
+
+Inline CSS
+----------
+
+CSS can be inlined into the head element of the HTML by using the inline loader.
+Note that the plugin itself does not need any options set up for inlining:
+
+```javascript
+module: {
+  loaders: [
+    { test: /\.css$/, loader: HtmlWebpackPlugin.inline() }
+  ]           
+},
+plugins: [
+  new HtmlWebpackPlugin()
+]  
+```
+The inline loader can be the end of a chain of CSS loaders, though note that any prior loader must output pure CSS, not javascript.  This means that [css-loader](https://www.npmjs.com/package/css-loader) and [style-loader](https://www.npmjs.com/package/style-loader) cannot be used, though the very useful [post-css](https://www.npmjs.com/package/postcss-loader) loader can be:
+
+```javascript
+module: {
+  loaders: [
+    { test: /\.css$/, loader: HtmlWebpackPlugin.inline('postcss-loader') }
+  ]           
+},
+postcss: [
+  require('autoprefixer')
+],
+plugins: [
+  new HtmlWebpackPlugin()
+]  
+```
+
+You may also wish to minify the in-lined CSS; this requires specific `minify` options:
+
+```javascript
+module: {
+  loaders: [
+    { test: /\.css$/, loader: HtmlWebpackPlugin.inline() }
+  ]           
+},
+plugins: [
+  new HtmlWebpackPlugin({
+   minify: {
+    minifyCSS: true
+   }
+  })
+]  
+```
