@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.12.0
+----
+* Basic Webpack 2.x support #225
+
 v2.11.0
 ----
 * Add `xhtml` option which is turned of by default. When activated it will inject self closed `<link href=".." />` tags instead of unclosed `<link href="..">` tags. https://github.com/ampedandwired/html-webpack-plugin/pull/255
