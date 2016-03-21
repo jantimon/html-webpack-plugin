@@ -16,19 +16,24 @@ var path = require('path');
 var webpack = require('webpack');
 var rm_rf = require('rimraf');
 var fs = require('fs');
+var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
+
+jasmine.getEnv().defaultTimeoutInterval = 5000;
 
 function runExample (exampleName, done) {
   var examplePath = path.resolve(__dirname, '..', 'examples', exampleName);
   var exampleOutput = path.join(OUTPUT_DIR, exampleName);
+  var fixturePath = path.join(examplePath, 'dist', 'webpack-' + webpackMajorVersion);
+  // Clear old results
   rm_rf(exampleOutput, function () {
     var options = require(path.join(examplePath, 'webpack.config.js'));
     options.context = examplePath;
     options.output.path = exampleOutput;
     webpack(options, function (err) {
       var dircompare = require('dir-compare');
-      var res = dircompare.compareSync(path.join(examplePath, 'dist'), exampleOutput, {compareSize: true});
+      var res = dircompare.compareSync(fixturePath, exampleOutput, {compareSize: true});
 
       res.diffSet.filter(function (diff) {
         return diff.state === 'distinct';
