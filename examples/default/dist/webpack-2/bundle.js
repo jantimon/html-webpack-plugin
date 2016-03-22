@@ -7,23 +7,23 @@
 
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
-/******/ 			return installedModules[moduleId].exports;
+/******/ 			return installedModules[moduleId].e;
 
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
-/******/ 			exports: {},
-/******/ 			id: moduleId,
-/******/ 			loaded: false
+/******/ 			e: {},
+/******/ 			i: moduleId,
+/******/ 			l: false
 /******/ 		};
 
 /******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 		modules[moduleId].call(module.e, module, module.e, __webpack_require__);
 
 /******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
+/******/ 		module.l = true;
 
 /******/ 		// Return the exports of the module
-/******/ 		return module.exports;
+/******/ 		return module.e;
 /******/ 	}
 
 
@@ -48,10 +48,10 @@
 
 	// load the styles
 	var content = __webpack_require__(2);
-	if(typeof content === 'string') content = [[module.id, content, '']];
+	if(typeof content === 'string') content = [[module.i, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
-	if(content.locals) module.exports = content.locals;
+	if(content.locals) module.e = content.locals;
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
@@ -80,26 +80,26 @@
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(3)();
+	exports = module.e = __webpack_require__(3)();
 	// imports
 
 
 	// module
-	exports.push([module.id, "body {\n  background: snow;\n}", ""]);
+	exports.push([module.i, "body {\n  background: snow;\n}", ""]);
 
 	// exports
 
 
 /***/ },
 /* 3 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/*
 		MIT License http://www.opensource.org/licenses/mit-license.php
 		Author Tobias Koppers @sokra
 	*/
 	// css base code, injected by the css-loader
-	module.exports = function() {
+	module.e = function() {
 		var list = [];
 
 		// return the list of modules as css string
@@ -148,7 +148,7 @@
 
 /***/ },
 /* 4 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/*
 		MIT License http://www.opensource.org/licenses/mit-license.php
@@ -172,7 +172,7 @@
 		singletonCounter = 0,
 		styleElementsInsertedAtTop = [];
 
-	module.exports = function(list, options) {
+	module.e = function(list, options) {
 		if(typeof DEBUG !== "undefined" && DEBUG) {
 			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
 		}
