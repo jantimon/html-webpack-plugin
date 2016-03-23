@@ -579,9 +579,35 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({
+        filename: path.resolve(OUTPUT_DIR, 'subfolder', 'test.html')
+      })]
+    }, ['<script src="../index_bundle.js"'], path.join('subfolder', 'test.html'), done);
+  });
+
+  it('allows you to use an absolute output filename outside the output path', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: path.join(OUTPUT_DIR, 'app'),
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
         filename: path.resolve(OUTPUT_DIR, 'test.html')
       })]
-    }, ['<script src="index_bundle.js"'], 'test.html', done);
+    }, ['<script src="app/index_bundle.js"'], 'test.html', done);
+  });
+
+  it('allows you to use an relative output filename outside the output path', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: path.join(OUTPUT_DIR, 'app'),
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        filename: '../test.html'
+      })]
+    }, ['<script src="app/index_bundle.js"'], 'test.html', done);
   });
 
   it('will try to use a relative name if the filename is in a subdirectory', function (done) {

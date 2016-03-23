@@ -1,6 +1,11 @@
 Change History
 ==============
 
+v2.13.0
+----
+* Add support for absolute output file names
+* Add support for relative file names outside the output path
+
 v2.12.0
 ----
 * Basic Webpack 2.x support #225
