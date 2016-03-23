@@ -35,6 +35,13 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
 
   this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
 
+  // convert absolute filename into relative so that webpack can
+  // generate it at correct location
+  var filename = this.options.filename;
+  if (path.resolve(filename) === path.normalize(filename)) {
+    this.options.filename = path.relative(compiler.options.output.path, filename);
+  }
+
   compiler.plugin('make', function (compilation, callback) {
     // Compile the template (queued)
     compilationPromise = childCompiler.compileTemplate(self.options.template, compiler.context, self.options.filename, compilation)
