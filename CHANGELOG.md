@@ -1,6 +1,11 @@
 Change History
 ==============
 
+v2.14.0
+----
+* Export publicPath to the template
+* Add example for inlining css and js
+
 v2.13.0
 ----
 * Add support for absolute output file names

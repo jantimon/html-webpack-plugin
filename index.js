@@ -215,13 +215,13 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
     // Template processing
     .then(function () {
       var templateParams = {
+        compilation: compilation,
         webpack: compilation.getStats().toJson(),
         webpackConfig: compilation.options,
         htmlWebpackPlugin: {
           files: assets,
           options: self.options
-        },
-        compilation: compilation
+        }
       };
       var html = '';
       try {
@@ -357,6 +357,8 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
   }
 
   var assets = {
+    // The public path
+    publicPath: publicPath,
     // Will contain all js & css files by chunk
     chunks: {},
     // Will contain all js files
