@@ -70,6 +70,10 @@ describe('HtmlWebpackPlugin Examples', function () {
     runExample('html-loader', done);
   });
 
+  it('inline example', function (done) {
+    runExample('inline', done);
+  });
+
   it('jade-loader example', function (done) {
     runExample('jade-loader', done);
   });

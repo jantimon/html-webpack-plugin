@@ -4,7 +4,6 @@
  * You could do the same by going into each example and execute
  * `webpack`
  */
-
 var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 
 var fs = require('fs');
