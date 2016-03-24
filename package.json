@@ -11,7 +11,7 @@
   "scripts": {
     "prepublish": "npm run test",
     "pretest": "semistandard",
-    "recompile": "node examples/rebuild.js",
+    "build-examples": "node examples/build-examples.js",
     "test": "jasmine"
   },
   "repository": {

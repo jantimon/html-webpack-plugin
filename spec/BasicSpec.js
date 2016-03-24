@@ -20,6 +20,8 @@ var HtmlWebpackPlugin = require('../index.js');
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
 
+jasmine.getEnv().defaultTimeoutInterval = 5000;
+
 function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expectErrors, expectWarnings) {
   outputFile = outputFile || 'index.html';
   webpack(webpackConfig, function (err, stats) {
@@ -106,7 +108,7 @@ describe('HtmlWebpackPlugin', function () {
     }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
   });
 
-  it('allows you to specify a custom loader', function (done) {
+  it('allows you to specify a custom loader without injection', function (done) {
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -117,7 +119,7 @@ describe('HtmlWebpackPlugin', function () {
       },
       plugins: [new HtmlWebpackPlugin({
         inject: false,
-        template: 'underscore-template-loader!' + path.join(__dirname, 'fixtures/test.html')
+        template: 'jade-loader!' + path.join(__dirname, 'fixtures/template.jade')
       })]
     },
     ['<script src="app_bundle.js', 'Some unique text'], null, done);
@@ -147,7 +149,7 @@ describe('HtmlWebpackPlugin', function () {
       },
       module: {
         loaders: [
-          {test: /\.html$/, loader: 'underscore-template-loader'}
+          {test: /\.jade$/, loader: 'jade-loader'}
         ]
       },
       output: {
@@ -156,7 +158,7 @@ describe('HtmlWebpackPlugin', function () {
       },
       plugins: [new HtmlWebpackPlugin({
         inject: false,
-        template: path.join(__dirname, 'fixtures/test.html')
+        template: path.join(__dirname, 'fixtures/template.jade')
       })]
     },
     ['<script src="app_bundle.js', 'Some unique text'], null, done);
@@ -871,7 +873,7 @@ describe('HtmlWebpackPlugin', function () {
       plugins: [
         new HtmlWebpackPlugin({
           inject: false,
-          template: 'underscore-template-loader!' + path.join(__dirname, 'fixtures/custom_file.html')
+          template: 'jade!' + path.join(__dirname, 'fixtures/template.jade')
         }),
         examplePlugin
       ]
@@ -1059,10 +1061,10 @@ describe('HtmlWebpackPlugin', function () {
           template: path.join(__dirname, 'fixtures/non-existing-template.html')
         })
       ]
-    }, ["Child compilation failed:\n  Entry module not found: Error: Cannot resolve 'file' or 'directory'"], null, done, true);
+    }, ['Child compilation failed:\n  Entry module not found:'], null, done, true);
   });
 
-  it('should sort the chunks', function (done) {
+  it('should sort the chunks in auto mode', function (done) {
     testHtmlPlugin({
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),

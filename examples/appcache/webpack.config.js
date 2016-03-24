@@ -1,10 +1,12 @@
 var AppCachePlugin = require('appcache-webpack-plugin');
 var HtmlWebpackPlugin = require('../..');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
+
 module.exports = {
   entry: './example.js',
   output: {
-    path: __dirname + '/dist',
+    path: __dirname + '/dist/webpack-' + webpackMajorVersion,
     publicPath: '',
     filename: 'bundle.js'
   },
@@ -28,4 +30,3 @@ module.exports = {
     new ExtractTextPlugin('styles.css')
   ]
 };
-
