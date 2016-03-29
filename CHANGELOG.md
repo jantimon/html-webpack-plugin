@@ -1,6 +1,12 @@
 Change History
 ==============
 
+v2.15.0
+----
+* Add full unit test coverage for the webpack 2 beta version
+* For webpack 2 the default sort will be 'dependency' instead of 'id'
+* Upgrade dependencies
+
 v2.14.0
 ----
 * Export publicPath to the template
