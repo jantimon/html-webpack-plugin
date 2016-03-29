@@ -443,7 +443,7 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
 
   // If there is a favicon present, add it to the head
   if (assets.favicon) {
-    head.push('<link rel="shortcut icon" href="' + assets.favicon + '"' + xhtml + '>');
+    head.push('<link rel="shortcut icon" href="/' + assets.favicon + '"' + xhtml + '>');
   }
   // Add styles to the head
   head = head.concat(styles);
