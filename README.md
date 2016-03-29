@@ -1,6 +1,6 @@
 HTML Webpack Plugin
 ===================
-[![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/ampedandwired/html-webpack-plugin.svg)](https://david-dm.org/ampedandwired/html-webpack-plugin) [![Build status](https://travis-ci.org/ampedandwired/html-webpack-plugin.svg)](https://travis-ci.org/ampedandwired/html-webpack-plugin) [![Windows build status](https://ci.appveyor.com/api/projects/status/github/ampedandwired/html-webpack-plugin?svg=true&branch=master)](https://ci.appveyor.com/project/jantimon/html-webpack-plugin) [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
+[![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/ampedandwired/html-webpack-plugin.svg)](https://david-dm.org/ampedandwired/html-webpack-plugin) [![Build status](https://travis-ci.org/ampedandwired/html-webpack-plugin.svg)](https://travis-ci.org/ampedandwired/html-webpack-plugin) [![Windows build status](https://ci.appveyor.com/api/projects/status/github/ampedandwired/html-webpack-plugin?svg=true&branch=master)](https://ci.appveyor.com/project/jantimon/html-webpack-plugin) [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard) [![bitHound Dependencies](https://www.bithound.io/github/ampedandwired/html-webpack-plugin/badges/dependencies.svg)](https://www.bithound.io/github/ampedandwired/html-webpack-plugin/master/dependencies/npm)
 
 [![NPM](https://nodei.co/npm/html-webpack-plugin.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/html-webpack-plugin/)
 
@@ -8,6 +8,8 @@ This is a [webpack](http://webpack.github.io/) plugin that simplifies creation o
 webpack bundles. This is especially useful for webpack bundles that include
 a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you, supply
 your own template using lodash templates or use your own loader.
+
+Maintainer: Jan Nicklas [@jantimon](https://twitter.com/jantimon) 
 
 Installation
 ------------
