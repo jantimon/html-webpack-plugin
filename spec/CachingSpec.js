@@ -10,6 +10,7 @@ if (!global.Promise) {
   require('es6-promise').polyfill();
 }
 
+var _ = require('lodash');
 var path = require('path');
 var webpack = require('webpack');
 var rm_rf = require('rimraf');
@@ -39,6 +40,14 @@ function getCompiledModuleCount (statsJson) {
   }, 0);
 }
 
+var baseConfigurations = [
+  {},
+  {
+    filename: 'test-[hash].html'
+  }
+];
+
+baseConfigurations.forEach(function (baseConfiguration) {
 describe('HtmlWebpackPluginCaching', function () {
   beforeEach(function (done) {
     rm_rf(OUTPUT_DIR, done);
@@ -46,9 +55,9 @@ describe('HtmlWebpackPluginCaching', function () {
 
   it('should compile nothing if no file was changed', function (done) {
     var template = path.join(__dirname, 'fixtures/plain.html');
-    var htmlWebpackPlugin = new HtmlWebpackPlugin({
+    var htmlWebpackPlugin = new HtmlWebpackPlugin(_.assign(baseConfiguration, {
       template: template
-    });
+    }));
     var childCompilerHash;
     var compiler = setUpCompiler(htmlWebpackPlugin);
     compiler.run()
@@ -72,7 +81,7 @@ describe('HtmlWebpackPluginCaching', function () {
   });
 
   it('should not compile the webpack html file if only a javascript file was changed', function (done) {
-    var htmlWebpackPlugin = new HtmlWebpackPlugin();
+    var htmlWebpackPlugin = new HtmlWebpackPlugin(baseConfiguration);
     var compiler = setUpCompiler(htmlWebpackPlugin);
     var childCompilerHash;
     compiler.run()
@@ -97,9 +106,9 @@ describe('HtmlWebpackPluginCaching', function () {
   });
 
   it('should compile the webpack html file even if only a javascript file was changed if caching is disabled', function (done) {
-    var htmlWebpackPlugin = new HtmlWebpackPlugin({
+    var htmlWebpackPlugin = new HtmlWebpackPlugin(_.assign(baseConfiguration, {
       cache: false
-    });
+    }));
     var childCompilerHash;
     var compiler = setUpCompiler(htmlWebpackPlugin);
     compiler.run()
@@ -125,9 +134,9 @@ describe('HtmlWebpackPluginCaching', function () {
 
   it('should compile the webpack html if the template file was changed', function (done) {
     var template = path.join(__dirname, 'fixtures/plain.html');
-    var htmlWebpackPlugin = new HtmlWebpackPlugin({
+    var htmlWebpackPlugin = new HtmlWebpackPlugin(_.assign(baseConfiguration, {
       template: template
-    });
+    }));
     var childCompilerHash;
     var compiler = setUpCompiler(htmlWebpackPlugin);
     compiler.run()
@@ -150,4 +159,5 @@ describe('HtmlWebpackPluginCaching', function () {
       })
       .then(done);
   });
+});
 });

@@ -43,8 +43,12 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   }
 
   compiler.plugin('make', function (compilation, callback) {
+    // Remove occurences of '[hash]' in the filename so the child
+    // compiler does not try to replace it.
+    var escapedFilename = self.options.filename.replace('[hash]', '');
+
     // Compile the template (queued)
-    compilationPromise = childCompiler.compileTemplate(self.options.template, compiler.context, self.options.filename, compilation)
+    compilationPromise = childCompiler.compileTemplate(self.options.template, compiler.context, escapedFilename, compilation)
       .catch(function (err) {
         compilation.errors.push(prettyError(err, compiler.context).toString());
         return {
@@ -149,8 +153,9 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
       })
       .then(function (html) {
+        var outputFilename = self.options.filename.replace('[hash]', self.childCompilerHash);
         // Replace the compilation result with the evaluated html code
-        compilation.assets[self.options.filename] = {
+        compilation.assets[outputFilename] = {
           source: function () {
             return html;
           },
@@ -158,11 +163,12 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
             return html.length;
           }
         };
+        return outputFilename;
       })
-      .then(function () {
+      .then(function (outputFilename) {
         // Let other plugins know that we are done:
         return applyPluginsAsyncWaterfall('html-webpack-plugin-after-emit', {
-          html: compilation.assets[self.options.filename],
+          html: compilation.assets[outputFilename],
           plugin: self
         });
       })
