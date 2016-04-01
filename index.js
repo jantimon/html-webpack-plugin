@@ -19,6 +19,7 @@ function HtmlWebpackPlugin (options) {
     compile: true,
     favicon: false,
     minify: false,
+    beautify: false,
     cache: true,
     showErrors: true,
     chunks: 'all',
@@ -258,6 +259,11 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function (html, assets) {
       if (self.options.minify) {
         var minify = require('html-minifier').minify;
         return minify(html, self.options.minify);
+      } else if (self.options.beautify) {
+        var beautify = require('js-beautify').html;
+          return beautify(html, {
+            indentSize: 4
+          });
       }
       return html;
     });
