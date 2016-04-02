@@ -259,13 +259,18 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function (html, assets) {
       if (self.options.minify) {
         var minify = require('html-minifier').minify;
         return minify(html, self.options.minify);
-      } else if (self.options.beautify) {
-        var beautify = require('js-beautify').html;
-          return beautify(html, {
-            indentSize: 4
-          });
+      } else {
+        return html;
       }
-      return html;
+    })
+    // Beautify
+    .then(function (html) {
+      if (self.options.beautify && !self.options.minify) {
+        var beautify = require('js-beautify').html;
+        return beautify(html, self.options.beautify);
+      } else {
+        return html;
+      }
     });
 };
 
