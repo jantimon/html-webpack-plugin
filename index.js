@@ -48,13 +48,15 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       .catch(function (err) {
         compilation.errors.push(prettyError(err, compiler.context).toString());
         return {
-          content: self.options.showErrors ? prettyError(err, compiler.context).toJsonHtml() : 'ERROR'
+          content: self.options.showErrors ? prettyError(err, compiler.context).toJsonHtml() : 'ERROR',
+          outputName: self.options.filename
         };
       })
       .then(function (compilationResult) {
         // If the compilation change didnt change the cache is valid
         isCompilationCached = compilationResult.hash && self.childCompilerHash === compilationResult.hash;
         self.childCompilerHash = compilationResult.hash;
+        self.childCompilationOutputName = compilationResult.outputName;
         callback();
         return compilationResult.content;
       });
@@ -150,7 +152,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       })
       .then(function (html) {
         // Replace the compilation result with the evaluated html code
-        compilation.assets[self.options.filename] = {
+        compilation.assets[self.childCompilationOutputName] = {
           source: function () {
             return html;
           },
@@ -162,7 +164,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       .then(function () {
         // Let other plugins know that we are done:
         return applyPluginsAsyncWaterfall('html-webpack-plugin-after-emit', {
-          html: compilation.assets[self.options.filename],
+          html: compilation.assets[self.childCompilationOutputName],
           plugin: self
         });
       })
@@ -349,7 +351,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
     // If a hard coded public path exists use it
     ? compilation.mainTemplate.getPublicPath({hash: webpackStatsJson.hash})
     // If no public path was set get a relative url path
-    : path.relative(path.resolve(compilation.options.output.path, path.dirname(self.options.filename)), compilation.options.output.path)
+    : path.relative(path.resolve(compilation.options.output.path, path.dirname(self.childCompilationOutputName)), compilation.options.output.path)
       .split(path.sep).join('/');
 
   if (publicPath.length && publicPath.substr(-1, 1) !== '/') {

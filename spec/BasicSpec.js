@@ -39,7 +39,13 @@ function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expec
       expect(compilationWarnings).toBe('');
     }
     var outputFileExists = fs.existsSync(path.join(OUTPUT_DIR, outputFile));
-    expect(outputFileExists).toBe(true);
+    expect({
+      exists: outputFileExists,
+      filename: outputFile
+    }).toEqual({
+      exists: true,
+      filename: outputFile
+    });
     if (!outputFileExists) {
       return done();
     }
