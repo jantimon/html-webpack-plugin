@@ -79,6 +79,7 @@ Allowed values are as follows:
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
+- `beautify`: `{...} | false` Pass a [js-beautify](https://github.com/beautify-web/js-beautify) options object to beautify the output. Work only if `minify: false`.
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
   included scripts and css files. This is useful for cache busting.
 - `cache`: `true | false` if `true` (default) try to emit the file only if it was changed.
