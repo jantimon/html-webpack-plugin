@@ -189,7 +189,7 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function (compilation, s
   // The LibraryTemplatePlugin stores the template result in a local variable.
   // To extract the result during the evaluation this part has to be removed.
   source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '')
-    .replace(/(__webpack_require__\.p\s=\s\")[\s\S]*/, ['$1', compilation.mainTemplate.getPublicPath({hash: compilation.hash }), '"'].join(''));
+    .replace(/(__webpack_require__\.p\s=\s\")[\s\S]*?\"/, ['$1', compilation.mainTemplate.getPublicPath({hash: compilation.hash }), '"'].join(''));
   var template = this.options.template.replace(/^.+!/, '').replace(/\?.+$/, '');
   var vmContext = vm.createContext(_.extend({HTML_WEBPACK_PLUGIN: true, require: require}, global));
   var vmScript = new vm.Script(source, {filename: template});
