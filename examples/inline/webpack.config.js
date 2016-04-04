@@ -18,6 +18,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       inject: false,
+      cache: false,
       template: 'template.jade',
       filename: 'index.html',
       favicon: 'favicon.ico',
