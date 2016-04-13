@@ -255,6 +255,7 @@ Usage:
 ```javascript
 compilation.plugin('html-webpack-plugin-before-html-processing', function(htmlPluginData, callback) {
   htmlPluginData.html += 'The magic footer';
-  callback();
+  callback(null, htmlPluginData);
 });
 ```
+Note that the callback must be passed the htmlPluginData in order to pass this onto any other plugins listening on the same 'html-webpack-plugin-before-html-processing' event. 
