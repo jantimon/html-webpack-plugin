@@ -243,7 +243,7 @@ plugins: [
 Events
 ------
 
-To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the html when this plugin executes the following events:
+To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the html this plugin executes the following events:
 
  * `html-webpack-plugin-before-html-generation`
  * `html-webpack-plugin-before-html-processing`
