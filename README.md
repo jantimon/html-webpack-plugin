@@ -9,7 +9,7 @@ webpack bundles. This is especially useful for webpack bundles that include
 a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you, supply
 your own template using lodash templates or use your own loader.
 
-Maintainer: Jan Nicklas [@jantimon](https://twitter.com/jantimon) 
+Maintainer: Jan Nicklas [@jantimon](https://twitter.com/jantimon)
 
 Installation
 ------------
@@ -243,7 +243,7 @@ plugins: [
 Events
 ------
 
-To allow other plugins to alter the html this plugin executes the following events:
+To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the html when this plugin executes the following events:
 
  * `html-webpack-plugin-before-html-generation`
  * `html-webpack-plugin-before-html-processing`
@@ -253,9 +253,33 @@ To allow other plugins to alter the html this plugin executes the following even
 Usage:
 
 ```javascript
-compilation.plugin('html-webpack-plugin-before-html-processing', function(htmlPluginData, callback) {
-  htmlPluginData.html += 'The magic footer';
-  callback(null, htmlPluginData);
-});
+// MyPlugin.js
+
+function MyPlugin(options) {
+  // Configure your plugin with options...
+}
+
+MyPlugin.prototype.apply = function(compiler) {
+  // ...
+  compiler.plugin('compilation', function(compilation) {
+    console.log('The compiler is starting a new compilation...');
+
+    compilation.plugin('html-webpack-plugin-before-html-processing', function(htmlPluginData, callback) {
+      htmlPluginData.html += 'The magic footer';
+      callback(null, htmlPluginData);
+    });
+  });
+
+};
+
+module.exports = MyPlugin;
 ```
-Note that the callback must be passed the htmlPluginData in order to pass this onto any other plugins listening on the same 'html-webpack-plugin-before-html-processing' event. 
+Then in `webpack.config.js`
+
+```javascript
+plugins: [
+  new MyPlugin({options: ''})
+]
+```
+
+Note that the callback must be passed the htmlPluginData in order to pass this onto any other plugins listening on the same 'html-webpack-plugin-before-html-processing' event.
