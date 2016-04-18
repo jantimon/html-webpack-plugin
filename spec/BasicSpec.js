@@ -38,6 +38,14 @@ function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expec
     } else {
       expect(compilationWarnings).toBe('');
     }
+    if (outputFile instanceof RegExp) {
+      var matches = Object.keys(stats.compilation.assets).filter(function (item) {
+        return outputFile.test(item);
+      });
+      expect(matches.length).toBe(1);
+      outputFile = matches[0];
+    }
+    expect(outputFile.indexOf('[hash]') === -1).toBe(true);
     var outputFileExists = fs.existsSync(path.join(OUTPUT_DIR, outputFile));
     expect(outputFileExists).toBe(true);
     if (!outputFileExists) {
@@ -571,6 +579,19 @@ describe('HtmlWebpackPlugin', function () {
       },
       plugins: [new HtmlWebpackPlugin({filename: 'test.html'})]
     }, ['<script src="index_bundle.js"'], 'test.html', done);
+  });
+
+  it('will replace [hash] in the filename with the child compilation hash', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        filename: 'test-[hash].html'
+      })]
+    }, ['<script src="index_bundle.js"'], /test-\S+\.html$/, done);
   });
 
   it('allows you to use an absolute output filename', function (done) {

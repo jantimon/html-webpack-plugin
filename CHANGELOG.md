@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.16.0
+----
+* Add support for dynamic filenames like index[hash].html
+
 v2.15.0
 ----
 * Add full unit test coverage for the webpack 2 beta version
