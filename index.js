@@ -109,10 +109,14 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       // Allow plugins to make changes to the assets before invoking the template
       // This only makes sense to use if `inject` is `false`
       .then(function (compilationResult) {
-        return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-generation', {assets: assets, plugin: self})
-          .then(function () {
-            return compilationResult;
-          });
+        return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-generation', {
+          assets: assets,
+          outputName: self.childCompilationOutputName,
+          plugin: self
+        })
+        .then(function () {
+          return compilationResult;
+        });
       })
       // Execute the template
       .then(function (compilationResult) {
@@ -124,7 +128,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       })
       // Allow plugins to change the html before assets are injected
       .then(function (html) {
-        var pluginArgs = {html: html, assets: assets, plugin: self};
+        var pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
         return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-processing', pluginArgs)
           .then(function () {
             return pluginArgs.html;
@@ -136,7 +140,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       })
       // Allow plugins to change the html after assets are injected
       .then(function (html) {
-        var pluginArgs = {html: html, assets: assets, plugin: self};
+        var pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
         return applyPluginsAsyncWaterfall('html-webpack-plugin-after-html-processing', pluginArgs)
           .then(function () {
             return pluginArgs.html;
@@ -165,7 +169,13 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         // Let other plugins know that we are done:
         return applyPluginsAsyncWaterfall('html-webpack-plugin-after-emit', {
           html: compilation.assets[self.childCompilationOutputName],
+          outputName: self.childCompilationOutputName,
           plugin: self
+        }).catch(function (err) {
+          console.error(err);
+          return null;
+        }).then(function () {
+          return null;
         });
       })
       // Let webpack continue with it
