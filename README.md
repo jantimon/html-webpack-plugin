@@ -250,6 +250,8 @@ To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter 
  * `html-webpack-plugin-after-html-processing`
  * `html-webpack-plugin-after-emit`
 
+Example implementation: [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
+
 Usage:
 
 ```javascript
