@@ -7,23 +7,23 @@
 
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
-/******/ 			return installedModules[moduleId].e;
+/******/ 			return installedModules[moduleId].exports;
 
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
-/******/ 			e: {},
 /******/ 			i: moduleId,
-/******/ 			l: false
+/******/ 			l: false,
+/******/ 			exports: {}
 /******/ 		};
 
 /******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.e, module, module.e, __webpack_require__);
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
 
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
 
 /******/ 		// Return the exports of the module
-/******/ 		return module.e;
+/******/ 		return module.exports;
 /******/ 	}
 
 
@@ -52,7 +52,7 @@
 
 	var jade = __webpack_require__(4);
 
-	module.e = function template(locals) {
+	module.exports = function template(locals) {
 	var buf = [];
 	var jade_mixins = {};
 	var jade_interp;
@@ -80,7 +80,7 @@
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.e = __webpack_require__.p + "0714810ae3fb211173e2964249507195.png";
+	module.exports = __webpack_require__.p + "0714810ae3fb211173e2964249507195.png";
 
 /***/ },
 /* 4 */

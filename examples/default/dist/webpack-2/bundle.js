@@ -7,23 +7,23 @@
 
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
-/******/ 			return installedModules[moduleId].e;
+/******/ 			return installedModules[moduleId].exports;
 
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
-/******/ 			e: {},
 /******/ 			i: moduleId,
-/******/ 			l: false
+/******/ 			l: false,
+/******/ 			exports: {}
 /******/ 		};
 
 /******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.e, module, module.e, __webpack_require__);
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
 
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
 
 /******/ 		// Return the exports of the module
-/******/ 		return module.e;
+/******/ 		return module.exports;
 /******/ 	}
 
 
@@ -51,7 +51,7 @@
 	if(typeof content === 'string') content = [[module.i, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
-	if(content.locals) module.e = content.locals;
+	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
@@ -80,7 +80,7 @@
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.e = __webpack_require__(3)();
+	exports = module.exports = __webpack_require__(3)();
 	// imports
 
 
@@ -92,14 +92,14 @@
 
 /***/ },
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/*
 		MIT License http://www.opensource.org/licenses/mit-license.php
 		Author Tobias Koppers @sokra
 	*/
 	// css base code, injected by the css-loader
-	module.e = function() {
+	module.exports = function() {
 		var list = [];
 
 		// return the list of modules as css string
@@ -148,7 +148,7 @@
 
 /***/ },
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/*
 		MIT License http://www.opensource.org/licenses/mit-license.php
@@ -172,7 +172,7 @@
 		singletonCounter = 0,
 		styleElementsInsertedAtTop = [];
 
-	module.e = function(list, options) {
+	module.exports = function(list, options) {
 		if(typeof DEBUG !== "undefined" && DEBUG) {
 			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
 		}
