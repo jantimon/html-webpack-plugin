@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.17.0
+----
+* Add `type` attribute to `script` element to prevent issues in Safari 9.1.1
+
 v2.16.2
 ----
 * Fix bug introduced by 2.16.2. Fixes #315

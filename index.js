@@ -450,7 +450,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
 HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
   // Turn script files into script tags
   var scripts = assets.js.map(function (scriptPath) {
-    return '<script src="' + scriptPath + '"></script>';
+    return '<script type="text/javascript" src="' + scriptPath + '"></script>';
   });
   // Make tags self-closing in case of xhtml
   var xhtml = this.options.xhtml ? '/' : '';
