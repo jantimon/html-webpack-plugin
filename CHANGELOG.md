@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.17.0
+----
+* Add `type` attribute to `script` element to prevent issues in Safari 9.1.1
+
 v2.16.0
 ----
 * Add support for dynamic filenames like index[hash].html
