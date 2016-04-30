@@ -70,6 +70,12 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
     chunks = self.sortChunks(chunks, self.options.chunksSortMode);
     // Get assets
     var assets = self.htmlWebpackPluginAssets(compilation, chunks);
+    // If this is a hot update compilation, move on!
+    // This solves a problem where an `index.html` file is generated for hot-update js files
+    // It only happens in Webpack 2, where hot updates are emitted separately before the full bundle
+    if (self.isHotUpdateCompilation(assets)) {
+      return callback();
+    }
 
     // If the template and the assets did not change we don't have to emit the html
     var assetJson = JSON.stringify(self.getAssetFiles(assets));
@@ -349,6 +355,12 @@ HtmlWebpackPlugin.prototype.filterChunks = function (webpackStatsJson, includedC
     }
     // Add otherwise
     return true;
+  });
+};
+
+HtmlWebpackPlugin.prototype.isHotUpdateCompilation = function (assets) {
+  return assets.js.every(function (name) {
+    return /\.hot-update\.js$/.test(name);
   });
 };
 
