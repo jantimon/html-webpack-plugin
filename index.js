@@ -437,11 +437,11 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
  * Injects the assets into the given html string
  */
 HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
-  //check to see if we have the prefetch option in our options object
+  // check to see if we have the prefetch option in our options object
   var prefetch = this.options.preFetch;
-  //this is the defay
+  // this is the defay
   var strCSSAttribute = 'stylesheet';
-  //if the prefetch option is set to true then add it to the stylesheet element
+  // if the prefetch option is set to true then add it to the stylesheet element
   if (prefetch) {
     strCSSAttribute = 'dns-prefetch';
   }
@@ -451,10 +451,12 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
   });
   // Make tags self-closing in case of xhtml
   var xhtml = this.options.xhtml ? '/' : '';
+
   // Turn css files into link tags
   var styles = assets.css.map(function (stylePath) {
-    return '<link href="' + stylePath + '" rel="'+ strCSSAttribute + xhtml + '>';
+    return '<link href="' + stylePath + '" rel="' + strCSSAttribute + '" ' + xhtml + '>';
   });
+  console.log(styles);
   // Injections
   var htmlRegExp = /(<html[^>]*>)/i;
   var head = [];
