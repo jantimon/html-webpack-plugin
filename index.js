@@ -454,9 +454,8 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
 
   // Turn css files into link tags
   var styles = assets.css.map(function (stylePath) {
-    return '<link href="' + stylePath + '" rel="' + strCSSAttribute + '" ' + xhtml + '>';
+    return '<link href="' + stylePath + '" rel="' + strCSSAttribute + '"' + xhtml + '>';
   });
-  console.log(styles);
   // Injections
   var htmlRegExp = /(<html[^>]*>)/i;
   var head = [];
