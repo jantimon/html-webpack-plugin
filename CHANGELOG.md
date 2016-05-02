@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.16.1
+----
+* Fix hot module replacement for webpack 2.x
+
 v2.16.0
 ----
 * Add support for dynamic filenames like index[hash].html
