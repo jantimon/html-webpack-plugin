@@ -20,7 +20,7 @@ var HtmlWebpackPlugin = require('../index.js');
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
 
-jasmine.getEnv().defaultTimeoutInterval = 5000;
+jasmine.getEnv().defaultTimeoutInterval = 10000;
 
 function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expectErrors, expectWarnings) {
   outputFile = outputFile || 'index.html';
