@@ -94,8 +94,7 @@ Here's an example webpack config illustrating how to use these options:
   entry: 'index.js',
   output: {
     path: 'dist',
-    filename: 'index_bundle.js',
-    hash: true
+    filename: 'index_bundle.js'
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -138,8 +137,8 @@ and favicon files into the markup.
 plugins: [
   new HtmlWebpackPlugin({
     title: 'Custom template',
-    template: 'my-index.ejs', // Load a custom template
-    inject: 'body' // Inject all scripts into the body
+    template: 'my-index.ejs', // Load a custom template (ejs by default but can be changed)
+    inject: 'body' // Inject all scripts into the body (this is the default so you can skip it)
   })
 ]
 ```
