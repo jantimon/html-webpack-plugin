@@ -359,7 +359,7 @@ HtmlWebpackPlugin.prototype.filterChunks = function (webpackStatsJson, includedC
 };
 
 HtmlWebpackPlugin.prototype.isHotUpdateCompilation = function (assets) {
-  return assets.js.every(function (name) {
+  return assets.js.length && assets.js.every(function (name) {
     return /\.hot-update\.js$/.test(name);
   });
 };
