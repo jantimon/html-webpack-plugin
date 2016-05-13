@@ -24,7 +24,8 @@ function HtmlWebpackPlugin (options) {
     chunks: 'all',
     excludeChunks: [],
     title: 'Webpack App',
-    xhtml: false
+    xhtml: false,
+    preFetch: false
   }, options);
 }
 
@@ -448,15 +449,24 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
  * Injects the assets into the given html string
  */
 HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
+  // check to see if we have the prefetch option in our options object
+  var prefetch = this.options.preFetch;
+  // this is the defay
+  var strCSSAttribute = 'stylesheet';
+  // if the prefetch option is set to true then add it to the stylesheet element
+  if (prefetch) {
+    strCSSAttribute = 'dns-prefetch';
+  }
   // Turn script files into script tags
   var scripts = assets.js.map(function (scriptPath) {
     return '<script type="text/javascript" src="' + scriptPath + '"></script>';
   });
   // Make tags self-closing in case of xhtml
   var xhtml = this.options.xhtml ? '/' : '';
+
   // Turn css files into link tags
   var styles = assets.css.map(function (stylePath) {
-    return '<link href="' + stylePath + '" rel="stylesheet"' + xhtml + '>';
+    return '<link href="' + stylePath + '" rel="' + strCSSAttribute + '"' + xhtml + '>';
   });
   // Injections
   var htmlRegExp = /(<html[^>]*>)/i;

@@ -87,6 +87,7 @@ Allowed values are as follows:
 - `chunksSortMode`: Allows to control how chunks should be sorted before they are included to the html. Allowed values: 'none' | 'auto' | 'dependency' | {function} - default: 'auto'
 - `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk)
 - `xhtml`: `true | false` If `true` render the `link` tags as self-closing, XHTML compliant. Default is `false`
+- `preFetch`: 'true' Gives a hint to the browser to perform a DNS lookup in the background to improve performance if false then 'stylesheet' attribute is added by default.
 
 Here's an example webpack config illustrating how to use these options:
 ```javascript
