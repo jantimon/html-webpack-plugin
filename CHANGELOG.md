@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.16.2
+----
+* Fix bug introduced by 2.16.2. Fixes #315
+
 v2.16.1
 ----
 * Fix hot module replacement for webpack 2.x
