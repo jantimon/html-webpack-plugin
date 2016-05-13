@@ -64,6 +64,7 @@
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	'use strict';
 	__webpack_require__(0);
 	// Use the same template for the frontend code
@@ -86,6 +87,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	'use strict';
 
 	/**

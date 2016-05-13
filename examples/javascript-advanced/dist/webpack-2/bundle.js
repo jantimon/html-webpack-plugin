@@ -44,6 +44,7 @@
 /* 0 */
 /***/ function(module, exports) {
 
+	"use strict";
 	eval("// This file is used for frontend and backend\n'use strict';\n\n// If compiled by the html-webpack-plugin\n// HTML_WEBPACK_PLUGIN is set to true:\nvar backend = typeof HTML_WEBPACK_PLUGIN !== 'undefined';\n\nmodule.exports = function () {\n  return 'Hello World from ' + (backend ? 'backend' : 'frontend');\n};\n\n\n/*****************\n ** WEBPACK FOOTER\n ** ./universial.js\n ** module id = 0\n ** module chunks = 0\n **/\n\n//# sourceURL=webpack:///./universial.js?");
 
 /***/ },
