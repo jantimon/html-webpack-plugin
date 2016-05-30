@@ -68,6 +68,8 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
     var chunks = self.filterChunks(compilation.getStats().toJson(), self.options.chunks, self.options.excludeChunks);
     // Sort chunks
     chunks = self.sortChunks(chunks, self.options.chunksSortMode);
+    // Let plugins alter the chunks and the chunk sorting
+    chunks = compilation.applyPluginsWaterfall('html-webpack-plugin-alter-chunks', chunks, { plugin: self });
     // Get assets
     var assets = self.htmlWebpackPluginAssets(compilation, chunks);
     // If this is a hot update compilation, move on!

@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.19.0
+----
+* Add `html-webpack-plugin-alter-chunks` event for custom chunk sorting and interpolation
+
 v2.18.0
 ----
 * Updated all dependencies
