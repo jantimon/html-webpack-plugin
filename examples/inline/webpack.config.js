@@ -12,14 +12,14 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
-      { test: /\.jade$/, loader: 'jade' }
+      { test: /\.pug$/, loader: 'pug' }
     ]
   },
   plugins: [
     new HtmlWebpackPlugin({
       inject: false,
       cache: false,
-      template: 'template.jade',
+      template: 'template.pug',
       filename: 'index.html',
       favicon: 'favicon.ico',
       title: 'Jade demo'

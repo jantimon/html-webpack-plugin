@@ -127,7 +127,7 @@ describe('HtmlWebpackPlugin', function () {
       },
       plugins: [new HtmlWebpackPlugin({
         inject: false,
-        template: 'jade-loader!' + path.join(__dirname, 'fixtures/template.jade')
+        template: 'pug-load!' + path.join(__dirname, 'fixtures/template.pug')
       })]
     },
     ['<script type="text/javascript" src="app_bundle.js', 'Some unique text'], null, done);
@@ -157,7 +157,7 @@ describe('HtmlWebpackPlugin', function () {
       },
       module: {
         loaders: [
-          {test: /\.jade$/, loader: 'jade-loader'}
+          {test: /\.pug$/, loader: 'pug-load'}
         ]
       },
       output: {
@@ -166,7 +166,7 @@ describe('HtmlWebpackPlugin', function () {
       },
       plugins: [new HtmlWebpackPlugin({
         inject: false,
-        template: path.join(__dirname, 'fixtures/template.jade')
+        template: path.join(__dirname, 'fixtures/template.pug')
       })]
     },
     ['<script type="text/javascript" src="app_bundle.js', 'Some unique text'], null, done);
@@ -894,7 +894,7 @@ describe('HtmlWebpackPlugin', function () {
       plugins: [
         new HtmlWebpackPlugin({
           inject: false,
-          template: 'jade!' + path.join(__dirname, 'fixtures/template.jade')
+          template: 'pug!' + path.join(__dirname, 'fixtures/template.pug')
         }),
         examplePlugin
       ]

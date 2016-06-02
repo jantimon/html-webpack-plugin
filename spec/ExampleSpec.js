@@ -74,8 +74,8 @@ describe('HtmlWebpackPlugin Examples', function () {
     runExample('inline', done);
   });
 
-  it('jade-loader example', function (done) {
-    runExample('jade-loader', done);
+  it('pug-load example', function (done) {
+    runExample('pug-load', done);
   });
 
   it('javascript example', function (done) {

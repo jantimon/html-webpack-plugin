@@ -1,62 +1,97 @@
-<!DOCTYPE html><html><head><meta http-equiv="Content-type" content="text/html; charset=utf-8"><title>Jade demo</title></head><body><style>body {
-  background: snow;
-}</style><script type="text/javascript">/******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
-/******/ 			return installedModules[moduleId].exports;
-
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			exports: {},
-/******/ 			id: moduleId,
-/******/ 			loaded: false
-/******/ 		};
-
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
-
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-
-
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(0);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	__webpack_require__(1);
-
-	console.log('Hello World');
-
-
-/***/ },
-/* 1 */
-/***/ function(module, exports) {
-
-	// removed by extract-text-webpack-plugin
-
-/***/ }
-/******/ ]);</script></body></html>
+Html Webpack Plugin:
+<pre>
+  Error: Child compilation failed:
+  Entry module not found: Error: Cannot resolve 'file' or 'directory' /Users/dor  ian/Downloads/html-webpack-plugin-master/examples/inline/template.pug in /User  s/dorian/Downloads/html-webpack-plugin-master/examples/inline:
+  Error: Cannot resolve 'file' or 'directory' /Users/dorian/Downloads/html-webpa  ck-plugin-master/examples/inline/template.pug in /Users/dorian/Downloads/html-  webpack-plugin-master/examples/inline
+  
+  - compiler.js:88 
+    /Users/dorian/Downloads/html-webpack-plugin-master/lib/compiler.js:88:16
+  
+  - Compiler.js:214 Compiler.<anonymous>
+    [html-webpack-plugin-master]/[webpack]/lib/Compiler.js:214:10
+  
+  - Compiler.js:403 
+    [html-webpack-plugin-master]/[webpack]/lib/Compiler.js:403:12
+  
+  - Tapable.js:67 Compiler.next
+    [html-webpack-plugin-master]/[tapable]/lib/Tapable.js:67:11
+  
+  - CachePlugin.js:40 Compiler.<anonymous>
+    [html-webpack-plugin-master]/[webpack]/lib/CachePlugin.js:40:4
+  
+  - Tapable.js:71 Compiler.applyPluginsAsync
+    [html-webpack-plugin-master]/[tapable]/lib/Tapable.js:71:13
+  
+  - Compiler.js:400 Compiler.<anonymous>
+    [html-webpack-plugin-master]/[webpack]/lib/Compiler.js:400:9
+  
+  - Compilation.js:577 Compilation.<anonymous>
+    [html-webpack-plugin-master]/[webpack]/lib/Compilation.js:577:13
+  
+  - Tapable.js:60 Compilation.applyPluginsAsync
+    [html-webpack-plugin-master]/[tapable]/lib/Tapable.js:60:69
+  
+  - Compilation.js:572 Compilation.<anonymous>
+    [html-webpack-plugin-master]/[webpack]/lib/Compilation.js:572:10
+  
+  - Tapable.js:60 Compilation.applyPluginsAsync
+    [html-webpack-plugin-master]/[tapable]/lib/Tapable.js:60:69
+  
+  - Compilation.js:567 Compilation.<anonymous>
+    [html-webpack-plugin-master]/[webpack]/lib/Compilation.js:567:9
+  
+  - Tapable.js:60 Compilation.applyPluginsAsync
+    [html-webpack-plugin-master]/[tapable]/lib/Tapable.js:60:69
+  
+  - Compilation.js:563 Compilation.<anonymous>
+    [html-webpack-plugin-master]/[webpack]/lib/Compilation.js:563:8
+  
+  - Tapable.js:60 Compilation.applyPluginsAsync
+    [html-webpack-plugin-master]/[tapable]/lib/Tapable.js:60:69
+  
+  - Compilation.js:525 Compilation.seal
+    [html-webpack-plugin-master]/[webpack]/lib/Compilation.js:525:7
+  
+  - Compiler.js:397 Compiler.<anonymous>
+    [html-webpack-plugin-master]/[webpack]/lib/Compiler.js:397:15
+  
+  - Tapable.js:103 
+    [html-webpack-plugin-master]/[tapable]/lib/Tapable.js:103:11
+  
+  - Compilation.js:445 Compilation.<anonymous>
+    [html-webpack-plugin-master]/[webpack]/lib/Compilation.js:445:10
+  
+  - Compilation.js:344 Compilation.errorAndCallback
+    [html-webpack-plugin-master]/[webpack]/lib/Compilation.js:344:3
+  
+  - Compilation.js:358 Compilation.<anonymous>
+    [html-webpack-plugin-master]/[webpack]/lib/Compilation.js:358:11
+  
+  - NormalModuleFactory.js:29 onDoneResolving
+    [html-webpack-plugin-master]/[webpack]/lib/NormalModuleFactory.js:29:20
+  
+  - NormalModuleFactory.js:85 
+    [html-webpack-plugin-master]/[webpack]/lib/NormalModuleFactory.js:85:20
+  
+  - async.js:726 
+    [html-webpack-plugin-master]/[webpack]/[async]/lib/async.js:726:13
+  
+  - async.js:52 
+    [html-webpack-plugin-master]/[webpack]/[async]/lib/async.js:52:16
+  
+  - async.js:241 done
+    [html-webpack-plugin-master]/[webpack]/[async]/lib/async.js:241:17
+  
+  - async.js:44 
+    [html-webpack-plugin-master]/[webpack]/[async]/lib/async.js:44:16
+  
+  - async.js:723 
+    [html-webpack-plugin-master]/[webpack]/[async]/lib/async.js:723:17
+  
+  - async.js:167 
+    [html-webpack-plugin-master]/[webpack]/[async]/lib/async.js:167:37
+  
+  - UnsafeCachePlugin.js:24 
+    [html-webpack-plugin-master]/[enhanced-resolve]/lib/UnsafeCachePlugin.js:24:    19
+  
+</pre>

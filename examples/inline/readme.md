@@ -1,4 +1,4 @@
-# isomorphic jade example
+# isomorphic pug example
 
-This example shows how to use a different template engine (in this case jade)
-to load the `time.jade` template on the backend and frontend.
+This example shows how to use a different template engine (in this case pug)
+to load the `time.pug` template on the backend and frontend.
