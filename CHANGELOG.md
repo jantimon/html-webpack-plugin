@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.20.0
+----
+* Exclude chunks works now even if combined with dependency sort
+
 v2.19.0
 ----
 * Add `html-webpack-plugin-alter-chunks` event for custom chunk sorting and interpolation
