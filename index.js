@@ -143,8 +143,15 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
           });
       })
       .then(function (html) {
-        // Add the stylesheets, scripts and so on to the resulting html
-        return self.postProcessHtml(html, assets);
+        // Prepare script and link tags
+        var assetTags = self.generateAssetTags(assets);
+        var pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, outputName: self.childCompilationOutputName};
+        // Allow plugins to change the assetTag definitions
+        return applyPluginsAsyncWaterfall('html-webpack-plugin-alter-asset-tags', pluginArgs)
+          .then(function () {
+              // Add the stylesheets, scripts and so on to the resulting html
+            return self.postProcessHtml(html, assets, { body: pluginArgs.body, head: pluginArgs.head });
+          });
       })
       // Allow plugins to change the html after assets are injected
       .then(function (html) {
@@ -259,7 +266,7 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
  *
  * Returns a promise
  */
-HtmlWebpackPlugin.prototype.postProcessHtml = function (html, assets) {
+HtmlWebpackPlugin.prototype.postProcessHtml = function (html, assets, assetTags) {
   var self = this;
   if (typeof html !== 'string') {
     return Promise.reject('Expected html to be a string but got ' + JSON.stringify(html));
@@ -268,7 +275,7 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function (html, assets) {
     // Inject
     .then(function () {
       if (self.options.inject) {
-        return self.injectAssetsIntoHtml(html, assets);
+        return self.injectAssetsIntoHtml(html, assets, assetTags);
       } else {
         return html;
       }
@@ -449,27 +456,45 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
 /**
  * Injects the assets into the given html string
  */
-HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
+HtmlWebpackPlugin.prototype.generateAssetTags = function (assets, applyPluginsAsyncWaterfall) {
   // Turn script files into script tags
   var scripts = assets.js.map(function (scriptPath) {
-    return '<script type="text/javascript" src="' + scriptPath + '"></script>';
+    return {
+      tagName: 'script',
+      closeTag: true,
+      attributes: {
+        type: 'text/javascript',
+        src: scriptPath
+      }
+    };
   });
   // Make tags self-closing in case of xhtml
-  var xhtml = this.options.xhtml ? '/' : '';
+  var selfClosingTag = !!this.options.xhtml;
   // Turn css files into link tags
   var styles = assets.css.map(function (stylePath) {
-    return '<link href="' + stylePath + '" rel="stylesheet"' + xhtml + '>';
+    return {
+      tagName: 'link',
+      selfClosingTag: selfClosingTag,
+      attributes: {
+        href: stylePath,
+        rel: 'stylesheet'
+      }
+    };
   });
-  // Injections
-  var htmlRegExp = /(<html[^>]*>)/i;
+  // Injection targets
   var head = [];
-  var headRegExp = /(<\/head>)/i;
   var body = [];
-  var bodyRegExp = /(<\/body>)/i;
 
   // If there is a favicon present, add it to the head
   if (assets.favicon) {
-    head.push('<link rel="shortcut icon" href="' + assets.favicon + '"' + xhtml + '>');
+    head.push({
+      tagName: 'link',
+      selfClosingTag: selfClosingTag,
+      attributes: {
+        rel: 'shortcut icon',
+        href: assets.favicon
+      }
+    });
   }
   // Add styles to the head
   head = head.concat(styles);
@@ -479,6 +504,18 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
   } else {
     body = body.concat(scripts);
   }
+  return {head: head, body: body};
+};
+
+/**
+ * Injects the assets into the given html string
+ */
+HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets, assetTags) {
+  var htmlRegExp = /(<html[^>]*>)/i;
+  var headRegExp = /(<\/head>)/i;
+  var bodyRegExp = /(<\/body>)/i;
+  var body = assetTags.body.map(this.createHtmlTag);
+  var head = assetTags.head.map(this.createHtmlTag);
 
   if (body.length) {
     if (bodyRegExp.test(html)) {
@@ -531,6 +568,18 @@ HtmlWebpackPlugin.prototype.appendHash = function (url, hash) {
     return url;
   }
   return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
+};
+
+/**
+ * Turn a tag definition into a html string
+ */
+HtmlWebpackPlugin.prototype.createHtmlTag = function (tagDefinition) {
+  var attributes = Object.keys(tagDefinition.attributes || {}).map(function (attributeName) {
+    return attributeName + '="' + tagDefinition.attributes[attributeName] + '"';
+  });
+  return '<' + [tagDefinition.tagName].concat(attributes).join(' ') + (tagDefinition.selfClosingTag ? '/' : '') + '>' +
+    (tagDefinition.innerHTML || '') +
+    (tagDefinition.closeTag ? '</' + tagDefinition.tagName + '>' : '');
 };
 
 /**

@@ -717,6 +717,38 @@ describe('HtmlWebpackPlugin', function () {
     ['Public path is https://cdn.com'], null, done);
   });
 
+  it('fires the html-webpack-plugin-alter-asset-tags event', function (done) {
+    var eventFired = false;
+    var examplePlugin = {
+      apply: function (compiler) {
+        compiler.plugin('compilation', function (compilation) {
+          compilation.plugin('html-webpack-plugin-alter-asset-tags', function (object, callback) {
+            expect(typeof object.body).toBe('object');
+            expect(typeof object.head).toBe('object');
+            eventFired = true;
+            callback();
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    }, [], null, function () {
+      expect(eventFired).toBe(true);
+      done();
+    });
+  });
+
   it('fires the html-webpack-plugin-before-html-processing event', function (done) {
     var eventFired = false;
     var examplePlugin = {
