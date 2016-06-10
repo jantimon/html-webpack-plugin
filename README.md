@@ -248,6 +248,7 @@ Asnyc:
 
  * `html-webpack-plugin-before-html-generation`
  * `html-webpack-plugin-before-html-processing`
+ * `html-webpack-plugin-alter-asset-tags`
  * `html-webpack-plugin-after-html-processing`
  * `html-webpack-plugin-after-emit`
 
