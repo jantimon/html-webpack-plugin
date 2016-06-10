@@ -1163,6 +1163,35 @@ describe('HtmlWebpackPlugin', function () {
       /<script type="text\/javascript" src="common_bundle.js">.+<script type="text\/javascript" src="aTheme_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">/], null, done);
   });
 
+  it('should sort the chunks by chunk dependencies even if a parent chunk is excluded', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        aTheme: path.join(__dirname, 'fixtures/theme.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: 'css-loader' }
+        ]
+      },
+      plugins: [
+        new CommonsChunkPlugin({
+          name: 'common',
+          filename: 'common_bundle.js'
+        }),
+        new HtmlWebpackPlugin({
+          chunksSortMode: 'dependency',
+          excludeChunks: ['common']
+        })
+      ]
+    }, [
+      /<script type="text\/javascript" src="aTheme_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">/], null, done);
+  });
+
   it('should add the webpack compilation object as a property of the templateParam object', function (done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),
