@@ -63,9 +63,9 @@ This will generate a file `dist/index.html` containing the following:
 If you have multiple webpack entry points, they will all be included with `script`
 tags in the generated HTML.
 
-If you have any css assets in webpack's output (for example, css extracted
+If you have any json or css assets in webpack's output (for example, css extracted
 with the [ExtractTextPlugin](https://github.com/webpack/extract-text-webpack-plugin))
-then these will be included with `<link>` tags in the HTML head.
+then these will be included with the appropriate `<script>` or `<link>` tags in the generated HTML.
 
 Configuration
 -------------

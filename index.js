@@ -428,6 +428,12 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
     assets.chunks[chunkName].entry = entry;
     assets.chunks[chunkName].hash = chunk.hash;
     assets.js.push(entry);
+    
+    // Append json files to javascript asset collection
+    var json = chunkFiles.filter(function (chunkFile) {
+      return /.json($|\?)/.test(chunkFile);
+    });
+    assets.js.push(json);
 
     // Gather all css files
     var css = chunkFiles.filter(function (chunkFile) {
