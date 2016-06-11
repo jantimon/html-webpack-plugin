@@ -466,6 +466,8 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
   var headRegExp = /(<\/head>)/i;
   var body = [];
   var bodyRegExp = /(<\/body>)/i;
+  var div = [];
+  var divRegExp = /(<div inject>)/i;
 
   // If there is a favicon present, add it to the head
   if (assets.favicon) {
@@ -476,6 +478,8 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
   // Add scripts to body or head
   if (this.options.inject === 'head') {
     head = head.concat(scripts);
+  } else if (this.options.inject === 'div') {
+    div = div.concat(scripts);
   } else {
     body = body.concat(scripts);
   }
@@ -508,6 +512,19 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets) {
     html = html.replace(headRegExp, function (match) {
       return head.join('') + match;
     });
+  }
+  
+  if (div.length) {
+    if (divRegExp.test(html)) {
+      // Prepend assets to <div inject> element
+      html = html.replace(divRegExp, function (match) {
+        // match comes first since we're prepending it right after the opening tag
+        return match + div.join('');
+      });
+    } else {
+      // Append scripts to the end of the file if no <div inject> element exists:
+      html += div.join('');
+    }
   }
 
   // Inject manifest into the opening html tag
