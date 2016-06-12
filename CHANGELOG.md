@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.21.0
+----
+* Add `html-webpack-plugin-alter-asset-tags` event to allow plugins to adjust the script/link tags
+
 v2.20.0
 ----
 * Exclude chunks works now even if combined with dependency sort
