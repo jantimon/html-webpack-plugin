@@ -244,14 +244,14 @@ Events
 
 To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the html this plugin executes the following events:
 
-Asnyc:
+Async:
 
  * `html-webpack-plugin-before-html-generation`
  * `html-webpack-plugin-before-html-processing`
  * `html-webpack-plugin-after-html-processing`
  * `html-webpack-plugin-after-emit`
 
- Sync:
+Sync:
 
  * `html-webpack-plugin-alter-chunks`
 
