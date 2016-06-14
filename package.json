@@ -49,6 +49,9 @@
     "webpack": "^1.13.0",
     "webpack-recompilation-simulator": "^1.3.0"
   },
+  "peerDependencies": {
+    "webpack": "^1.13.0"    
+  },
   "dependencies": {
     "bluebird": "^3.3.5",
     "html-minifier": "^2.1.3",
