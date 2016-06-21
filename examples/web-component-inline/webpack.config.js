@@ -16,7 +16,6 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       inject: false,
-      cache: false,
       template: 'template.ejs'
     }),
     new ExtractTextPlugin('styles.css')

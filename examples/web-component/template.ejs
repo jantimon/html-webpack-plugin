@@ -1,7 +1,9 @@
 <template>
-  <% htmlWebpackPlugin.files.css.forEach(function(cssFile) { %>
-  <style>@import "<%=cssFile%>";</style>
-  <% }) %>
+  <style>
+    <% htmlWebpackPlugin.files.css.forEach(function(cssFile) { %>
+      @import "<%=cssFile%>";
+    <% }) %>
+  </style>
   <div id="mountTarget"></div>
 </template>
 <% htmlWebpackPlugin.files.js.forEach(function(jsFile) { %>
