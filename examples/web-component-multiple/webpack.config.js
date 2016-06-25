@@ -3,8 +3,8 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 module.exports = {
   entry: {
-    "one-example": './example-component-one.js',
-    "another-example": './example-component-two.js'
+    'one-example': './example-component-one.js',
+    'another-example': './example-component-two.js'
   },
   output: {
     path: __dirname + '/dist/webpack-' + webpackMajorVersion,
