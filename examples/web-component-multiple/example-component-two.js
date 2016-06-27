@@ -1,10 +1,8 @@
-if (!HTMLElement) function HTMLElement () {} // TODO: this is just to pass "semistandard" pretest
-
 require('./main-component-one.css');
 
 var template = (document.currentScript || document._currentScript).ownerDocument.querySelector('template');
 
-var proto = Object.create(HTMLElement.prototype);
+var proto = Object.create(window.HTMLElement.prototype);
 
 proto.createdCallback = function () {
   this.el = this.createShadowRoot();
