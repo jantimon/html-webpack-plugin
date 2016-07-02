@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.21.1
+---
+* Better error handling (#354)
+
 v2.21.0
 ----
 * Add `html-webpack-plugin-alter-asset-tags` event to allow plugins to adjust the script/link tags

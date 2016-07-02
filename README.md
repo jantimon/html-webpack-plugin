@@ -24,8 +24,7 @@ Migration guide from 1.x
 [Changelog](https://github.com/ampedandwired/html-webpack-plugin/blob/master/CHANGELOG.md)
 
 If you used the 1.x version please take a look at the [migration guide](https://github.com/ampedandwired/html-webpack-plugin/blob/master/migration.md)
-In case I missed something please open a pull request for it.
-See also issue [#186](https://github.com/ampedandwired/html-webpack-plugin/issues/186)
+
 
 Basic Usage
 -----------
@@ -75,7 +74,7 @@ Allowed values are as follows:
 - `title`: The title to use for the generated HTML document.
 - `filename`: The file to write the HTML to. Defaults to `index.html`.
    You can specify a subdirectory here too (eg: `assets/admin.html`).
-- `template`: Path to the template. Supports loaders e.g. `html!./index.html`.
+- `template`: Webpack require path to the template. Please see the [docs](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md) for details. 
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
@@ -104,6 +103,13 @@ Here's an example webpack config illustrating how to use these options:
   ]
 }
 ```
+
+FAQ
+----
+
+* [Why is my html minified?](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md)
+* [Why is my `<% ... %>` template not working?](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md)
+* [How can I use handlebars/pug/ejs as template engine](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md)
 
 Generating Multiple HTML Files
 ------------------------------
@@ -137,8 +143,7 @@ and favicon files into the markup.
 plugins: [
   new HtmlWebpackPlugin({
     title: 'Custom template',
-    template: 'my-index.ejs', // Load a custom template (ejs by default but can be changed)
-    inject: 'body' // Inject all scripts into the body (this is the default so you can skip it)
+    template: 'my-index.ejs', // Load a custom template (ejs by default see the FAQ for details)
   })
 ]
 ```
