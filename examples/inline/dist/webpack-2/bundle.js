@@ -59,17 +59,17 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	// removed by extract-text-webpack-plugin
+// removed by extract-text-webpack-plugin
 
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
-	'use strict';
-	__webpack_require__(0);
+"use strict";
+'use strict';
+__webpack_require__(0);
 
-	console.log('Hello World');
+console.log('Hello World');
 
 
 /***/ }

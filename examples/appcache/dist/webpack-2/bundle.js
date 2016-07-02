@@ -59,16 +59,16 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	// removed by extract-text-webpack-plugin
+// removed by extract-text-webpack-plugin
 
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(0);
-	var h1 = document.createElement('h1');
-	h1.innerHTML = 'Hello world!';
-	document.body.appendChild(h1);
+__webpack_require__(0);
+var h1 = document.createElement('h1');
+h1.innerHTML = 'Hello world!';
+document.body.appendChild(h1);
 
 
 /***/ }
