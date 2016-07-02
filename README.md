@@ -1,6 +1,6 @@
 HTML Webpack Plugin
 ===================
-[![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/ampedandwired/html-webpack-plugin.svg)](https://david-dm.org/ampedandwired/html-webpack-plugin) [![Build status](https://travis-ci.org/ampedandwired/html-webpack-plugin.svg)](https://travis-ci.org/ampedandwired/html-webpack-plugin) [![Windows build status](https://ci.appveyor.com/api/projects/status/github/ampedandwired/html-webpack-plugin?svg=true&branch=master)](https://ci.appveyor.com/project/jantimon/html-webpack-plugin) [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard) [![bitHound Dependencies](https://www.bithound.io/github/ampedandwired/html-webpack-plugin/badges/dependencies.svg)](https://www.bithound.io/github/ampedandwired/html-webpack-plugin/master/dependencies/npm)
+[![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/ampedandwired/html-webpack-plugin.svg)](https://david-dm.org/ampedandwired/html-webpack-plugin) [![Build status](https://travis-ci.org/ampedandwired/html-webpack-plugin.svg)](https://travis-ci.org/ampedandwired/html-webpack-plugin) [![Windows build status](https://ci.appveyor.com/api/projects/status/github/ampedandwired/html-webpack-plugin?svg=true&branch=master)](https://ci.appveyor.com/project/jantimon/html-webpack-plugin) [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard) [![bitHound Dependencies](https://www.bithound.io/github/ampedandwired/html-webpack-plugin/badges/dependencies.svg)](https://www.bithound.io/github/ampedandwired/html-webpack-plugin/master/dependencies/npm) [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)]()
 
 [![NPM](https://nodei.co/npm/html-webpack-plugin.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/html-webpack-plugin/)
 
@@ -296,3 +296,13 @@ plugins: [
 ```
 
 Note that the callback must be passed the htmlPluginData in order to pass this onto any other plugins listening on the same 'html-webpack-plugin-before-html-processing' event.
+
+
+# Contribution
+
+You're free to contribute to this project by submitting [issues](https://github.com/ampedandwired/html-webpack-plugin/issues) and/or [pull requests](https://github.com/ampedandwired/html-webpack-plugin/pulls). This project is test-driven, so keep in mind that every change and new feature should be covered by tests.
+This project uses the [semistandard code style](https://github.com/Flet/semistandard).
+
+# License
+
+This project is licensed under [MIT](https://github.com/ampedandwired/html-webpack-plugin/blob/master/LICENSE).
