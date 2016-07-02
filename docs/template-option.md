@@ -50,7 +50,7 @@ new HtmlWebpackPlugin({
 ```
 
 However this also means that in the following example webpack will use the html loader for your template.
-This will causes html minification and disables the fallback loader which allows to use `ejs` syntax:
+This will **cause html minification** and it will also **disable the ejs fallback** loader.
 
 ```js
 {
