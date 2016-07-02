@@ -9,7 +9,7 @@ var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 var fs = require('fs');
 var path = require('path');
 var execSync = require('child_process').execSync;
-var rm_rf = require('rimraf');
+var rimraf = require('rimraf');
 var webpackBin = path.resolve(__dirname, '..', 'node_modules', '.bin', 'webpack');
 
 var examples = fs.readdirSync(__dirname).filter(function (file) {
@@ -19,6 +19,6 @@ var examples = fs.readdirSync(__dirname).filter(function (file) {
 examples.forEach(function (exampleName) {
   var examplePath = path.join(__dirname, exampleName);
   var configFile = path.join(examplePath, 'webpack.config.js');
-  rm_rf.sync(path.join(examplePath, 'dist', 'webpack-' + webpackMajorVersion));
+  rimraf.sync(path.join(examplePath, 'dist', 'webpack-' + webpackMajorVersion));
   execSync(webpackBin + ' --context "' + examplePath + '" --config "' + configFile + '"');
 });

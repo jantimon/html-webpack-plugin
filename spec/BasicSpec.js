@@ -14,7 +14,7 @@ if (!global.Promise) {
 var path = require('path');
 var fs = require('fs');
 var webpack = require('webpack');
-var rm_rf = require('rimraf');
+var rimraf = require('rimraf');
 var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 var HtmlWebpackPlugin = require('../index.js');
 
@@ -88,7 +88,7 @@ function getChunksInfoFromStats (stats) {
 
 describe('HtmlWebpackPlugin', function () {
   beforeEach(function (done) {
-    rm_rf(OUTPUT_DIR, done);
+    rimraf(OUTPUT_DIR, done);
   });
 
   it('generates a default index.html file for a single entry point', function (done) {

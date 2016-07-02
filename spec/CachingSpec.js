@@ -12,7 +12,7 @@ if (!global.Promise) {
 
 var path = require('path');
 var webpack = require('webpack');
-var rm_rf = require('rimraf');
+var rimraf = require('rimraf');
 var WebpackRecompilationSimulator = require('webpack-recompilation-simulator');
 var HtmlWebpackPlugin = require('../index.js');
 
@@ -43,7 +43,7 @@ function getCompiledModuleCount (statsJson) {
 
 describe('HtmlWebpackPluginCaching', function () {
   beforeEach(function (done) {
-    rm_rf(OUTPUT_DIR, done);
+    rimraf(OUTPUT_DIR, done);
   });
 
   it('should compile nothing if no file was changed', function (done) {

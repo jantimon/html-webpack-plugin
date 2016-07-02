@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.22.0
+---
+* Update dependencies
+
 v2.21.1
 ---
 * Better error handling (#354)

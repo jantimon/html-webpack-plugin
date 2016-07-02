@@ -1,10 +1,11 @@
+var path = require('path');
 var HtmlWebpackPlugin = require('../..');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 module.exports = {
   entry: './example.js',
   output: {
-    path: __dirname + '/dist/webpack-' + webpackMajorVersion,
+    path: path.join(__dirname, 'dist/webpack-' + webpackMajorVersion),
     publicPath: '',
     filename: 'bundle.js'
   },

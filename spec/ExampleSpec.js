@@ -14,7 +14,7 @@ if (!global.Promise) {
 
 var path = require('path');
 var webpack = require('webpack');
-var rm_rf = require('rimraf');
+var rimraf = require('rimraf');
 var fs = require('fs');
 var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 
@@ -27,7 +27,7 @@ function runExample (exampleName, done) {
   var exampleOutput = path.join(OUTPUT_DIR, exampleName);
   var fixturePath = path.join(examplePath, 'dist', 'webpack-' + webpackMajorVersion);
   // Clear old results
-  rm_rf(exampleOutput, function () {
+  rimraf(exampleOutput, function () {
     var options = require(path.join(examplePath, 'webpack.config.js'));
     options.context = examplePath;
     options.output.path = exampleOutput;

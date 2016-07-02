@@ -12,7 +12,7 @@ Promise.promisifyAll(fs);
 function HtmlWebpackPlugin (options) {
   // Default options
   this.options = _.extend({
-    template: __dirname + '/default_index.ejs',
+    template: path.join(__dirname, 'default_index.ejs'),
     filename: 'index.html',
     hash: false,
     inject: true,
@@ -592,7 +592,7 @@ HtmlWebpackPlugin.prototype.getFullTemplatePath = function (template, context) {
   }
   // Resolve template path
   return template.replace(
-    /(\!)([^\/\\][^\!\?]+|[^\/\\!?])($|\?.+$)/,
+    /([!])([^\/\\][^!\?]+|[^\/\\!?])($|\?.+$)/,
     function (match, prefix, filepath, postfix) {
       return prefix + path.resolve(filepath) + postfix;
     });

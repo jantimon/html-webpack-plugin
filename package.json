@@ -1,6 +1,6 @@
 {
   "name": "html-webpack-plugin",
-  "version": "2.21.1",
+  "version": "2.22.0",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "main": "index.js",
   "files": [
@@ -30,6 +30,11 @@
     "url": "https://github.com/ampedandwired/html-webpack-plugin/issues"
   },
   "homepage": "https://github.com/ampedandwired/html-webpack-plugin",
+  "semistandard": {
+    "ignore": [
+      "examples/*/dist/**/*.*"
+    ]
+  },
   "devDependencies": {
     "appcache-webpack-plugin": "^1.2.1",
     "css-loader": "^0.23.1",
