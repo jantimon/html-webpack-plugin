@@ -107,7 +107,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       })
       .then(function (compiledTemplate) {
         // Allow to use a custom function / string instead
-        if (self.options.templateContent) {
+        if (self.options.templateContent !== undefined) {
           return self.options.templateContent;
         }
         // Once everything is compiled evaluate the html factory

@@ -1239,4 +1239,18 @@ describe('HtmlWebpackPlugin', function () {
       ]
     }, ['templateParams.compilation exists: true'], null, done);
   });
+
+  it('should not treat templateContent set to an empty string as missing', function (done) {
+    testHtmlPlugin({
+      entry: {app: path.join(__dirname, 'fixtures/index.js')},
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'app_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        templateContent: ''
+      })]
+    },
+    [/^<script type="text\/javascript" src="app_bundle\.js"><\/script>$/], null, done);
+  });
 });
