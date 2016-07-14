@@ -40,6 +40,7 @@ new HtmlWebpackPlugin({
         test: /\.hbs$/,
         loader: 'handlebars'
       },
+    ]
   },
   plugins: [
     new HtmlWebpackPlugin({
