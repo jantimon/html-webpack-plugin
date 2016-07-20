@@ -16,6 +16,7 @@ function HtmlWebpackPlugin (options) {
     filename: 'index.html',
     hash: false,
     inject: true,
+    injectPosition: false,
     compile: true,
     favicon: false,
     minify: false,
@@ -513,16 +514,24 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
 HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets, assetTags) {
   var htmlRegExp = /(<html[^>]*>)/i;
   var headRegExp = /(<\/head>)/i;
+  var injectPositionRegExp = /(<!--HtmlWebpackPlugin-Inject-Position-->)/i;
   var bodyRegExp = /(<\/body>)/i;
   var body = assetTags.body.map(this.createHtmlTag);
   var head = assetTags.head.map(this.createHtmlTag);
 
   if (body.length) {
     if (bodyRegExp.test(html)) {
-      // Append assets to body element
-      html = html.replace(bodyRegExp, function (match) {
-        return body.join('') + match;
-      });
+      if (this.options.injectPosition) {
+        // Append assets to body element at a specific position
+        html = html.replace(injectPositionRegExp, function (match) {
+          return body.join('');
+        });
+      } else {
+        // Append assets to body element at the end
+        html = html.replace(bodyRegExp, function (match) {
+          return body.join('') + match;
+        });
+      }
     } else {
       // Append scripts to the end of the file if no <body> element exists:
       html += body.join('');
@@ -541,10 +550,17 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets, asset
       }
     }
 
-    // Append assets to head element
-    html = html.replace(headRegExp, function (match) {
-      return head.join('') + match;
-    });
+    if (this.options.injectPosition) {
+      // Append assets to head element at a specific position
+      html = html.replace(injectPositionRegExp, function (match) {
+        return head.join('');
+      });
+    } else {
+      // Append assets to head element at the bottom
+      html = html.replace(headRegExp, function (match) {
+        return head.join('') + match;
+      });
+    }
   }
 
   // Inject manifest into the opening html tag
