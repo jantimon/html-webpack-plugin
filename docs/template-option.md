@@ -15,7 +15,7 @@ Instead of forcing all users to use the [blueimp](https://github.com/blueimp/Jav
 Under the hood it is using a webpack child compilation which inherits all loaders from
 your main configuration.
 
-There are two ways to set the loader:
+There are three ways to set the loader:
 
 ## 1) Don't set any loader
 
