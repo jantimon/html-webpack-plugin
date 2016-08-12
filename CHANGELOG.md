@@ -1,6 +1,11 @@
 Change History
 ==============
 
+v2.23.0
+---
+* Update dependencies
+* Stop automated tests for webpack 2 beta because of #401
+
 v2.22.0
 ---
 * Update dependencies
