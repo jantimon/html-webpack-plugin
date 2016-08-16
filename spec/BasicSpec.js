@@ -536,6 +536,29 @@ describe('HtmlWebpackPlugin', function () {
     }, ['<script type="text/javascript" src="http://cdn.example.com/assets/index_bundle.js"'], null, done);
   });
 
+  it('prepends the custom public path to script src', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({publicPath: 'http://cdn.example.com/assets/'})]
+    }, ['<script type="text/javascript" src="http://cdn.example.com/assets/index_bundle.js"'], null, done);
+  });
+
+  it('prepends the custom public path instead of the webpack public path to script src', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        publicPath: 'http://cdn.example.com/bad-assets/'
+      },
+      plugins: [new HtmlWebpackPlugin({publicPath: 'http://cdn.example.com/assets/'})]
+    }, ['<script type="text/javascript" src="http://cdn.example.com/assets/index_bundle.js"'], null, done);
+  });
+
   it('handles subdirectories in the webpack output bundles', function (done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),
