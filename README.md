@@ -62,7 +62,7 @@ This will generate a file `dist/index.html` containing the following:
 If you have multiple webpack entry points, they will all be included with `script`
 tags in the generated HTML.
 
-If you have any css assets in webpack's output (for example, css extracted
+If you have any CSS assets in webpack's output (for example, CSS extracted
 with the [ExtractTextPlugin](https://github.com/webpack/extract-text-webpack-plugin))
 then these will be included with `<link>` tags in the HTML head.
 
@@ -79,7 +79,7 @@ Allowed values are as follows:
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
-  included scripts and css files. This is useful for cache busting.
+  included scripts and CSS files. This is useful for cache busting.
 - `cache`: `true | false` if `true` (default) try to emit the file only if it was changed.
 - `showErrors`: `true | false` if `true` (default) errors details will be written into the html page.
 - `chunks`: Allows you to add only some chunks (e.g. only the unit-test chunk)
@@ -136,7 +136,7 @@ Writing Your Own Templates
 --------------------------
 If the default generated HTML doesn't meet your needs you can supply
 your own template. The easiest way is to use the `inject` option and pass a custom html file.
-The html-webpack-plugin will automatically inject all necessary css, js, manifest
+The html-webpack-plugin will automatically inject all necessary CSS, JS, manifest
 and favicon files into the markup.
 
 ```javascript
