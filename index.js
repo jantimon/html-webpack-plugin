@@ -18,6 +18,7 @@ function HtmlWebpackPlugin (options) {
     inject: true,
     compile: true,
     favicon: false,
+    meta: [],
     minify: false,
     cache: true,
     showErrors: true,
@@ -503,6 +504,16 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
     head = head.concat(scripts);
   } else {
     body = body.concat(scripts);
+  }
+
+  if (this.options.meta.length > 0) {
+    head = head.concat(this.options.meta.map(function (attributes) {
+      return {
+        tagName: 'meta',
+        selfClosingTag: selfClosingTag,
+        attributes: attributes
+      };
+    }));
   }
   return {head: head, body: body};
 };

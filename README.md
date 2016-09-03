@@ -77,6 +77,7 @@ Allowed values are as follows:
 - `template`: Webpack require path to the template. Please see the [docs](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md) for details. 
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
 - `favicon`: Adds the given favicon path to the output html.
+- `meta`: An array of objects containg attributes to be injected as `meta`-tags. E.g. `meta: [{ charset: 'utf-8' }, { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge' }]`
 - `minify`: `{...} | false` Pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
   included scripts and CSS files. This is useful for cache busting.

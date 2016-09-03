@@ -1253,4 +1253,18 @@ describe('HtmlWebpackPlugin', function () {
     },
     [/^<script type="text\/javascript" src="app_bundle\.js"><\/script>$/], null, done);
   });
+
+  it('should inject meta tags provided', function (done) {
+    testHtmlPlugin({
+      entry: {app: path.join(__dirname, 'fixtures/index.js')},
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'app_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        meta: [{ charset: 'utf-8' }, { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge' }]
+      })]
+    },
+    [/<meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge">/], null, done);
+  });
 });
