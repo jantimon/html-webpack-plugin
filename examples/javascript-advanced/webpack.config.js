@@ -19,7 +19,8 @@ module.exports = {
   devtool: 'eval',
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'template.js'
+      template: 'template.js',
+      meta: {}
     }),
     new ExtractTextPlugin('styles.css')
   ]

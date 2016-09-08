@@ -18,7 +18,7 @@ function HtmlWebpackPlugin (options) {
     inject: true,
     compile: true,
     favicon: false,
-    meta: [],
+    meta: { 'charset=UTF-8': null },
     minify: false,
     cache: true,
     showErrors: true,
@@ -506,15 +506,23 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
     body = body.concat(scripts);
   }
 
-  if (this.options.meta.length > 0) {
-    head = head.concat(this.options.meta.map(function (attributes) {
-      return {
-        tagName: 'meta',
-        selfClosingTag: selfClosingTag,
-        attributes: attributes
-      };
-    }));
-  }
+  _.forOwn(this.options.meta, function (value, key) {
+    var attributes = {};
+    var splitKeys = key.split('=');
+
+    attributes[splitKeys[0]] = splitKeys[1];
+
+    if (value) {
+      attributes.content = value;
+    }
+
+    head.unshift({
+      tagName: 'meta',
+      selfClosingTag: selfClosingTag,
+      attributes: attributes
+    });
+  });
+
   return {head: head, body: body};
 };
 

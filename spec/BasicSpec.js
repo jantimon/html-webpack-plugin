@@ -1248,10 +1248,23 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'app_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({
-        templateContent: ''
+        templateContent: '',
+        meta: {}
       })]
     },
     [/^<script type="text\/javascript" src="app_bundle\.js"><\/script>$/], null, done);
+  });
+
+  it('should default to charset meta tag', function (done) {
+    testHtmlPlugin({
+      entry: {app: path.join(__dirname, 'fixtures/index.js')},
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'app_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    },
+    [/<meta charset="UTF-8">/], null, done);
   });
 
   it('should inject meta tags provided', function (done) {
@@ -1262,7 +1275,7 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'app_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({
-        meta: [{ charset: 'utf-8' }, { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge' }]
+        meta: { 'http-equiv=X-UA-Compatible': 'IE=edge', 'charset=utf-8': null }
       })]
     },
     [/<meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge">/], null, done);
