@@ -76,6 +76,7 @@ Allowed values are as follows:
    You can specify a subdirectory here too (eg: `assets/admin.html`).
 - `template`: Webpack require path to the template. Please see the [docs](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md) for details. 
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
+- `injectOrder`: Allow to specify the order of js and css in output html. Allow values: `false | Object` -- default: `false`.
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
@@ -110,6 +111,106 @@ FAQ
 * [Why is my html minified?](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md)
 * [Why is my `<% ... %>` template not working?](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md)
 * [How can I use handlebars/pug/ejs as template engine](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md)
+
+Specify The Order of JS and CSS
+-------------------------------
+
+You can specify the order of js and css in output html :  
+
+```javascript
+let orderFunc = function (arrChunks, arrOrders) {
+      var arrProcesseds = [];
+
+      for (var i=0; i<arrOrders.length; i++) {
+
+          // 保留以 ~ 开头的字符串, 例如 `~/css/register.css`, `最后会变成 `/css/register.css`
+          if (arrOrders[i].indexOf('~') == 0) {
+              arrProcesseds.push(arrOrders[i].slice(1));
+              continue;
+          }
+
+          var length = arrChunks.length;
+          for (var j = 0; j < length;  j++) {
+            if (arrChunks[j].indexOf(arrOrders[i]) >= 0) {
+                break;
+            }
+          }
+
+          if (j < length) {
+            arrProcesseds.push(arrChunks[j]);
+            arrChunks.splice(j,1);    // 去除已添加的数据, 提高排除效率
+          }
+      }
+      return arrProcesseds;
+};
+
+{
+  entry: {
+      'vendor': path.resolve(BASE_PATH, 'vendor.browser.js'),
+      'polyfills': path.resolve(BASE_PATH, 'polyfills.browser.js'),
+      'app': path.resolve(BASE_PATH, 'app.js'),
+      "style": path.resolve(BASE_PATH, 'style.js'),
+    },
+  plugins: {
+	new HtmlWebpackPlugin({
+		filename: 'test1.html',
+		template: 'src/assets/test1.html',
+		inject: 'body',
+      	injectOrder:  {
+              js: {
+                  keys: ['commons', 'vendor', 'style', 'polyfills', 'app'],
+                  func: orderFunc
+              },
+              css: {
+                  keys: ['style', 'app'],
+                  func: orderFunc
+              }
+        },
+
+	}),
+	new HtmlWebpackPlugin({
+		filename: 'test2.html',
+		template: '!!ejs!src/assets/test2.html',
+		inject: false,
+      	injectOrder:  {
+              js: {
+                  keys: ['commons', 'vendor', 'style', 'polyfills', 'app'],
+                  func: orderFunc
+              },
+              css: {
+                  keys: ['style', 'app'],
+                  func: orderFunc
+              }
+        },
+
+	})
+
+  }
+}
+```
+
+`test1.html` : The all javascript resources will be placed at the bottom of the body element, and the all css will be placed the bottom of the head element   
+`test2.html` : Depending on your template file `src/asssets/test2.html`, like this :  
+
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title></title>
+        <% for (var css in htmlWebpackPlugin.files.css) { %>
+        <link href="<%= htmlWebpackPlugin.files.css[css] %>" rel="stylesheet">
+        <% } %>
+    </head>
+    <body>
+        this template use ejs
+         <% for (var js in htmlWebpackPlugin.files.js) { %>
+        <link href="<%= htmlWebpackPlugin.files.js[js] %>" rel="stylesheet">
+        <% } %>
+    </body>
+</html>
+```
 
 Generating Multiple HTML Files
 ------------------------------

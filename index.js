@@ -16,6 +16,7 @@ function HtmlWebpackPlugin (options) {
     filename: 'index.html',
     hash: false,
     inject: true,
+    injectOrder: false,
     compile: true,
     favicon: false,
     minify: false,
@@ -241,6 +242,17 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
   return Promise.resolve()
     // Template processing
     .then(function () {
+       var injectOrder = self.options.injectOrder;
+       if (injectOrder) {
+          if (injectOrder.js) {
+              assets.js = injectOrder.js.func(assets.js, injectOrder.js.keys);
+          }
+
+          if (injectOrder.css) {
+              assets.css = injectOrder.css.func(assets.css, injectOrder.css.keys);
+          }
+	  }
+
       var templateParams = {
         compilation: compilation,
         webpack: compilation.getStats().toJson(),
@@ -457,6 +469,18 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
  * Injects the assets into the given html string
  */
 HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
+
+  var injectOrder = this.options.injectOrder;
+  // According to `options.injectOrder`, regenrate assets js and css
+  if (injectOrder) {
+      if (injectOrder.js) {
+          assets.js = injectOrder.js.func(assets.js, injectOrder.js.keys);
+      }
+      if (injectOrder.css) {
+          assets.css = injectOrder.css.func(assets.css, injectOrder.css.keys);
+      }
+   }
+
   // Turn script files into script tags
   var scripts = assets.js.map(function (scriptPath) {
     return {
