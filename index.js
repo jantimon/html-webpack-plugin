@@ -347,8 +347,8 @@ HtmlWebpackPlugin.prototype.filterChunks = function (webpackStatsJson, includedC
   if (Array.isArray(includedChunks)) {
     // Looping through the includedChunks instead of filtering,
     // ensures that the order of the chunks is order of includedChunks
-    return includedChunks.map(function(name) {
-      for (var i=0; i < webpackStatsJson.chunks.length; i++) {
+    return includedChunks.map(function (name) {
+      for (var i = 0; i < webpackStatsJson.chunks.length; i++) {
         var chunk = webpackStatsJson.chunks[i];
         if (chunk.names[0] === name) {
           return chunk;
