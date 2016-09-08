@@ -1140,11 +1140,11 @@ describe('HtmlWebpackPlugin', function () {
       /<script type="text\/javascript" src="common_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">.+<script type="text\/javascript" src="index_bundle.js">/], null, done);
   });
 
-  it('should not sort the chunks in the order provided in none mode', function (done) {
+  it('should sort the chunks in the order provided in none mode', function (done) {
     testHtmlPlugin({
       entry: {
-        index: path.join(__dirname, 'fixtures/index.js'),
-        util: path.join(__dirname, 'fixtures/util.js')
+        util: path.join(__dirname, 'fixtures/util.js'),
+        index: path.join(__dirname, 'fixtures/index.js')
       },
       output: {
         path: OUTPUT_DIR,
