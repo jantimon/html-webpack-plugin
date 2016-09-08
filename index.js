@@ -344,19 +344,19 @@ HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
  * Return all chunks from the compilation result which match the exclude and include filters
  */
 HtmlWebpackPlugin.prototype.filterChunks = function (webpackStatsJson, includedChunks, excludedChunks) {
-    if (Array.isArray(includedChunks)) {
-        // Looping through the includedChunks instead of filtering,
-        // ensures that the order of the chunks is order of includedChunks
-        return includedChunks.map(function(name) {
-            for (var i=0; i < webpackStatsJson.chunks.length; i++) {
-                var chunk = webpackStatsJson.chunks[i];
-                if (chunk.names[0] === name) {
-                    return chunk;
-                }
-            }
-            // unknown chunk, ignore
-        })
-    };
+  if (Array.isArray(includedChunks)) {
+    // Looping through the includedChunks instead of filtering,
+    // ensures that the order of the chunks is order of includedChunks
+    return includedChunks.map(function(name) {
+      for (var i=0; i < webpackStatsJson.chunks.length; i++) {
+        var chunk = webpackStatsJson.chunks[i];
+        if (chunk.names[0] === name) {
+          return chunk;
+        }
+      }
+      // unknown chunk, ignore
+    });
+  }
 
   return webpackStatsJson.chunks.filter(function (chunk) {
     var chunkName = chunk.names[0];
