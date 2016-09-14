@@ -63,6 +63,6 @@
     "toposort": "^1.0.0"
   },
   "peerDependencies": {
-    "webpack": "*"
+    "webpack": "1 || ^2.1.0-beta"
   }
 }
