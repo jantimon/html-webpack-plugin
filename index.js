@@ -468,7 +468,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
         src: scriptPath
       }
     };
-    _.assign(jsConfig.attributes, self.options.attributes)
+    _.assign(jsConfig.attributes, self.options.scriptAttributes)
     return jsConfig;
   });
   // Make tags self-closing in case of xhtml
