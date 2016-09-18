@@ -406,7 +406,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
 
   // Append a hash for cache busting
   if (this.options.hash) {
-    assets.manifest = self.appendHash(assets.manifest, webpackStatsJson.hash);
+    assets.manifest = self.appendHash(assets.publicPath + assets.manifest, webpackStatsJson.hash);
     assets.favicon = self.appendHash(assets.favicon, webpackStatsJson.hash);
   }
 
