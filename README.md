@@ -135,7 +135,7 @@ once in your plugins array:
 Writing Your Own Templates
 --------------------------
 If the default generated HTML doesn't meet your needs you can supply
-your own template. The easiest way is to use the `inject` option and pass a custom html file.
+your own template. The easiest way is to use the `template` option and pass a custom html file.
 The html-webpack-plugin will automatically inject all necessary CSS, JS, manifest
 and favicon files into the markup.
 
