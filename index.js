@@ -93,7 +93,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         if (self.options.favicon) {
           return self.addFileToAssets(self.options.favicon, compilation)
             .then(function (faviconBasename) {
-              var publicPath = compilation.options.output.publicPath || '';
+              var publicPath = compilation.mainTemplate.getPublicPath({hash: compilation.hash}) || '';
               if (publicPath && publicPath.substr(-1) !== '/') {
                 publicPath += '/';
               }
