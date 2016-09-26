@@ -870,6 +870,52 @@ describe('HtmlWebpackPlugin', function () {
     });
   });
 
+  it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event', function (done) {
+    var eventFiredForFirstPlugin = false;
+    var eventFiredForSecondPlugin = false;
+    var examplePlugin = {
+      apply: function (compiler) {
+        compiler.plugin('compilation', function (compilation) {
+          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+            eventFiredForFirstPlugin = true;
+            object.html += 'Injected by first plugin';
+            callback(null, object);
+          });
+        });
+      }
+    };
+    var secondExamplePlugin = {
+      apply: function (compiler) {
+        compiler.plugin('compilation', function (compilation) {
+          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+            eventFiredForSecondPlugin = true;
+            object.html += ' Injected by second plugin';
+            callback(null);
+          });
+        });
+      }
+    };
+
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin,
+        secondExamplePlugin
+      ]
+    }, ['Injected by first plugin Injected by second plugin'], null, function () {
+      expect(eventFiredForFirstPlugin).toBe(true);
+      expect(eventFiredForSecondPlugin).toBe(true);
+      done();
+    });
+  });
+
   it('allows to modify the html during html-webpack-plugin-before-html-processing event', function (done) {
     var eventFired = false;
     var examplePlugin = {
