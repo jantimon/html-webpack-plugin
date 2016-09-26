@@ -1020,7 +1020,7 @@ describe('HtmlWebpackPlugin', function () {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="\/*\/+[^"]+\.ico">/], null, done);
+    }, [/<link rel="shortcut icon" href="\/[a-z0-9]{20}\/favicon\.ico">/], null, done);
   });
 
   it('adds a favicon with inject enabled', function (done) {
