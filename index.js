@@ -138,8 +138,8 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       .then(function (html) {
         var pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
         return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-processing', pluginArgs)
-          .then(function () {
-            return pluginArgs.html;
+          .then(function (newPluginArgs) {
+            return newPluginArgs && newPluginArgs.html || pluginArgs.html;
           });
       })
       .then(function (html) {
@@ -157,8 +157,8 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       .then(function (html) {
         var pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
         return applyPluginsAsyncWaterfall('html-webpack-plugin-after-html-processing', pluginArgs)
-          .then(function () {
-            return pluginArgs.html;
+          .then(function (newPluginArgs) {
+            return newPluginArgs && newPluginArgs.html || pluginArgs.html;
           });
       })
       .catch(function (err) {
