@@ -139,7 +139,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         var pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
         return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-processing', pluginArgs)
           .then(function (newPluginArgs) {
-            return newPluginArgs && newPluginArgs.html || pluginArgs.html;
+            return newPluginArgs ? newPluginArgs.html : pluginArgs.html;
           });
       })
       .then(function (html) {
@@ -158,7 +158,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         var pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
         return applyPluginsAsyncWaterfall('html-webpack-plugin-after-html-processing', pluginArgs)
           .then(function (newPluginArgs) {
-            return newPluginArgs && newPluginArgs.html || pluginArgs.html;
+            return newPluginArgs ? newPluginArgs.html : pluginArgs.html;
           });
       })
       .catch(function (err) {
