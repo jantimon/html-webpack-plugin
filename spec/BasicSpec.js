@@ -1007,6 +1007,22 @@ describe('HtmlWebpackPlugin', function () {
     }, [/<link rel="shortcut icon" href="\/some\/+[^"]+\.ico">/], null, done);
   });
 
+  it('adds a favicon with a publichPath set to [hash]/ and replaces the hash', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        publicPath: '/[hash]/',
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          favicon: path.join(__dirname, 'fixtures/favicon.ico')
+        })
+      ]
+    }, [/<link rel="shortcut icon" href="\/*\/+[^"]+\.ico">/], null, done);
+  });
+
   it('adds a favicon with inject enabled', function (done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),
