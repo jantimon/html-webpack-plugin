@@ -145,7 +145,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         var chunks = result.chunks;
         // Prepare script and link tags
         var assetTags = self.generateAssetTags(assets);
-        var pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, chunks: chunks, outputName: self.childCompilationOutputName, assets: assets, html: html};
+        var pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, chunks: chunks, outputName: self.childCompilationOutputName};
         // Allow plugins to change the assetTag definitions
         return applyPluginsAsyncWaterfall('html-webpack-plugin-alter-asset-tags', pluginArgs)
           .then(function (result) {
@@ -156,7 +156,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
               // Add the stylesheets, scripts and so on to the resulting html
             return self.postProcessHtml(html, assets, { body: body, head: head })
               .then(function (html) {
-                return _.extend(result, {html: html});
+                return _.extend(result, {html: html, assets: assets});
               });
           });
       })
