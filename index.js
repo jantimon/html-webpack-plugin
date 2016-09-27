@@ -149,12 +149,8 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         // Allow plugins to change the assetTag definitions
         return applyPluginsAsyncWaterfall('html-webpack-plugin-alter-asset-tags', pluginArgs)
           .then(function (result) {
-            var html = result.html;
-            var assets = result.assets;
-            var body = result.body;
-            var head = result.head;
               // Add the stylesheets, scripts and so on to the resulting html
-            return self.postProcessHtml(html, assets, { body: body, head: head })
+            return self.postProcessHtml(html, assets, { body: result.body, head: result.head })
               .then(function (html) {
                 return _.extend(result, {html: html, assets: assets});
               });
