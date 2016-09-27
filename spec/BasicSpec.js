@@ -15,6 +15,7 @@ var path = require('path');
 var fs = require('fs');
 var webpack = require('webpack');
 var rimraf = require('rimraf');
+var _ = require('lodash');
 var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 var HtmlWebpackPlugin = require('../index.js');
 
@@ -870,7 +871,7 @@ describe('HtmlWebpackPlugin', function () {
     });
   });
 
-  it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event', function (done) {
+  it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event by edit the given arguments object', function (done) {
     var eventFiredForFirstPlugin = false;
     var eventFiredForSecondPlugin = false;
     var examplePlugin = {
@@ -891,6 +892,104 @@ describe('HtmlWebpackPlugin', function () {
             eventFiredForSecondPlugin = true;
             object.html += ' Injected by second plugin';
             callback(null);
+          });
+        });
+      }
+    };
+
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin,
+        secondExamplePlugin
+      ]
+    }, ['Injected by first plugin Injected by second plugin'], null, function () {
+      expect(eventFiredForFirstPlugin).toBe(true);
+      expect(eventFiredForSecondPlugin).toBe(true);
+      done();
+    });
+  });
+
+  it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event either by edit the given arguments object or by return a new object in the callback', function (done) {
+    var eventFiredForFirstPlugin = false;
+    var eventFiredForSecondPlugin = false;
+    var examplePlugin = {
+      apply: function (compiler) {
+        compiler.plugin('compilation', function (compilation) {
+          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+            eventFiredForFirstPlugin = true;
+            var result = _.extend(object, {
+              html: object.html + 'Injected by first plugin'
+            });
+            callback(null, result);
+          });
+        });
+      }
+    };
+    var secondExamplePlugin = {
+      apply: function (compiler) {
+        compiler.plugin('compilation', function (compilation) {
+          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+            eventFiredForSecondPlugin = true;
+            object.html += ' Injected by second plugin';
+            callback(null);
+          });
+        });
+      }
+    };
+
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin,
+        secondExamplePlugin
+      ]
+    }, ['Injected by first plugin Injected by second plugin'], null, function () {
+      expect(eventFiredForFirstPlugin).toBe(true);
+      expect(eventFiredForSecondPlugin).toBe(true);
+      done();
+    });
+  });
+
+  it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event by return a new object in the callback', function (done) {
+    var eventFiredForFirstPlugin = false;
+    var eventFiredForSecondPlugin = false;
+    var examplePlugin = {
+      apply: function (compiler) {
+        compiler.plugin('compilation', function (compilation) {
+          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+            eventFiredForFirstPlugin = true;
+            var result = _.extend(object, {
+              html: object.html + 'Injected by first plugin'
+            });
+            callback(null, result);
+          });
+        });
+      }
+    };
+    var secondExamplePlugin = {
+      apply: function (compiler) {
+        compiler.plugin('compilation', function (compilation) {
+          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+            eventFiredForSecondPlugin = true;
+            var result = _.extend(object, {
+              html: object.html + ' Injected by second plugin'
+            });
+            callback(null, result);
           });
         });
       }
