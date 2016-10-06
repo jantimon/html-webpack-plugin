@@ -82,7 +82,7 @@ Allowed values are as follows:
   included scripts and CSS files. This is useful for cache busting.
 - `cache`: `true | false` if `true` (default) try to emit the file only if it was changed.
 - `showErrors`: `true | false` if `true` (default) errors details will be written into the html page.
-- `createMissingTags`: `true | false` if `true` whether to create a `<head>` tag ( if it does not exists ) when injecting assets. default: 'true'
+- `createMissingTags`: `true | false` if `true` and `<head>` tag is missing in the html, create one when injecting assets. default: 'true'
 - `chunks`: Allows you to add only some chunks (e.g. only the unit-test chunk)
 - `chunksSortMode`: Allows to control how chunks should be sorted before they are included to the html. Allowed values: 'none' | 'auto' | 'dependency' | {function} - default: 'auto'
 - `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk)
