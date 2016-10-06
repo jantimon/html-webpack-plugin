@@ -313,6 +313,53 @@ describe('HtmlWebpackPlugin', function () {
     }], null, done);
   });
 
+  it('creates missing head tag by default', function (done) {
+    var ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+        ]
+      },
+      plugins: [
+        new ExtractTextPlugin('styles.css'),
+        new HtmlWebpackPlugin({
+          filename: 'head-tag-test.html',
+          template: path.join(__dirname, 'fixtures/empty_html.html')
+        })]
+    }, [/<head>/gm], 'head-tag-test.html', done);
+  });
+
+  it('allows you to prevent the creation of missing head tag', function (done) {
+    var ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+        ]
+      },
+      plugins: [
+        new ExtractTextPlugin('styles.css'),
+        new HtmlWebpackPlugin({
+          createMissingTags: false,
+          filename: 'head-tag-test.html',
+          template: path.join(__dirname, 'fixtures/empty_html.html')
+        })]
+    }, [/^((?!<head>).)*$/gmi], 'head-tag-test.html', done);
+  });
+
   it('allows you to disable injection', function (done) {
     testHtmlPlugin({
       entry: {

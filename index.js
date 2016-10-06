@@ -21,6 +21,7 @@ function HtmlWebpackPlugin (options) {
     minify: false,
     cache: true,
     showErrors: true,
+    createMissingTags: true,
     chunks: 'all',
     excludeChunks: [],
     title: 'Webpack App',
@@ -531,20 +532,25 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets, asset
 
   if (head.length) {
     // Create a head tag if none exists
-    if (!headRegExp.test(html)) {
+    if (this.options.createMissingTags && !headRegExp.test(html)) {
       if (!htmlRegExp.test(html)) {
+        // prepend 'head' tag to the 'html' if there's no 'html' tag.
         html = '<head></head>' + html;
       } else {
+        // append 'head' tag to 'html' tag.
         html = html.replace(htmlRegExp, function (match) {
           return match + '<head></head>';
         });
       }
-    }
 
-    // Append assets to head element
-    html = html.replace(headRegExp, function (match) {
-      return head.join('') + match;
-    });
+      // Append assets to head element
+      html = html.replace(headRegExp, function (match) {
+        return head.join('') + match;
+      });
+    } else {
+      // add scripts to the begining of the file when no <head> tag element exists.
+      html = head.join('') + html;
+    }
   }
 
   // Inject manifest into the opening html tag
