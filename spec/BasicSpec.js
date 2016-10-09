@@ -747,7 +747,7 @@ describe('HtmlWebpackPlugin', function () {
     }, [], null, function () {
       expect(eventFired).toBe(true);
       done();
-    });
+    }, false, true);
   });
 
   it('fires the html-webpack-plugin-before-html-processing event', function (done) {
@@ -777,7 +777,7 @@ describe('HtmlWebpackPlugin', function () {
     }, [], null, function () {
       expect(eventFired).toBe(true);
       done();
-    });
+    }, false, true);
   });
 
   it('fires the html-webpack-plugin-after-html-processing event', function (done) {
@@ -807,7 +807,7 @@ describe('HtmlWebpackPlugin', function () {
     }, [], null, function () {
       expect(eventFired).toBe(true);
       done();
-    });
+    }, false, true);
   });
 
   it('fires the html-webpack-plugin-after-emit event', function (done) {
@@ -837,7 +837,7 @@ describe('HtmlWebpackPlugin', function () {
     }, [], null, function () {
       expect(eventFired).toBe(true);
       done();
-    });
+    }, false, true);
   });
 
   it('allows to modify the html during html-webpack-plugin-after-html-processing event', function (done) {
@@ -868,7 +868,7 @@ describe('HtmlWebpackPlugin', function () {
     }, ['Injected by plugin'], null, function () {
       expect(eventFired).toBe(true);
       done();
-    });
+    }, false, true);
   });
 
   it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event by edit the given arguments object', function (done) {
@@ -914,7 +914,7 @@ describe('HtmlWebpackPlugin', function () {
       expect(eventFiredForFirstPlugin).toBe(true);
       expect(eventFiredForSecondPlugin).toBe(true);
       done();
-    });
+    }, false, true);
   });
 
   it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event either by edit the given arguments object or by return a new object in the callback', function (done) {
@@ -962,7 +962,7 @@ describe('HtmlWebpackPlugin', function () {
       expect(eventFiredForFirstPlugin).toBe(true);
       expect(eventFiredForSecondPlugin).toBe(true);
       done();
-    });
+    }, false, true);
   });
 
   it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event by return a new object in the callback', function (done) {
@@ -1044,7 +1044,7 @@ describe('HtmlWebpackPlugin', function () {
     }, ['Injected by plugin', '<script type="text/javascript" src="funky-script.js"'], null, function () {
       expect(eventFired).toBe(true);
       done();
-    });
+    }, false, true);
   });
 
   it('allows to modify the html during html-webpack-plugin-before-html-generation event', function (done) {
@@ -1078,7 +1078,7 @@ describe('HtmlWebpackPlugin', function () {
     }, ['<script type="text/javascript" src="funky-script.js"'], null, function () {
       expect(eventFired).toBe(true);
       done();
-    });
+    }, false, true);
   });
 
   it('works with commons chunk plugin', function (done) {

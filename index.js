@@ -626,6 +626,9 @@ HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) 
   return function (eventName, pluginArgs) {
     return promisedApplyPluginsAsyncWaterfall(eventName, pluginArgs)
       .then(function (result) {
+        if (!result) {
+          compilation.warnings.push(new Error('Using html-webpack-plugin-after-html-processing without returning a result is deprecated.'));
+        }
         return _.extend(pluginArgs, result);
       });
   };
