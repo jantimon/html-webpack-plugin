@@ -63,7 +63,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   });
 
   compiler.plugin('emit', function (compilation, callback) {
-    var applyPluginsAsyncWaterfall = Promise.promisify(compilation.applyPluginsAsyncWaterfall, {context: compilation});
+    var applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
     // Get all chunks
     var chunks = self.filterChunks(compilation.getStats().toJson(), self.options.chunks, self.options.excludeChunks);
     // Sort chunks
@@ -137,28 +137,33 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       // Allow plugins to change the html before assets are injected
       .then(function (html) {
         var pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
-        return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-processing', pluginArgs)
-          .then(function () {
-            return pluginArgs.html;
-          });
+        return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-processing', pluginArgs);
       })
-      .then(function (html) {
+      .then(function (result) {
+        var html = result.html;
+        var assets = result.assets;
+        var chunks = result.chunks;
         // Prepare script and link tags
         var assetTags = self.generateAssetTags(assets);
         var pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, chunks: chunks, outputName: self.childCompilationOutputName};
         // Allow plugins to change the assetTag definitions
         return applyPluginsAsyncWaterfall('html-webpack-plugin-alter-asset-tags', pluginArgs)
-          .then(function () {
+          .then(function (result) {
               // Add the stylesheets, scripts and so on to the resulting html
-            return self.postProcessHtml(html, assets, { body: pluginArgs.body, head: pluginArgs.head });
+            return self.postProcessHtml(html, assets, { body: result.body, head: result.head })
+              .then(function (html) {
+                return _.extend(result, {html: html, assets: assets});
+              });
           });
       })
       // Allow plugins to change the html after assets are injected
-      .then(function (html) {
+      .then(function (result) {
+        var html = result.html;
+        var assets = result.assets;
         var pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
         return applyPluginsAsyncWaterfall('html-webpack-plugin-after-html-processing', pluginArgs)
-          .then(function () {
-            return pluginArgs.html;
+          .then(function (result) {
+            return result.html;
           });
       })
       .catch(function (err) {
@@ -610,6 +615,23 @@ HtmlWebpackPlugin.prototype.getAssetFiles = function (assets) {
   }, []));
   files.sort();
   return files;
+};
+
+/**
+ * Helper to promisify compilation.applyPluginsAsyncWaterfall that returns
+ * a function that helps to merge given plugin arguments with processed ones
+ */
+HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) {
+  var promisedApplyPluginsAsyncWaterfall = Promise.promisify(compilation.applyPluginsAsyncWaterfall, {context: compilation});
+  return function (eventName, pluginArgs) {
+    return promisedApplyPluginsAsyncWaterfall(eventName, pluginArgs)
+      .then(function (result) {
+        if (!result) {
+          compilation.warnings.push(new Error('Using html-webpack-plugin-after-html-processing without returning a result is deprecated.'));
+        }
+        return _.extend(pluginArgs, result);
+      });
+  };
 };
 
 module.exports = HtmlWebpackPlugin;
