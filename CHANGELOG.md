@@ -1,6 +1,12 @@
 Change History
 ==============
 
+v2.24.0
+---
+* Update dependencies
+* Add deprecate warning for plugins not returning a result
+* Add [path] for favicons
+
 v2.23.0
 ---
 * Update dependencies
