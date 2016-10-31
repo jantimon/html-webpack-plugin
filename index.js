@@ -117,7 +117,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       // Allow plugins to make changes to the assets before invoking the template
       // This only makes sense to use if `inject` is `false`
       .then(function (compilationResult) {
-        return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-generation', {
+        return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-generation', false, {
           assets: assets,
           outputName: self.childCompilationOutputName,
           plugin: self
@@ -137,7 +137,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       // Allow plugins to change the html before assets are injected
       .then(function (html) {
         var pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
-        return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-processing', pluginArgs);
+        return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-processing', true, pluginArgs);
       })
       .then(function (result) {
         var html = result.html;
@@ -147,7 +147,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         var assetTags = self.generateAssetTags(assets);
         var pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, chunks: chunks, outputName: self.childCompilationOutputName};
         // Allow plugins to change the assetTag definitions
-        return applyPluginsAsyncWaterfall('html-webpack-plugin-alter-asset-tags', pluginArgs)
+        return applyPluginsAsyncWaterfall('html-webpack-plugin-alter-asset-tags', true, pluginArgs)
           .then(function (result) {
               // Add the stylesheets, scripts and so on to the resulting html
             return self.postProcessHtml(html, assets, { body: result.body, head: result.head })
@@ -161,7 +161,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         var html = result.html;
         var assets = result.assets;
         var pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
-        return applyPluginsAsyncWaterfall('html-webpack-plugin-after-html-processing', pluginArgs)
+        return applyPluginsAsyncWaterfall('html-webpack-plugin-after-html-processing', true, pluginArgs)
           .then(function (result) {
             return result.html;
           });
@@ -187,7 +187,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       })
       .then(function () {
         // Let other plugins know that we are done:
-        return applyPluginsAsyncWaterfall('html-webpack-plugin-after-emit', {
+        return applyPluginsAsyncWaterfall('html-webpack-plugin-after-emit', false, {
           html: compilation.assets[self.childCompilationOutputName],
           outputName: self.childCompilationOutputName,
           plugin: self
@@ -623,11 +623,11 @@ HtmlWebpackPlugin.prototype.getAssetFiles = function (assets) {
  */
 HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) {
   var promisedApplyPluginsAsyncWaterfall = Promise.promisify(compilation.applyPluginsAsyncWaterfall, {context: compilation});
-  return function (eventName, pluginArgs) {
+  return function (eventName, requiresResult, pluginArgs) {
     return promisedApplyPluginsAsyncWaterfall(eventName, pluginArgs)
       .then(function (result) {
-        if (!result) {
-          compilation.warnings.push(new Error('Using html-webpack-plugin-after-html-processing without returning a result is deprecated.'));
+        if (requiresResult && !result) {
+          compilation.warnings.push(new Error('Using ' + eventName + ' without returning a result is deprecated.'));
         }
         return _.extend(pluginArgs, result);
       });

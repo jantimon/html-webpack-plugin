@@ -837,7 +837,7 @@ describe('HtmlWebpackPlugin', function () {
     }, [], null, function () {
       expect(eventFired).toBe(true);
       done();
-    }, false, true);
+    });
   });
 
   it('allows to modify the html during html-webpack-plugin-after-html-processing event', function (done) {
@@ -1078,7 +1078,7 @@ describe('HtmlWebpackPlugin', function () {
     }, ['<script type="text/javascript" src="funky-script.js"'], null, function () {
       expect(eventFired).toBe(true);
       done();
-    }, false, true);
+    });
   });
 
   it('works with commons chunk plugin', function (done) {
