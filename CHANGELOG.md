@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.24.1
+---
+* Hide event deprecated warning of 'applyPluginsAsyncWaterfall' for html-webpack-plugin-after-emit and improve the warning message.
+
 v2.24.0
 ---
 * Update dependencies
