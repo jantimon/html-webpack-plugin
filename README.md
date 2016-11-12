@@ -18,14 +18,17 @@ Install the plugin with npm:
 $ npm install html-webpack-plugin --save-dev
 ```
 
-Migration guide from 1.x
-------------------------
+Third party addons:
+-------------
 
-[Changelog](https://github.com/ampedandwired/html-webpack-plugin/blob/master/CHANGELOG.md)
+The html-webpack-plugin provides [hooks](https://github.com/ampedandwired/html-webpack-plugin#events) to extend it to your needs.
+There are already some really powerfull plugins which can be integrated with zero configuration:
 
-If you used the 1.x version please take a look at the [migration guide](https://github.com/ampedandwired/html-webpack-plugin/blob/master/migration.md)
-
-
+ * [webpack-subresource-integrity](https://www.npmjs.com/package/webpack-subresource-integrity) for enhanced asset security
+ * [appcache-webpack-plugin](https://github.com/lettertwo/appcache-webpack-plugin) for iOS and Android offline usage
+ * [favicons-webpack-plugin](https://github.com/jantimon/favicons-webpack-plugin) which generates facivons and icons for iOS Android and desktop browsers
+ * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
+ 
 Basic Usage
 -----------
 
