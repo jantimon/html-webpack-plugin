@@ -1301,6 +1301,26 @@ describe('HtmlWebpackPlugin', function () {
       /<script type="text\/javascript" src="common_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">.+<script type="text\/javascript" src="index_bundle.js">/], null, done);
   });
 
+  it('should sort the chunks in the order provided in none mode', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        index: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          chunks: ['util', 'index'],
+          chunksSortMode: 'none'
+        })
+      ]
+    }, [
+      /<script type="text\/javascript" src="util_bundle.js">.+<script type="text\/javascript" src="index_bundle.js">/], null, done);
+  });
+
   it('should sort the chunks in custom (reverse alphabetical) order', function (done) {
     testHtmlPlugin({
       entry: {
