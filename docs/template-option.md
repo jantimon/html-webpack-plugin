@@ -69,3 +69,13 @@ This will **cause html minification** and it will also **disable the ejs fallbac
   ]
 }
 ```
+
+### Passing variables
+
+Variables can be retrieved from within the template using `htmlWebpackPlugin.options`. So in `ejs` that'd be:
+
+```html
+<html>
+  <title><%= htmlWebpackPlugin.options.someTitle  %></title>
+</html>
+```
