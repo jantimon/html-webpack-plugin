@@ -65,7 +65,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   compiler.plugin('emit', function (compilation, callback) {
     var applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
     // Get all chunks
-    var allChunks = compilation.getStats().toJson();
+    var allChunks = compilation.getStats().toJson().chunks;
     // Filter chunks (options.chunks and options.excludeCHunks)
     var chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
     // Sort chunks
@@ -350,8 +350,8 @@ HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
 /**
  * Return all chunks from the compilation result which match the exclude and include filters
  */
-HtmlWebpackPlugin.prototype.filterChunks = function (webpackStatsJson, includedChunks, excludedChunks) {
-  return webpackStatsJson.chunks.filter(function (chunk) {
+HtmlWebpackPlugin.prototype.filterChunks = function (chunks, includedChunks, excludedChunks) {
+  return chunks.filter(function (chunk) {
     var chunkName = chunk.names[0];
     // This chunk doesn't have a name. This script can't handled it.
     if (chunkName === undefined) {
