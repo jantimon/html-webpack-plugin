@@ -26,8 +26,9 @@ There are already some really powerfull plugins which can be integrated with zer
 
  * [webpack-subresource-integrity](https://www.npmjs.com/package/webpack-subresource-integrity) for enhanced asset security
  * [appcache-webpack-plugin](https://github.com/lettertwo/appcache-webpack-plugin) for iOS and Android offline usage
- * [favicons-webpack-plugin](https://github.com/jantimon/favicons-webpack-plugin) which generates facivons and icons for iOS Android and desktop browsers
- * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
+ * [favicons-webpack-plugin](https://github.com/jantimon/favicons-webpack-plugin) which generates favicons and icons for iOS Android and desktop browsers
+ * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin) that adds a writeToDisk option
+ * [html-webpack-inline-source-plugin](https://github.com/DustinJackson/html-webpack-inline-source-plugin) which allows you to embed javascript and css source inline
  
 Basic Usage
 -----------
