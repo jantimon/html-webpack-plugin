@@ -28,6 +28,7 @@ There are already some really powerfull plugins which can be integrated with zer
  * [appcache-webpack-plugin](https://github.com/lettertwo/appcache-webpack-plugin) for iOS and Android offline usage
  * [favicons-webpack-plugin](https://github.com/jantimon/favicons-webpack-plugin) which generates facivons and icons for iOS Android and desktop browsers
  * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
+ * [html-webpack-inline-source-plugin](https://github.com/DustinJackson/html-webpack-inline-source-plugin) To inline your assets in the result html file
  
 Basic Usage
 -----------
