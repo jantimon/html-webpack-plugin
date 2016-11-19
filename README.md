@@ -90,7 +90,7 @@ Allowed values are as follows:
 - `chunksSortMode`: Allows to control how chunks should be sorted before they are included to the html. Allowed values: 'none' | 'auto' | 'dependency' | {function} - default: 'auto'
 - `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk)
 - `xhtml`: `true | false` If `true` render the `link` tags as self-closing, XHTML compliant. Default is `false`
-- `excludeAssets`: `RegExp` Allows you to skip some assets (e.g. if you add a `style` as webpack's entry with value `['some-3rd-party-styles.css']` and want to skip the `style.js`)
+- `excludeAssets`: `[RegExp]` Allows you to skip some assets (e.g. if you add a `style` as webpack's entry with value `['some-3rd-party-styles.css']` and want to skip the `style.js` but keep `style.css`)
 
 Here's an example webpack config illustrating how to use these options:
 ```javascript
@@ -248,6 +248,23 @@ plugins: [
   })
 ]
 ```
+
+
+Filtering assets
+----------------
+
+To exclude certain assets by setting the `excludeAssets` option:
+
+```javascript
+plugins: [
+  new HtmlWebpackPlugin({
+    excludeAssets: [/style.*.js/]
+  })
+]
+```
+
+Use case: If you have a seprate entry of webpack, for example `style` for third party css libraries, such as Bootstrap, and you want to exclude the `style.js` or the `style.[chunkhash].js`, you can use this option to archive that.
+
 
 Events
 ------
