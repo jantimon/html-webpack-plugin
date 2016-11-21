@@ -22,7 +22,7 @@ Third party addons:
 -------------
 
 The html-webpack-plugin provides [hooks](https://github.com/ampedandwired/html-webpack-plugin#events) to extend it to your needs.
-There are already some really powerfull plugins which can be integrated with zero configuration:
+There are already some really powerful plugins which can be integrated with zero configuration:
 
  * [webpack-subresource-integrity](https://www.npmjs.com/package/webpack-subresource-integrity) for enhanced asset security
  * [appcache-webpack-plugin](https://github.com/lettertwo/appcache-webpack-plugin) for iOS and Android offline usage
