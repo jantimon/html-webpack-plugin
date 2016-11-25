@@ -26,9 +26,9 @@ There are already some really powerful plugins which can be integrated with zero
 
  * [webpack-subresource-integrity](https://www.npmjs.com/package/webpack-subresource-integrity) for enhanced asset security
  * [appcache-webpack-plugin](https://github.com/lettertwo/appcache-webpack-plugin) for iOS and Android offline usage
- * [favicons-webpack-plugin](https://github.com/jantimon/favicons-webpack-plugin) which generates facivons and icons for iOS Android and desktop browsers
+ * [favicons-webpack-plugin](https://github.com/jantimon/favicons-webpack-plugin) which generates favicons and icons for iOS, Android and desktop browsers
  * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
- * [html-webpack-inline-source-plugin](https://github.com/DustinJackson/html-webpack-inline-source-plugin) To inline your assets in the result html file
+ * [html-webpack-inline-source-plugin](https://github.com/DustinJackson/html-webpack-inline-source-plugin) to inline your assets in the resulting HTML file
  
 Basic Usage
 -----------
@@ -85,7 +85,7 @@ Allowed values are as follows:
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
   included scripts and CSS files. This is useful for cache busting.
 - `cache`: `true | false` if `true` (default) try to emit the file only if it was changed.
-- `showErrors`: `true | false` if `true` (default) errors details will be written into the html page.
+- `showErrors`: `true | false` if `true` (default) errors details will be written into the HTML page.
 - `chunks`: Allows you to add only some chunks (e.g. only the unit-test chunk)
 - `chunksSortMode`: Allows to control how chunks should be sorted before they are included to the html. Allowed values: 'none' | 'auto' | 'dependency' | {function} - default: 'auto'
 - `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk)
@@ -111,7 +111,7 @@ Here's an example webpack config illustrating how to use these options:
 FAQ
 ----
 
-* [Why is my html minified?](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md)
+* [Why is my HTML minified?](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md)
 * [Why is my `<% ... %>` template not working?](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md)
 * [How can I use handlebars/pug/ejs as template engine](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md)
 
@@ -139,7 +139,7 @@ once in your plugins array:
 Writing Your Own Templates
 --------------------------
 If the default generated HTML doesn't meet your needs you can supply
-your own template. The easiest way is to use the `template` option and pass a custom html file.
+your own template. The easiest way is to use the `template` option and pass a custom HTML file.
 The html-webpack-plugin will automatically inject all necessary CSS, JS, manifest
 and favicon files into the markup.
 
@@ -251,7 +251,7 @@ plugins: [
 Events
 ------
 
-To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the html this plugin executes the following events:
+To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the HTML this plugin executes the following events:
 
 Async:
 
@@ -299,7 +299,7 @@ plugins: [
 ]
 ```
 
-Note that the callback must be passed the htmlPluginData in order to pass this onto any other plugins listening on the same 'html-webpack-plugin-before-html-processing' event.
+Note that the callback must be passed the htmlPluginData in order to pass this onto any other plugins listening on the same `html-webpack-plugin-before-html-processing` event.
 
 
 # Contribution
