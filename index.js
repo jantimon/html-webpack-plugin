@@ -465,14 +465,22 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
  */
 HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
   // Turn script files into script tags
+  var jsAsync = this.options.jsAsync;
+  var jsDefer = this.otions.jsDefer;
+
   var scripts = assets.js.map(function (scriptPath) {
+    var attributes = {
+      type: 'text/javascript',
+      src: scriptPath
+    };
+
+    jsAsync && (attributes.async = jsAsync);
+    jsDefer && (attribute.defer = jsDefer);
+
     return {
       tagName: 'script',
       closeTag: true,
-      attributes: {
-        type: 'text/javascript',
-        src: scriptPath
-      }
+      attributes: attributes
     };
   });
   // Make tags self-closing in case of xhtml
