@@ -466,7 +466,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
 HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
   // Turn script files into script tags
   var jsAsync = this.options.jsAsync;
-  var jsDefer = this.otions.jsDefer;
+  var jsDefer = this.options.jsDefer;
 
   var scripts = assets.js.map(function (scriptPath) {
     var attributes = {
