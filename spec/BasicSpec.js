@@ -18,6 +18,7 @@ var rimraf = require('rimraf');
 var _ = require('lodash');
 var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 var HtmlWebpackPlugin = require('../index.js');
+var AddOnPlugin = require('./AddOnPlugin.js');
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
 
@@ -1413,5 +1414,41 @@ describe('HtmlWebpackPlugin', function () {
       })]
     },
     [/^<script type="text\/javascript" src="app_bundle\.js"><\/script>$/], null, done);
+  });
+
+  fit('gracefully handles a thrown error from an addon plugin', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        new AddOnPlugin(AddOnPlugin.THROW_ERR)
+      ]
+    },
+    [],
+    null,
+    done,
+    true);
+  });
+
+  fit('gracefully handles a reported error from an addon plugin', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        new AddOnPlugin(AddOnPlugin.CALLBACK_ERR)
+      ]
+    },
+    [],
+    null,
+    done,
+    true);
   });
 });
