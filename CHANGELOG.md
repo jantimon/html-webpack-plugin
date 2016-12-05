@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.26.0
+---
+* Allow plugins to add attributes without values to the `<script>` and `<link>` tags
+
 v2.25.0
 ---
 * Clearer loader output

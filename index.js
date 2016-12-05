@@ -581,9 +581,16 @@ HtmlWebpackPlugin.prototype.appendHash = function (url, hash) {
  * Turn a tag definition into a html string
  */
 HtmlWebpackPlugin.prototype.createHtmlTag = function (tagDefinition) {
-  var attributes = Object.keys(tagDefinition.attributes || {}).map(function (attributeName) {
-    return attributeName + '="' + tagDefinition.attributes[attributeName] + '"';
-  });
+  var attributes = Object.keys(tagDefinition.attributes || {})
+    .filter(function (attributeName) {
+      return tagDefinition.attributes[attributeName] !== false;
+    })
+    .map(function (attributeName) {
+      if (tagDefinition.attributes[attributeName] === true) {
+        return attributeName;
+      }
+      return attributeName + '="' + tagDefinition.attributes[attributeName] + '"';
+    });
   return '<' + [tagDefinition.tagName].concat(attributes).join(' ') + (tagDefinition.selfClosingTag ? '/' : '') + '>' +
     (tagDefinition.innerHTML || '') +
     (tagDefinition.closeTag ? '</' + tagDefinition.tagName + '>' : '');
