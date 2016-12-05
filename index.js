@@ -582,7 +582,8 @@ HtmlWebpackPlugin.prototype.appendHash = function (url, hash) {
  */
 HtmlWebpackPlugin.prototype.createHtmlTag = function (tagDefinition) {
   var attributes = Object.keys(tagDefinition.attributes || {}).map(function (attributeName) {
-    return attributeName + '="' + tagDefinition.attributes[attributeName] + '"';
+    const value = tagDefinition.attributes[attributeName];
+    return value ? attributeName + '="' + tagDefinition.attributes[attributeName] + '"' : attributeName;
   });
   return '<' + [tagDefinition.tagName].concat(attributes).join(' ') + (tagDefinition.selfClosingTag ? '/' : '') + '>' +
     (tagDefinition.innerHTML || '') +
