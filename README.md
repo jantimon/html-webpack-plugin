@@ -29,6 +29,8 @@ There are already some really powerful plugins which can be integrated with zero
  * [favicons-webpack-plugin](https://github.com/jantimon/favicons-webpack-plugin) which generates favicons and icons for iOS, Android and desktop browsers
  * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
  * [html-webpack-inline-source-plugin](https://github.com/DustinJackson/html-webpack-inline-source-plugin) to inline your assets in the resulting HTML file
+ * [html-webpack-exclude-assets-plugin](https://github.com/jamesjieye/html-webpack-exclude-assets-plugin) for excluding assets using regular expressions
+
  
 Basic Usage
 -----------
