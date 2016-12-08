@@ -55,7 +55,7 @@ This will generate a file `dist/index.html` containing the following:
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <title>Webpack App</title>
   </head>
   <body>
