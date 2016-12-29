@@ -83,8 +83,8 @@ Allowed values are as follows:
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
-- `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
-  included scripts and CSS files. This is useful for cache busting.
+- `hash`: `true | 'string' | false` if `true` then append a unique webpack compilation hash to all
+  included scripts and CSS files. This is useful for cache busting. If a string is specified, use that string as the query string variable that contains the compilation hash
 - `cache`: `true | false` if `true` (default) try to emit the file only if it was changed.
 - `showErrors`: `true | false` if `true` (default) errors details will be written into the HTML page.
 - `chunks`: Allows you to add only some chunks (e.g. only the unit-test chunk)

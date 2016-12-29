@@ -465,6 +465,26 @@ describe('HtmlWebpackPlugin', function () {
     }, ['<link href="styles.css?%hash%"'], null, done);
   });
 
+  it('should allow adding cache hashes to assets with a given query string name', function (done) {
+    var ExtractTextPlugin = require('extract-text-webpack-plugin');
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({hash: '_version'}),
+        new ExtractTextPlugin('styles.css')
+      ]
+    }, ['<link href="styles.css?_version=%hash%"'], null, done);
+  });
+
   it('should inject css files when using the extract text plugin', function (done) {
     var ExtractTextPlugin = require('extract-text-webpack-plugin');
     testHtmlPlugin({
