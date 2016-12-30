@@ -599,7 +599,7 @@ HtmlWebpackPlugin.prototype.getFullTemplatePath = function (template, context) {
   }
   // Resolve template path
   return template.replace(
-    /([!])([^\/\\][^!\?]+|[^\/\\!?])($|\?.+$)/,
+    /([!])([^/\\][^!?]+|[^/\\!?])($|\?.+$)/,
     function (match, prefix, filepath, postfix) {
       return prefix + path.resolve(filepath) + postfix;
     });
