@@ -1,6 +1,11 @@
 Change History
 ==============
 
+v2.25.0
+---
+* Clearer loader output
+* Add basic support for webpack 2
+
 v2.24.1
 ---
 * Hide event deprecated warning of 'applyPluginsAsyncWaterfall' for html-webpack-plugin-after-emit and improve the warning message.
