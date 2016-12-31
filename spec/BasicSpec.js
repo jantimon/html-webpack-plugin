@@ -750,6 +750,38 @@ describe('HtmlWebpackPlugin', function () {
     }, false, true);
   });
 
+  it('the html-webpack-plugin-alter-asset-tags event can add a no-value attribute', function (done) {
+    var examplePlugin = {
+      apply: function (compiler) {
+        compiler.plugin('compilation', function (compilation) {
+          compilation.plugin('html-webpack-plugin-alter-asset-tags', function (pluginArgs, callback) {
+            pluginArgs.body = pluginArgs.body.map(tag => {
+              if (tag.tagName === 'script') {
+                Object.defineProperty(tag.attributes, 'async', {enumerable: true});
+              }
+              return tag;
+            });
+            callback(null, pluginArgs);
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    },
+    [/<body>[\s]*<script type="text\/javascript" src="app_bundle.js" async><\/script>[\s]*<\/body>/],
+    null, done, false, false);
+  });
   it('fires the html-webpack-plugin-before-html-processing event', function (done) {
     var eventFired = false;
     var examplePlugin = {
