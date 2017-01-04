@@ -788,7 +788,7 @@ describe('HtmlWebpackPlugin', function () {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
           compilation.plugin('html-webpack-plugin-alter-asset-tags', function (pluginArgs, callback) {
-            pluginArgs.body = pluginArgs.body.map(tag => {
+            pluginArgs.body = pluginArgs.body.map(function (tag) {
               if (tag.tagName === 'script') {
                 tag.attributes.async = false;
               }
