@@ -16,6 +16,7 @@ function HtmlWebpackPlugin (options) {
     filename: 'index.html',
     hash: false,
     inject: true,
+    injectHeadTag: true,
     compile: true,
     favicon: false,
     minify: false,
@@ -518,6 +519,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
  * Injects the assets into the given html string
  */
 HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets, assetTags) {
+  var self = this;
   var htmlRegExp = /(<html[^>]*>)/i;
   var headRegExp = /(<\/head>)/i;
   var bodyRegExp = /(<\/body>)/i;
@@ -539,19 +541,22 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets, asset
   if (head) {
     // Create a head tag if none exists
     if (!headRegExp.test(html)) {
+      var finalHead = self.options.injectHeadTag ? '<head>' + head + '</head>' : head;
+
       if (!htmlRegExp.test(html)) {
-        html = '<head></head>' + html;
+        html = finalHead + html;
       } else {
         html = html.replace(htmlRegExp, function (match) {
-          return match + '<head></head>';
+          return match + finalHead;
         });
       }
+    } else {
+      // Append assets to head element
+      html = html.replace(headRegExp, function (match) {
+        return head + match;
+      });
     }
 
-    // Append assets to head element
-    html = html.replace(headRegExp, function (match) {
-      return head + match;
-    });
   }
 
   // Inject manifest into the opening html tag
