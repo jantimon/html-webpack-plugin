@@ -234,6 +234,9 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function (compilation, s
   } catch (e) {
     return Promise.reject(e);
   }
+  if (typeof newSource === 'object' && newSource.__esModule && newSource.default) {
+    newSource = newSource.default;
+  }
   return typeof newSource === 'string' || typeof newSource === 'function'
     ? Promise.resolve(newSource)
     : Promise.reject('The loader "' + this.options.template + '" didn\'t return html.');
