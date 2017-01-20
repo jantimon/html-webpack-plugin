@@ -7,6 +7,8 @@ node_js:
   - "6"
 env:
   - WEBPACK=webpack
+before_install:
+  - stty columns 120
 install:
   - npm install --ignore-scripts
   - npm rm webpack
