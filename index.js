@@ -605,7 +605,7 @@ HtmlWebpackPlugin.prototype.createHtmlTag = function (tagDefinition) {
 HtmlWebpackPlugin.prototype.getFullTemplatePath = function (template, context) {
   // If the template doesn't use a loader use the lodash template loader
   if (template.indexOf('!') === -1) {
-    template = 'html-webpack-plugin/lib/loader.js!' + path.resolve(context, template);
+    template = path.join(__dirname, 'lib/loader.js') + '!' + path.resolve(context, template);
   }
   // Resolve template path
   return template.replace(
