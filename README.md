@@ -82,7 +82,7 @@ Allowed values are as follows:
 - `title`: The title to use for the generated HTML document.
 - `filename`: The file to write the HTML to. Defaults to `index.html`.
    You can specify a subdirectory here too (eg: `assets/admin.html`).
-- `template`: Webpack require path to the template. Please see the [docs](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md) for details. 
+- `template`: Webpack require path to the template. Please see the [docs](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md) for details.
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
@@ -94,6 +94,7 @@ Allowed values are as follows:
 - `chunksSortMode`: Allows to control how chunks should be sorted before they are included to the html. Allowed values: 'none' | 'auto' | 'dependency' | {function} - default: 'auto'
 - `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk)
 - `xhtml`: `true | false` If `true` render the `link` tags as self-closing, XHTML compliant. Default is `false`
+- `publicPath`: Overrides `output.publicPath` for `link` and `script` tag URLs
 
 Here's an example webpack config illustrating how to use these options:
 ```javascript
