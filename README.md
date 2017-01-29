@@ -312,6 +312,8 @@ Note that the callback must be passed the htmlPluginData in order to pass this o
 You're free to contribute to this project by submitting [issues](https://github.com/ampedandwired/html-webpack-plugin/issues) and/or [pull requests](https://github.com/ampedandwired/html-webpack-plugin/pulls). This project is test-driven, so keep in mind that every change and new feature should be covered by tests.
 This project uses the [semistandard code style](https://github.com/Flet/semistandard).
 
+Before running the tests, make sure to execute `yarn link` and `yarn link html-webpack-plugin` (or the npm variant of this).
+
 # License
 
 This project is licensed under [MIT](https://github.com/ampedandwired/html-webpack-plugin/blob/master/LICENSE).
