@@ -1,6 +1,12 @@
 Change History
 ==============
 
+v2.27.0
+---
+* Fix a chunksorter webpack 2 issue (#569)
+* Fix template path resolving(#542)
+* Revert 2.25.0 loader resolvement
+
 v2.26.0
 ---
 * Allow plugins to add attributes without values to the `<script>` and `<link>` tags
