@@ -133,7 +133,6 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       .then(result => {
         var html = result.html;
         var assets = result.assets;
-        var chunks = result.chunks;
         // Prepare script and link tags
         var assetTags = this.generateAssetTags(assets);
         var pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: this, chunks: chunks, outputName: this.childCompilationOutputName};
