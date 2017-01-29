@@ -312,6 +312,8 @@ You're free to contribute to this project by submitting [issues](https://github.
 This project uses the [semistandard code style](https://github.com/Flet/semistandard).
 This plugin follows the webpack teams decision to support [node 4+](http://node.green/).
 
+Before running the tests, make sure to execute `yarn link` and `yarn link html-webpack-plugin` (or the npm variant of this).
+
 # License
 
 This project is licensed under [MIT](https://github.com/ampedandwired/html-webpack-plugin/blob/master/LICENSE).
