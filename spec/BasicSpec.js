@@ -750,6 +750,36 @@ describe('HtmlWebpackPlugin', function () {
     }, false, true);
   });
 
+  it('passes chunks to the html-webpack-plugin-alter-asset-tags event', function (done) {
+    var chunks;
+    var examplePlugin = {
+      apply: function (compiler) {
+        compiler.plugin('compilation', function (compilation) {
+          compilation.plugin('html-webpack-plugin-alter-asset-tags', function (object, callback) {
+            chunks = object.chunks;
+            callback();
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    }, [], null, function () {
+      expect(chunks).toBeDefined();
+      done();
+    }, false, true);
+  });
+
   it('allows events to add a no-value attribute', function (done) {
     var examplePlugin = {
       apply: function (compiler) {
