@@ -594,9 +594,12 @@ HtmlWebpackPlugin.prototype.createHtmlTag = function (tagDefinition) {
       }
       return attributeName + '="' + tagDefinition.attributes[attributeName] + '"';
     });
-  return '<' + [tagDefinition.tagName].concat(attributes).join(' ') + (tagDefinition.selfClosingTag ? '/' : '') + '>' +
+  // Backport of 3.x void tag definition
+  var voidTag = tagDefinition.voidTag !== undefined ? tagDefinition.voidTag : !tagDefinition.closeTag;
+  var selfClosingTag = tagDefinition.voidTag !== undefined ? tagDefinition.voidTag && this.options.xhtml : tagDefinition.selfClosingTag;
+  return '<' + [tagDefinition.tagName].concat(attributes).join(' ') + (selfClosingTag ? '/' : '') + '>' +
     (tagDefinition.innerHTML || '') +
-    (tagDefinition.closeTag ? '</' + tagDefinition.tagName + '>' : '');
+    (voidTag ? '' : '</' + tagDefinition.tagName + '>');
 };
 
 /**

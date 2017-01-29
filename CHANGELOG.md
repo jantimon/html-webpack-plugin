@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.28.0
+---
+* Backport 3.x void tag for plugin authors
+
 v2.27.1
 ---
 * Revert 2.25.0 loader resolving
