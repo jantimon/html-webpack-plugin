@@ -1,6 +1,6 @@
 HTML Webpack Plugin
 ===================
-[![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/ampedandwired/html-webpack-plugin.svg)](https://david-dm.org/ampedandwired/html-webpack-plugin) [![Build status](https://travis-ci.org/ampedandwired/html-webpack-plugin.svg)](https://travis-ci.org/ampedandwired/html-webpack-plugin) [![Windows build status](https://ci.appveyor.com/api/projects/status/github/ampedandwired/html-webpack-plugin?svg=true&branch=master)](https://ci.appveyor.com/project/jantimon/html-webpack-plugin) [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard) [![bitHound Dependencies](https://www.bithound.io/github/ampedandwired/html-webpack-plugin/badges/dependencies.svg)](https://www.bithound.io/github/ampedandwired/html-webpack-plugin/master/dependencies/npm) [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)]()
+[![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/jantimon/html-webpack-plugin.svg)](https://david-dm.org/jantimon/html-webpack-plugin) [![Build status](https://travis-ci.org/jantimon/html-webpack-plugin.svg)](https://travis-ci.org/jantimon/html-webpack-plugin) [![Windows build status](https://ci.appveyor.com/api/projects/status/github/jantimon/html-webpack-plugin?svg=true&branch=master)](https://ci.appveyor.com/project/jantimon/html-webpack-plugin) [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard) [![bitHound Dependencies](https://www.bithound.io/github/jantimon/html-webpack-plugin/badges/dependencies.svg)](https://www.bithound.io/github/jantimon/html-webpack-plugin/master/dependencies/npm) [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)]()
 
 [![NPM](https://nodei.co/npm/html-webpack-plugin.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/html-webpack-plugin/)
 
@@ -21,7 +21,7 @@ $ npm install html-webpack-plugin --save-dev
 Third party addons:
 -------------
 
-The html-webpack-plugin provides [hooks](https://github.com/ampedandwired/html-webpack-plugin#events) to extend it to your needs.
+The html-webpack-plugin provides [hooks](https://github.com/jantimon/html-webpack-plugin#events) to extend it to your needs.
 There are already some really powerful plugins which can be integrated with zero configuration:
 
  * [webpack-subresource-integrity](https://www.npmjs.com/package/webpack-subresource-integrity) for enhanced asset security
@@ -83,7 +83,7 @@ Allowed values are as follows:
 - `title`: The title to use for the generated HTML document.
 - `filename`: The file to write the HTML to. Defaults to `index.html`.
    You can specify a subdirectory here too (eg: `assets/admin.html`).
-- `template`: Webpack require path to the template. Please see the [docs](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md) for details.
+- `template`: Webpack require path to the template. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details.
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
 - `favicon`: Adds the given favicon path to the output html.
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
@@ -115,9 +115,9 @@ Here's an example webpack config illustrating how to use these options:
 FAQ
 ----
 
-* [Why is my HTML minified?](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md)
-* [Why is my `<% ... %>` template not working?](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md)
-* [How can I use handlebars/pug/ejs as template engine](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md)
+* [Why is my HTML minified?](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md)
+* [Why is my `<% ... %>` template not working?](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md)
+* [How can I use handlebars/pug/ejs as template engine](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md)
 
 Generating Multiple HTML Files
 ------------------------------
@@ -308,7 +308,7 @@ Note that the callback must be passed the htmlPluginData in order to pass this o
 
 # Contribution
 
-You're free to contribute to this project by submitting [issues](https://github.com/ampedandwired/html-webpack-plugin/issues) and/or [pull requests](https://github.com/ampedandwired/html-webpack-plugin/pulls). This project is test-driven, so keep in mind that every change and new feature should be covered by tests.
+You're free to contribute to this project by submitting [issues](https://github.com/jantimon/html-webpack-plugin/issues) and/or [pull requests](https://github.com/jantimon/html-webpack-plugin/pulls). This project is test-driven, so keep in mind that every change and new feature should be covered by tests.
 This project uses the [semistandard code style](https://github.com/Flet/semistandard).
 This plugin follows the webpack teams decision to support [node 4+](http://node.green/).
 
@@ -316,4 +316,4 @@ Before running the tests, make sure to execute `yarn link` and `yarn link html-w
 
 # License
 
-This project is licensed under [MIT](https://github.com/ampedandwired/html-webpack-plugin/blob/master/LICENSE).
+This project is licensed under [MIT](https://github.com/jantimon/html-webpack-plugin/blob/master/LICENSE).
