@@ -47,7 +47,7 @@
     "jade-loader": "^0.8.0",
     "jasmine": "^2.5.2",
     "rimraf": "^2.5.4",
-    "semistandard": "8.0.0",
+    "semistandard": "9.2.1",
     "style-loader": "^0.13.1",
     "underscore-template-loader": "^0.7.3",
     "url-loader": "^0.5.7",
