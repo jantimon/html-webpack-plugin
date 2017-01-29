@@ -1,11 +1,14 @@
 Change History
 ==============
 
+v2.27.1
+---
+* Revert 2.25.0 loader resolving
+
 v2.27.0
 ---
 * Fix a chunksorter webpack 2 issue (#569)
 * Fix template path resolving(#542)
-* Revert 2.25.0 loader resolvement
 
 v2.26.0
 ---
