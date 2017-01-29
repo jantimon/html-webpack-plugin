@@ -7,6 +7,7 @@ var path = require('path');
 var childCompiler = require('./lib/compiler.js');
 var prettyError = require('./lib/errors.js');
 var chunkSorter = require('./lib/chunksorter.js');
+var htmlTag = require('./lib/html-tags.js');
 Promise.promisifyAll(fs);
 
 function HtmlWebpackPlugin (options) {
@@ -466,27 +467,17 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
 HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
   // Turn script files into script tags
   var scripts = assets.js.map(function (scriptPath) {
-    return {
-      tagName: 'script',
-      closeTag: true,
-      attributes: {
-        type: 'text/javascript',
-        src: scriptPath
-      }
-    };
+    return htmlTag.createHtmlTagObject('script', {
+      type: 'text/javascript',
+      src: scriptPath
+    });
   });
-  // Make tags self-closing in case of xhtml
-  var selfClosingTag = !!this.options.xhtml;
   // Turn css files into link tags
   var styles = assets.css.map(function (stylePath) {
-    return {
-      tagName: 'link',
-      selfClosingTag: selfClosingTag,
-      attributes: {
-        href: stylePath,
-        rel: 'stylesheet'
-      }
-    };
+    return htmlTag.createHtmlTagObject('link', {
+      href: stylePath,
+      rel: 'stylesheet'
+    });
   });
   // Injection targets
   var head = [];
@@ -494,14 +485,10 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
 
   // If there is a favicon present, add it to the head
   if (assets.favicon) {
-    head.push({
-      tagName: 'link',
-      selfClosingTag: selfClosingTag,
-      attributes: {
-        rel: 'shortcut icon',
-        href: assets.favicon
-      }
-    });
+    head.push(htmlTag.createHtmlTagObject('link', {
+      rel: 'shortcut icon',
+      href: assets.favicon
+    }));
   }
   // Add styles to the head
   head = head.concat(styles);
@@ -521,8 +508,14 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets, asset
   var htmlRegExp = /(<html[^>]*>)/i;
   var headRegExp = /(<\/head>)/i;
   var bodyRegExp = /(<\/body>)/i;
-  var body = assetTags.body.map(this.createHtmlTag);
-  var head = assetTags.head.map(this.createHtmlTag);
+  // Create the html strings for head
+  var head = assetTags.head.map(
+    (htmlTagObject) => htmlTag.htmlTagObjectToString(htmlTagObject, this.options.xhtml)
+  );
+  // Create the html strings for body
+  var body = assetTags.body.map(
+    (htmlTagObject) => htmlTag.htmlTagObjectToString(htmlTagObject, this.options.xhtml)
+  );
 
   if (body.length) {
     if (bodyRegExp.test(html)) {
@@ -575,25 +568,6 @@ HtmlWebpackPlugin.prototype.appendHash = function (url, hash) {
     return url;
   }
   return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
-};
-
-/**
- * Turn a tag definition into a html string
- */
-HtmlWebpackPlugin.prototype.createHtmlTag = function (tagDefinition) {
-  var attributes = Object.keys(tagDefinition.attributes || {})
-    .filter(function (attributeName) {
-      return tagDefinition.attributes[attributeName] !== false;
-    })
-    .map(function (attributeName) {
-      if (tagDefinition.attributes[attributeName] === true) {
-        return attributeName;
-      }
-      return attributeName + '="' + tagDefinition.attributes[attributeName] + '"';
-    });
-  return '<' + [tagDefinition.tagName].concat(attributes).join(' ') + (tagDefinition.selfClosingTag ? '/' : '') + '>' +
-    (tagDefinition.innerHTML || '') +
-    (tagDefinition.closeTag ? '</' + tagDefinition.tagName + '>' : '');
 };
 
 /**

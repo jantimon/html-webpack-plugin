@@ -30,7 +30,7 @@ There are already some really powerful plugins which can be integrated with zero
  * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
  * [html-webpack-inline-source-plugin](https://github.com/DustinJackson/html-webpack-inline-source-plugin) to inline your assets in the resulting HTML file
  * [html-webpack-exclude-assets-plugin](https://github.com/jamesjieye/html-webpack-exclude-assets-plugin) for excluding assets using regular expressions
- 
+
 Basic Usage
 -----------
 
@@ -79,7 +79,7 @@ Allowed values are as follows:
 - `title`: The title to use for the generated HTML document.
 - `filename`: The file to write the HTML to. Defaults to `index.html`.
    You can specify a subdirectory here too (eg: `assets/admin.html`).
-- `template`: Webpack require path to the template. Please see the [docs](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md) for details. 
+- `template`: Webpack require path to the template. Please see the [docs](https://github.com/ampedandwired/html-webpack-plugin/blob/master/docs/template-option.md) for details.
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass a [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) options object to minify the output.
@@ -307,6 +307,7 @@ Note that the callback must be passed the htmlPluginData in order to pass this o
 
 You're free to contribute to this project by submitting [issues](https://github.com/ampedandwired/html-webpack-plugin/issues) and/or [pull requests](https://github.com/ampedandwired/html-webpack-plugin/pulls). This project is test-driven, so keep in mind that every change and new feature should be covered by tests.
 This project uses the [semistandard code style](https://github.com/Flet/semistandard).
+This plugin follows the webpack teams decision to support [node 4+](http://node.green/).
 
 # License
 
