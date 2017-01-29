@@ -1,13 +1,13 @@
 'use strict';
-var vm = require('vm');
-var fs = require('fs');
-var _ = require('lodash');
-var Promise = require('bluebird');
-var path = require('path');
-var childCompiler = require('./lib/compiler.js');
-var prettyError = require('./lib/errors.js');
-var chunkSorter = require('./lib/chunksorter.js');
-var htmlTag = require('./lib/html-tags.js');
+const vm = require('vm');
+const fs = require('fs');
+const _ = require('lodash');
+const Promise = require('bluebird');
+const path = require('path');
+const childCompiler = require('./lib/compiler.js');
+const prettyError = require('./lib/errors.js');
+const chunkSorter = require('./lib/chunksorter.js');
+const htmlTag = require('./lib/html-tags.js');
 Promise.promisifyAll(fs);
 
 module.exports = class HtmlWebpackPlugin {
@@ -34,14 +34,14 @@ module.exports = class HtmlWebpackPlugin {
    * The main function which is called by webpack to initialize the plugin
    */
   apply (compiler) {
-    var isCompilationCached = false;
-    var compilationPromise;
+    let isCompilationCached = false;
+    let compilationPromise;
 
     this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
 
     // convert absolute filename into relative so that webpack can
     // generate it at correct location
-    var filename = this.options.filename;
+    const filename = this.options.filename;
     if (path.resolve(filename) === path.normalize(filename)) {
       this.options.filename = path.relative(compiler.options.output.path, filename);
     }
@@ -67,9 +67,9 @@ module.exports = class HtmlWebpackPlugin {
     });
 
     compiler.plugin('emit', (compilation, callback) => {
-      var applyPluginsAsyncWaterfall = this.applyPluginsAsyncWaterfall(compilation);
+      const applyPluginsAsyncWaterfall = this.applyPluginsAsyncWaterfall(compilation);
       // Get all chunks
-      var allChunks = compilation.getStats().toJson().chunks;
+      const allChunks = compilation.getStats().toJson().chunks;
       // Filter chunks (options.chunks and options.excludeCHunks)
       var chunks = this.filterChunks(allChunks, this.options.chunks, this.options.excludeChunks);
       // Sort chunks
@@ -77,7 +77,7 @@ module.exports = class HtmlWebpackPlugin {
       // Let plugins alter the chunks and the chunk sorting
       chunks = compilation.applyPluginsWaterfall('html-webpack-plugin-alter-chunks', chunks, { plugin: this });
       // Get assets
-      var assets = this.htmlWebpackPluginAssets(compilation, chunks);
+      const assets = this.htmlWebpackPluginAssets(compilation, chunks);
       // If this is a hot update compilation, move on!
       // This solves a problem where an `index.html` file is generated for hot-update js files
       // It only happens in Webpack 2, where hot updates are emitted separately before the full bundle
@@ -86,7 +86,7 @@ module.exports = class HtmlWebpackPlugin {
       }
 
       // If the template and the assets did not change we don't have to emit the html
-      var assetJson = JSON.stringify(this.getAssetFiles(assets));
+      const assetJson = JSON.stringify(this.getAssetFiles(assets));
       if (isCompilationCached && this.options.cache && assetJson === this.assetJson) {
         return callback();
       } else {
@@ -99,7 +99,7 @@ module.exports = class HtmlWebpackPlugin {
           if (this.options.favicon) {
             return this.addFileToAssets(this.options.favicon, compilation)
               .then(faviconBasename => {
-                var publicPath = compilation.mainTemplate.getPublicPath({hash: compilation.hash}) || '';
+                let publicPath = compilation.mainTemplate.getPublicPath({hash: compilation.hash}) || '';
                 if (publicPath && publicPath.substr(-1) !== '/') {
                   publicPath += '/';
                 }
@@ -136,15 +136,15 @@ module.exports = class HtmlWebpackPlugin {
         })
           // Allow plugins to change the html before assets are injected
           .then(html => {
-            var pluginArgs = {html: html, assets: assets, plugin: this, outputName: this.childCompilationOutputName};
+            const pluginArgs = {html: html, assets: assets, plugin: this, outputName: this.childCompilationOutputName};
             return applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-processing', true, pluginArgs);
           })
           .then(result => {
-            var html = result.html;
-            var assets = result.assets;
+            const html = result.html;
+            const assets = result.assets;
             // Prepare script and link tags
-            var assetTags = this.generateAssetTags(assets);
-            var pluginArgs = {
+            const assetTags = this.generateAssetTags(assets);
+            const pluginArgs = {
               head: assetTags.head,
               body: assetTags.body,
               plugin: this,
@@ -159,9 +159,9 @@ module.exports = class HtmlWebpackPlugin {
           })
         // Allow plugins to change the html after assets are injected
         .then(result => {
-          var html = result.html;
-          var assets = result.assets;
-          var pluginArgs = {
+          const html = result.html;
+          const assets = result.assets;
+          const pluginArgs = {
             html: html,
             assets: assets,
             plugin: this,
@@ -222,11 +222,11 @@ module.exports = class HtmlWebpackPlugin {
     // The LibraryTemplatePlugin stores the template result in a local variable.
     // To extract the result during the evaluation this part has to be removed.
     source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
-    var template = this.options.template.replace(/^.+!/, '').replace(/\?.+$/, '');
-    var vmContext = vm.createContext(_.extend({HTML_WEBPACK_PLUGIN: true, require: require}, global));
-    var vmScript = new vm.Script(source, {filename: template});
+    const template = this.options.template.replace(/^.+!/, '').replace(/\?.+$/, '');
+    const vmContext = vm.createContext(_.extend({HTML_WEBPACK_PLUGIN: true, require: require}, global));
+    const vmScript = new vm.Script(source, {filename: template});
     // Evaluate code and cast to string
-    var newSource;
+    let newSource;
     try {
       newSource = vmScript.runInContext(vmContext);
     } catch (e) {
@@ -249,7 +249,7 @@ module.exports = class HtmlWebpackPlugin {
     return Promise.resolve()
       // Template processing
       .then(() => {
-        var templateParams = {
+        const templateParams = {
           compilation: compilation,
           webpack: compilation.getStats().toJson(),
           webpackConfig: compilation.options,
@@ -258,7 +258,7 @@ module.exports = class HtmlWebpackPlugin {
             options: this.options
           }
         };
-        var html = '';
+        let html = '';
         try {
           html = templateFunction(templateParams);
         } catch (e) {
@@ -300,7 +300,7 @@ module.exports = class HtmlWebpackPlugin {
     })
       .catch(() => Promise.reject(new Error(`HtmlWebpackPlugin: could not load file ${filename}`)))
       .then(results => {
-        var basename = path.basename(filename);
+        const basename = path.basename(filename);
         compilation.fileDependencies.push(filename);
         compilation.assets[basename] = {
           source: function () {
@@ -342,7 +342,7 @@ module.exports = class HtmlWebpackPlugin {
    */
   filterChunks (chunks, includedChunks, excludedChunks) {
     return chunks.filter(chunk => {
-      var chunkName = chunk.names[0];
+      const chunkName = chunk.names[0];
       // This chunk doesn't have a name. This script can't handled it.
       if (chunkName === undefined) {
         return false;
@@ -375,10 +375,10 @@ module.exports = class HtmlWebpackPlugin {
    * Returns all assets from the current compilation
    */
   htmlWebpackPluginAssets (compilation, chunks) {
-    var webpackStatsJson = compilation.getStats().toJson();
+    const webpackStatsJson = compilation.getStats().toJson();
 
     // Use the configured public path or build a relative path
-    var publicPath = typeof compilation.options.output.publicPath !== 'undefined'
+    let publicPath = typeof compilation.options.output.publicPath !== 'undefined'
       // If a hard coded public path exists use it
       ? compilation.mainTemplate.getPublicPath({hash: webpackStatsJson.hash})
       // If no public path was set get a relative url path
@@ -389,7 +389,7 @@ module.exports = class HtmlWebpackPlugin {
       publicPath += '/';
     }
 
-    var assets = {
+    const assets = {
       // The public path
       publicPath: publicPath,
       // Will contain all js & css files by chunk
@@ -408,14 +408,14 @@ module.exports = class HtmlWebpackPlugin {
       assets.favicon = this.appendHash(assets.favicon, webpackStatsJson.hash);
     }
 
-    for (var i = 0; i < chunks.length; i++) {
-      var chunk = chunks[i];
-      var chunkName = chunk.names[0];
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      const chunkName = chunk.names[0];
 
       assets.chunks[chunkName] = {};
 
       // Prepend the public path to all chunk files
-      var chunkFiles = [].concat(chunk.files).map(chunkFile => publicPath + chunkFile);
+      let chunkFiles = [].concat(chunk.files).map(chunkFile => publicPath + chunkFile);
 
       // Append a hash for cache busting
       if (this.options.hash) {
@@ -424,7 +424,7 @@ module.exports = class HtmlWebpackPlugin {
 
       // Webpack outputs an array for each chunk when using sourcemaps
       // But we need only the entry file
-      var entry = chunkFiles[0];
+      const entry = chunkFiles[0];
       assets.chunks[chunkName].size = chunk.size;
       assets.chunks[chunkName].entry = entry;
       assets.chunks[chunkName].hash = chunk.hash;
@@ -452,17 +452,17 @@ module.exports = class HtmlWebpackPlugin {
    */
   generateAssetTags (assets) {
     // Turn script files into script tags
-    var scripts = assets.js.map(scriptPath => htmlTag.createHtmlTagObject('script', {
+    const scripts = assets.js.map(scriptPath => htmlTag.createHtmlTagObject('script', {
       src: scriptPath
     }));
     // Turn css files into link tags
-    var styles = assets.css.map(stylePath => htmlTag.createHtmlTagObject('link', {
+    const styles = assets.css.map(stylePath => htmlTag.createHtmlTagObject('link', {
       href: stylePath,
       rel: 'stylesheet'
     }));
     // Injection targets
-    var head = [];
-    var body = [];
+    let head = [];
+    let body = [];
 
     // If there is a favicon present, add it to the head
     if (assets.favicon) {
@@ -486,15 +486,15 @@ module.exports = class HtmlWebpackPlugin {
    * Injects the assets into the given html string
    */
   injectAssetsIntoHtml (html, assets, assetTags) {
-    var htmlRegExp = /(<html[^>]*>)/i;
-    var headRegExp = /(<\/head>)/i;
-    var bodyRegExp = /(<\/body>)/i;
+    const htmlRegExp = /(<html[^>]*>)/i;
+    const headRegExp = /(<\/head>)/i;
+    const bodyRegExp = /(<\/body>)/i;
     // Create the html strings for head
-    var head = assetTags.head.map(
+    const head = assetTags.head.map(
       (htmlTagObject) => htmlTag.htmlTagObjectToString(htmlTagObject, this.options.xhtml)
     );
     // Create the html strings for body
-    var body = assetTags.body.map(
+    const body = assetTags.body.map(
       (htmlTagObject) => htmlTag.htmlTagObjectToString(htmlTagObject, this.options.xhtml)
     );
 
@@ -565,10 +565,10 @@ module.exports = class HtmlWebpackPlugin {
    * asset object
    */
   getAssetFiles (assets) {
-    var files = Object.keys(assets)
+    const files = Object.keys(assets)
       .filter(assetType => assetType !== 'chunks' && assets[assetType])
       .reduce((files, assetType) => files.concat(assets[assetType]), []);
-    var uniqFiles = _.uniq(files);
+    const uniqFiles = _.uniq(files);
     uniqFiles.sort();
     return uniqFiles;
   }
@@ -578,7 +578,7 @@ module.exports = class HtmlWebpackPlugin {
    * a function that helps to merge given plugin arguments with processed ones
    */
   applyPluginsAsyncWaterfall (compilation) {
-    var promisedApplyPluginsAsyncWaterfall = Promise.promisify(compilation.applyPluginsAsyncWaterfall, {context: compilation});
+    const promisedApplyPluginsAsyncWaterfall = Promise.promisify(compilation.applyPluginsAsyncWaterfall, {context: compilation});
     return function (eventName, requiresResult, pluginArgs) {
       return promisedApplyPluginsAsyncWaterfall(eventName, pluginArgs)
       .then(result => {
