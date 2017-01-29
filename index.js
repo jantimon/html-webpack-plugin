@@ -217,7 +217,7 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function (compilation, s
   }
   return typeof newSource === 'string' || typeof newSource === 'function'
     ? Promise.resolve(newSource)
-    : Promise.reject(`The loader "${this.options.template}" didn\'t return html.`);
+    : Promise.reject(`The loader "${this.options.template}" didn't return html.`);
 };
 
 /**
