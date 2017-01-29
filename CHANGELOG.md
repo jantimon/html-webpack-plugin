@@ -6,6 +6,7 @@ v3.x
 * Rename `closingTag` into `voidTag` like in the official w3c spec.
 * Provide a `createHtmlTagObject` helper for plugin authors to create new tags.
 * Remove build in html minification
+* Support same node version like webpack 2: node 4 and higher
 
 v2.26.0
 ---

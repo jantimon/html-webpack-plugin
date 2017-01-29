@@ -63,5 +63,8 @@
   },
   "peerDependencies": {
     "webpack": "1 || ^2 || ^2.1.0-beta || ^2.2.0-rc"
+  },
+  "engines": {
+    "node": ">= 4.3.2"
   }
 }
