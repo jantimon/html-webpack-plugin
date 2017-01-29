@@ -22,11 +22,7 @@ module.exports = {
     new AppCachePlugin(),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: 'template.html',
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true
-      }
+      template: 'template.html'
     }),
     new ExtractTextPlugin('styles.css')
   ]

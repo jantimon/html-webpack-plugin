@@ -19,7 +19,6 @@ function HtmlWebpackPlugin (options) {
     inject: true,
     compile: true,
     favicon: false,
-    minify: false,
     cache: true,
     showErrors: true,
     chunks: 'all',
@@ -290,14 +289,6 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function (html, assets, assetTags)
       } else {
         return html;
       }
-    })
-    // Minify
-    .then(function (html) {
-      if (self.options.minify) {
-        var minify = require('html-minifier').minify;
-        return minify(html, self.options.minify);
-      }
-      return html;
     });
 };
 
