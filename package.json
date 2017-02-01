@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ampedandwired/html-webpack-plugin.git"
+    "url": "https://github.com/jantimon/html-webpack-plugin.git"
   },
   "keywords": [
     "webpack",
@@ -27,9 +27,9 @@
   "author": "Charles Blaxland <charles.blaxland@gmail.com> (https://github.com/ampedandwired)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ampedandwired/html-webpack-plugin/issues"
+    "url": "https://github.com/jantimon/html-webpack-plugin/issues"
   },
-  "homepage": "https://github.com/ampedandwired/html-webpack-plugin",
+  "homepage": "https://github.com/jantimon/html-webpack-plugin",
   "semistandard": {
     "ignore": [
       "examples/*/dist/**/*.*"
