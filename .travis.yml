@@ -6,7 +6,7 @@ node_js:
   - "5"
   - "6"
 env:
-  - WEBPACK=webpack
+  - WEBPACK=webpack@1
 before_install:
   - stty columns 120
 install:
