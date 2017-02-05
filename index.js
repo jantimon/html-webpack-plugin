@@ -447,6 +447,22 @@ module.exports = class HtmlWebpackPlugin {
     return assets;
   }
 
+  inferMediaFromCSSFilename (filename) {
+    const matches = filename.match(/\bmedia_([A-Z0-9=]*)/i);
+
+    if (matches) {
+      // Node 5.10+
+      if (typeof Buffer.from === 'function') {
+        return Buffer.from(matches[1], 'base64');
+      }
+
+      // older Node versions
+      return new Buffer(matches[1], 'base64');
+    }
+
+    return false;
+  }
+
   /**
    * Injects the assets into the given html string
    */
@@ -458,7 +474,8 @@ module.exports = class HtmlWebpackPlugin {
     // Turn css files into link tags
     const styles = assets.css.map(stylePath => htmlTag.createHtmlTagObject('link', {
       href: stylePath,
-      rel: 'stylesheet'
+      rel: 'stylesheet',
+      media: this.inferMediaFromCSSFilename(stylePath)
     }));
     // Injection targets
     let head = [];
