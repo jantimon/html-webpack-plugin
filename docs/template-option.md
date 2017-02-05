@@ -35,10 +35,10 @@ new HtmlWebpackPlugin({
 ```js
 {
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.hbs$/,
-        loader: 'handlebars'
+        loader: 'handlebars-loader'
       },
     ]
   },
@@ -56,10 +56,10 @@ This will **cause html minification** and it will also **disable the ejs fallbac
 ```js
 {
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.html$/,
-        loader: 'html'
+        loader: 'html-loader'
       },
   },
   plugins: [
