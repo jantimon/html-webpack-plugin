@@ -525,6 +525,31 @@ describe('HtmlWebpackPlugin', function () {
     }, ['<link href="styles.css" rel="stylesheet"/>'], null, done);
   });
 
+  it('should output xhtml link stylesheet tag with media attribute when inferred from the filename', function (done) {
+    var ExtractTextPlugin = require('extract-text-webpack-plugin');
+    var printExtractor = new ExtractTextPlugin('styles.media_KG1pbi13aWR0aDogNzAwcHgpLCBoYW5kaGVsZCBhbmQgKG9yaWVudGF0aW9uOiBsYW5kc2NhcGUp.css');
+    var styleExtractor = new ExtractTextPlugin('styles.css');
+
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /print\.css$/, loader: printExtractor.extract('style-loader', 'css-loader') },
+          { test: /\.css$/, exclude: /print\.css$/, loader: styleExtractor.extract('style-loader', 'css-loader') }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({xhtml: true}),
+        printExtractor,
+        styleExtractor
+      ]
+    }, ['<link href="styles.media_KG1pbi13aWR0aDogNzAwcHgpLCBoYW5kaGVsZCBhbmQgKG9yaWVudGF0aW9uOiBsYW5kc2NhcGUp.css" rel="stylesheet" media="(min-width: 700px), handheld and (orientation: landscape)"/>'], null, done);
+  });
+
   it('prepends the webpack public path to script src', function (done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),

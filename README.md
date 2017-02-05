@@ -75,6 +75,16 @@ If you have any CSS assets in webpack's output (for example, CSS extracted
 with the [ExtractTextPlugin](https://github.com/webpack/extract-text-webpack-plugin))
 then these will be included with `<link>` tags in the HTML head.
 
+If you want to automatically set the `<link>` element [`media` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/link#Attributes), ensure the extracted CSS file name includes "media_{base64MediaString}":
+
+```
+style.media_KG1pbi13aWR0aDogNzAwcHgpLCBoYW5kaGVsZCBhbmQgKG9yaWVudGF0aW9uOiBsYW5kc2NhcGUp.css
+
+will be injected into the HTML template as:
+
+<link src="styles.media_KG1pbi13aWR0aDogNzAwcHgpLCBoYW5kaGVsZCBhbmQgKG9yaWVudGF0aW9uOiBsYW5kc2NhcGUp.css" rel="stylesheet" media="(min-width: 700px), handheld and (orientation: landscape)" />
+```
+
 Configuration
 -------------
 You can pass a hash of configuration options to `HtmlWebpackPlugin`.
