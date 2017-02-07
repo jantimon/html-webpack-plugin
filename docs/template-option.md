@@ -51,7 +51,7 @@ new HtmlWebpackPlugin({
 ```
 
 However this also means that in the following example webpack will use the html loader for your template.
-This will **cause html minification** and it will also **disable the ejs fallback** loader.
+This will **cause html minification** with `production` ENV but it can be disabled by setting a query `minimize: false`, and it will also **disable the ejs fallback** loader.
 
 ```js
 {
@@ -59,7 +59,11 @@ This will **cause html minification** and it will also **disable the ejs fallbac
     loaders: [
       {
         test: /\.html$/,
-        loader: 'html'
+        loader: 'html',
+        // html-loader minimize option
+        query: {
+          minimize: true | false
+        }
       },
   },
   plugins: [
