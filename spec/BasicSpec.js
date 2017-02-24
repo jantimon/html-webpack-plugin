@@ -421,7 +421,7 @@ describe('HtmlWebpackPlugin', function () {
         new HtmlWebpackPlugin(),
         new ExtractTextPlugin('styles.css')
       ]
-    }, ['<link href="styles.css" rel="stylesheet">'], null, done);
+    }, ['<link href="styles.css" type="text/css" rel="stylesheet">'], null, done);
   });
 
   it('should work with the css extract plugin on windows and protocol relative urls support (#205)', function (done) {
@@ -522,7 +522,7 @@ describe('HtmlWebpackPlugin', function () {
         new HtmlWebpackPlugin({xhtml: true}),
         new ExtractTextPlugin('styles.css')
       ]
-    }, ['<link href="styles.css" rel="stylesheet"/>'], null, done);
+    }, ['<link href="styles.css" type="text/css" rel="stylesheet"/>'], null, done);
   });
 
   it('prepends the webpack public path to script src', function (done) {
