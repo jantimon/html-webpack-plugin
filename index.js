@@ -427,7 +427,11 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
 
     // Prepend the public path to all chunk files
     var chunkFiles = [].concat(chunk.files).map(function (chunkFile) {
-      return publicPath + chunkFile;
+      if (/^[a-z][a-z0-9+\-.]*:\/\//.test(chunkFile))
+        // If the chunkFile is a URL (eg. a CDN), use it as is
+        return chunkFile;
+      else
+        return publicPath + chunkFile;
     });
 
     // Append a hash for cache busting
