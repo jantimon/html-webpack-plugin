@@ -14,6 +14,7 @@ function HtmlWebpackPlugin (options) {
   this.options = _.extend({
     template: path.join(__dirname, 'default_index.ejs'),
     filename: 'index.html',
+    useGzip: false,
     hash: false,
     inject: true,
     compile: true,
@@ -466,6 +467,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
  * Injects the assets into the given html string
  */
 HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
+  var useGzip = this.options.useGzip;
   // Turn script files into script tags
   var scripts = assets.js.map(function (scriptPath) {
     return {
@@ -473,7 +475,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
       closeTag: true,
       attributes: {
         type: 'text/javascript',
-        src: scriptPath
+        src: scriptPath + (useGzip ? '.gz' : '')
       }
     };
   });
@@ -485,7 +487,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
       tagName: 'link',
       selfClosingTag: selfClosingTag,
       attributes: {
-        href: stylePath,
+        href: stylePath + (useGzip ? '.gz' : ''),
         rel: 'stylesheet'
       }
     };
