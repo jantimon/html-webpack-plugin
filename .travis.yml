@@ -6,12 +6,14 @@ node_js:
   - "5"
   - "6"
 env:
-  - WEBPACK=webpack@1
+  - WEBPACK_VERSION=1
+  - WEBPACK_VERSION=2
 before_install:
   - stty columns 120
 install:
   - npm install --ignore-scripts
   - npm rm webpack
-  - npm install $WEBPACK --ignore-scripts || true
+  - npm rm extract-text-webpack-plugin
+  - npm install webpack@$WEBPACK_VERSION extract-text-webpack-plugin@$WEBPACK_VERSION --ignore-scripts || true
 script:
   - npm test
