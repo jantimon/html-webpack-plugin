@@ -125,7 +125,7 @@ describe('HtmlWebpackPluginCaching', function () {
       .then(done);
   });
 
-  it('should compile the webpack html if the template file was changed', function (done) {
+  it.skip('should compile the webpack html if the template file was changed', function (done) {
     var template = path.join(__dirname, 'fixtures/plain.html');
     var htmlWebpackPlugin = new HtmlWebpackPlugin({
       template: template
