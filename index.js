@@ -415,8 +415,8 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
 
   // Append a hash for cache busting
   if (this.options.hash) {
-    assets.manifest = self.appendHash(assets.manifest, webpackStatsJson.hash);
-    assets.favicon = self.appendHash(assets.favicon, webpackStatsJson.hash);
+    assets.manifest = self.appendHash(assets.manifest, webpackStatsJson.hash, this.options.hash);
+    assets.favicon = self.appendHash(assets.favicon, webpackStatsJson.hash, this.options.hash);
   }
 
   for (var i = 0; i < chunks.length; i++) {
@@ -433,7 +433,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
     // Append a hash for cache busting
     if (this.options.hash) {
       chunkFiles = chunkFiles.map(function (chunkFile) {
-        return self.appendHash(chunkFile, webpackStatsJson.hash);
+        return self.appendHash(chunkFile, webpackStatsJson.hash, self.options.hash);
       });
     }
 
@@ -571,12 +571,17 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets, asset
 
 /**
  * Appends a cache busting hash
+ * If qsv is a string, use that as the cache busting hash variable
  */
-HtmlWebpackPlugin.prototype.appendHash = function (url, hash) {
+HtmlWebpackPlugin.prototype.appendHash = function (url, hash, qsv) {
+  var finalHash = hash;
+  if (typeof qsv === 'string') {
+    finalHash = qsv + '=' + hash;
+  }
   if (!url) {
     return url;
   }
-  return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
+  return url + (url.indexOf('?') === -1 ? '?' : '&') + finalHash;
 };
 
 /**
