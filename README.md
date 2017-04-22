@@ -62,7 +62,7 @@ This will generate a file `dist/index.html` containing the following:
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <title>Webpack App</title>
   </head>
   <body>
@@ -166,7 +166,7 @@ plugins: [
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8"/>
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
