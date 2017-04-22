@@ -18,6 +18,7 @@ function HtmlWebpackPlugin (options) {
     inject: true,
     compile: true,
     favicon: false,
+    meta: { 'charset=UTF-8': null },
     minify: false,
     cache: true,
     showErrors: true,
@@ -513,6 +514,24 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
   } else {
     body = body.concat(scripts);
   }
+
+  _.forOwn(this.options.meta, function (value, key) {
+    var attributes = {};
+    var splitKeys = key.split('=');
+
+    attributes[splitKeys[0]] = splitKeys[1];
+
+    if (value) {
+      attributes.content = value;
+    }
+
+    head.unshift({
+      tagName: 'meta',
+      selfClosingTag: selfClosingTag,
+      attributes: attributes
+    });
+  });
+
   return {head: head, body: body};
 };
 

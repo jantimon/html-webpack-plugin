@@ -21,7 +21,8 @@ module.exports = {
       filename: 'index.html',
       favicon: 'favicon.ico',
       template: 'template.jade',
-      title: 'Jade demo'
+      title: 'Jade demo',
+      meta: {}
     }),
     new ExtractTextPlugin('styles.css')
   ]

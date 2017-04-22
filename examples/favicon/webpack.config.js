@@ -19,7 +19,8 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'HtmlWebpackPlugin example',
       favicon: 'favicon.ico',
-      filename: 'favicon.html'
+      filename: 'favicon.html',
+      meta: {}
     }),
     new ExtractTextPlugin('styles.css')
   ]

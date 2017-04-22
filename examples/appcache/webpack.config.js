@@ -23,6 +23,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'template.html',
+      meta: {},
       minify: {
         removeComments: true,
         collapseWhitespace: true
