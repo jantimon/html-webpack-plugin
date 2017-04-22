@@ -7,4 +7,4 @@ html
     each cssFile in htmlWebpackPlugin.files.css
       style !{compilation.assets[cssFile.substr(htmlWebpackPlugin.files.publicPath.length)].source()}
     each jsFile in htmlWebpackPlugin.files.js
-      script(type="text/javascript") !{compilation.assets[jsFile.substr(htmlWebpackPlugin.files.publicPath.length)].source()}
+      script !{compilation.assets[jsFile.substr(htmlWebpackPlugin.files.publicPath.length)].source()}
