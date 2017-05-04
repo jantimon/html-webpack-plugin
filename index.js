@@ -114,7 +114,8 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         }
         // Once everything is compiled evaluate the html factory
         // and replace it with its content
-        return self.evaluateCompilationResult(compilation, compiledTemplate);
+        console.log('evaluateCompilationResult', chunks, assets);
+        return self.evaluateCompilationResult(compilation, compiledTemplate, assets);
       })
       // Allow plugins to make changes to the assets before invoking the template
       // This only makes sense to use if `inject` is `false`
@@ -130,6 +131,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       })
       // Execute the template
       .then(function (compilationResult) {
+        console.log('executeTemplate', chunks, assets);
         // If the loader result is a function execute it to retrieve the html
         // otherwise use the returned html
         return typeof compilationResult !== 'function'
@@ -144,6 +146,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       .then(function (result) {
         var html = result.html;
         var assets = result.assets;
+        var chunks = result.chunks;
         // Prepare script and link tags
         var assetTags = self.generateAssetTags(assets);
         var pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, chunks: chunks, outputName: self.childCompilationOutputName};
@@ -210,11 +213,23 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   });
 };
 
+HtmlWebpackPlugin.prototype.getTemplateParams = function (compilation, assets) {
+  return {
+    compilation: compilation,
+    webpack: compilation.getStats().toJson(),
+    webpackConfig: compilation.options,
+    htmlWebpackPlugin: {
+      files: assets,
+      options: this.options
+    }
+  };
+};
+
 /**
  * Evaluates the child compilation result
  * Returns a promise
  */
-HtmlWebpackPlugin.prototype.evaluateCompilationResult = function (compilation, source) {
+HtmlWebpackPlugin.prototype.evaluateCompilationResult = function (compilation, source, assets) {
   if (!source) {
     return Promise.reject('The child compilation didn\'t provide a result');
   }
@@ -223,7 +238,8 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function (compilation, s
   // To extract the result during the evaluation this part has to be removed.
   source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
   var template = this.options.template.replace(/^.+!/, '').replace(/\?.+$/, '');
-  var vmContext = vm.createContext(_.extend({HTML_WEBPACK_PLUGIN: true, require: require}, global));
+  var templateParams = this.getTemplateParams(compilation, assets);
+  var vmContext = vm.createContext(_.extend({HTML_WEBPACK_PLUGIN: true, require: require}, global, templateParams));
   var vmScript = new vm.Script(source, {filename: template});
   // Evaluate code and cast to string
   var newSource;
@@ -246,19 +262,10 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function (compilation, s
  * Returns a promise
  */
 HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks, assets, compilation) {
-  var self = this;
+  var templateParams = this.getTemplateParams(compilation, assets);
   return Promise.resolve()
     // Template processing
     .then(function () {
-      var templateParams = {
-        compilation: compilation,
-        webpack: compilation.getStats().toJson(),
-        webpackConfig: compilation.options,
-        htmlWebpackPlugin: {
-          files: assets,
-          options: self.options
-        }
-      };
       var html = '';
       try {
         html = templateFunction(templateParams);
