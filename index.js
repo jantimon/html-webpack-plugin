@@ -114,7 +114,6 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         }
         // Once everything is compiled evaluate the html factory
         // and replace it with its content
-        console.log('evaluateCompilationResult', chunks, assets);
         return self.evaluateCompilationResult(compilation, compiledTemplate, assets);
       })
       // Allow plugins to make changes to the assets before invoking the template
@@ -131,7 +130,6 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
       })
       // Execute the template
       .then(function (compilationResult) {
-        console.log('executeTemplate', chunks, assets);
         // If the loader result is a function execute it to retrieve the html
         // otherwise use the returned html
         return typeof compilationResult !== 'function'
