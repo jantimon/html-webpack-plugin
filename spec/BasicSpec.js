@@ -17,7 +17,19 @@ var webpack = require('webpack');
 var rimraf = require('rimraf');
 var _ = require('lodash');
 var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 var HtmlWebpackPlugin = require('../index.js');
+
+if (webpackMajorVersion === '2') {
+  var extractOriginal = ExtractTextPlugin.extract;
+  ExtractTextPlugin.extract = function (fallback, use) {
+    return extractOriginal({
+      fallback: fallback,
+      use: use
+    });
+  };
+}
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
 
@@ -405,7 +417,6 @@ describe('HtmlWebpackPlugin', function () {
   });
 
   it('should work with the css extract plugin', function (done) {
-    var ExtractTextPlugin = require('extract-text-webpack-plugin');
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
@@ -425,7 +436,6 @@ describe('HtmlWebpackPlugin', function () {
   });
 
   it('should work with the css extract plugin on windows and protocol relative urls support (#205)', function (done) {
-    var ExtractTextPlugin = require('extract-text-webpack-plugin');
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
@@ -446,7 +456,6 @@ describe('HtmlWebpackPlugin', function () {
   });
 
   it('should allow to add cache hashes to with the css assets', function (done) {
-    var ExtractTextPlugin = require('extract-text-webpack-plugin');
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
@@ -466,7 +475,6 @@ describe('HtmlWebpackPlugin', function () {
   });
 
   it('should inject css files when using the extract text plugin', function (done) {
-    var ExtractTextPlugin = require('extract-text-webpack-plugin');
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
@@ -486,7 +494,6 @@ describe('HtmlWebpackPlugin', function () {
   });
 
   it('should allow to add cache hashes to with injected css assets', function (done) {
-    var ExtractTextPlugin = require('extract-text-webpack-plugin');
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
@@ -506,7 +513,6 @@ describe('HtmlWebpackPlugin', function () {
   });
 
   it('should output xhtml link stylesheet tag', function (done) {
-    var ExtractTextPlugin = require('extract-text-webpack-plugin');
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
@@ -684,7 +690,6 @@ describe('HtmlWebpackPlugin', function () {
   });
 
   it('should inject js css files even if the html file is incomplete', function (done) {
-    var ExtractTextPlugin = require('extract-text-webpack-plugin');
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
@@ -1167,7 +1172,7 @@ describe('HtmlWebpackPlugin', function () {
       plugins: [
         new HtmlWebpackPlugin({
           inject: false,
-          template: 'jade!' + path.join(__dirname, 'fixtures/template.jade')
+          template: 'jade-loader!' + path.join(__dirname, 'fixtures/template.jade')
         }),
         examplePlugin
       ]
@@ -1179,8 +1184,6 @@ describe('HtmlWebpackPlugin', function () {
 
   it('works with commons chunk plugin', function (done) {
     testHtmlPlugin({
-      debug: true,
-      verbose: true,
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
         index: path.join(__dirname, 'fixtures/index.js')
