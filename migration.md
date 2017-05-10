@@ -57,7 +57,7 @@ Although we did not specify any script tags or link tags they will be injected a
 <head>
   <meta charset="utf-8">
   <title>Webpack App</title>
-  <link href="styles.css" rel="stylesheet">
+  <link href="styles.css" type="text/css" rel="stylesheet">
 </head>
 <body>
 <script src="bundle.js"></script>

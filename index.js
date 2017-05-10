@@ -486,6 +486,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
       selfClosingTag: selfClosingTag,
       attributes: {
         href: stylePath,
+        type: 'text/css',
         rel: 'stylesheet'
       }
     };
