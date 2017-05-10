@@ -71,7 +71,8 @@ This will **cause html minification** and it will also **disable the ejs fallbac
       {
         test: /\.html$/,
         loader: 'html-loader'
-      },
+      }
+    ]
   },
   plugins: [
     new HtmlWebpackPlugin({
