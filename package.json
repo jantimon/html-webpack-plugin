@@ -56,7 +56,7 @@
   },
   "dependencies": {
     "bluebird": "^3.4.7",
-    "loader-utils": "^0.2.16",
+    "loader-utils": "^1.1.0",
     "lodash": "^4.17.3",
     "pretty-error": "^2.0.2",
     "toposort": "^1.0.0"
