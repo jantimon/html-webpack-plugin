@@ -353,6 +353,22 @@ HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
  * Return all chunks from the compilation result which match the exclude and include filters
  */
 HtmlWebpackPlugin.prototype.filterChunks = function (chunks, includedChunks, excludedChunks) {
+  // Return includedChunks(In order of the includedChunks) from the compilation result
+  let chunksResult=[],
+      filterResult=[];
+  if(Array.isArray(includedChunks)){
+    includedChunks.forEach(function(v){
+        filterResult=chunks.filter(function (chunk) {
+            if(chunk.names[0]&&v === chunk.names[0]){
+                return true;
+            }
+            return false;
+        });
+        filterResult.length>0&&chunksResult.push(filterResult[0]);
+    });
+    return chunksResult;
+  }
+  
   return chunks.filter(function (chunk) {
     var chunkName = chunk.names[0];
     // This chunk doesn't have a name. This script can't handled it.
