@@ -100,7 +100,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
               if (publicPath && publicPath.substr(-1) !== '/') {
                 publicPath += '/';
               }
-              assets.favicon = publicPath + faviconBasename;
+              assets.favicon = publicPath + faviconBasename + (self.options.useGzip ? '.gz' : '');
             });
         }
       })
@@ -467,7 +467,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
  * Injects the assets into the given html string
  */
 HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
-  var useGzip = this.options.useGzip;
+  var gzipSuffix = this.options.useGzip ? '.gz' : '';
   // Turn script files into script tags
   var scripts = assets.js.map(function (scriptPath) {
     return {
@@ -475,7 +475,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
       closeTag: true,
       attributes: {
         type: 'text/javascript',
-        src: scriptPath + (useGzip ? '.gz' : '')
+        src: scriptPath + gzipSuffix
       }
     };
   });
@@ -487,7 +487,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
       tagName: 'link',
       selfClosingTag: selfClosingTag,
       attributes: {
-        href: stylePath + (useGzip ? '.gz' : ''),
+        href: stylePath + gzipSuffix,
         rel: 'stylesheet'
       }
     };
