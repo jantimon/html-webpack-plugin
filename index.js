@@ -358,7 +358,7 @@ HtmlWebpackPlugin.prototype.filterChunks = function (chunks, includedChunks, exc
   // Return includedChunks(In order of the includedChunks) from the compilation result
   if (Array.isArray(includedChunks)) {
     for (var i = 0; i < includedChunks.length; i++) {
-      filterResult = chunks.filter(function(chunk) {
+      filterResult = chunks.filter(function (chunk) {
         if (chunk.names[0] && chunk.names[0] === includedChunks[i]) {
           return true;
         }
@@ -368,7 +368,6 @@ HtmlWebpackPlugin.prototype.filterChunks = function (chunks, includedChunks, exc
     }
     return chunksResult;
   }
-  
   return chunks.filter(function (chunk) {
     var chunkName = chunk.names[0];
     // This chunk doesn't have a name. This script can't handled it.
