@@ -24,7 +24,8 @@ function HtmlWebpackPlugin (options) {
     chunks: 'all',
     excludeChunks: [],
     title: 'Webpack App',
-    xhtml: false
+    xhtml: false,
+    excludeAssets: []
   }, options);
 }
 
@@ -466,8 +467,21 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
  * Injects the assets into the given html string
  */
 HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
+  // Skip invalid RegExp patterns
+  var excludePatterns = this.options.excludeAssets.filter(function (excludePattern) {
+    return excludePattern.constructor === RegExp;
+  });
+
+  var isExcluded = function (assetPath) {
+    return excludePatterns.filter(function (excludePattern) {
+      return excludePattern.test(assetPath);
+    }).length > 0;
+  };
+
   // Turn script files into script tags
-  var scripts = assets.js.map(function (scriptPath) {
+  var scripts = assets.js.filter(function (scriptPath) {
+    return !isExcluded(scriptPath);
+  }).map(function (scriptPath) {
     return {
       tagName: 'script',
       closeTag: true,
@@ -480,7 +494,9 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
   // Make tags self-closing in case of xhtml
   var selfClosingTag = !!this.options.xhtml;
   // Turn css files into link tags
-  var styles = assets.css.map(function (stylePath) {
+  var styles = assets.css.filter(function (stylePath) {
+    return !isExcluded(stylePath);
+  }).map(function (stylePath) {
     return {
       tagName: 'link',
       selfClosingTag: selfClosingTag,
