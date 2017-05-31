@@ -344,7 +344,7 @@ HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
   }
   // Check if the given sort mode is a valid chunkSorter sort mode
   if (typeof chunkSorter[sortMode] !== 'undefined') {
-    return chunkSorter[sortMode](chunks);
+    return chunkSorter[sortMode](chunks, this.options.chunks);
   }
   throw new Error('"' + sortMode + '" is not a valid chunk sort mode');
 };
@@ -353,21 +353,6 @@ HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
  * Return all chunks from the compilation result which match the exclude and include filters
  */
 HtmlWebpackPlugin.prototype.filterChunks = function (chunks, includedChunks, excludedChunks) {
-  var chunksResult = [];
-  var filterResult = [];
-  // Return includedChunks(In order of the includedChunks) from the compilation result
-  if (Array.isArray(includedChunks)) {
-    for (var i = 0; i < includedChunks.length; i++) {
-      filterResult = chunks.filter(function (chunk) {
-        if (chunk.names[0] && chunk.names[0] === includedChunks[i]) {
-          return true;
-        }
-        return false;
-      });
-      filterResult.length > 0 && chunksResult.push(filterResult[0]);
-    }
-    return chunksResult;
-  }
   return chunks.filter(function (chunk) {
     var chunkName = chunk.names[0];
     // This chunk doesn't have a name. This script can't handled it.
