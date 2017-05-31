@@ -466,9 +466,10 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
  * Injects the assets into the given html string
  */
 HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
+  var self = this;
   // Turn script files into script tags
   var scripts = assets.js.map(function (scriptPath) {
-    return {
+    var jsConfig = {
       tagName: 'script',
       closeTag: true,
       attributes: {
@@ -476,6 +477,8 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
         src: scriptPath
       }
     };
+    _.assign(jsConfig.attributes, self.options.scriptAttributes)
+    return jsConfig;
   });
   // Make tags self-closing in case of xhtml
   var selfClosingTag = !!this.options.xhtml;
