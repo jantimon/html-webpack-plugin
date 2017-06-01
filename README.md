@@ -95,7 +95,7 @@ Allowed values are as follows:
 - `cache`: `true | false` if `true` (default) try to emit the file only if it was changed.
 - `showErrors`: `true | false` if `true` (default) errors details will be written into the HTML page.
 - `chunks`: Allows you to add only some chunks (e.g. only the unit-test chunk)
-- `chunksSortMode`: Allows to control how chunks should be sorted before they are included to the html. Allowed values: 'none' | 'auto' | 'dependency' | {function} - default: 'auto'
+- `chunksSortMode`: Allows to control how chunks should be sorted before they are included to the html. Allowed values: 'none' | 'auto' | 'dependency' |'manual' | {function} - default: 'auto'
 - `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk)
 - `xhtml`: `true | false` If `true` render the `link` tags as self-closing, XHTML compliant. Default is `false`
 
