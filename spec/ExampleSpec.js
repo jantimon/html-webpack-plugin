@@ -85,4 +85,8 @@ describe('HtmlWebpackPlugin Examples', function () {
   it('javascript-advanced example', function (done) {
     runExample('javascript-advanced', done);
   });
+
+  it('sort manually example', function (done) {
+    runExample('sort-manually', done);
+  });
 });
