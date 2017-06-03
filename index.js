@@ -443,6 +443,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
     assets.chunks[chunkName].size = chunk.size;
     assets.chunks[chunkName].entry = entry;
     assets.chunks[chunkName].hash = chunk.hash;
+    assets.chunks[chunkName].basename = path.basename(entry); // make it trivial to get back to compilation.assets[chunk]
     assets.js.push(entry);
 
     // Gather all css files
