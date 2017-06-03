@@ -72,7 +72,19 @@ This will generate a file `dist/index.html` containing the following:
 ```
 
 If you have multiple webpack entry points, they will all be included with `script`
-tags in the generated HTML.
+tags in the generated HTML. But you can create custom template, set `inject: false` and insert scripts and styles any you want:
+
+`my-index.ejs`:
+
+```html
+...
+<% for (var i in htmlWebpackPlugin.files.chunks.<YOUR_ENTRY_POINT_NAME>.css) { %>
+    <link href="<%= htmlWebpackPlugin.files.chunks.<YOUR_ENTRY_POINT_NAME>.css[i] %>" rel="stylesheet">
+<% } %>
+...
+<script src="<%= htmlWebpackPlugin.files.chunks.<YOUR_ENTRY_POINT_NAME>.entry %>"></script>
+...
+```
 
 If you have any CSS assets in webpack's output (for example, CSS extracted
 with the [ExtractTextPlugin](https://github.com/webpack/extract-text-webpack-plugin))
