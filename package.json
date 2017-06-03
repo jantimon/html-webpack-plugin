@@ -46,6 +46,7 @@
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
     "jasmine": "^2.5.2",
+    "jasmine2-custom-message": "^0.8.2",
     "rimraf": "^2.5.4",
     "semistandard": "8.0.0",
     "style-loader": "^0.13.1",

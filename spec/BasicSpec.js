@@ -20,6 +20,7 @@ var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 var HtmlWebpackPlugin = require('../index.js');
+var AddOnTestPlugin = require('./AddOnTestPlugin.js');
 
 if (webpackMajorVersion === '2') {
   var extractOriginal = ExtractTextPlugin.extract;
@@ -1512,5 +1513,58 @@ describe('HtmlWebpackPlugin', function () {
       })]
     },
     [/^<script type="text\/javascript" src="app_bundle\.js"><\/script>$/], null, done);
+  });
+
+  it('should gracefully handle a thrown error from an addon plugin', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        new AddOnTestPlugin(AddOnTestPlugin.THROW_ERR)
+      ]
+    },
+    [],
+    null,
+    done,
+    true);
+  });
+
+  it('should gracefully handle a reported error from an addon plugin', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        new AddOnTestPlugin(AddOnTestPlugin.CALLBACK_ERR)
+      ]
+    },
+    [],
+    null,
+    done,
+    true);
+  });
+
+  it('should pass on all arguments to addon plugins', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        new AddOnTestPlugin(AddOnTestPlugin.CHECK_ARGS)
+      ]
+    },
+    [],
+    null,
+    done);
   });
 });
