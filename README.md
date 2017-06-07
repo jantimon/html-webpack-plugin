@@ -50,7 +50,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var webpackConfig = {
   entry: 'index.js',
   output: {
-    path: 'dist',
+    path: __dirname + '/dist',
     filename: 'index_bundle.js'
   },
   plugins: [new HtmlWebpackPlugin()]
@@ -104,7 +104,7 @@ Here's an example webpack config illustrating how to use these options:
 {
   entry: 'index.js',
   output: {
-    path: 'dist',
+    path: __dirname + '/dist',
     filename: 'index_bundle.js'
   },
   plugins: [
@@ -131,7 +131,7 @@ once in your plugins array:
 {
   entry: 'index.js',
   output: {
-    path: 'dist',
+    path: __dirname + '/dist',
     filename: 'index_bundle.js'
   },
   plugins: [
