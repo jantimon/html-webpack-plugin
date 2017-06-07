@@ -223,7 +223,7 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function (compilation, s
   // To extract the result during the evaluation this part has to be removed.
   source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
   var template = this.options.template.replace(/^.+!/, '').replace(/\?.+$/, '');
-  var vmContext = vm.createContext(_.extend({HTML_WEBPACK_PLUGIN: true, require: require}, global));
+  var vmContext = vm.createContext(_.extend({HTML_WEBPACK_PLUGIN: true, require: require}, global, this.options.variables));
   var vmScript = new vm.Script(source, {filename: template});
   // Evaluate code and cast to string
   var newSource;
