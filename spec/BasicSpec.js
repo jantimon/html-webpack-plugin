@@ -253,6 +253,24 @@ describe('HtmlWebpackPlugin', function () {
     }, ['<script type="text/javascript" src="util_bundle.js"', '<script type="text/javascript" src="app_bundle.js"'], null, done);
   });
 
+  it('allows you to inject the assets into the body at a specific position of the given template', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: 'body',
+        injectPosition: true,
+        template: path.join(__dirname, 'fixtures/plain-position.html')
+      })]
+    }, ['<script type="text/javascript" src="util_bundle.js"', '<script type="text/javascript" src="app_bundle.js"'], null, done);
+  });
+
   it('allows you to inject the assets into the head of the given template', function (done) {
     testHtmlPlugin({
       entry: {
@@ -266,6 +284,24 @@ describe('HtmlWebpackPlugin', function () {
       plugins: [new HtmlWebpackPlugin({
         inject: 'head',
         template: path.join(__dirname, 'fixtures/plain.html')
+      })]
+    }, ['<script type="text/javascript" src="util_bundle.js"', '<script type="text/javascript" src="app_bundle.js"'], null, done);
+  });
+
+  it('allows you to inject the assets into the head at a specifc position of the given template', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: 'head',
+        injectPosition: true,
+        template: path.join(__dirname, 'fixtures/plain-position.html')
       })]
     }, ['<script type="text/javascript" src="util_bundle.js"', '<script type="text/javascript" src="app_bundle.js"'], null, done);
   });
