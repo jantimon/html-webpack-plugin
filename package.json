@@ -24,6 +24,9 @@
     "html",
     "html-webpack-plugin"
   ],
+  "semistandard": {
+    "ignore": ["*bundle.js"]
+  },
   "author": "Charles Blaxland <charles.blaxland@gmail.com> (https://github.com/ampedandwired)",
   "license": "MIT",
   "bugs": {

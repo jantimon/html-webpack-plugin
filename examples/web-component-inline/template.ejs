@@ -1,0 +1,13 @@
+<template>
+  <% htmlWebpackPlugin.files.css.forEach(function(cssFile) { %>
+  <style>
+    <%= compilation.assets[cssFile.substr(htmlWebpackPlugin.files.publicPath.length)].source() %>
+  </style>
+  <% }) %>
+  <div id="mountTarget"></div>
+</template>
+<% htmlWebpackPlugin.files.js.forEach(function(jsFile) { %>
+<script type="text/javascript">
+<%= compilation.assets[jsFile.substr(htmlWebpackPlugin.files.publicPath.length)].source() %>
+</script>
+<% }) %>
