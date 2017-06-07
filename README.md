@@ -87,7 +87,7 @@ Allowed values are as follows:
 - `filename`: The file to write the HTML to. Defaults to `index.html`.
    You can specify a subdirectory here too (eg: `assets/admin.html`).
 - `template`: Webpack require path to the template. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details.
-- `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
+- `inject`: `true | 'head' | 'body' | false` | `RegExp` | `Function` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element. If a RegExp is passed in, the script url that passes the RegExp is placed at the bottom of the body, and if not, it will be placed at the bottom of the head. If a function is passed in the same way, script url will be used as a parameter.
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference)'s options as object to minify the output.
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all

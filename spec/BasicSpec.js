@@ -270,6 +270,42 @@ describe('HtmlWebpackPlugin', function () {
     }, ['<script type="text/javascript" src="util_bundle.js"', '<script type="text/javascript" src="app_bundle.js"'], null, done);
   });
 
+  it('allows you to inject the assets into the head or body by regexp', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: /util/, // regexp
+        template: path.join(__dirname, 'fixtures/plain.html')
+      })]
+    }, ['<script type="text/javascript" src="util_bundle.js"', '<script type="text/javascript" src="app_bundle.js"'], null, done);
+  });
+
+  it('allows you to inject the assets into the head or body by function', function (done) {
+    testHtmlPlugin({
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject (scriptUrl) { // function
+          return scriptUrl.indexOf('util') !== -1;
+        },
+        template: path.join(__dirname, 'fixtures/plain.html')
+      })]
+    }, ['<script type="text/javascript" src="util_bundle.js"', '<script type="text/javascript" src="app_bundle.js"'], null, done);
+  });
+
   it('allows you to inject a specified asset into a given html file', function (done) {
     testHtmlPlugin({
       entry: {
