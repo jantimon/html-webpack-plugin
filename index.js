@@ -563,7 +563,7 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets, asset
       if (/\smanifest\s*=/.test(match)) {
         return match;
       }
-      return start + ' manifest="' + assets.manifest + '"' + end;
+      return start + ' manifest="' + assets.publicPath + assets.manifest + '"' + end;
     });
   }
   return html;
