@@ -16,6 +16,7 @@ function HtmlWebpackPlugin (options) {
     filename: 'index.html',
     hash: false,
     inject: true,
+    injectHeadTag: true,
     compile: true,
     favicon: false,
     minify: false,
@@ -520,40 +521,44 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
  * Injects the assets into the given html string
  */
 HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets, assetTags) {
+  var self = this;
   var htmlRegExp = /(<html[^>]*>)/i;
   var headRegExp = /(<\/head>)/i;
   var bodyRegExp = /(<\/body>)/i;
-  var body = assetTags.body.map(this.createHtmlTag);
-  var head = assetTags.head.map(this.createHtmlTag);
+  var body = assetTags.body.map(this.createHtmlTag).join('');
+  var head = assetTags.head.map(this.createHtmlTag).join('');
 
-  if (body.length) {
+  if (body) {
     if (bodyRegExp.test(html)) {
       // Append assets to body element
       html = html.replace(bodyRegExp, function (match) {
-        return body.join('') + match;
+        return body + match;
       });
     } else {
       // Append scripts to the end of the file if no <body> element exists:
-      html += body.join('');
+      html += body;
     }
   }
 
-  if (head.length) {
+  if (head) {
     // Create a head tag if none exists
     if (!headRegExp.test(html)) {
+      var finalHead = self.options.injectHeadTag ? '<head>' + head + '</head>' : head;
+
       if (!htmlRegExp.test(html)) {
-        html = '<head></head>' + html;
+        html = finalHead + html;
       } else {
         html = html.replace(htmlRegExp, function (match) {
-          return match + '<head></head>';
+          return match + finalHead;
         });
       }
+    } else {
+      // Append assets to head element
+      html = html.replace(headRegExp, function (match) {
+        return head + match;
+      });
     }
 
-    // Append assets to head element
-    html = html.replace(headRegExp, function (match) {
-      return head.join('') + match;
-    });
   }
 
   // Inject manifest into the opening html tag
