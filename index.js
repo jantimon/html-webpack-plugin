@@ -26,6 +26,10 @@ function HtmlWebpackPlugin (options) {
     title: 'Webpack App',
     xhtml: false
   }, options);
+  
+  if (this.options.minify && typeof this.options.minify !== 'object') {
+    this.emitError('minify option has to be an object');
+  }
 }
 
 HtmlWebpackPlugin.prototype.apply = function (compiler) {
