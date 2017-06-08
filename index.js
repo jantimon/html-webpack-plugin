@@ -24,7 +24,8 @@ function HtmlWebpackPlugin (options) {
     chunks: 'all',
     excludeChunks: [],
     title: 'Webpack App',
-    xhtml: false
+    xhtml: false,
+    doctype: 'html'
   }, options);
 }
 
