@@ -219,6 +219,16 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function (compilation, s
     return Promise.reject('The child compilation didn\'t provide a result');
   }
 
+  // If custom template proceed though loader which have link to external assets with [hash].
+  // We need to replace publicPath to publicPath of main compilation
+  var publicPathTemplate = _.get(compilation, 'options.output.publicPath');
+  var regexp = /(__webpack_require__\.p\s=\s\")[\s\S]*?(\")/;
+  var target = ['$1', this.compilationPublicPath, '$2'].join('');
+
+  if (publicPathTemplate && publicPathTemplate.indexOf('[hash]') !== -1) {
+    source = source.replace(regexp, target);
+  }
+
   // The LibraryTemplatePlugin stores the template result in a local variable.
   // To extract the result during the evaluation this part has to be removed.
   source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
@@ -387,7 +397,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
   var webpackStatsJson = compilation.getStats().toJson();
 
   // Use the configured public path or build a relative path
-  var publicPath = typeof compilation.options.output.publicPath !== 'undefined'
+  var publicPath = self.compilationPublicPath = typeof compilation.options.output.publicPath !== 'undefined'
     // If a hard coded public path exists use it
     ? compilation.mainTemplate.getPublicPath({hash: webpackStatsJson.hash})
     // If no public path was set get a relative url path
