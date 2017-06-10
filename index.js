@@ -523,6 +523,21 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets, asset
   var htmlRegExp = /(<html[^>]*>)/i;
   var headRegExp = /(<\/head>)/i;
   var bodyRegExp = /(<\/body>)/i;
+  var prefix = this.options.prefix
+  if (prefix) {
+    assetTags.body = assetTags.body.map(function(tag){
+      if (tag.attributes.src) {
+        tag.attributes.src = prefix + tag.attributes.src
+      }
+      return tag  
+    })
+    assetTags.head = assetTags.head.map(function(tag){
+      if (tag.attributes.href) {
+        tag.attributes.href = prefix + tag.attributes.href
+      }
+      return tag  
+    })
+  }
   var body = assetTags.body.map(this.createHtmlTag);
   var head = assetTags.head.map(this.createHtmlTag);
 
