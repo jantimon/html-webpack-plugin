@@ -13,6 +13,7 @@ function HtmlWebpackPlugin (options) {
   // Default options
   this.options = _.extend({
     template: path.join(__dirname, 'default_index.ejs'),
+    templateArgs: {},
     filename: 'index.html',
     hash: false,
     inject: true,
@@ -250,7 +251,7 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
   return Promise.resolve()
     // Template processing
     .then(function () {
-      var templateParams = {
+      var templateParams = _.extend({
         compilation: compilation,
         webpack: compilation.getStats().toJson(),
         webpackConfig: compilation.options,
@@ -258,7 +259,7 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
           files: assets,
           options: self.options
         }
-      };
+      }, self.options.templateArgs);
       var html = '';
       try {
         html = templateFunction(templateParams);
