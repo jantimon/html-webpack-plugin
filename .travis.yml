@@ -13,6 +13,7 @@ install:
   - npm install --ignore-scripts
   - npm rm webpack
   - npm rm extract-text-webpack-plugin
-  - npm install webpack@$WEBPACK_VERSION extract-text-webpack-plugin@$EXTRACT_TEXT_VERSION --ignore-scripts || true
+  - npm install webpack@$WEBPACK_VERSION --ignore-scripts || true
+  - npm install extract-text-webpack-plugin@$EXTRACT_TEXT_VERSION --ignore-scripts || true
 script:
   - npm test
