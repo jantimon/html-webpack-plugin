@@ -21,7 +21,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 var HtmlWebpackPlugin = require('../index.js');
 
-if (webpackMajorVersion === '2') {
+if (Number(webpackMajorVersion) > 1) {
   var extractOriginal = ExtractTextPlugin.extract;
   ExtractTextPlugin.extract = function (fallback, use) {
     return extractOriginal({
