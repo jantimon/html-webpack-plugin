@@ -27,7 +27,7 @@ There are already some really powerful plugins which can be integrated with zero
  * [webpack-subresource-integrity](https://www.npmjs.com/package/webpack-subresource-integrity) for enhanced asset security
  * [appcache-webpack-plugin](https://github.com/lettertwo/appcache-webpack-plugin) for iOS and Android offline usage
  * [favicons-webpack-plugin](https://github.com/jantimon/favicons-webpack-plugin) which generates favicons and icons for iOS, Android and desktop browsers
- * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
+ * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin) can be used to always write to disk the html file, useful when webpack-dev-server / HMR are being used
  * [html-webpack-inline-source-plugin](https://github.com/DustinJackson/html-webpack-inline-source-plugin) to inline your assets in the resulting HTML file
  * [html-webpack-exclude-assets-plugin](https://github.com/jamesjieye/html-webpack-exclude-assets-plugin) for excluding assets using regular expressions
  * [html-webpack-include-assets-plugin](https://github.com/jharris4/html-webpack-include-assets-plugin) for including lists of js or css file paths (such as those copied by the copy-webpack-plugin).
@@ -47,7 +47,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var webpackConfig = {
   entry: 'index.js',
   output: {
-    path: 'dist',
+    path: __dirname + '/dist',
     filename: 'index_bundle.js'
   },
   plugins: [new HtmlWebpackPlugin()]
@@ -100,7 +100,7 @@ Here's an example webpack config illustrating how to use these options:
 {
   entry: 'index.js',
   output: {
-    path: 'dist',
+    path: __dirname + '/dist',
     filename: 'index_bundle.js'
   },
   plugins: [
@@ -127,7 +127,7 @@ once in your plugins array:
 {
   entry: 'index.js',
   output: {
-    path: 'dist',
+    path: __dirname + '/dist',
     filename: 'index_bundle.js'
   },
   plugins: [
@@ -223,7 +223,7 @@ The following variables are available in the template:
 - `webpack`: the webpack [stats](https://github.com/webpack/docs/wiki/node.js-api#stats)
   object. Note that this is the stats object as it was at the time the HTML template
   was emitted and as such may not have the full set of stats that are available
-  after the wepback run is complete.
+  after the webpack run is complete.
 
 - `webpackConfig`: the webpack configuration that was used for this compilation. This
   can be used, for example, to get the `publicPath` (`webpackConfig.output.publicPath`).
@@ -311,6 +311,8 @@ Note that the callback must be passed the htmlPluginData in order to pass this o
 You're free to contribute to this project by submitting [issues](https://github.com/jantimon/html-webpack-plugin/issues) and/or [pull requests](https://github.com/jantimon/html-webpack-plugin/pulls). This project is test-driven, so keep in mind that every change and new feature should be covered by tests.
 This project uses the [semistandard code style](https://github.com/Flet/semistandard).
 This plugin follows the webpack teams decision to support [node 4+](http://node.green/).
+
+Before running the tests, make sure to execute `yarn link` and `yarn link html-webpack-plugin` (or the npm variant of this).
 
 Before running the tests, make sure to execute `yarn link` and `yarn link html-webpack-plugin` (or the npm variant of this).
 

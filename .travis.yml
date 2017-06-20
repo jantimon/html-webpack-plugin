@@ -10,6 +10,7 @@ before_install:
 install:
   - npm install --ignore-scripts
   - npm rm webpack
-  - npm install $WEBPACK --ignore-scripts || true
+  - npm rm extract-text-webpack-plugin
+  - npm install webpack@$WEBPACK_VERSION extract-text-webpack-plugin@$WEBPACK_VERSION --ignore-scripts || true
 script:
   - npm test
