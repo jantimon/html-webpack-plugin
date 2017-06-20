@@ -44,6 +44,10 @@ function runExample (exampleName, done) {
 
       expect(err).toBeFalsy();
       expect(res.same).toBe(true);
+      if (!res.same) {
+        console.log(
+        console.log(exampleName, res));
+      }
       done();
     });
   });

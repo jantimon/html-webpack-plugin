@@ -1,18 +1,12 @@
 Change History
 ==============
 
-v2.28.0
+v3.x
 ---
-* Backport 3.x void tag for plugin authors
-
-v2.27.1
----
-* Revert 2.25.0 loader resolving
-
-v2.27.0
----
-* Fix a chunksorter webpack 2 issue (#569)
-* Fix template path resolving(#542)
+* Rename `closingTag` into `voidTag` like in the official w3c spec.
+* Provide a `createHtmlTagObject` helper for plugin authors to create new tags.
+* Remove build in html minification
+* Support same node version like webpack 2: node 4 and higher
 
 v2.26.0
 ---
