@@ -51,7 +51,7 @@
     "style-loader": "^0.13.1",
     "underscore-template-loader": "^0.7.3",
     "url-loader": "^0.5.7",
-    "webpack": "^1.14.0",
+    "webpack": "^3.0.0",
     "webpack-recompilation-simulator": "^1.3.0"
   },
   "dependencies": {
@@ -63,6 +63,6 @@
     "toposort": "^1.0.0"
   },
   "peerDependencies": {
-    "webpack": "1 || ^2 || ^2.1.0-beta || ^2.2.0-rc"
+    "webpack": "1 || ^2 || ^2.1.0-beta || ^2.2.0-rc || ^3"
   }
 }
