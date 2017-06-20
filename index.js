@@ -410,6 +410,8 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
     // Will contain the html5 appcache manifest files if it exists
     manifest: Object.keys(compilation.assets).filter(function (assetFile) {
       return path.extname(assetFile) === '.appcache';
+    }).map(function (manifestFile) {
+      return publicPath + manifestFile
     })[0]
   };
 
