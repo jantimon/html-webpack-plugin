@@ -411,7 +411,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
     manifest: Object.keys(compilation.assets).filter(function (assetFile) {
       return path.extname(assetFile) === '.appcache';
     }).map(function (manifestFile) {
-      return publicPath + manifestFile
+      return publicPath + manifestFile;
     })[0]
   };
 
