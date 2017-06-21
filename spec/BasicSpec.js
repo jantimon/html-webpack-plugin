@@ -1513,4 +1513,32 @@ describe('HtmlWebpackPlugin', function () {
     },
     [/^<script type="text\/javascript" src="app_bundle\.js"><\/script>$/], null, done);
   });
+
+  it('allows you to inject the assets into the body of the given spaced closing tag template', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: 'body',
+        template: path.join(__dirname, 'fixtures/spaced_plain.html')
+      })]
+    }, [/<body>[\s]*<script type="text\/javascript" src="index_bundle.js"><\/script>[\s]*<\/body\s>/], null, done);
+  });
+
+  it('allows you to inject the assets into the head of the given spaced closing tag template', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: 'head',
+        template: path.join(__dirname, 'fixtures/spaced_plain.html')
+      })]
+    }, [/<head>[\s]*<script type="text\/javascript" src="index_bundle.js"><\/script>[\s]*<\/head\s>/], null, done);
+  });
 });
