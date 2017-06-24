@@ -1513,4 +1513,28 @@ describe('HtmlWebpackPlugin', function () {
     },
     [/^<script type="text\/javascript" src="app_bundle\.js"><\/script>$/], null, done);
   });
+
+  it('allows to pass template arguments by specifying templateArgs options', function (done) {
+    var messages = Array.apply(null, new Array(5))
+      .map(function (_, index) {
+        return 'msg' + index.toString(10);
+      });
+
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'app_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        template: 'jade-loader!' + path.join(__dirname, 'fixtures/template_with_args.jade'),
+        templateArgs: {
+          messages: messages
+        }
+      })]
+    },
+    [messages.map(function (msg) { return '<div>' + msg + '</div>'; }).join('') + '<script type="text/javascript" src="app_bundle.js"></script>'], null, done);
+  });
 });
