@@ -12,7 +12,7 @@ var rimraf = require('rimraf');
 var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-if (webpackMajorVersion === '2') {
+if (Number(webpackMajorVersion) > 1) {
   var extractOriginal = ExtractTextPlugin.extract;
   ExtractTextPlugin.extract = function (fallback, use) {
     return extractOriginal({
