@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.29.0
+---
+* Add support for Webpack 3
+
 v2.28.0
 ---
 * Backport 3.x void tag for plugin authors
