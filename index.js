@@ -530,7 +530,7 @@ HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets, asset
     if (bodyRegExp.test(html)) {
       // Append assets to body element
       html = html.replace(bodyRegExp, function (match) {
-        return body.join('') + match;
+        return body.join('') + '\n\t' + match;
       });
     } else {
       // Append scripts to the end of the file if no <body> element exists:
