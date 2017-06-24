@@ -18,10 +18,10 @@ var rimraf = require('rimraf');
 var _ = require('lodash');
 var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
+var extractTextPluginMajorVersion = require('extract-text-webpack-plugin/package.json').version.split('.')[0];
 var HtmlWebpackPlugin = require('../index.js');
 
-if (Number(webpackMajorVersion) > 1) {
+if (Number(extractTextPluginMajorVersion) > 1) {
   var extractOriginal = ExtractTextPlugin.extract;
   ExtractTextPlugin.extract = function (fallback, use) {
     return extractOriginal({

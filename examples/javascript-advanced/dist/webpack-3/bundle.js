@@ -67,7 +67,7 @@
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("__webpack_require__(1);\r\n\r\nvar universal = __webpack_require__(2);\r\nvar h1 = document.createElement('h1');\r\nh1.innerHTML = universal();\r\n\r\ndocument.body.appendChild(h1);\r\n\n\n//////////////////\n// WEBPACK FOOTER\n// ./example.js\n// module id = 0\n// module chunks = 0\n\n//# sourceURL=webpack:///./example.js?");
+eval("__webpack_require__(1);\n\nvar universal = __webpack_require__(2);\nvar h1 = document.createElement('h1');\nh1.innerHTML = universal();\n\ndocument.body.appendChild(h1);\n\n\n//////////////////\n// WEBPACK FOOTER\n// ./example.js\n// module id = 0\n// module chunks = 0\n\n//# sourceURL=webpack:///./example.js?");
 
 /***/ }),
 /* 1 */
@@ -80,7 +80,7 @@ eval("// removed by extract-text-webpack-plugin\n\n//////////////////\n// WEBPAC
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("// This file is used for frontend and backend\r\n\r\n\r\n// If compiled by the html-webpack-plugin\r\n// HTML_WEBPACK_PLUGIN is set to true:\r\nvar backend = typeof HTML_WEBPACK_PLUGIN !== 'undefined';\r\n\r\nmodule.exports = function () {\r\n  return 'Hello World from ' + (backend ? 'backend' : 'frontend');\r\n};\r\n\n\n//////////////////\n// WEBPACK FOOTER\n// ./universial.js\n// module id = 2\n// module chunks = 0\n\n//# sourceURL=webpack:///./universial.js?");
+eval("// This file is used for frontend and backend\n\n\n// If compiled by the html-webpack-plugin\n// HTML_WEBPACK_PLUGIN is set to true:\nvar backend = typeof HTML_WEBPACK_PLUGIN !== 'undefined';\n\nmodule.exports = function () {\n  return 'Hello World from ' + (backend ? 'backend' : 'frontend');\n};\n\n\n//////////////////\n// WEBPACK FOOTER\n// ./universial.js\n// module id = 2\n// module chunks = 0\n\n//# sourceURL=webpack:///./universial.js?");
 
 /***/ })
 /******/ ]);

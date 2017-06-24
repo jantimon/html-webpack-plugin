@@ -89,8 +89,8 @@ if(content.locals) module.exports = content.locals;
 if(false) {
 	// When the styles change, update the <style> tags
 	if(!content.locals) {
-		module.hot.accept("!!./../../node_modules/css-loader/index.js!./main.css", function() {
-			var newContent = require("!!./../../node_modules/css-loader/index.js!./main.css");
+		module.hot.accept("!!../../node_modules/css-loader/index.js!./main.css", function() {
+			var newContent = require("!!../../node_modules/css-loader/index.js!./main.css");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
@@ -108,7 +108,7 @@ exports = module.exports = __webpack_require__(3)();
 
 
 // module
-exports.push([module.i, "body {\r\n  background: snow;\r\n}", ""]);
+exports.push([module.i, "body {\n  background: snow;\n}", ""]);
 
 // exports
 
@@ -186,7 +186,7 @@ var stylesInDom = {},
 		};
 	},
 	isOldIE = memoize(function() {
-		return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+		return /msie [6-9]\b/.test(self.navigator.userAgent.toLowerCase());
 	}),
 	getHeadElement = memoize(function () {
 		return document.head || document.getElementsByTagName("head")[0];
