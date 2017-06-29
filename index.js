@@ -66,7 +66,6 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
     var applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
     // Get all chunks
     var allChunks = compilation.chunks;
-    debugger;
     // Filter chunks (options.chunks and options.excludeCHunks)
     var chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
     // Sort chunks
