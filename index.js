@@ -10,10 +10,12 @@ var chunkSorter = require('./lib/chunksorter.js');
 Promise.promisifyAll(fs);
 
 var getStats = (function () {
-  var cachedStats = null;
+  var cachedStats = {};
+
   return function (compilation) {
-    cachedStats = cachedStats || compilation.getStats().toJson();
-    return cachedStats;
+    var hash = compilation.hash;
+    cachedStats[hash] = cachedStats[hash] || compilation.getStats().toJson();
+    return cachedStats[hash];
   };
 }());
 
