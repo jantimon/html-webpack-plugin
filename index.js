@@ -65,7 +65,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   compiler.plugin('emit', function (compilation, callback) {
     var applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
     // Get all chunks
-    var allChunks = compilation.chunks;
+    var allChunks = compilation.getStats().toJson().chunks;
     // Filter chunks (options.chunks and options.excludeCHunks)
     var chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
     // Sort chunks
@@ -354,7 +354,7 @@ HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
  */
 HtmlWebpackPlugin.prototype.filterChunks = function (chunks, includedChunks, excludedChunks) {
   return chunks.filter(function (chunk) {
-    var chunkName = chunk.name;
+    var chunkName = chunk.names[0];
     // This chunk doesn't have a name. This script can't handled it.
     if (chunkName === undefined) {
       return false;
@@ -425,7 +425,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
 
   for (var i = 0; i < chunks.length; i++) {
     var chunk = chunks[i];
-    var chunkName = chunk.name;
+    var chunkName = chunk.names[0];
 
     assets.chunks[chunkName] = {};
 
@@ -446,7 +446,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
     var entry = chunkFiles[0];
     assets.chunks[chunkName].size = chunk.size;
     assets.chunks[chunkName].entry = entry;
-    assets.chunks[chunkName].hash = chunk.renderedHash;
+    assets.chunks[chunkName].hash = chunk.hash;
     assets.js.push(entry);
 
     // Gather all css files
