@@ -360,7 +360,11 @@ HtmlWebpackPlugin.prototype.filterChunks = function (chunks, includedChunks, exc
       return false;
     }
     // Skip if the chunk should be lazy loaded
-    if (!chunk.initial) {
+    if (typeof chunk.isInitial === 'function') {
+      if (!chunk.isInitial()) {
+        return false;
+      }
+    } else if (!chunk.initial) {
       return false;
     }
     // Skip if the chunks should be filtered and the given chunk was not added explicity
