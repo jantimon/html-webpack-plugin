@@ -9,16 +9,6 @@ var prettyError = require('./lib/errors.js');
 var chunkSorter = require('./lib/chunksorter.js');
 Promise.promisifyAll(fs);
 
-var getStats = (function () {
-  var cachedStats = {};
-
-  return function (compilation) {
-    var hash = compilation.hash;
-    cachedStats[hash] = cachedStats[hash] || compilation.getStats().toJson();
-    return cachedStats[hash];
-  };
-}());
-
 function HtmlWebpackPlugin (options) {
   // Default options
   this.options = _.extend({
@@ -75,7 +65,8 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   compiler.plugin('emit', function (compilation, callback) {
     var applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
     // Get all chunks
-    var allChunks = getStats(compilation).chunks;
+    var allChunks = compilation.chunks;
+    debugger;
     // Filter chunks (options.chunks and options.excludeCHunks)
     var chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
     // Sort chunks
@@ -262,7 +253,7 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
     .then(function () {
       var templateParams = {
         compilation: compilation,
-        webpack: getStats(compilation),
+        webpack: compilation.getStats(),
         webpackConfig: compilation.options,
         htmlWebpackPlugin: {
           files: assets,
@@ -364,7 +355,7 @@ HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
  */
 HtmlWebpackPlugin.prototype.filterChunks = function (chunks, includedChunks, excludedChunks) {
   return chunks.filter(function (chunk) {
-    var chunkName = chunk.names[0];
+    var chunkName = chunk.name;
     // This chunk doesn't have a name. This script can't handled it.
     if (chunkName === undefined) {
       return false;
@@ -394,12 +385,12 @@ HtmlWebpackPlugin.prototype.isHotUpdateCompilation = function (assets) {
 
 HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chunks) {
   var self = this;
-  var webpackStatsJson = getStats(compilation);
+  var compilationHash = compilation.hash;
 
   // Use the configured public path or build a relative path
   var publicPath = typeof compilation.options.output.publicPath !== 'undefined'
     // If a hard coded public path exists use it
-    ? compilation.mainTemplate.getPublicPath({hash: webpackStatsJson.hash})
+    ? compilation.mainTemplate.getPublicPath({hash: compilationHash})
     // If no public path was set get a relative url path
     : path.relative(path.resolve(compilation.options.output.path, path.dirname(self.childCompilationOutputName)), compilation.options.output.path)
       .split(path.sep).join('/');
@@ -425,13 +416,13 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
 
   // Append a hash for cache busting
   if (this.options.hash) {
-    assets.manifest = self.appendHash(assets.manifest, webpackStatsJson.hash);
-    assets.favicon = self.appendHash(assets.favicon, webpackStatsJson.hash);
+    assets.manifest = self.appendHash(assets.manifest, compilationHash);
+    assets.favicon = self.appendHash(assets.favicon, compilationHash);
   }
 
   for (var i = 0; i < chunks.length; i++) {
     var chunk = chunks[i];
-    var chunkName = chunk.names[0];
+    var chunkName = chunk.name;
 
     assets.chunks[chunkName] = {};
 
@@ -443,7 +434,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
     // Append a hash for cache busting
     if (this.options.hash) {
       chunkFiles = chunkFiles.map(function (chunkFile) {
-        return self.appendHash(chunkFile, webpackStatsJson.hash);
+        return self.appendHash(chunkFile, compilationHash);
       });
     }
 
@@ -452,7 +443,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
     var entry = chunkFiles[0];
     assets.chunks[chunkName].size = chunk.size;
     assets.chunks[chunkName].entry = entry;
-    assets.chunks[chunkName].hash = chunk.hash;
+    assets.chunks[chunkName].hash = chunk.renderedHash;
     assets.js.push(entry);
 
     // Gather all css files

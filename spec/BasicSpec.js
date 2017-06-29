@@ -1414,10 +1414,10 @@ describe('HtmlWebpackPlugin', function () {
       plugins: [
         new HtmlWebpackPlugin({
           chunksSortMode: function (a, b) {
-            if (a.names[0] < b.names[0]) {
+            if (a.name < b.name) {
               return 1;
             }
-            if (a.names[0] > b.names[0]) {
+            if (a.name > b.name) {
               return -1;
             }
             return 0;
