@@ -521,8 +521,8 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
  */
 HtmlWebpackPlugin.prototype.injectAssetsIntoHtml = function (html, assets, assetTags) {
   var htmlRegExp = /(<html[^>]*>)/i;
-  var headRegExp = /(<\/head>)/i;
-  var bodyRegExp = /(<\/body>)/i;
+  var headRegExp = /(<\/head\s*>)/i;
+  var bodyRegExp = /(<\/body\s*>)/i;
   var body = assetTags.body.map(this.createHtmlTag);
   var head = assetTags.head.map(this.createHtmlTag);
 
