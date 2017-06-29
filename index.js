@@ -9,6 +9,14 @@ var prettyError = require('./lib/errors.js');
 var chunkSorter = require('./lib/chunksorter.js');
 Promise.promisifyAll(fs);
 
+var getStats = (function () {
+  var cachedStats = null;
+  return function (compilation) {
+    cachedStats = cachedStats || compilation.getStats().toJson();
+    return cachedStats;
+  };
+}());
+
 function HtmlWebpackPlugin (options) {
   // Default options
   this.options = _.extend({
@@ -65,7 +73,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   compiler.plugin('emit', function (compilation, callback) {
     var applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
     // Get all chunks
-    var allChunks = compilation.getStats().toJson().chunks;
+    var allChunks = getStats(compilation).chunks;
     // Filter chunks (options.chunks and options.excludeCHunks)
     var chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
     // Sort chunks
@@ -252,7 +260,7 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
     .then(function () {
       var templateParams = {
         compilation: compilation,
-        webpack: compilation.getStats().toJson(),
+        webpack: getStats(compilation),
         webpackConfig: compilation.options,
         htmlWebpackPlugin: {
           files: assets,
@@ -384,7 +392,7 @@ HtmlWebpackPlugin.prototype.isHotUpdateCompilation = function (assets) {
 
 HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chunks) {
   var self = this;
-  var webpackStatsJson = compilation.getStats().toJson();
+  var webpackStatsJson = getStats(compilation);
 
   // Use the configured public path or build a relative path
   var publicPath = typeof compilation.options.output.publicPath !== 'undefined'
