@@ -344,7 +344,7 @@ HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
   }
   // Check if the given sort mode is a valid chunkSorter sort mode
   if (typeof chunkSorter[sortMode] !== 'undefined') {
-    return chunkSorter[sortMode](chunks);
+    return chunkSorter[sortMode](chunks, this.options.chunks);
   }
   throw new Error('"' + sortMode + '" is not a valid chunk sort mode');
 };
