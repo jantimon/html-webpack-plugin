@@ -87,7 +87,7 @@ Allowed values are as follows:
 - `filename`: The file to write the HTML to. Defaults to `index.html`.
    You can specify a subdirectory here too (eg: `assets/admin.html`).
 - `template`: Webpack require path to the template. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details.
-- `templateArgs`: Allows you to pass custom template arguments to your template. Expects an object.
+- `templateArgs`: Allows you to pass custom template arguments to your template. Expects an object or a function that returns an object.
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference)'s options as object to minify the output.

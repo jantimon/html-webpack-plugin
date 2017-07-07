@@ -251,6 +251,11 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
   return Promise.resolve()
     // Template processing
     .then(function () {
+      let templateArgs = self.options.templateArgs;
+      if (typeof self.options.templateArgs === 'function') {
+        templateArgs = self.options.templateArgs();
+      }
+
       var templateParams = _.extend({
         compilation: compilation,
         webpack: compilation.getStats().toJson(),
@@ -259,7 +264,7 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
           files: assets,
           options: self.options
         }
-      }, self.options.templateArgs);
+      }, templateArgs);
       var html = '';
       try {
         html = templateFunction(templateParams);
