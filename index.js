@@ -65,8 +65,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   compiler.plugin('emit', function (compilation, callback) {
     var applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
     // Get all chunks
-    var allChunks = compilation.chunks;
-
+    var allChunks = compilation.getStats().toJson().chunks;
     // Filter chunks (options.chunks and options.excludeCHunks)
     var chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
     // Sort chunks
@@ -355,13 +354,13 @@ HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
  */
 HtmlWebpackPlugin.prototype.filterChunks = function (chunks, includedChunks, excludedChunks) {
   return chunks.filter(function (chunk) {
-    var chunkName = chunk.name;
+    var chunkName = chunk.names[0];
     // This chunk doesn't have a name. This script can't handled it.
     if (chunkName === undefined) {
       return false;
     }
     // Skip if the chunk should be lazy loaded
-    if (!chunk.isInitial()) {
+    if (!chunk.initial) {
       return false;
     }
     // Skip if the chunks should be filtered and the given chunk was not added explicity
@@ -422,7 +421,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
 
   for (var i = 0; i < chunks.length; i++) {
     var chunk = chunks[i];
-    var chunkName = chunk.name;
+    var chunkName = chunk.names[0];
 
     assets.chunks[chunkName] = {};
 
@@ -649,4 +648,5 @@ HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) 
   };
 };
 
+module.exports = HtmlWebpackPlugin;
 module.exports = HtmlWebpackPlugin;
