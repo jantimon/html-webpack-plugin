@@ -384,12 +384,12 @@ HtmlWebpackPlugin.prototype.isHotUpdateCompilation = function (assets) {
 
 HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chunks) {
   var self = this;
-  var webpackStatsJson = compilation.getStats().toJson();
+  var compilationHash = compilation.hash;
 
   // Use the configured public path or build a relative path
   var publicPath = typeof compilation.options.output.publicPath !== 'undefined'
     // If a hard coded public path exists use it
-    ? compilation.mainTemplate.getPublicPath({hash: webpackStatsJson.hash})
+    ? compilation.mainTemplate.getPublicPath({hash: compilationHash})
     // If no public path was set get a relative url path
     : path.relative(path.resolve(compilation.options.output.path, path.dirname(self.childCompilationOutputName)), compilation.options.output.path)
       .split(path.sep).join('/');
@@ -415,8 +415,8 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
 
   // Append a hash for cache busting
   if (this.options.hash) {
-    assets.manifest = self.appendHash(assets.manifest, webpackStatsJson.hash);
-    assets.favicon = self.appendHash(assets.favicon, webpackStatsJson.hash);
+    assets.manifest = self.appendHash(assets.manifest, compilationHash);
+    assets.favicon = self.appendHash(assets.favicon, compilationHash);
   }
 
   for (var i = 0; i < chunks.length; i++) {
@@ -433,7 +433,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
     // Append a hash for cache busting
     if (this.options.hash) {
       chunkFiles = chunkFiles.map(function (chunkFile) {
-        return self.appendHash(chunkFile, webpackStatsJson.hash);
+        return self.appendHash(chunkFile, compilationHash);
       });
     }
 
@@ -648,4 +648,5 @@ HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) 
   };
 };
 
+module.exports = HtmlWebpackPlugin;
 module.exports = HtmlWebpackPlugin;
