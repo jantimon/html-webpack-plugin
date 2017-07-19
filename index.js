@@ -514,7 +514,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
   if (this.options.injectCss === 'head') {
     head = head.concat(styles);
   } else if(this.options.injectCss === 'body'){
-    body = body.concat(scripts);
+    body = body.concat(styles);
   }
 
   // Add scripts to body or head
