@@ -513,7 +513,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
   // Add styles to the head or body
   if (this.options.injectCss === 'head') {
     head = head.concat(styles);
-  } else if(this.options.injectCss === 'body'){
+  } else if (this.options.injectCss === 'body') {
     body = body.concat(styles);
   }
 
