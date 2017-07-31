@@ -1,6 +1,10 @@
 Change History
 ==============
 
+v2.30.1
+---
+* Revert part the performance optimization (#723) because of #753.
+
 v2.30.0
 ---
 * Add manual sort
