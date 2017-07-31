@@ -252,7 +252,7 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
     .then(function () {
       var templateParams = {
         compilation: compilation,
-        webpack: compilation.getStats(),
+        webpack: compilation.getStats().toJson(),
         webpackConfig: compilation.options,
         htmlWebpackPlugin: {
           files: assets,
