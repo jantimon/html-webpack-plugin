@@ -1,6 +1,11 @@
 Change History
 ==============
 
+v2.30.0
+---
+* Add manual sort
+* Performance improvements (#723)
+
 v2.29.0
 ---
 * Add support for Webpack 3

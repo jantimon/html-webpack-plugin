@@ -9,7 +9,7 @@ webpack bundles. This is especially useful for webpack bundles that include
 a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you, supply
 your own template using lodash templates or use your own loader.
 
-Maintainer: Jan Nicklas [@jantimon](https://twitter.com/jantimon)
+Maintainer: Jan Nicklas [@jantimon](https://twitter.com/jantimon) and Thomas Sileghem [@mastilver](https://twitter.com/mastilver)
 
 Installation
 ------------
