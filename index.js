@@ -471,7 +471,10 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
  */
 HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
   // Turn script files into script tags
-  var scripts = assets.js.map(function (scriptPath) {
+  var js = assets.js.filter(function (scriptPath) {
+    return /.js($|\?)/.test(scriptPath);
+  });
+  var scripts = js.map(function (scriptPath) {
     return {
       tagName: 'script',
       closeTag: true,
