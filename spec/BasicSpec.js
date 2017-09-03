@@ -61,7 +61,6 @@ function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expec
       expect(matches.length).toBe(1);
       outputFile = matches[0];
     }
-
     expect(outputFile.indexOf('[hash]') === -1).toBe(true);
 
     var outputFileExists = fs.existsSync(path.join(OUTPUT_DIR, outputFile));
