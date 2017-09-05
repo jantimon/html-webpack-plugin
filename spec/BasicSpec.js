@@ -15,7 +15,7 @@ var path = require('path');
 var fs = require('fs');
 var webpack = require('webpack');
 var rimraf = require('rimraf');
-var _ = require('lodash');
+var _extend = require('lodash/extend');
 var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var extractTextPluginMajorVersion = require('extract-text-webpack-plugin/package.json').version.split('.')[0];
@@ -1026,7 +1026,7 @@ describe('HtmlWebpackPlugin', function () {
         compiler.plugin('compilation', function (compilation) {
           compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
             eventFiredForFirstPlugin = true;
-            var result = _.extend(object, {
+            var result = _extend(object, {
               html: object.html + 'Injected by first plugin'
             });
             callback(null, result);
@@ -1074,7 +1074,7 @@ describe('HtmlWebpackPlugin', function () {
         compiler.plugin('compilation', function (compilation) {
           compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
             eventFiredForFirstPlugin = true;
-            var result = _.extend(object, {
+            var result = _extend(object, {
               html: object.html + 'Injected by first plugin'
             });
             callback(null, result);
@@ -1087,7 +1087,7 @@ describe('HtmlWebpackPlugin', function () {
         compiler.plugin('compilation', function (compilation) {
           compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
             eventFiredForSecondPlugin = true;
-            var result = _.extend(object, {
+            var result = _extend(object, {
               html: object.html + ' Injected by second plugin'
             });
             callback(null, result);
