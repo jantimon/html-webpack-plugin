@@ -8,7 +8,7 @@ var path = require('path');
 var childCompiler = require('./lib/compiler.js');
 var prettyError = require('./lib/errors.js');
 var chunkSorter = require('./lib/chunksorter.js');
-Promise.promisifyAll(fs);  
+Promise.promisifyAll(fs);
 
 function HtmlWebpackPlugin (options) {
   // Default options
