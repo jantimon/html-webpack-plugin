@@ -49,6 +49,7 @@
     "rimraf": "^2.5.4",
     "semistandard": "8.0.0",
     "style-loader": "^0.13.1",
+    "supertest": "^3.0.0",
     "underscore-template-loader": "^0.7.3",
     "url-loader": "^0.5.7",
     "webpack": "^1.14.0",
