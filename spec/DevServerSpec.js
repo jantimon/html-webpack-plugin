@@ -19,7 +19,7 @@ function testDevConfig (config) {
   server.listen(8080, 'localhost', function (err) {
     if (err) return err;
 
-    request.get(/static/).expect(200);
+    request(server.app).get(/static/).expect(200);
 
     server.close();
   });
