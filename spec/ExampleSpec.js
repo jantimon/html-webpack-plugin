@@ -58,7 +58,7 @@ describe('HtmlWebpackPlugin Examples', function () {
     runExample('custom-template', done);
   });
 
-  fit('default example', function (done) {
+  it('default example', function (done) {
     runExample('default', done);
   });
 
