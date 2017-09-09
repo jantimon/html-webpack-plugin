@@ -9,9 +9,9 @@ const request = require('supertest');
 var HtmlWebpackPlugin = require('../index.js');
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
-let server, config;
+let server, config, urls;
 
-function testDevConfig (config) {
+function testDevConfig (config, urls) {
   const compiler = webpack(config);
   const options = {compress: true, quiet: true};
 
@@ -19,7 +19,9 @@ function testDevConfig (config) {
   server.listen(8080, 'localhost', function (err) {
     if (err) return err;
 
-    request(server.app).get(/static/).expect(200);
+    urls.forEach(function (url) {
+      request(server.app).get(url).expect(200);
+    });
 
     server.close();
   });
@@ -38,6 +40,9 @@ describe('webpack-dev-server should not apply publicPath to index.html generated
         publicPath: '/static/'
       }
     };
-    testDevConfig(config);
+
+    urls = ['index.html', '/static/index_bundle.js'];
+
+    testDevConfig(config, urls);
   });
 });
