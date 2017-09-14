@@ -73,7 +73,9 @@ This will generate a file `dist/index.html` containing the following:
 ```
 
 If you have multiple webpack entry points, they will all be included with `script`
-tags in the generated HTML.
+tags in the generated HTML, or the `chunks` configuration setting may be used
+to manually specify which chunks should be injected into the HTML as `script`
+tags.
 
 If you have any CSS assets in webpack's output (for example, CSS extracted
 with the [ExtractTextPlugin](https://github.com/webpack/extract-text-webpack-plugin))
@@ -144,6 +146,12 @@ once in your plugins array:
   ]
 }
 ```
+
+If you have multiple entry points that each correspond to a specific HTML file,
+the `chunks` setting may be used to manually specify which entry-points should
+be included with each HTML file as a `script` tags. See `examples/multiple-chunks`
+for an example that demonstrates how to use this plugin with the [CommonsChunkPlugin](https://webpack.js.org/plugins/commons-chunk-plugin/)
+to create an efficient build of a multi-page application.
 
 Writing Your Own Templates
 --------------------------
