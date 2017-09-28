@@ -156,12 +156,12 @@ and favicon files into the markup.
 plugins: [
   new HtmlWebpackPlugin({
     title: 'Custom template',
-    template: 'my-index.ejs', // Load a custom template (ejs by default see the FAQ for details)
+    template: 'my-index.html', // Load a custom template (lodash by default see the FAQ for details)
   })
 ]
 ```
 
-`my-index.ejs`:
+`my-index.html`:
 
 ```html
 <!DOCTYPE html>
