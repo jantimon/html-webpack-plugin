@@ -490,7 +490,8 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
       selfClosingTag: selfClosingTag,
       attributes: {
         href: stylePath,
-        rel: 'stylesheet'
+        rel: 'stylesheet',
+        type: 'text/css'
       }
     };
   });
