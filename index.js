@@ -476,7 +476,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
       tagName: 'script',
       closeTag: true,
       attributes: {
-        type: 'module',
+        defer: 'defer',
         src: scriptPath
       }
     };
