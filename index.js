@@ -24,7 +24,9 @@ function HtmlWebpackPlugin (options) {
     chunks: 'all',
     excludeChunks: [],
     title: 'Webpack App',
-    xhtml: false
+    xhtml: false,
+    // resolve multi html recompile slow
+    multihtmlCache: false
   }, options);
 }
 
@@ -32,6 +34,11 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   var self = this;
   var isCompilationCached = false;
   var compilationPromise;
+  // cache childCompilation
+  var childCompilation = null;
+  // when done, set true;
+  // when childCompilation's fileDependencies had changed, set false
+  var isValidChildCompilation = false;
 
   this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
 
@@ -42,7 +49,33 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
     this.options.filename = path.relative(compiler.options.output.path, filename);
   }
 
+  compiler.plugin('invalid', function (fileName) {
+    if (childCompilation &&
+      childCompilation.fileDependencies.indexOf(fileName) !== -1) {
+      isValidChildCompilation = false;
+    }
+  });
+
+  compiler.plugin('done', function (stats) {
+    var compilation = stats.compilation;
+
+    if (childCompilation) {
+      // webpack watch
+      childCompilation.fileDependencies.forEach(function (fileName) {
+        if (compilation.fileDependencies.indexOf(fileName) === -1) {
+          compilation.fileDependencies.push(fileName);
+        }
+      });
+    }
+
+    isValidChildCompilation = true;
+  });
+
   compiler.plugin('make', function (compilation, callback) {
+    if (self.options.multihtmlCache && isValidChildCompilation) {
+      return callback();
+    }
+
     // Compile the template (queued)
     compilationPromise = childCompiler.compileTemplate(self.options.template, compiler.context, self.options.filename, compilation)
       .catch(function (err) {
@@ -53,6 +86,8 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         };
       })
       .then(function (compilationResult) {
+        childCompilation = compilationResult.childCompilation;
+
         // If the compilation change didnt change the cache is valid
         isCompilationCached = compilationResult.hash && self.childCompilerHash === compilationResult.hash;
         self.childCompilerHash = compilationResult.hash;
@@ -63,6 +98,10 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   });
 
   compiler.plugin('emit', function (compilation, callback) {
+    if (self.options.multihtmlCache && isValidChildCompilation) {
+      return callback();
+    }
+
     var applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
     // Get all chunks
     var allChunks = compilation.getStats().toJson().chunks;
