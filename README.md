@@ -1,7 +1,7 @@
 HTML Webpack Plugin
 ===================
 
-add a configuration options (`multihtmlCache`) to solve multihtml recompile slow
+> add a configuration options (`multihtmlCache`) to solve multihtml recompile slow
 
 [![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/jantimon/html-webpack-plugin.svg)](https://david-dm.org/jantimon/html-webpack-plugin) [![Build status](https://travis-ci.org/jantimon/html-webpack-plugin.svg)](https://travis-ci.org/jantimon/html-webpack-plugin) [![Windows build status](https://ci.appveyor.com/api/projects/status/github/jantimon/html-webpack-plugin?svg=true&branch=master)](https://ci.appveyor.com/project/jantimon/html-webpack-plugin) [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard) [![bitHound Dependencies](https://www.bithound.io/github/jantimon/html-webpack-plugin/badges/dependencies.svg)](https://www.bithound.io/github/jantimon/html-webpack-plugin/master/dependencies/npm) [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)]()
 
