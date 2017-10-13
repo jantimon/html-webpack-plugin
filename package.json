@@ -1,6 +1,6 @@
 {
-  "name": "html-webpack-plugin",
-  "version": "2.30.1",
+  "name": "html-webpack-plugin-for-multihtml",
+  "version": "2.30.2",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "main": "index.js",
   "files": [
@@ -16,20 +16,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jantimon/html-webpack-plugin.git"
+    "url": "https://github.com/daifee/html-webpack-plugin-for-multihtml.git"
   },
   "keywords": [
     "webpack",
     "plugin",
     "html",
-    "html-webpack-plugin"
+    "html-webpack-plugin",
+    "html-webpack-plugin-for-multihtml"
   ],
   "author": "Charles Blaxland <charles.blaxland@gmail.com> (https://github.com/ampedandwired)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jantimon/html-webpack-plugin/issues"
+    "url": "https://github.com/daifee/html-webpack-plugin-for-multihtml/issues"
   },
-  "homepage": "https://github.com/jantimon/html-webpack-plugin",
+  "homepage": "https://github.com/daifee/html-webpack-plugin-for-multihtml",
   "semistandard": {
     "ignore": [
       "examples/*/dist/**/*.*"
