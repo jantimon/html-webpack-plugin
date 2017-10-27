@@ -668,7 +668,7 @@ HtmlWebpackPlugin.prototype.getAllChunks = function (compilation) {
     allChunks = compilation.getStats().toJSON().chunks;
     hashToChunksMap[compilation.hash] = allChunks;
   }
-  return allChunks
+  return allChunks;
 };
 
 module.exports = HtmlWebpackPlugin;
