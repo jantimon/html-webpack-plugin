@@ -664,7 +664,7 @@ HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) 
  */
 HtmlWebpackPlugin.prototype.getAllChunks = function (compilation) {
   var allChunks = hashToChunksMap[compilation.hash];
-  if(!allChunks){
+  if (!allChunks) {
     allChunks = compilation.getStats().toJSON().chunks;
     hashToChunksMap[compilation.hash] = allChunks;
   }
