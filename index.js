@@ -9,6 +9,11 @@ var prettyError = require('./lib/errors.js');
 var chunkSorter = require('./lib/chunksorter.js');
 Promise.promisifyAll(fs);
 
+/**
+ * Cache chunks result between multiple entry point html page
+ */
+var hashToChunksMap = {};
+
 function HtmlWebpackPlugin (options) {
   // Default options
   this.options = _.extend({
@@ -65,7 +70,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   compiler.plugin('emit', function (compilation, callback) {
     var applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
     // Get all chunks
-    var allChunks = compilation.getStats().toJson().chunks;
+    var allChunks = self.getAllChunks(compilation);
     // Filter chunks (options.chunks and options.excludeCHunks)
     var chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
     // Sort chunks
@@ -650,6 +655,20 @@ HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) 
         return _.extend(pluginArgs, result);
       });
   };
+};
+
+/**
+ * Get all chunks from compilation
+ * @param compilation
+ * @return {Array}
+ */
+HtmlWebpackPlugin.prototype.getAllChunks = function (compilation) {
+  var allChunks = hashToChunksMap[compilation.hash];
+  if(!allChunks){
+    allChunks = compilation.getStats().toJSON().chunks;
+    hashToChunksMap[compilation.hash] = allChunks;
+  }
+  return allChunks
 };
 
 module.exports = HtmlWebpackPlugin;
