@@ -1,7 +1,8 @@
 'use strict';
 var vm = require('vm');
 var fs = require('fs');
-var _ = require('lodash');
+var _extend = require('lodash/extend');
+var _uniq = require('lodash/uniq');
 var Promise = require('bluebird');
 var path = require('path');
 var childCompiler = require('./lib/compiler.js');
@@ -11,7 +12,7 @@ Promise.promisifyAll(fs);
 
 function HtmlWebpackPlugin (options) {
   // Default options
-  this.options = _.extend({
+  this.options = _extend({
     template: path.join(__dirname, 'default_index.ejs'),
     filename: 'index.html',
     hash: false,
@@ -153,7 +154,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
               // Add the stylesheets, scripts and so on to the resulting html
             return self.postProcessHtml(html, assets, { body: result.body, head: result.head })
               .then(function (html) {
-                return _.extend(result, {html: html, assets: assets});
+                return _extend(result, {html: html, assets: assets});
               });
           });
       })
@@ -223,7 +224,7 @@ HtmlWebpackPlugin.prototype.evaluateCompilationResult = function (compilation, s
   // To extract the result during the evaluation this part has to be removed.
   source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
   var template = this.options.template.replace(/^.+!/, '').replace(/\?.+$/, '');
-  var vmContext = vm.createContext(_.extend({HTML_WEBPACK_PLUGIN: true, require: require}, global));
+  var vmContext = vm.createContext(_extend({HTML_WEBPACK_PLUGIN: true, require: require}, global));
   var vmScript = new vm.Script(source, {filename: template});
   // Evaluate code and cast to string
   var newSource;
@@ -461,7 +462,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
 
   // Duplicate css assets can occur on occasion if more than one chunk
   // requires the same css.
-  assets.css = _.uniq(assets.css);
+  assets.css = _uniq(assets.css);
 
   return assets;
 };
@@ -626,7 +627,7 @@ HtmlWebpackPlugin.prototype.getFullTemplatePath = function (template, context) {
  * asset object
  */
 HtmlWebpackPlugin.prototype.getAssetFiles = function (assets) {
-  var files = _.uniq(Object.keys(assets).filter(function (assetType) {
+  var files = _uniq(Object.keys(assets).filter(function (assetType) {
     return assetType !== 'chunks' && assets[assetType];
   }).reduce(function (files, assetType) {
     return files.concat(assets[assetType]);
@@ -647,7 +648,7 @@ HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) 
         if (requiresResult && !result) {
           compilation.warnings.push(new Error('Using ' + eventName + ' without returning a result is deprecated.'));
         }
-        return _.extend(pluginArgs, result);
+        return _extend(pluginArgs, result);
       });
   };
 };
