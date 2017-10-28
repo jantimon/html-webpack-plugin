@@ -1,5 +1,5 @@
 {
-  "name": "html-webpack-plugin",
+  "name": "@yunke/html-webpack-plugin",
   "version": "2.30.2",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "main": "index.js",
@@ -9,7 +9,6 @@
     "lib/"
   ],
   "scripts": {
-    "prepublish": "npm run test",
     "pretest": "semistandard",
     "build-examples": "node examples/build-examples.js",
     "test": "jasmine"
