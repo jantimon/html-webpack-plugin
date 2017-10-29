@@ -10,9 +10,9 @@ var chunkSorter = require('./lib/chunksorter.js');
 Promise.promisifyAll(fs);
 
 /**
- * Cache chunks result between multiple entry point html page
+ * Cache compilation stats between multiple entry point html page
  */
-var hashToChunksMap = {};
+var compilationHashToStatsMap = {};
 
 function HtmlWebpackPlugin (options) {
   // Default options
@@ -70,7 +70,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   compiler.plugin('emit', function (compilation, callback) {
     var applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
     // Get all chunks
-    var allChunks = self.getAllChunks(compilation);
+    var allChunks = self.getCompilationStats(compilation).chunks;
     // Filter chunks (options.chunks and options.excludeCHunks)
     var chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
     // Sort chunks
@@ -257,7 +257,7 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
     .then(function () {
       var templateParams = {
         compilation: compilation,
-        webpack: compilation.getStats().toJson(),
+        webpack: self.getCompilationStats(compilation),
         webpackConfig: compilation.options,
         htmlWebpackPlugin: {
           files: assets,
@@ -658,17 +658,15 @@ HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) 
 };
 
 /**
- * Get all chunks from compilation
- * @param compilation
- * @return {Array}
+ * Get stats from compilation
  */
-HtmlWebpackPlugin.prototype.getAllChunks = function (compilation) {
-  var allChunks = hashToChunksMap[compilation.hash];
-  if (!allChunks) {
-    allChunks = compilation.getStats().toJson().chunks;
-    hashToChunksMap[compilation.hash] = allChunks;
+HtmlWebpackPlugin.prototype.getCompilationStats = function (compilation) {
+  var stats = compilationHashToStatsMap[compilation.hash];
+  if (!stats) {
+    stats = compilation.getStats().toJson();
+    compilationHashToStatsMap[compilation.hash] = stats;
   }
-  return allChunks;
+  return stats;
 };
 
 module.exports = HtmlWebpackPlugin;
