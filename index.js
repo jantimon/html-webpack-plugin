@@ -9,6 +9,11 @@ var prettyError = require('./lib/errors.js');
 var chunkSorter = require('./lib/chunksorter.js');
 Promise.promisifyAll(fs);
 
+/**
+ * Cache compilation stats between multiple entry point html page
+ */
+var compilationHashToStatsMap = {};
+
 function HtmlWebpackPlugin (options) {
   // Default options
   this.options = _.extend({
@@ -65,7 +70,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   compiler.plugin('emit', function (compilation, callback) {
     var applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
     // Get all chunks
-    var allChunks = compilation.getStats().toJson().chunks;
+    var allChunks = self.getCompilationStats(compilation).chunks;
     // Filter chunks (options.chunks and options.excludeCHunks)
     var chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
     // Sort chunks
@@ -252,7 +257,7 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
     .then(function () {
       var templateParams = {
         compilation: compilation,
-        webpack: compilation.getStats().toJson(),
+        webpack: self.getCompilationStats(compilation),
         webpackConfig: compilation.options,
         htmlWebpackPlugin: {
           files: assets,
@@ -650,6 +655,18 @@ HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) 
         return _.extend(pluginArgs, result);
       });
   };
+};
+
+/**
+ * Get stats from compilation
+ */
+HtmlWebpackPlugin.prototype.getCompilationStats = function (compilation) {
+  var stats = compilationHashToStatsMap[compilation.hash];
+  if (!stats) {
+    stats = compilation.getStats().toJson();
+    compilationHashToStatsMap[compilation.hash] = stats;
+  }
+  return stats;
 };
 
 module.exports = HtmlWebpackPlugin;
