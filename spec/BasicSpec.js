@@ -39,18 +39,21 @@ function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expec
   outputFile = outputFile || 'index.html';
   webpack(webpackConfig, function (err, stats) {
     expect(err).toBeFalsy();
+
     var compilationErrors = (stats.compilation.errors || []).join('\n');
     if (expectErrors) {
       expect(compilationErrors).not.toBe('');
     } else {
       expect(compilationErrors).toBe('');
     }
+
     var compilationWarnings = (stats.compilation.warnings || []).join('\n');
     if (expectWarnings) {
       expect(compilationWarnings).not.toBe('');
     } else {
       expect(compilationWarnings).toBe('');
     }
+
     if (outputFile instanceof RegExp) {
       var matches = Object.keys(stats.compilation.assets).filter(function (item) {
         return outputFile.test(item);
@@ -59,11 +62,13 @@ function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expec
       outputFile = matches[0];
     }
     expect(outputFile.indexOf('[hash]') === -1).toBe(true);
+
     var outputFileExists = fs.existsSync(path.join(OUTPUT_DIR, outputFile));
     expect(outputFileExists).toBe(true);
     if (!outputFileExists) {
       return done();
     }
+
     var htmlContent = fs.readFileSync(path.join(OUTPUT_DIR, outputFile)).toString();
     var chunksInfo;
     for (var i = 0; i < expectedResults.length; i++) {
