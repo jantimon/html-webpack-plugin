@@ -20,7 +20,8 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'HtmlWebpackPlugin example',
       favicon: 'favicon.ico',
-      filename: 'favicon.html'
+      filename: 'favicon.html',
+      useGzip: true
     }),
     new ExtractTextPlugin('styles.css')
   ]

@@ -14,6 +14,7 @@ function HtmlWebpackPlugin (options) {
   this.options = _.extend({
     template: path.join(__dirname, 'default_index.ejs'),
     filename: 'index.html',
+    useGzip: false,
     hash: false,
     inject: true,
     compile: true,
@@ -99,7 +100,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
               if (publicPath && publicPath.substr(-1) !== '/') {
                 publicPath += '/';
               }
-              assets.favicon = publicPath + faviconBasename;
+              assets.favicon = publicPath + faviconBasename + (self.options.useGzip ? '.gz' : '');
             });
         }
       })
@@ -470,6 +471,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
  * Injects the assets into the given html string
  */
 HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
+  var gzipSuffix = this.options.useGzip ? '.gz' : '';
   // Turn script files into script tags
   var scripts = assets.js.map(function (scriptPath) {
     return {
@@ -477,7 +479,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
       closeTag: true,
       attributes: {
         type: 'text/javascript',
-        src: scriptPath
+        src: scriptPath + gzipSuffix
       }
     };
   });
@@ -489,7 +491,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
       tagName: 'link',
       selfClosingTag: selfClosingTag,
       attributes: {
-        href: stylePath,
+        href: stylePath + gzipSuffix,
         rel: 'stylesheet'
       }
     };
