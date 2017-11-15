@@ -1,6 +1,15 @@
 Change History
 ==============
 
+v2.30.1
+---
+* Revert part the performance optimization (#723) because of #753.
+
+v2.30.0
+---
+* Add manual sort
+* Performance improvements (#723)
+
 v2.29.0
 ---
 * Add support for Webpack 3

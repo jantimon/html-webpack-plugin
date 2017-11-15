@@ -9,7 +9,7 @@ webpack bundles. This is especially useful for webpack bundles that include
 a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you, supply
 your own template using lodash templates or use your own loader.
 
-Maintainer: Jan Nicklas [@jantimon](https://twitter.com/jantimon)
+Maintainer: Jan Nicklas [@jantimon](https://twitter.com/jantimon) and Thomas Sileghem [@mastilver](https://twitter.com/mastilver)
 
 Installation
 ------------
@@ -29,6 +29,7 @@ There are already some really powerful plugins which can be integrated with zero
  * [favicons-webpack-plugin](https://github.com/jantimon/favicons-webpack-plugin) which generates favicons and icons for iOS, Android and desktop browsers
  * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin) can be used to always write to disk the html file, useful when webpack-dev-server / HMR are being used
  * [html-webpack-inline-source-plugin](https://github.com/DustinJackson/html-webpack-inline-source-plugin) to inline your assets in the resulting HTML file
+ * [html-webpack-inline-svg-plugin](https://github.com/thegc/html-webpack-inline-svg-plugin) to inline SVGs in the resulting HTML file.
  * [html-webpack-exclude-assets-plugin](https://github.com/jamesjieye/html-webpack-exclude-assets-plugin) for excluding assets using regular expressions
  * [html-webpack-include-assets-plugin](https://github.com/jharris4/html-webpack-include-assets-plugin) for including lists of js or css file paths (such as those copied by the copy-webpack-plugin).
  * [script-ext-html-webpack-plugin](https://github.com/numical/script-ext-html-webpack-plugin) to add `async`, `defer` or `module` attributes to your`<script>` elements, or even in-line them
@@ -156,12 +157,12 @@ and favicon files into the markup.
 plugins: [
   new HtmlWebpackPlugin({
     title: 'Custom template',
-    template: 'my-index.ejs', // Load a custom template (ejs by default see the FAQ for details)
+    template: 'my-index.html', // Load a custom template (lodash by default see the FAQ for details)
   })
 ]
 ```
 
-`my-index.ejs`:
+`my-index.html`:
 
 ```html
 <!DOCTYPE html>
