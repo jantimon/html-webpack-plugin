@@ -2,12 +2,14 @@
 var vm = require('vm');
 var fs = require('fs');
 var _ = require('lodash');
-var Promise = require('bluebird');
+var promisify = require('util.promisify');
 var path = require('path');
 var childCompiler = require('./lib/compiler.js');
 var prettyError = require('./lib/errors.js');
 var chunkSorter = require('./lib/chunksorter.js');
-Promise.promisifyAll(fs);
+
+var statAsync = promisify(fs.stat);
+var readFileAsync = promisify(fs.readFile);
 
 function HtmlWebpackPlugin (options) {
   // Default options
@@ -200,12 +202,10 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
         });
       })
       // Let webpack continue with it
-      .finally(function () {
+      .then(function () {
         callback();
-        // Tell blue bird that we don't want to wait for callback.
-        // Fixes "Warning: a promise was created in a handler but none were returned from it"
-        // https://github.com/petkaantonov/bluebird/blob/master/docs/docs/warning-explanations.md#warning-a-promise-was-created-in-a-handler-but-none-were-returned-from-it
-        return null;
+      }, function () {
+        callback();
       });
   });
 };
@@ -304,22 +304,24 @@ HtmlWebpackPlugin.prototype.postProcessHtml = function (html, assets, assetTags)
  */
 HtmlWebpackPlugin.prototype.addFileToAssets = function (filename, compilation) {
   filename = path.resolve(compilation.compiler.context, filename);
-  return Promise.props({
-    size: fs.statAsync(filename),
-    source: fs.readFileAsync(filename)
-  })
+  return Promise.all([
+    statAsync(filename),
+    readFileAsync(filename)
+  ])
   .catch(function () {
     return Promise.reject(new Error('HtmlWebpackPlugin: could not load file ' + filename));
   })
   .then(function (results) {
+    var size = results[0];
+    var source = results[1];
     var basename = path.basename(filename);
     compilation.fileDependencies.push(filename);
     compilation.assets[basename] = {
       source: function () {
-        return results.source;
+        return source;
       },
       size: function () {
-        return results.size.size;
+        return size.size;
       }
     };
     return basename;
@@ -640,15 +642,19 @@ HtmlWebpackPlugin.prototype.getAssetFiles = function (assets) {
  * a function that helps to merge given plugin arguments with processed ones
  */
 HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) {
-  var promisedApplyPluginsAsyncWaterfall = Promise.promisify(compilation.applyPluginsAsyncWaterfall, {context: compilation});
   return function (eventName, requiresResult, pluginArgs) {
-    return promisedApplyPluginsAsyncWaterfall(eventName, pluginArgs)
-      .then(function (result) {
-        if (requiresResult && !result) {
-          compilation.warnings.push(new Error('Using ' + eventName + ' without returning a result is deprecated.'));
-        }
-        return _.extend(pluginArgs, result);
+    return new Promise(function (resolve, reject) {
+      compilation.applyPluginsAsyncWaterfall(eventName, pluginArgs, function (err, result) {
+        if (err) { reject(err); }
+        resolve(result);
       });
+    })
+    .then(function (result) {
+      if (requiresResult && !result) {
+        compilation.warnings.push(new Error('Using ' + eventName + ' without returning a result is deprecated.'));
+      }
+      return _.extend(pluginArgs, result);
+    });
   };
 };
 
