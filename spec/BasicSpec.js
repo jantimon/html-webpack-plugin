@@ -33,7 +33,7 @@ if (Number(extractTextPluginMajorVersion) > 1) {
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
 
-jasmine.getEnv().defaultTimeoutInterval = 30000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 
 function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expectErrors, expectWarnings) {
   outputFile = outputFile || 'index.html';
@@ -78,6 +78,8 @@ function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expec
           var chunkhash = chunksInfo[expectedResult.chunkName].hash;
           expect(htmlContent).toContain(expectedResult.containStr.replace('%chunkhash%', chunkhash));
         }
+      } else if (typeof expectedResult === 'function') {
+        expectedResult(htmlContent);
       } else {
         expect(htmlContent).toContain(expectedResult.replace('%hash%', stats.hash));
       }
@@ -304,6 +306,79 @@ describe('HtmlWebpackPlugin', function () {
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
     }, ['<script type="text/javascript" src="app_bundle.js"'], null, done);
+  });
+
+  describe('injectCss option', function () {
+    it('defaults to "head"', function () {
+      var plugin = new HtmlWebpackPlugin();
+      expect(plugin.options.injectCss).toBe('head');
+    });
+
+    it('allows you to inject the css assets into the head of the given template', function (done) {
+      testHtmlPlugin({
+        entry: path.join(__dirname, 'fixtures/theme.js'),
+        output: {
+          path: OUTPUT_DIR,
+          filename: 'index_bundle.js'
+        },
+        module: {
+          loaders: [
+            { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+          ]
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            injectCss: 'head'
+          }),
+          new ExtractTextPlugin('styles.css')
+        ]
+      }, [/<link href="styles.css" rel="stylesheet">[\s\S]*<\/head>/m], null, done);
+    });
+
+    it('allows you to inject the css assets into the body of the given template', function (done) {
+      testHtmlPlugin({
+        entry: path.join(__dirname, 'fixtures/theme.js'),
+        output: {
+          path: OUTPUT_DIR,
+          filename: 'index_bundle.js'
+        },
+        module: {
+          loaders: [
+            { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+          ]
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            injectCss: 'body'
+          }),
+          new ExtractTextPlugin('styles.css')
+        ]
+      }, [/<body>[\s\S]*<link href="styles.css" rel="stylesheet">[\s\S]*<\/body>/m], null, done);
+    });
+
+    it('will not inject the css assets if set to `false`', function (done) {
+      testHtmlPlugin({
+        entry: path.join(__dirname, 'fixtures/theme.js'),
+        output: {
+          path: OUTPUT_DIR,
+          filename: 'index_bundle.js'
+        },
+        module: {
+          loaders: [
+            { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+          ]
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            injectCss: false
+          }),
+          new ExtractTextPlugin('styles.css')
+        ]
+      }, [
+        function (htmlContent) {
+          expect(htmlContent.indexOf('styles.css')).toBe(-1);
+        }], null, done);
+    });
   });
 
   it('allows you to use chunkhash with asset into a given html file', function (done) {
