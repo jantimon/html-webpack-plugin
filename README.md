@@ -89,6 +89,7 @@ Allowed values are as follows:
    You can specify a subdirectory here too (eg: `assets/admin.html`).
 - `template`: Webpack require path to the template. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details.
 - `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
+- `injectCss`: `'head' | 'body' | false` Inject css links into the given `template` or `templateContent` - When passing `'body'` all CSS resources will be placed at the bottom of the body element. `'head'` will place the CSS in the head element. `false` will not inject the CSS at all.
 - `favicon`: Adds the given favicon path to the output html.
 - `minify`: `{...} | false` Pass [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference)'s options as object to minify the output.
 - `hash`: `true | false` if `true` then append a unique webpack compilation hash to all

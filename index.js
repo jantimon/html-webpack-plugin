@@ -16,6 +16,7 @@ function HtmlWebpackPlugin (options) {
     filename: 'index.html',
     hash: false,
     inject: true,
+    injectCss: 'head',
     compile: true,
     favicon: false,
     minify: false,
@@ -509,8 +510,13 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
       }
     });
   }
-  // Add styles to the head
-  head = head.concat(styles);
+  // Add styles to the head or body
+  if (this.options.injectCss === 'head') {
+    head = head.concat(styles);
+  } else if (this.options.injectCss === 'body') {
+    body = body.concat(styles);
+  }
+
   // Add scripts to body or head
   if (this.options.inject === 'head') {
     head = head.concat(scripts);
