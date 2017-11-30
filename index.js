@@ -24,7 +24,8 @@ function HtmlWebpackPlugin (options) {
     chunks: 'all',
     excludeChunks: [],
     title: 'Webpack App',
-    xhtml: false
+    xhtml: false,
+    interpolate: /<%=([\s\S]+?)%>/g
   }, options);
 }
 
@@ -33,6 +34,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   var isCompilationCached = false;
   var compilationPromise;
 
+  _.templateSettings = {interpolate: this.options.interpolate};
   this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
 
   // convert absolute filename into relative so that webpack can
