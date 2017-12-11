@@ -31,6 +31,12 @@ function runExample (exampleName, done) {
     var options = require(path.join(examplePath, 'webpack.config.js'));
     options.context = examplePath;
     options.output.path = exampleOutput;
+    if (Number(webpackMajorVersion) >= 4) {
+      if (options.module && options.module.loaders) {
+        options.module.rules = options.module.loaders;
+        delete options.module.loaders;
+      }
+    }
     webpack(options, function (err) {
       var dircompare = require('dir-compare');
       var res = dircompare.compareSync(fixturePath, exampleOutput, {compareSize: true});

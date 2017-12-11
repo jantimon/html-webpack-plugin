@@ -19,6 +19,7 @@ var _ = require('lodash');
 var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var extractTextPluginMajorVersion = require('extract-text-webpack-plugin/package.json').version.split('.')[0];
+var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 var HtmlWebpackPlugin = require('../index.js');
 
 if (Number(extractTextPluginMajorVersion) > 1) {
@@ -36,6 +37,13 @@ var OUTPUT_DIR = path.join(__dirname, '../dist');
 jasmine.getEnv().defaultTimeoutInterval = 30000;
 
 function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expectErrors, expectWarnings) {
+  // TODO should we test both modes?
+  if (Number(webpackMajorVersion) >= 4) {
+    if (webpackConfig.module && webpackConfig.module.loaders) {
+      webpackConfig.module.rules = webpackConfig.module.loaders;
+      delete webpackConfig.module.loaders;
+    }
+  }
   outputFile = outputFile || 'index.html';
   webpack(webpackConfig, function (err, stats) {
     expect(err).toBeFalsy();

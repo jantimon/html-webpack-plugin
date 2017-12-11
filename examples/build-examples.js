@@ -30,8 +30,16 @@ examples.forEach(function (exampleName) {
   var examplePath = path.join(__dirname, exampleName);
   var configFile = path.join(examplePath, 'webpack.config.js');
 
+  var config = require(configFile);
+  if (webpackMajorVersion === '4') {
+    if (config.module && config.module.loaders) {
+      config.module.rules = config.module.loaders;
+      delete config.module.loaders;
+    }
+  }
+
   rimraf.sync(path.join(examplePath, 'dist', 'webpack-' + webpackMajorVersion));
-  webpack(require(configFile), function (err, stats) {
+  webpack(config, function (err, stats) {
     if (err) {
       console.error(err.stack || err);
       if (err.details) {
