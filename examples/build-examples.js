@@ -32,6 +32,11 @@ examples.forEach(function (exampleName) {
 
   var config = require(configFile);
   if (webpackMajorVersion === '4') {
+    config.plugins.unshift(new webpack.LoaderOptionsPlugin({
+      options: {
+        context: process.cwd() // or the same value as `context`
+      }
+    }));
     if (config.module && config.module.loaders) {
       config.module.rules = config.module.loaders;
       delete config.module.loaders;

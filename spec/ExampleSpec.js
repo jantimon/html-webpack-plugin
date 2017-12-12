@@ -32,6 +32,11 @@ function runExample (exampleName, done) {
     options.context = examplePath;
     options.output.path = exampleOutput;
     if (Number(webpackMajorVersion) >= 4) {
+      options.plugins.unshift(new webpack.LoaderOptionsPlugin({
+        options: {
+          context: process.cwd() // or the same value as `context`
+        }
+      }));
       if (options.module && options.module.loaders) {
         options.module.rules = options.module.loaders;
         delete options.module.loaders;
