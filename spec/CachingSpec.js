@@ -33,7 +33,7 @@ function setUpCompiler (htmlWebpackPlugin) {
   };
   // TODO should we test both modes?
   if (Number(webpackMajorVersion) >= 4) {
-    webpackConfig.mode = 'production';
+    webpackConfig.mode = 'development';
   }
   var compiler = new WebpackRecompilationSimulator(webpack(webpackConfig));
   return compiler;
