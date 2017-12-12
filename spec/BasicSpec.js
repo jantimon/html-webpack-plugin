@@ -1447,7 +1447,8 @@ describe('HtmlWebpackPlugin', function () {
         })
       ]
     }, [
-      /<script type="text\/javascript" src="common_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">.+<script type="text\/javascript" src="index_bundle.js">/], null, done);
+      /(<script type="text\/javascript" src="common_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">.+<script type="text\/javascript" src="index_bundle.js">)|(<script type="text\/javascript" src="common_bundle.js">.+<script type="text\/javascript" src="index_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">)/
+    ], null, done);
   });
 
   it('should sort the chunks in custom (reverse alphabetical) order', function (done) {
