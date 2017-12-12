@@ -15,6 +15,7 @@ var webpack = require('webpack');
 var rimraf = require('rimraf');
 var WebpackRecompilationSimulator = require('webpack-recompilation-simulator');
 var HtmlWebpackPlugin = require('../index.js');
+var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 
 var OUTPUT_DIR = path.join(__dirname, '../dist');
 
@@ -22,14 +23,19 @@ jasmine.getEnv().defaultTimeoutInterval = 30000;
 
 function setUpCompiler (htmlWebpackPlugin) {
   spyOn(htmlWebpackPlugin, 'evaluateCompilationResult').and.callThrough();
-  var compiler = new WebpackRecompilationSimulator(webpack({
+  var webpackConfig = {
     entry: path.join(__dirname, 'fixtures/index.js'),
     output: {
       path: OUTPUT_DIR,
       filename: 'index_bundle.js'
     },
     plugins: [htmlWebpackPlugin]
-  }));
+  };
+  // TODO should we test both modes?
+  if (Number(webpackMajorVersion) >= 4) {
+    webpackConfig.mode = 'production';
+  }
+  var compiler = new WebpackRecompilationSimulator(webpack(webpackConfig));
   return compiler;
 }
 

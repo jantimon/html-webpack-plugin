@@ -41,7 +41,9 @@ function runExample (exampleName, done) {
         options.module.rules = options.module.loaders;
         delete options.module.loaders;
       }
+      options.mode = 'production';
     }
+
     webpack(options, function (err) {
       var dircompare = require('dir-compare');
       var res = dircompare.compareSync(fixturePath, exampleOutput, {compareSize: true});
