@@ -108,6 +108,26 @@ function getChunksInfoFromStats (stats) {
   return chunksInfo;
 }
 
+function tapCompilationEvent (compilation, eventName, handler) {
+  // Webpack 4 has a new interface
+  if (compilation.hooks) {
+    return compilation.hooks[trainCaseToCamelCase(eventName)].tapAsync(
+      'AsyncPlugin' + tapCompilationEvent.counter++,
+      handler
+    );
+  } else {
+    return compilation.plugin(eventName, handler);
+  }
+}
+// There's probably a better way to do this
+tapCompilationEvent.counter = 0;
+
+function trainCaseToCamelCase (word) {
+  return word.replace(/-([\w])/g, function (match, p1) {
+    return p1.toUpperCase();
+  });
+}
+
 describe('HtmlWebpackPlugin', function () {
   beforeEach(function (done) {
     rimraf(OUTPUT_DIR, done);
@@ -737,7 +757,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-alter-asset-tags', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-alter-asset-tags', function (object, callback) {
             expect(typeof object.body).toBe('object');
             expect(typeof object.head).toBe('object');
             eventFired = true;
@@ -769,7 +789,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-alter-asset-tags', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-alter-asset-tags', function (object, callback) {
             chunks = object.chunks;
             callback();
           });
@@ -798,7 +818,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-alter-asset-tags', function (pluginArgs, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-alter-asset-tags', function (pluginArgs, callback) {
             pluginArgs.body = pluginArgs.body.map(function (tag) {
               if (tag.tagName === 'script') {
                 tag.attributes.async = true;
@@ -831,7 +851,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-alter-asset-tags', function (pluginArgs, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-alter-asset-tags', function (pluginArgs, callback) {
             pluginArgs.body = pluginArgs.body.map(function (tag) {
               if (tag.tagName === 'script') {
                 tag.attributes.async = false;
@@ -865,7 +885,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-before-html-processing', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-before-html-processing', function (object, callback) {
             eventFired = true;
             callback();
           });
@@ -895,7 +915,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
             eventFired = true;
             callback();
           });
@@ -925,7 +945,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-after-emit', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-after-emit', function (object, callback) {
             eventFired = true;
             callback();
           });
@@ -955,7 +975,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
             eventFired = true;
             object.html += 'Injected by plugin';
             callback();
@@ -987,7 +1007,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
             eventFiredForFirstPlugin = true;
             object.html += 'Injected by first plugin';
             callback(null, object);
@@ -998,7 +1018,7 @@ describe('HtmlWebpackPlugin', function () {
     var secondExamplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
             eventFiredForSecondPlugin = true;
             object.html += ' Injected by second plugin';
             callback(null);
@@ -1033,7 +1053,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
             eventFiredForFirstPlugin = true;
             var result = _.extend(object, {
               html: object.html + 'Injected by first plugin'
@@ -1046,7 +1066,7 @@ describe('HtmlWebpackPlugin', function () {
     var secondExamplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
             eventFiredForSecondPlugin = true;
             object.html += ' Injected by second plugin';
             callback(null);
@@ -1081,7 +1101,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
             eventFiredForFirstPlugin = true;
             var result = _.extend(object, {
               html: object.html + 'Injected by first plugin'
@@ -1094,7 +1114,7 @@ describe('HtmlWebpackPlugin', function () {
     var secondExamplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-after-html-processing', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
             eventFiredForSecondPlugin = true;
             var result = _.extend(object, {
               html: object.html + ' Injected by second plugin'
@@ -1130,7 +1150,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-before-html-processing', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-before-html-processing', function (object, callback) {
             eventFired = true;
             object.assets.js.push('funky-script.js');
             object.html += 'Injected by plugin';
@@ -1162,7 +1182,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          compilation.plugin('html-webpack-plugin-before-html-generation', function (object, callback) {
+          tapCompilationEvent(compilation, 'html-webpack-plugin-before-html-generation', function (object, callback) {
             eventFired = true;
             object.assets.js.push('funky-script.js');
             callback();
