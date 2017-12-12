@@ -673,16 +673,7 @@ HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) 
         );
       }
 
-      return compilation.hooks[ccEventName]
-        .promise(pluginArgs)
-        .then(function (result) {
-          if (requiresResult && !result) {
-            compilation.warnings.push(
-              new Error('Using ' + eventName + ' without returning a result is deprecated.')
-            );
-          }
-          return _.extend(pluginArgs, result);
-        });
+      return compilation.hooks[ccEventName].promise(pluginArgs);
     };
   } else {
     // Before Webpack 4

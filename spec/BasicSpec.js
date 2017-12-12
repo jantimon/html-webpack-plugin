@@ -766,6 +766,8 @@ describe('HtmlWebpackPlugin', function () {
         });
       }
     };
+
+    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -781,7 +783,8 @@ describe('HtmlWebpackPlugin', function () {
     }, [], null, function () {
       expect(eventFired).toBe(true);
       done();
-    }, false, true);
+    }, false,
+    shouldExpectWarnings);
   });
 
   it('passes chunks to the html-webpack-plugin-alter-asset-tags event', function (done) {
@@ -796,6 +799,8 @@ describe('HtmlWebpackPlugin', function () {
         });
       }
     };
+
+    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -811,7 +816,8 @@ describe('HtmlWebpackPlugin', function () {
     }, [], null, function () {
       expect(chunks).toBeDefined();
       done();
-    }, false, true);
+    }, false,
+    shouldExpectWarnings);
   });
 
   it('allows events to add a no-value attribute', function (done) {
@@ -892,6 +898,8 @@ describe('HtmlWebpackPlugin', function () {
         });
       }
     };
+
+    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -907,7 +915,8 @@ describe('HtmlWebpackPlugin', function () {
     }, [], null, function () {
       expect(eventFired).toBe(true);
       done();
-    }, false, true);
+    }, false,
+    shouldExpectWarnings);
   });
 
   it('fires the html-webpack-plugin-after-html-processing event', function (done) {
@@ -922,6 +931,7 @@ describe('HtmlWebpackPlugin', function () {
         });
       }
     };
+    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -937,7 +947,8 @@ describe('HtmlWebpackPlugin', function () {
     }, [], null, function () {
       expect(eventFired).toBe(true);
       done();
-    }, false, true);
+    }, false,
+    shouldExpectWarnings);
   });
 
   it('fires the html-webpack-plugin-after-emit event', function (done) {
@@ -983,6 +994,8 @@ describe('HtmlWebpackPlugin', function () {
         });
       }
     };
+
+    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -998,7 +1011,8 @@ describe('HtmlWebpackPlugin', function () {
     }, ['Injected by plugin'], null, function () {
       expect(eventFired).toBe(true);
       done();
-    }, false, true);
+    }, false,
+    shouldExpectWarnings);
   });
 
   it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event by edit the given arguments object', function (done) {
@@ -1027,6 +1041,7 @@ describe('HtmlWebpackPlugin', function () {
       }
     };
 
+    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -1044,7 +1059,8 @@ describe('HtmlWebpackPlugin', function () {
       expect(eventFiredForFirstPlugin).toBe(true);
       expect(eventFiredForSecondPlugin).toBe(true);
       done();
-    }, false, true);
+    }, false,
+    shouldExpectWarnings);
   });
 
   it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event either by edit the given arguments object or by return a new object in the callback', function (done) {
@@ -1075,6 +1091,7 @@ describe('HtmlWebpackPlugin', function () {
       }
     };
 
+    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -1092,7 +1109,8 @@ describe('HtmlWebpackPlugin', function () {
       expect(eventFiredForFirstPlugin).toBe(true);
       expect(eventFiredForSecondPlugin).toBe(true);
       done();
-    }, false, true);
+    }, false,
+    shouldExpectWarnings);
   });
 
   it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event by return a new object in the callback', function (done) {
@@ -1159,6 +1177,8 @@ describe('HtmlWebpackPlugin', function () {
         });
       }
     };
+
+    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -1174,7 +1194,8 @@ describe('HtmlWebpackPlugin', function () {
     }, ['Injected by plugin', '<script type="text/javascript" src="funky-script.js"'], null, function () {
       expect(eventFired).toBe(true);
       done();
-    }, false, true);
+    }, false,
+    shouldExpectWarnings);
   });
 
   it('allows to modify the html during html-webpack-plugin-before-html-generation event', function (done) {
