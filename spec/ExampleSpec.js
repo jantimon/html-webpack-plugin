@@ -51,8 +51,10 @@ function runExample (exampleName, done) {
       res.diffSet.filter(function (diff) {
         return diff.state === 'distinct';
       }).forEach(function (diff) {
-        expect(fs.readFileSync(path.join(diff.path1, diff.name1)).toString())
-          .toBe(fs.readFileSync(path.join(diff.path2, diff.name2)).toString());
+        var file1Contents = fs.readFileSync(path.join(diff.path1, diff.name1)).toString();
+        var file2Contents = fs.readFileSync(path.join(diff.path2, diff.name2)).toString();
+        expect(file1Contents).diffPatch(file2Contents);
+        expect(file1Contents).toBe(file2Contents);
       });
 
       expect(err).toBeFalsy();
@@ -63,6 +65,10 @@ function runExample (exampleName, done) {
 }
 
 describe('HtmlWebpackPlugin Examples', function () {
+  beforeEach(function () {
+    jasmine.addMatchers(require('jasmine-diff-matchers').diffPatch);
+  });
+
   it('appcache example', function (done) {
     runExample('appcache', done);
   });
