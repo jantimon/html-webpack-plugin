@@ -85,11 +85,11 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
     // Sort chunks
     chunks = self.sortChunks(chunks, self.options.chunksSortMode);
     // Let plugins alter the chunks and the chunk sorting
-    if (compilation.applyPluginsWaterfall) {
-      chunks = compilation.applyPluginsWaterfall('html-webpack-plugin-alter-chunks', chunks, { plugin: self });
-    } else {
-      // Webpack 4
+    if (compilation.hooks) {
       chunks = compilation.hooks.htmlWebpackPluginAlterChunks.call(chunks, { plugin: self });
+    } else {
+      // Before Webpack 4
+      chunks = compilation.applyPluginsWaterfall('html-webpack-plugin-alter-chunks', chunks, { plugin: self });
     }
     // Get assets
     var assets = self.htmlWebpackPluginAssets(compilation, chunks);
@@ -659,25 +659,7 @@ HtmlWebpackPlugin.prototype.getAssetFiles = function (assets) {
  * a function that helps to merge given plugin arguments with processed ones
  */
 HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) {
-  if (compilation.applyPluginsAsyncWaterfall) {
-    // Webpack < 4
-    var promisedApplyPluginsAsyncWaterfall = Promise.promisify(
-      compilation.applyPluginsAsyncWaterfall,
-      { context: compilation }
-    );
-    return function (eventName, requiresResult, pluginArgs) {
-      return promisedApplyPluginsAsyncWaterfall(eventName, pluginArgs)
-        .then(function (result) {
-          if (requiresResult && !result) {
-            compilation.warnings.push(
-              new Error('Using ' + eventName + ' without returning a result is deprecated.')
-            );
-          }
-          return _.extend(pluginArgs, result);
-        });
-    };
-  } else {
-    // Webpack 4
+  if (compilation.hooks) {
     return function (eventName, requiresResult, pluginArgs) {
       var ccEventName = trainCaseToCamelCase(eventName);
       if (!compilation.hooks[ccEventName]) {
@@ -688,6 +670,23 @@ HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) 
 
       return compilation.hooks[ccEventName]
         .promise(pluginArgs)
+        .then(function (result) {
+          if (requiresResult && !result) {
+            compilation.warnings.push(
+              new Error('Using ' + eventName + ' without returning a result is deprecated.')
+            );
+          }
+          return _.extend(pluginArgs, result);
+        });
+    };
+  } else {
+    // Before Webpack 4
+    var promisedApplyPluginsAsyncWaterfall = Promise.promisify(
+      compilation.applyPluginsAsyncWaterfall,
+      { context: compilation }
+    );
+    return function (eventName, requiresResult, pluginArgs) {
+      return promisedApplyPluginsAsyncWaterfall(eventName, pluginArgs)
         .then(function (result) {
           if (requiresResult && !result) {
             compilation.warnings.push(
