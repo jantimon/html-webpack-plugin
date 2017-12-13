@@ -24,7 +24,8 @@ function HtmlWebpackPlugin (options) {
     chunks: 'all',
     excludeChunks: [],
     title: 'Webpack App',
-    xhtml: false
+    xhtml: false,
+    templateStats: true
   }, options);
 }
 
@@ -64,8 +65,24 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
 
   compiler.plugin('emit', function (compilation, callback) {
     var applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
-    // Get all chunks
-    var allChunks = compilation.getStats().toJson().chunks;
+    // Get chunks info as json
+    // Note: we're excluding stuff that we don't need to improve toJson serialization speed.
+    var chunkOnlyConfig = {
+      assets: false,
+      cached: false,
+      children: false,
+      chunks: true,
+      chunkModules: false,
+      chunkOrigins: false,
+      errorDetails: false,
+      hash: false,
+      modules: false,
+      reasons: false,
+      source: false,
+      timings: false,
+      version: false
+    };
+    var allChunks = compilation.getStats().toJson(chunkOnlyConfig).chunks;
     // Filter chunks (options.chunks and options.excludeCHunks)
     var chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
     // Sort chunks
@@ -252,7 +269,7 @@ HtmlWebpackPlugin.prototype.executeTemplate = function (templateFunction, chunks
     .then(function () {
       var templateParams = {
         compilation: compilation,
-        webpack: compilation.getStats().toJson(),
+        webpack: self.options.templateStats ? compilation.getStats().toJson() : undefined,
         webpackConfig: compilation.options,
         htmlWebpackPlugin: {
           files: assets,
