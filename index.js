@@ -443,7 +443,11 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
 
     // Webpack outputs an array for each chunk when using sourcemaps
     // But we need only the entry file
-    var entry = chunkFiles[0];
+    var entry = chunkFiles.filter(function (chunkFile) {
+      // Sometimes the first chunk isn’t the entry file but a JSON manifest.
+      // We must filter out non-JS files from the list to account for such cases.
+      return /\.js($|\?)/.test(chunkFile);
+    })[0];
     assets.chunks[chunkName].size = chunk.size;
     assets.chunks[chunkName].entry = entry;
     assets.chunks[chunkName].hash = chunk.hash;
