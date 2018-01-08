@@ -31,7 +31,6 @@ function setUpCompiler (htmlWebpackPlugin) {
     },
     plugins: [htmlWebpackPlugin]
   };
-  // TODO should we test both modes?
   if (Number(webpackMajorVersion) >= 4) {
     webpackConfig.mode = 'development';
   }

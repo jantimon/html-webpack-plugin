@@ -37,7 +37,6 @@ var OUTPUT_DIR = path.join(__dirname, '../dist');
 jasmine.getEnv().defaultTimeoutInterval = 30000;
 
 function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expectErrors, expectWarnings) {
-  // TODO should we test both modes?
   if (Number(webpackMajorVersion) >= 4) {
     webpackConfig.mode = 'development';
     if (webpackConfig.module && webpackConfig.module.loaders) {
