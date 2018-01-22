@@ -64,6 +64,6 @@
     "toposort": "^1.0.0"
   },
   "peerDependencies": {
-    "webpack": "1 || ^2 || ^2.1.0-beta || ^2.2.0-rc || ^3 || ^4.0.0-alpha.0"
+    "webpack": "1 || ^2 || ^2.1.0-beta || ^2.2.0-rc || ^3 || ^4.0.0-beta.1"
   }
 }

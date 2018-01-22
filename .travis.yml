@@ -7,7 +7,7 @@ env:
   - WEBPACK_VERSION=1 EXTRACT_PLUGIN_VERSION=1
   - WEBPACK_VERSION=2 EXTRACT_PLUGIN_VERSION=2
   - WEBPACK_VERSION=3 EXTRACT_PLUGIN_VERSION=3.0.0-beta.3
-  - WEBPACK_VERSION=4.0.0-alpha.4 EXTRACT_PLUGIN_VERSION=3.0.0-beta.3
+  - WEBPACK_VERSION=4.0.0-beta.1 EXTRACT_PLUGIN_VERSION=3.0.0-beta.3
 before_install:
   - stty columns 120
 install:
@@ -17,12 +17,12 @@ install:
   - npm install webpack@$WEBPACK_VERSION extract-text-webpack-plugin@$EXTRACT_PLUGIN_VERSION --ignore-scripts || true
 matrix:
   exclude:
-    - env: WEBPACK_VERSION=4.0.0-alpha.4 EXTRACT_PLUGIN_VERSION=3.0.0-beta.3
+    - env: WEBPACK_VERSION=4.0.0-beta.1 EXTRACT_PLUGIN_VERSION=3.0.0-beta.3
       node_js: "4"
-    - env: WEBPACK_VERSION=4.0.0-alpha.4 EXTRACT_PLUGIN_VERSION=3.0.0-beta.3
+    - env: WEBPACK_VERSION=4.0.0-beta.1 EXTRACT_PLUGIN_VERSION=3.0.0-beta.3
       node_js: "5"
   include:
-    - env: WEBPACK_VERSION=4.0.0-alpha.4 EXTRACT_PLUGIN_VERSION=3.0.0-beta.3
+    - env: WEBPACK_VERSION=4.0.0-beta.1 EXTRACT_PLUGIN_VERSION=3.0.0-beta.3
       node_js: "8"
 script:
   - npm test
