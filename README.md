@@ -43,12 +43,12 @@ Basic Usage
 -----------
 
 The plugin will generate an HTML5 file for you that includes all your webpack
-bundles in the body using `script` tags. Just add the plugin to your webpack
-config as follows:
+bundles in the body using `script` tags. Just add the plugin to your 
+[`webpack.config.js`](https://webpack.js.org/configuration/) as follows:
 
 ```javascript
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var webpackConfig = {
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+Module.exports = {
   entry: 'index.js',
   output: {
     path: __dirname + '/dist',
