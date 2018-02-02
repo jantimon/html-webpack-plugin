@@ -24,7 +24,8 @@ function HtmlWebpackPlugin (options) {
     chunks: 'all',
     excludeChunks: [],
     title: 'Webpack App',
-    xhtml: false
+    xhtml: false,
+    scriptType: true
   }, options);
 }
 
@@ -471,15 +472,23 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
  */
 HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
   // Turn script files into script tags
+  var scriptType = !!this.options.scriptType;
   var scripts = assets.js.map(function (scriptPath) {
-    return {
+    var tagAttr = {
       tagName: 'script',
       closeTag: true,
       attributes: {
-        type: 'text/javascript',
         src: scriptPath
       }
     };
+    if (scriptType) {
+      tagAttr = _.extend(tagAttr, {
+        attributes: {
+          type: 'text/javascript'
+        }
+      });
+    }
+    return tagAttr;
   });
   // Make tags self-closing in case of xhtml
   var selfClosingTag = !!this.options.xhtml;

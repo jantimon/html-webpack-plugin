@@ -99,6 +99,7 @@ Allowed values are as follows:
 - `chunksSortMode`: Allows to control how chunks should be sorted before they are included to the html. Allowed values: 'none' | 'auto' | 'dependency' |'manual' | {function} - default: 'auto'
 - `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk)
 - `xhtml`: `true | false` If `true` render the `link` tags as self-closing, XHTML compliant. Default is `false`
+- `scriptType`: `true | false` If `true` add the `type="text/javascript"` attribute; nothing otherwise. Defaults to `true`.
 
 Here's an example webpack config illustrating how to use these options:
 ```javascript
