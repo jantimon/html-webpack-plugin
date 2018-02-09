@@ -482,7 +482,7 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
       }
     };
     if (includeScriptType) {
-      tagAttr.attributes.type = 'test/javascript';
+      tagAttr.attributes.type = 'text/javascript';
     }
     return tagAttr;
   });
