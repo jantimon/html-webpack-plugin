@@ -1572,4 +1572,17 @@ describe('HtmlWebpackPlugin', function () {
       })]
     }, [/<head>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/head\s>/], null, done);
   });
+
+  it('allows you to specify whether or not you want to include the type attribute', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        includeScriptType: true
+      })]
+    }, [/<body>[\s]*<script src="index_bundle.js" type="text\/javascript"><\/script>[\s]*<\/body>/], null, done);
+  });
 });
