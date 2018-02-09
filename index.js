@@ -25,7 +25,7 @@ function HtmlWebpackPlugin (options) {
     excludeChunks: [],
     title: 'Webpack App',
     xhtml: false,
-    scriptType: true
+    includeScriptType: false
   }, options);
 }
 
@@ -472,7 +472,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
  */
 HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
   // Turn script files into script tags
-  var scriptType = !!this.options.scriptType;
+  var includeScriptType = !!this.options.includeScriptType;
   var scripts = assets.js.map(function (scriptPath) {
     var tagAttr = {
       tagName: 'script',
@@ -481,12 +481,8 @@ HtmlWebpackPlugin.prototype.generateAssetTags = function (assets) {
         src: scriptPath
       }
     };
-    if (scriptType) {
-      tagAttr = _.extend(tagAttr, {
-        attributes: {
-          type: 'text/javascript'
-        }
-      });
+    if (includeScriptType) {
+      tagAttr.attributes.type = 'test/javascript';
     }
     return tagAttr;
   });
