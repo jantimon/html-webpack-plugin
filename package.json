@@ -10,8 +10,8 @@
   ],
   "scripts": {
     "prepublish": "npm run test",
-    "pretest": "semistandard",
     "build-examples": "node examples/build-examples.js",
+    "pretest": "npm run build-examples && semistandard",
     "test": "jasmine"
   },
   "repository": {
