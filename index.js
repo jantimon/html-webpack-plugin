@@ -609,10 +609,9 @@ HtmlWebpackPlugin.prototype.createHtmlTag = function (tagDefinition) {
  * Helper to return the absolute template path with a fallback loader
  */
 HtmlWebpackPlugin.prototype.getFullTemplatePath = function (template, context) {
-
   // If template is a function, run the function and use its value
-  if (typeof(template) === 'function') {
-    template = template()
+  if (typeof template === 'function') {
+    template = template();
   }
 
   // If the template doesn't use a loader use the lodash template loader
