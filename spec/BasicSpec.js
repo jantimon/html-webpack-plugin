@@ -16,12 +16,14 @@ var fs = require('fs');
 var webpack = require('webpack');
 var rimraf = require('rimraf');
 var _ = require('lodash');
-var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var extractTextPluginMajorVersion = require('extract-text-webpack-plugin/package.json').version.split('.')[0];
 var webpackMajorVersion = Number(require('webpack/package.json').version.split('.')[0]);
 if (isNaN(webpackMajorVersion)) {
   throw new Error('Cannot parse webpack major version');
+}
+if (webpackMajorVersion < 4) {
+  var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 }
 var HtmlWebpackPlugin = require('../index.js');
 
@@ -39,6 +41,24 @@ var OUTPUT_DIR = path.join(__dirname, '../dist');
 
 jasmine.getEnv().defaultTimeoutInterval = 30000;
 
+function transformCommonChunkConfigToOptimization (config) {
+  if (config.name === 'common') {
+    return {
+      splitChunks: {
+        cacheGroups: {
+          commons: {
+            chunks: 'initial',
+            name: config.name,
+            enforce: true
+          }
+        }
+      }
+    };
+  } else {
+    throw new Error('Unrecognized common chunk config');
+  }
+}
+
 function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expectErrors, expectWarnings) {
   if (webpackMajorVersion >= 4) {
     webpackConfig.mode = 'development';
@@ -46,6 +66,15 @@ function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expec
       webpackConfig.module.rules = webpackConfig.module.loaders;
       delete webpackConfig.module.loaders;
     }
+  }
+  if (webpackConfig.__commonsChunk) {
+    if (webpackMajorVersion < 4) {
+      webpackConfig.plugins = webpackConfig.plugins || [];
+      webpackConfig.plugins.unshift(new CommonsChunkPlugin(webpackConfig.__commonsChunk));
+    } else {
+      webpackConfig.optimization = transformCommonChunkConfigToOptimization(webpackConfig.__commonsChunk);
+    }
+    delete webpackConfig.__commonsChunk;
   }
   outputFile = outputFile || 'index.html';
   webpack(webpackConfig, function (err, stats) {
@@ -1244,11 +1273,11 @@ describe('HtmlWebpackPlugin', function () {
         path: OUTPUT_DIR,
         filename: '[name]_bundle.js'
       },
+      __commonsChunk: {
+        name: 'common',
+        filename: 'common_bundle.js'
+      },
       plugins: [
-        new CommonsChunkPlugin({
-          name: 'common',
-          filename: 'common_bundle.js'
-        }),
         new HtmlWebpackPlugin()
       ]
     }, [
@@ -1439,11 +1468,11 @@ describe('HtmlWebpackPlugin', function () {
         path: OUTPUT_DIR,
         filename: '[name]_bundle.js'
       },
+      __commonsChunk: {
+        name: 'common',
+        filename: 'common_bundle.js'
+      },
       plugins: [
-        new CommonsChunkPlugin({
-          name: 'common',
-          filename: 'common_bundle.js'
-        }),
         new HtmlWebpackPlugin({
           chunksSortMode: 'auto'
         })
@@ -1495,11 +1524,11 @@ describe('HtmlWebpackPlugin', function () {
           { test: /\.css$/, loader: 'css-loader' }
         ]
       },
+      __commonsChunk: {
+        name: 'common',
+        filename: 'common_bundle.js'
+      },
       plugins: [
-        new CommonsChunkPlugin({
-          name: 'common',
-          filename: 'common_bundle.js'
-        }),
         new HtmlWebpackPlugin({
           chunksSortMode: 'dependency'
         })
@@ -1523,11 +1552,11 @@ describe('HtmlWebpackPlugin', function () {
           { test: /\.css$/, loader: 'css-loader' }
         ]
       },
+      __commonsChunk: {
+        name: 'common',
+        filename: 'common_bundle.js'
+      },
       plugins: [
-        new CommonsChunkPlugin({
-          name: 'common',
-          filename: 'common_bundle.js'
-        }),
         new HtmlWebpackPlugin({
           chunksSortMode: 'dependency',
           excludeChunks: ['common']
@@ -1554,11 +1583,11 @@ describe('HtmlWebpackPlugin', function () {
           { test: /\.css$/, loader: 'css-loader' }
         ]
       },
+      __commonsChunk: {
+        name: 'common',
+        filename: 'common_bundle.js'
+      },
       plugins: [
-        new CommonsChunkPlugin({
-          name: 'common',
-          filename: 'common_bundle.js'
-        }),
         new HtmlWebpackPlugin({
           chunksSortMode: 'manual',
           chunks: ['common', 'a', 'b', 'c']
