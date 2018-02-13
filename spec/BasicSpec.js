@@ -19,7 +19,10 @@ var _ = require('lodash');
 var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var extractTextPluginMajorVersion = require('extract-text-webpack-plugin/package.json').version.split('.')[0];
-var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
+var webpackMajorVersion = Number(require('webpack/package.json').version.split('.')[0]);
+if (isNaN(webpackMajorVersion)) {
+  throw new Error('Cannot parse webpack major version');
+}
 var HtmlWebpackPlugin = require('../index.js');
 
 if (Number(extractTextPluginMajorVersion) > 1) {
@@ -37,7 +40,7 @@ var OUTPUT_DIR = path.join(__dirname, '../dist');
 jasmine.getEnv().defaultTimeoutInterval = 30000;
 
 function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expectErrors, expectWarnings) {
-  if (Number(webpackMajorVersion) >= 4) {
+  if (webpackMajorVersion >= 4) {
     webpackConfig.mode = 'development';
     if (webpackConfig.module && webpackConfig.module.loaders) {
       webpackConfig.module.rules = webpackConfig.module.loaders;
@@ -766,7 +769,7 @@ describe('HtmlWebpackPlugin', function () {
       }
     };
 
-    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
+    var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -799,7 +802,7 @@ describe('HtmlWebpackPlugin', function () {
       }
     };
 
-    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
+    var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -898,7 +901,7 @@ describe('HtmlWebpackPlugin', function () {
       }
     };
 
-    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
+    var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -930,7 +933,7 @@ describe('HtmlWebpackPlugin', function () {
         });
       }
     };
-    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
+    var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -994,7 +997,7 @@ describe('HtmlWebpackPlugin', function () {
       }
     };
 
-    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
+    var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -1040,7 +1043,7 @@ describe('HtmlWebpackPlugin', function () {
       }
     };
 
-    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
+    var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -1090,7 +1093,7 @@ describe('HtmlWebpackPlugin', function () {
       }
     };
 
-    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
+    var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
@@ -1177,7 +1180,7 @@ describe('HtmlWebpackPlugin', function () {
       }
     };
 
-    var shouldExpectWarnings = Number(webpackMajorVersion) < 4;
+    var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
