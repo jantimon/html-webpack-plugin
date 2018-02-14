@@ -83,7 +83,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
     // Filter chunks (options.chunks and options.excludeCHunks)
     var chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
     // Sort chunks
-    chunks = self.sortChunks(chunks, self.options.chunksSortMode);
+    chunks = self.sortChunks(chunks, self.options.chunksSortMode, compilation.chunkGroups);
     // Let plugins alter the chunks and the chunk sorting
     if (compilation.hooks) {
       chunks = compilation.hooks.htmlWebpackPluginAlterChunks.call(chunks, { plugin: self });
@@ -353,7 +353,7 @@ HtmlWebpackPlugin.prototype.addFileToAssets = function (filename, compilation) {
 /**
  * Helper to sort chunks
  */
-HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
+HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode, chunkGroups) {
   // Sort mode auto by default:
   if (typeof sortMode === 'undefined') {
     sortMode = 'auto';
@@ -366,9 +366,12 @@ HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
   if (sortMode === 'none') {
     return chunkSorter.none(chunks);
   }
+  if (sortMode === 'manual') {
+    return chunkSorter.manual(chunks, this.options.chunks);
+  }
   // Check if the given sort mode is a valid chunkSorter sort mode
   if (typeof chunkSorter[sortMode] !== 'undefined') {
-    return chunkSorter[sortMode](chunks, this.options.chunks);
+    return chunkSorter[sortMode](chunks, chunkGroups);
   }
   throw new Error('"' + sortMode + '" is not a valid chunk sort mode');
 };

@@ -1534,7 +1534,9 @@ describe('HtmlWebpackPlugin', function () {
         })
       ]
     }, [
-      /<script type="text\/javascript" src="common_bundle.js">.+<script type="text\/javascript" src="aTheme_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">/], null, done);
+      // theme and util don't depend on each other, so the order of those doesn't matter
+      /<script type="text\/javascript" src="common_bundle.js">.+(<script type="text\/javascript" src="aTheme_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">|<script type="text\/javascript" src="util_bundle.js">.+<script type="text\/javascript" src="aTheme_bundle.js">)/
+    ], null, done);
   });
 
   it('should sort the chunks by chunk dependencies even if a parent chunk is excluded', function (done) {
@@ -1563,7 +1565,9 @@ describe('HtmlWebpackPlugin', function () {
         })
       ]
     }, [
-      /<script type="text\/javascript" src="aTheme_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">/], null, done);
+      // theme and util don't depend on each other, so the order of those doesn't matter
+      /(<script type="text\/javascript" src="aTheme_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">|<script type="text\/javascript" src="util_bundle.js">.+<script type="text\/javascript" src="aTheme_bundle.js">)/
+    ], null, done);
   });
 
   it('should sort manually by the chunks', function (done) {
