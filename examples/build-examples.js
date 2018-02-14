@@ -38,6 +38,7 @@ examples.forEach(function (exampleName) {
       }
     }));
     config.mode = 'production';
+    config.optimization = { minimizer: [] };
     if (config.module && config.module.loaders) {
       config.module.rules = config.module.loaders;
       delete config.module.loaders;

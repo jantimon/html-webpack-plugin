@@ -42,6 +42,7 @@ function runExample (exampleName, done) {
         delete options.module.loaders;
       }
       options.mode = 'production';
+      options.optimization = { minimizer: [] };
     }
 
     webpack(options, function (err) {
