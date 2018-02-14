@@ -43,7 +43,7 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
   }
 
   // setup hooks for webpack 4
-  if (compiler.hooks && compiler.hooks.compilation) {
+  if (compiler.hooks) {
     compiler.hooks.compilation.tap('HtmlWebpackPluginHooks', function (compilation) {
       var SyncWaterfallHook = require('tapable').SyncWaterfallHook;
       var AsyncSeriesWaterfallHook = require('tapable').AsyncSeriesWaterfallHook;
