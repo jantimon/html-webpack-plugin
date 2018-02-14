@@ -9,10 +9,11 @@
     "lib/"
   ],
   "scripts": {
-    "prepublish": "npm run test",
+    "prepare": "npm run test",
     "pretest": "semistandard",
     "build-examples": "node examples/build-examples.js",
-    "test": "jasmine"
+    "test": "jasmine",
+    "release": "standard-version"
   },
   "repository": {
     "type": "git",
@@ -48,6 +49,7 @@
     "jasmine": "^2.5.2",
     "rimraf": "^2.5.4",
     "semistandard": "8.0.0",
+    "standard-version": "^4.3.0",
     "style-loader": "^0.13.1",
     "underscore-template-loader": "^0.7.3",
     "url-loader": "^0.5.7",
