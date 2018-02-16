@@ -1,8 +1,8 @@
 language: node_js
 node_js:
-  - "4"
-  - "5"
-  - "6"
+  - stable
+  - lts/*
+  - 6
 env:
   - WEBPACK_VERSION=1 EXTRACT_PLUGIN_VERSION=1
   - WEBPACK_VERSION=2 EXTRACT_PLUGIN_VERSION=2
