@@ -42,6 +42,20 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
     this.options.filename = path.relative(compiler.options.output.path, filename);
   }
 
+  // setup hooks for webpack 4
+  if (compiler.hooks) {
+    compiler.hooks.compilation.tap('HtmlWebpackPluginHooks', function (compilation) {
+      var SyncWaterfallHook = require('tapable').SyncWaterfallHook;
+      var AsyncSeriesWaterfallHook = require('tapable').AsyncSeriesWaterfallHook;
+      compilation.hooks.htmlWebpackPluginAlterChunks = new SyncWaterfallHook(['chunks', 'objectWithPluginRef']);
+      compilation.hooks.htmlWebpackPluginBeforeHtmlGeneration = new AsyncSeriesWaterfallHook(['pluginArgs']);
+      compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing = new AsyncSeriesWaterfallHook(['pluginArgs']);
+      compilation.hooks.htmlWebpackPluginAlterAssetTags = new AsyncSeriesWaterfallHook(['pluginArgs']);
+      compilation.hooks.htmlWebpackPluginAfterHtmlProcessing = new AsyncSeriesWaterfallHook(['pluginArgs']);
+      compilation.hooks.htmlWebpackPluginAfterEmit = new AsyncSeriesWaterfallHook(['pluginArgs']);
+    });
+  }
+
   compiler.plugin('make', function (compilation, callback) {
     // Compile the template (queued)
     compilationPromise = childCompiler.compileTemplate(self.options.template, compiler.context, self.options.filename, compilation)
@@ -69,9 +83,14 @@ HtmlWebpackPlugin.prototype.apply = function (compiler) {
     // Filter chunks (options.chunks and options.excludeCHunks)
     var chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
     // Sort chunks
-    chunks = self.sortChunks(chunks, self.options.chunksSortMode);
+    chunks = self.sortChunks(chunks, self.options.chunksSortMode, compilation.chunkGroups);
     // Let plugins alter the chunks and the chunk sorting
-    chunks = compilation.applyPluginsWaterfall('html-webpack-plugin-alter-chunks', chunks, { plugin: self });
+    if (compilation.hooks) {
+      chunks = compilation.hooks.htmlWebpackPluginAlterChunks.call(chunks, { plugin: self });
+    } else {
+      // Before Webpack 4
+      chunks = compilation.applyPluginsWaterfall('html-webpack-plugin-alter-chunks', chunks, { plugin: self });
+    }
     // Get assets
     var assets = self.htmlWebpackPluginAssets(compilation, chunks);
     // If this is a hot update compilation, move on!
@@ -313,7 +332,12 @@ HtmlWebpackPlugin.prototype.addFileToAssets = function (filename, compilation) {
   })
   .then(function (results) {
     var basename = path.basename(filename);
-    compilation.fileDependencies.push(filename);
+    if (compilation.fileDependencies.add) {
+      compilation.fileDependencies.add(filename);
+    } else {
+      // Before Webpack 4 - fileDepenencies was an array
+      compilation.fileDependencies.push(filename);
+    }
     compilation.assets[basename] = {
       source: function () {
         return results.source;
@@ -329,7 +353,7 @@ HtmlWebpackPlugin.prototype.addFileToAssets = function (filename, compilation) {
 /**
  * Helper to sort chunks
  */
-HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
+HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode, chunkGroups) {
   // Sort mode auto by default:
   if (typeof sortMode === 'undefined') {
     sortMode = 'auto';
@@ -342,9 +366,12 @@ HtmlWebpackPlugin.prototype.sortChunks = function (chunks, sortMode) {
   if (sortMode === 'none') {
     return chunkSorter.none(chunks);
   }
+  if (sortMode === 'manual') {
+    return chunkSorter.manual(chunks, this.options.chunks);
+  }
   // Check if the given sort mode is a valid chunkSorter sort mode
   if (typeof chunkSorter[sortMode] !== 'undefined') {
-    return chunkSorter[sortMode](chunks, this.options.chunks);
+    return chunkSorter[sortMode](chunks, chunkGroups);
   }
   throw new Error('"' + sortMode + '" is not a valid chunk sort mode');
 };
@@ -640,16 +667,48 @@ HtmlWebpackPlugin.prototype.getAssetFiles = function (assets) {
  * a function that helps to merge given plugin arguments with processed ones
  */
 HtmlWebpackPlugin.prototype.applyPluginsAsyncWaterfall = function (compilation) {
-  var promisedApplyPluginsAsyncWaterfall = Promise.promisify(compilation.applyPluginsAsyncWaterfall, {context: compilation});
-  return function (eventName, requiresResult, pluginArgs) {
-    return promisedApplyPluginsAsyncWaterfall(eventName, pluginArgs)
-      .then(function (result) {
-        if (requiresResult && !result) {
-          compilation.warnings.push(new Error('Using ' + eventName + ' without returning a result is deprecated.'));
-        }
-        return _.extend(pluginArgs, result);
-      });
-  };
+  if (compilation.hooks) {
+    return function (eventName, requiresResult, pluginArgs) {
+      var ccEventName = trainCaseToCamelCase(eventName);
+      if (!compilation.hooks[ccEventName]) {
+        compilation.errors.push(
+          new Error('No hook found for ' + eventName)
+        );
+      }
+
+      return compilation.hooks[ccEventName].promise(pluginArgs);
+    };
+  } else {
+    // Before Webpack 4
+    var promisedApplyPluginsAsyncWaterfall = Promise.promisify(
+      compilation.applyPluginsAsyncWaterfall,
+      { context: compilation }
+    );
+    return function (eventName, requiresResult, pluginArgs) {
+      return promisedApplyPluginsAsyncWaterfall(eventName, pluginArgs)
+        .then(function (result) {
+          if (requiresResult && !result) {
+            compilation.warnings.push(
+              new Error('Using ' + eventName + ' without returning a result is deprecated.')
+            );
+          }
+          return _.extend(pluginArgs, result);
+        });
+    };
+  }
 };
+
+/**
+ * Takes a string in train case and transforms it to camel case
+ *
+ * Example: 'hello-my-world' to 'helloMyWorld'
+ *
+ * @param {string} word
+ */
+function trainCaseToCamelCase (word) {
+  return word.replace(/-([\w])/g, function (match, p1) {
+    return p1.toUpperCase();
+  });
+}
 
 module.exports = HtmlWebpackPlugin;
