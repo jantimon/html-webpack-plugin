@@ -23,6 +23,7 @@ function HtmlWebpackPlugin (options) {
     showErrors: true,
     chunks: 'all',
     excludeChunks: [],
+    chunksCheckInitialMode: true,
     title: 'Webpack App',
     xhtml: false
   }, options);
@@ -360,12 +361,14 @@ HtmlWebpackPlugin.prototype.filterChunks = function (chunks, includedChunks, exc
       return false;
     }
     // Skip if the chunk should be lazy loaded
-    if (typeof chunk.isInitial === 'function') {
-      if (!chunk.isInitial()) {
+    if (this.options.chunksCheckInitialMode) {
+      if (typeof chunk.isInitial === 'function') {
+        if (!chunk.isInitial()) {
+          return false;
+        }
+      } else if (!chunk.initial) {
         return false;
       }
-    } else if (!chunk.initial) {
-      return false;
     }
     // Skip if the chunks should be filtered and the given chunk was not added explicity
     if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
@@ -377,7 +380,7 @@ HtmlWebpackPlugin.prototype.filterChunks = function (chunks, includedChunks, exc
     }
     // Add otherwise
     return true;
-  });
+  }.bind(this));
 };
 
 HtmlWebpackPlugin.prototype.isHotUpdateCompilation = function (assets) {
