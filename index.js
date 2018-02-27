@@ -437,7 +437,15 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
     // Will contain all js files
     js: [],
     // Will contain all css files
-    css: [],
+    css: Object.keys(compilation.assets).filter(function (assetFile) {
+      return path.extname(assetFile) === '.css';
+    }).map(function (cssFile) {
+      cssFile = publicPath + cssFile;
+      if (self.options.hash) {
+        cssFile = self.appendHash(cssFile, webpackStatsJson.hash);
+      }
+      return cssFile;
+    }),
     // Will contain the html5 appcache manifest files if it exists
     manifest: Object.keys(compilation.assets).filter(function (assetFile) {
       return path.extname(assetFile) === '.appcache';
@@ -475,20 +483,7 @@ HtmlWebpackPlugin.prototype.htmlWebpackPluginAssets = function (compilation, chu
     assets.chunks[chunkName].entry = entry;
     assets.chunks[chunkName].hash = chunk.hash;
     assets.js.push(entry);
-
-    // Gather all css files
-    var css = chunkFiles.filter(function (chunkFile) {
-      // Some chunks may contain content hash in their names, for ex. 'main.css?1e7cac4e4d8b52fd5ccd2541146ef03f'.
-      // We must proper handle such cases, so we use regexp testing here
-      return /.css($|\?)/.test(chunkFile);
-    });
-    assets.chunks[chunkName].css = css;
-    assets.css = assets.css.concat(css);
   }
-
-  // Duplicate css assets can occur on occasion if more than one chunk
-  // requires the same css.
-  assets.css = _.uniq(assets.css);
 
   return assets;
 };

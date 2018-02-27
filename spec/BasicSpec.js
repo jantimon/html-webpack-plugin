@@ -572,6 +572,97 @@ describe('HtmlWebpackPlugin', function () {
     }, ['<link href="styles.css?%hash%"'], null, done);
   });
 
+  it('should pick up css files exported with the file-loader', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: 'file-loader?name=styles.css' }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin()
+      ]
+    }, ['<link href="styles.css" rel="stylesheet">'], null, done);
+  });
+
+  it('should pick up css files exported with the file-loader on windows and protocol relative urls support (#205)', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        publicPath: '//localhost:8080/'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: 'file-loader?name=styles.css' }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin()
+      ]
+    }, ['<link href="//localhost:8080/styles.css"'], null, done);
+  });
+
+  it('should allow to add cache hashes css files that have been exported with the file-loader', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: 'file-loader?name=styles.css' }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({hash: true})
+      ]
+    }, ['<link href="styles.css?%hash%"'], null, done);
+  });
+
+  it('should inject css files when using the file-loader to export css files', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: 'file-loader?name=styles.css' }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({inject: true})
+      ]
+    }, ['<link href="styles.css"'], null, done);
+  });
+
+  it('should allow to add cache hashes to with injected css assets that have been exported with the file-loader', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.css$/, loader: 'file-loader?name=styles.css' }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({hash: true, inject: true})
+      ]
+    }, ['<link href="styles.css?%hash%"'], null, done);
+  });
+
   it('should output xhtml link stylesheet tag', function (done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/theme.js'),
