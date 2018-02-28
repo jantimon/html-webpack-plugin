@@ -1,6 +1,12 @@
 Change History
 ==============
 
+v3.0.0
+---
+* Add support for the new [https://github.com/webpack/tapable](webpack tapable) to be compatible with webpack 4.x
+* Similar to webpack 4.x the support for node versions older than 6 are no longer supported
+* Remove bluebird dependency
+
 v2.30.1
 ---
 * Revert part the performance optimization (#723) because of #753.
