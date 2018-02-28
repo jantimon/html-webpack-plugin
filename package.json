@@ -52,7 +52,7 @@
     "util.promisify": "1.0.0"
   },
   "peerDependencies": {
-    "extract-text-webpack-plugin": "^1.0.0 || ^2.0.0 || 3.0.0 || ^4.0.0-alpha.0 || ^4.0.0",
+    "extract-text-webpack-plugin": "^1.0.0 || ^2.0.0 || ^3.0.0 || ^4.0.0-alpha.0 || ^4.0.0",
     "webpack": "^1.0.0 || ^2.0.0 || ^3.0.0 || ^4.0.0"
   },
   "keywords": [
