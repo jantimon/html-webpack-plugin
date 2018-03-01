@@ -84,8 +84,24 @@ class HtmlWebpackPlugin {
 
     compiler.plugin('emit', (compilation, callback) => {
       const applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
-      // Get all chunks
-      const allChunks = compilation.getStats().toJson().chunks;
+      // Get chunks info as json
+      // Note: we're excluding stuff that we don't need to improve toJson serialization speed.
+      const chunkOnlyConfig = {
+        assets: false,
+        cached: false,
+        children: false,
+        chunks: true,
+        chunkModules: false,
+        chunkOrigins: false,
+        errorDetails: false,
+        hash: false,
+        modules: false,
+        reasons: false,
+        source: false,
+        timings: false,
+        version: false
+      };
+      const allChunks = compilation.getStats().toJson(chunkOnlyConfig).chunks;
       // Filter chunks (options.chunks and options.excludeCHunks)
       let chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
       // Sort chunks
