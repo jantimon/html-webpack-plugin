@@ -1,28 +1,42 @@
-HTML Webpack Plugin
-===================
-[![npm version](https://badge.fury.io/js/html-webpack-plugin.svg)](http://badge.fury.io/js/html-webpack-plugin) [![Dependency Status](https://david-dm.org/jantimon/html-webpack-plugin.svg)](https://david-dm.org/jantimon/html-webpack-plugin) [![Build status](https://travis-ci.org/jantimon/html-webpack-plugin.svg)](https://travis-ci.org/jantimon/html-webpack-plugin) [![Windows build status](https://ci.appveyor.com/api/projects/status/github/jantimon/html-webpack-plugin?svg=true&branch=master)](https://ci.appveyor.com/project/jantimon/html-webpack-plugin) [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard) [![bitHound Dependencies](https://www.bithound.io/github/jantimon/html-webpack-plugin/badges/dependencies.svg)](https://www.bithound.io/github/jantimon/html-webpack-plugin/master/dependencies/npm) [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)]()
+[![npm][npm]][npm-url]
+[![node][node]][node-url]
+[![deps][deps]][deps-url]
+[![tests][tests]][tests-url]
+[![coverage][cover]][cover-url]
+[![chat][chat]][chat-url]
 
-[![NPM](https://nodei.co/npm/html-webpack-plugin.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/html-webpack-plugin/)
+<div align="center">
+  <img width="200" height="200" src="https://worldvectorlogo.com/logos/html5.svg">
+  <a href="https://github.com/webpack/webpack">
+    <img width="200" height="200"
+      src="https://webpack.js.org/assets/icon-square-big.svg">
+  </a>
+  <div>
+    <img width="100" height="100" title="Webpack Plugin" src="http://michael-ciniawsky.github.io/postcss-load-plugins/logo.svg">
+  </div>
+  <h1>HTML Webpack Plugin</h1>
+  <p>Plugin that simplifies creation of HTML files to serve your bundles</p>
+</div>
 
-This is a [webpack](http://webpack.github.io/) plugin that simplifies creation of HTML files to serve your
-webpack bundles. This is especially useful for webpack bundles that include
-a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you, supply
-your own template using lodash templates or use your own loader.
+<h2 align="center">Install</h2>
 
-Maintainer: Jan Nicklas [@jantimon](https://twitter.com/jantimon) and Thomas Sileghem [@mastilver](https://twitter.com/mastilver)
 
-Installation
-------------
-Install the plugin with npm:
-```shell
-$ npm install html-webpack-plugin --save-dev
+```bash
+  npm i --save-dev html-webpack-plugin
 ```
 
-Third party addons:
--------------
+```bash
+  yarn add --dev html-webpack-plugin
+```
 
-The html-webpack-plugin provides [hooks](https://github.com/jantimon/html-webpack-plugin#events) to extend it to your needs.
-There are already some really powerful plugins which can be integrated with zero configuration:
+
+
+This is a [webpack](http://webpack.js.org/) plugin that simplifies creation of HTML files to serve your `webpack` bundles. This is especially useful for `webpack` bundles that include a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you, supply
+your own template using `lodash` templates or use your own loader.
+
+### `Plugins`
+
+The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webpack-plugin#events) to extend it to your needs. There are already some really powerful plugins which can be integrated with zero configuration
 
  * [webpack-subresource-integrity](https://www.npmjs.com/package/webpack-subresource-integrity) for enhanced asset security
  * [appcache-webpack-plugin](https://github.com/lettertwo/appcache-webpack-plugin) for iOS and Android offline usage
@@ -39,26 +53,30 @@ There are already some really powerful plugins which can be integrated with zero
  * [link-media-html-webpack-plugin](https://github.com/yaycmyk/link-media-html-webpack-plugin) allows for injected stylesheet `<link />` tags to have their media attribute set automatically; useful for providing specific desktop/mobile/print etc. stylesheets that the browser will conditionally download
  * [inline-chunk-manifest-html-webpack-plugin](https://github.com/jouni-kantola/inline-chunk-manifest-html-webpack-plugin) for inlining webpack's chunk manifest. Default extracts manifest and inlines in `<head>`.
 
-Basic Usage
------------
+<h2 align="center">Usage</h2>
 
-The plugin will generate an HTML5 file for you that includes all your webpack
-bundles in the body using `script` tags. Just add the plugin to your webpack
+The plugin will generate an HTML5 file for you that includes all your `webpack`
+bundles in the body using `script` tags. Just add the plugin to your `webpack`
 config as follows:
 
-```javascript
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var webpackConfig = {
+**webpack.config.js**
+```js
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+module.exports = {
   entry: 'index.js',
   output: {
     path: __dirname + '/dist',
     filename: 'index_bundle.js'
   },
-  plugins: [new HtmlWebpackPlugin()]
-};
+  plugins: [
+    new HtmlWebpackPlugin()
+  ]
+}
 ```
 
-This will generate a file `dist/index.html` containing the following:
+This will generate a file `dist/index.html` containing the following
+
 ```html
 <!DOCTYPE html>
 <html>
@@ -72,36 +90,36 @@ This will generate a file `dist/index.html` containing the following:
 </html>
 ```
 
-If you have multiple webpack entry points, they will all be included with `script`
-tags in the generated HTML.
+If you have multiple `webpack` entry points, they will all be included with `script` tags in the generated HTML.
 
-If you have any CSS assets in webpack's output (for example, CSS extracted
-with the [ExtractTextPlugin](https://github.com/webpack/extract-text-webpack-plugin))
+If you have any CSS assets in webpack's output (for example, CSS extracted with the [ExtractTextPlugin](https://github.com/webpack/extract-text-webpack-plugin))
 then these will be included with `<link>` tags in the HTML head.
 
-Configuration
--------------
-You can pass a hash of configuration options to `HtmlWebpackPlugin`.
-Allowed values are as follows:
+<h2 align="center">Options</h2>
 
-- `title`: The title to use for the generated HTML document.
-- `filename`: The file to write the HTML to. Defaults to `index.html`.
-   You can specify a subdirectory here too (eg: `assets/admin.html`).
-- `template`: Webpack require path to the template. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details.
-- `inject`: `true | 'head' | 'body' | false` Inject all assets into the given `template` or `templateContent` - When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element.
-- `favicon`: Adds the given favicon path to the output html.
-- `minify`: `{...} | false` Pass [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference)'s options as object to minify the output.
-- `hash`: `true | false` if `true` then append a unique webpack compilation hash to all
-  included scripts and CSS files. This is useful for cache busting.
-- `cache`: `true | false` if `true` (default) try to emit the file only if it was changed.
-- `showErrors`: `true | false` if `true` (default) errors details will be written into the HTML page.
-- `chunks`: Allows you to add only some chunks (e.g. only the unit-test chunk)
-- `chunksSortMode`: Allows to control how chunks should be sorted before they are included to the html. Allowed values: 'none' | 'auto' | 'dependency' |'manual' | {function} - default: 'auto'
-- `excludeChunks`: Allows you to skip some chunks (e.g. don't add the unit-test chunk)
-- `xhtml`: `true | false` If `true` render the `link` tags as self-closing, XHTML compliant. Default is `false`
+You can pass a hash of configuration options to `html-webpack-plugin`.
+Allowed values are as follows
 
-Here's an example webpack config illustrating how to use these options:
-```javascript
+|Name|Type|Default|Description|
+|:--:|:--:|:-----:|:----------|
+|**[`title`](#)**|`{String}`|``|The title to use for the generated HTML document|
+|**[`filename`](#)**|`{String}`|`'index.html'`|The file to write the HTML to. Defaults to `index.html`. You can specify a subdirectory here too (eg: `assets/admin.html`)|
+|**[`template`](#)**|`{String}`|``|`webpack` require path to the template. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details|
+|**[`inject`](#)**|`{Boolean\|String}`|`true`|`true \|\| 'head' \|\| 'body' \|\| false` Inject all assets into the given `template` or `templateContent`. When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element|
+|**[`favicon`](#)**|`{String}`|``|Adds the given favicon path to the output HTML|
+|**[`minify`](#)**|`{Boolean\|Object}`|`true`|Pass [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference)'s options as object to minify the output|
+|**[`hash`](#)**|`{Boolean}`|`false`|If `true` then append a unique `webpack` compilation hash to all included scripts and CSS files. This is useful for cache busting|
+|**[`cache`](#)**|`{Boolean}`|`true`|Emit the file only if it was changed|
+|**[`showErrors`](#)**|`{Boolean}`|`true`|Errors details will be written into the HTML page|
+|**[`chunks`](#)**|`{?}`|`?`|Allows you to add only some chunks (e.g only the unit-test chunk)|
+|**[`chunksSortMode`](#plugins)**|`{String/|Function}`|`auto`|Allows to control how chunks should be sorted before they are included to the HTML. Allowed values are `'none' | 'auto' | 'dependency' | 'manual' | {Function}`|
+|**[`excludeChunks`](#)**|`{String}`|``|Allows you to skip some chunks (e.g don't add the unit-test chunk)|
+|**[`xhtml`](#)**|`{Boolean}`|`false`|If `true` render the `link` tags as self-closing (XHTML compliant)|
+
+Here's an example webpack config illustrating how to use these options
+
+**webpack.config.js**
+```js
 {
   entry: 'index.js',
   output: {
@@ -117,18 +135,13 @@ Here's an example webpack config illustrating how to use these options:
 }
 ```
 
-FAQ
-----
+### `Generating Multiple HTML Files`
 
-* [Why is my HTML minified?](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md)
-* [Why is my `<% ... %>` template not working?](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md)
-* [How can I use handlebars/pug/ejs as template engine](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md)
-
-Generating Multiple HTML Files
-------------------------------
 To generate more than one HTML file, declare the plugin more than
-once in your plugins array:
-```javascript
+once in your plugins array
+
+**webpack.confg.js**
+```js
 {
   entry: 'index.js',
   output: {
@@ -145,24 +158,24 @@ once in your plugins array:
 }
 ```
 
-Writing Your Own Templates
---------------------------
+### `Writing Your Own Templates`
+
 If the default generated HTML doesn't meet your needs you can supply
 your own template. The easiest way is to use the `template` option and pass a custom HTML file.
 The html-webpack-plugin will automatically inject all necessary CSS, JS, manifest
 and favicon files into the markup.
 
-```javascript
+```js
 plugins: [
   new HtmlWebpackPlugin({
     title: 'Custom template',
-    template: 'my-index.ejs', // Load a custom template (ejs by default see the FAQ for details)
+    // Load a custom template (lodash by default see the FAQ for details)
+    template: 'index.html'
   })
 ]
 ```
 
-`my-index.ejs`:
-
+**index.html**
 ```html
 <!DOCTYPE html>
 <html>
@@ -178,7 +191,8 @@ plugins: [
 If you already have a template loader, you can use it to parse the template.
 Please note that this will also happen if you specifiy the html-loader and use `.html` file as template.
 
-```javascript
+**webpack.config.js**
+```js
 module: {
   loaders: [
     { test: /\.hbs$/, loader: "handlebars" }
@@ -187,13 +201,12 @@ module: {
 plugins: [
   new HtmlWebpackPlugin({
     title: 'Custom template using Handlebars',
-    template: 'my-index.hbs'
+    template: 'index.hbs'
   })
 ]
 ```
 
-You can use the lodash syntax out of the box.
-If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/jaketrent/html-webpack-template/blob/86f285d5c790a6c15263f5cc50fd666d51f974fd/index.html) of the [html-webpack-template project](https://github.com/jaketrent/html-webpack-template) as a starting point for writing your own.
+You can use the `lodash` syntax out of the box. If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/jaketrent/html-webpack-template/blob/86f285d5c790a6c15263f5cc50fd666d51f974fd/index.html) of the [html-webpack-template project](https://github.com/jaketrent/html-webpack-template) as a starting point for writing your own.
 
 The following variables are available in the template:
 - `htmlWebpackPlugin`: data specific to this plugin
@@ -234,12 +247,12 @@ The following variables are available in the template:
   can be used, for example, to get the `publicPath` (`webpackConfig.output.publicPath`).
 
 
-Filtering chunks
-----------------
+### `Filtering Chunks`
 
-To include only certain chunks you can limit the chunks being used:
+To include only certain chunks you can limit the chunks being used
 
-```javascript
+**webpack.config.js**
+```js
 plugins: [
   new HtmlWebpackPlugin({
     chunks: ['app']
@@ -247,77 +260,113 @@ plugins: [
 ]
 ```
 
-It is also possible to exclude certain chunks by setting the `excludeChunks` option:
+It is also possible to exclude certain chunks by setting the `excludeChunks` option
 
-```javascript
+**webpack.config.js**
+```js
 plugins: [
   new HtmlWebpackPlugin({
-    excludeChunks: ['dev-helper']
+    excludeChunks: [ 'dev-helper' ]
   })
 ]
 ```
 
-Events
-------
+### `Events`
 
 To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the HTML this plugin executes the following events:
 
-Async:
+#### `Sync`
 
- * `html-webpack-plugin-before-html-generation`
- * `html-webpack-plugin-before-html-processing`
- * `html-webpack-plugin-alter-asset-tags`
- * `html-webpack-plugin-after-html-processing`
- * `html-webpack-plugin-after-emit`
+* `html-webpack-plugin-alter-chunks`
 
-Sync:
+#### `Async`
 
- * `html-webpack-plugin-alter-chunks`
+* `html-webpack-plugin-before-html-generation`
+* `html-webpack-plugin-before-html-processing`
+* `html-webpack-plugin-alter-asset-tags`
+* `html-webpack-plugin-after-html-processing`
+* `html-webpack-plugin-after-emit`
 
 Example implementation: [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
 
-Usage:
-
-```javascript
-// MyPlugin.js
-
+**plugin.js**
+```js
 function MyPlugin(options) {
   // Configure your plugin with options...
 }
 
-MyPlugin.prototype.apply = function(compiler) {
-  // ...
-  compiler.plugin('compilation', function(compilation) {
+MyPlugin.prototype.apply = function (compiler) {
+  compiler.plugin('compilation', (compilation) => {
     console.log('The compiler is starting a new compilation...');
 
-    compilation.plugin('html-webpack-plugin-before-html-processing', function(htmlPluginData, callback) {
-      htmlPluginData.html += 'The magic footer';
-      callback(null, htmlPluginData);
-    });
-  });
+    compilation.plugin(
+      'html-webpack-plugin-before-html-processing',
+      (data, cb) => {
+        data.html += 'The Magic Footer'
 
-};
+        cb(null, data)
+      }
+    )
+  })
+}
 
-module.exports = MyPlugin;
+module.exports = MyPlugin
 ```
-Then in `webpack.config.js`
 
-```javascript
+**webpack.config.js**
+```js
 plugins: [
-  new MyPlugin({options: ''})
+  new MyPlugin({ options: '' })
 ]
 ```
 
-Note that the callback must be passed the htmlPluginData in order to pass this onto any other plugins listening on the same `html-webpack-plugin-before-html-processing` event.
+Note that the callback must be passed the HtmlWebpackPluginData in order to pass this onto any other plugins listening on the same `html-webpack-plugin-before-html-processing` event
 
-
-# Contribution
+<h2 align="center">Contribution</h2>
 
 You're free to contribute to this project by submitting [issues](https://github.com/jantimon/html-webpack-plugin/issues) and/or [pull requests](https://github.com/jantimon/html-webpack-plugin/pulls). This project is test-driven, so keep in mind that every change and new feature should be covered by tests.
+
 This project uses the [semistandard code style](https://github.com/Flet/semistandard).
 
-Before running the tests, make sure to execute `yarn link` and `yarn link html-webpack-plugin` (or the npm variant of this).
+Before running the tests, make sure to execute `yarn link` and `yarn link html-webpack-plugin` (or the `npm` variant of this).
 
-# License
 
-This project is licensed under [MIT](https://github.com/jantimon/html-webpack-plugin/blob/master/LICENSE).
+<h2 align="center">Maintainers</h2>
+
+<table>
+  <tbody>
+    <tr>
+      <td align="center">
+        <img width="150" height="150"
+        src="https://avatars3.githubusercontent.com/u/4113649?v=3&s=150">
+        </br>
+        <a href="https://github.com/jantimon">Jan Nicklas</a>
+      </td>
+      <td align="center">
+        <img width="150" height="150"
+        src="https://avatars2.githubusercontent.com/u/4112409?v=3&s=150">
+        </br>
+        <a href="https://github.com/mastilver">Thomas Sileghem</a>
+      </td>
+    </tr>
+  <tbody>
+</table>
+
+
+[npm]: https://img.shields.io/npm/v/html-webpack-plugin.svg
+[npm-url]: https://npmjs.com/package/html-webpack-plugin
+
+[node]: https://img.shields.io/node/v/html-webpack-plugin.svg
+[node-url]: https://nodejs.org
+
+[deps]: https://david-dm.org/jantimon/html-webpack-plugin.svg
+[deps-url]: https://david-dm.org/jantimon/html-webpack-plugin
+
+[tests]: http://img.shields.io/travis/jantimon/html-webpack-plugin.svg
+[tests-url]: https://travis-ci.org/jantimon/html-webpack-plugin
+
+[cover]: https://img.shields.io/codecov/c/github/jantimon/html-webpack-plugin.svg
+[cover-url]: https://codecov.io/gh/jantimon/html-webpack-plugin
+
+[chat]: https://badges.gitter.im/webpack/webpack.svg
+[chat-url]: https://gitter.im/webpack/webpack
