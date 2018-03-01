@@ -34,7 +34,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* Add support for the new [https://github.com/webpack/tapable](webpack tapable) to be compatible with webpack 4.x
+* Add support for the new [webpack tapable](https://github.com/webpack/tapable) to be compatible with webpack 4.x
 * Remove bluebird dependency
 
 ### BREAKING CHANGES
@@ -44,13 +44,13 @@ All notable changes to this project will be documented in this file. See [standa
 <a name="2.30.1"></a>
 ## 2.30.1
 
-* Revert part the performance optimization (#723) because of #753.
+* Revert part the performance optimization ([#723](https://github.com/jantimon/html-webpack-plugin/pull/723)) because of [#753](https://github.com/jantimon/html-webpack-plugin/issues/753).
 
 <a name="2.30.0"></a>
 ## 2.30.0
 
 * Add manual sort
-* Performance improvements (#723)
+* Performance improvements ([#723](https://github.com/jantimon/html-webpack-plugin/pull/723))
 
 <a name="2.29.0"></a>
 ## 2.29.0
@@ -70,8 +70,8 @@ All notable changes to this project will be documented in this file. See [standa
 <a name="2.27.0"></a>
 ## 2.27.0
 
-* Fix a chunksorter webpack 2 issue (#569)
-* Fix template path resolving(#542)
+* Fix a chunksorter webpack 2 issue ([#569](https://github.com/jantimon/html-webpack-plugin/pull/569))
+* Fix template path resolving ([#542](https://github.com/jantimon/html-webpack-plugin/pull/542))
 
 <a name="2.26.0"></a>
 ## 2.26.0
@@ -100,7 +100,7 @@ All notable changes to this project will be documented in this file. See [standa
 ## 2.23.0
 
 * Update dependencies
-* Stop automated tests for webpack 2 beta because of #401
+* Stop automated tests for webpack 2 beta because of [#401](https://github.com/jantimon/html-webpack-plugin/issues/401)
 
 <a name="2.22.0"></a>
 ## 2.22.0
@@ -110,7 +110,7 @@ All notable changes to this project will be documented in this file. See [standa
 <a name="2.21.1"></a>
 ## 2.21.1
 
-* Better error handling (#354)
+* Better error handling ([#354](https://github.com/jantimon/html-webpack-plugin/pull/354))
 
 <a name="2.21.0"></a>
 ## 2.21.0
@@ -140,7 +140,7 @@ All notable changes to this project will be documented in this file. See [standa
 <a name="2.16.2"></a>
 ## 2.16.2
 
-* Fix bug introduced by 2.16.2. Fixes #315
+* Fix bug introduced by 2.16.2. Fixes  [#315](https://github.com/jantimon/html-webpack-plugin/issues/315)
 
 <a name="2.16.1"></a>
 ## 2.16.1
@@ -179,31 +179,31 @@ All notable changes to this project will be documented in this file. See [standa
 <a name="2.11.0"></a>
 ## 2.11.0
 
-* Add `xhtml` option which is turned of by default. When activated it will inject self closed `<link href=".." />` tags instead of unclosed `<link href="..">` tags. https://github.com/ampedandwired/html-webpack-plugin/pull/255
-* Add support for webpack placeholders inside the public path e.g. `'/dist/[hash]/'`. https://github.com/ampedandwired/html-webpack-plugin/pull/249
+* Add `xhtml` option which is turned of by default. When activated it will inject self closed `<link href=".." />` tags instead of unclosed `<link href="..">` tags. ([#255](https://github.com/ampedandwired/html-webpack-plugin/pull/255))
+* Add support for webpack placeholders inside the public path e.g. `'/dist/[hash]/'`. ([#249](https://github.com/ampedandwired/html-webpack-plugin/pull/249))
 
 <a name="2.10.0"></a>
 ## 2.10.0
 
 * Add `hash` field to the chunk object
-* Add `compilation` field to the templateParam object (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/237)
+* Add `compilation` field to the templateParam object ([#237](https://github.com/ampedandwired/html-webpack-plugin/issues/237))
 * Add `html-webpack-plugin-before-html-generation` event
 * Improve error messages
 
 <a name="2.9.0"></a>
 ## 2.9.0
 
-* Fix favicon path (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/185, https://github.com/ampedandwired/html-webpack-plugin/issues/208, https://github.com/ampedandwired/html-webpack-plugin/pull/215 )
+* Fix favicon path ([#185](https://github.com/ampedandwired/html-webpack-plugin/issues/185), [#208](https://github.com/ampedandwired/html-webpack-plugin/issues/208), [#215](https://github.com/ampedandwired/html-webpack-plugin/pull/215))
 
 <a name="2.8.2"></a>
 ## 2.8.2
 
-* Support relative URLs on Windows (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/205 )
+* Support relative URLs on Windows ([#205](https://github.com/ampedandwired/html-webpack-plugin/issues/205))
 
 <a name="2.8.1"></a>
 ## 2.8.1
 
-* Caching improvements (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/204 )
+* Caching improvements ([#204](https://github.com/ampedandwired/html-webpack-plugin/issues/204))
 
 <a name="2.8.0"></a>
 ## 2.8.0
@@ -241,12 +241,12 @@ All notable changes to this project will be documented in this file. See [standa
 <a name="2.6.2"></a>
 ## 2.6.2
 
-* Fix `lodash` resolve error (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/172 )
+* Fix `lodash` resolve error ([#172](https://github.com/ampedandwired/html-webpack-plugin/issues/172))
 
 <a name="2.6.1"></a>
 ## 2.6.1
 
-* Fix missing module (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/164 )
+* Fix missing module ([#164](https://github.com/ampedandwired/html-webpack-plugin/issues/164))
 
 <a name="2.6.0"></a>
 ## 2.6.0
@@ -259,7 +259,7 @@ All notable changes to this project will be documented in this file. See [standa
 ## 2.5.0
 
 * Support `lodash` template's HTML _"escape"_ delimiter (`<%- %>`)
-* Fix bluebird warning (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/130 )
+* Fix bluebird warning ([#130](https://github.com/ampedandwired/html-webpack-plugin/issues/130))
 * Fix an issue where incomplete cache modules were used
 
 <a name="2.4.0"></a>
@@ -275,7 +275,7 @@ All notable changes to this project will be documented in this file. See [standa
 <a name="2.2.0"></a>
 ## 2.2.0
 
-* Inject css and js even if the html file is incomplete (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/135 )
+* Inject css and js even if the html file is incomplete ([#135](https://github.com/ampedandwired/html-webpack-plugin/issues/135))
 * Update dependencies
 
 <a name="2.1.0"></a>
@@ -297,7 +297,7 @@ All notable changes to this project will be documented in this file. See [standa
 <a name="2.0.2"></a>
 ## 2.0.2
 
-* Add support for loaders in templates (fixes https://github.com/ampedandwired/html-webpack-plugin/pull/41 )
+* Add support for loaders in templates ([#41](https://github.com/ampedandwired/html-webpack-plugin/pull/41))
 * Remove `templateContent` option from configuration
 * Better error messages
 * Update dependencies
@@ -307,7 +307,7 @@ All notable changes to this project will be documented in this file. See [standa
 ## 1.7.0
 
 * Add `chunksSortMode` option to configuration to control how chunks should be sorted before they are included to the html
-* Don't insert async chunks into html (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/95 )
+* Don't insert async chunks into html ([#95](https://github.com/ampedandwired/html-webpack-plugin/issues/95))
 * Update dependencies
 
 <a name="1.6.2"></a>
@@ -328,7 +328,7 @@ All notable changes to this project will be documented in this file. See [standa
 ## 1.6.0
 
 * Support placing templates in subfolders
-* Don't include chunks with undefined name (fixes https://github.com/ampedandwired/html-webpack-plugin/pull/60 )
+* Don't include chunks with undefined name ([#60](https://github.com/ampedandwired/html-webpack-plugin/pull/60))
 * Don't include async chunks
 
 <a name="1.5.2"></a>
@@ -339,7 +339,7 @@ All notable changes to this project will be documented in this file. See [standa
 <a name="1.5.1"></a>
 ## 1.5.1
 
-* Fix error when manifest is specified (fixes https://github.com/ampedandwired/html-webpack-plugin/issues/56 )
+* Fix error when manifest is specified ([#56](https://github.com/ampedandwired/html-webpack-plugin/issues/56))
 
 <a name="1.5.0"></a>
 ## 1.5.0
