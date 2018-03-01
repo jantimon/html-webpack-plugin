@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.0.2"></a>
+## [3.0.2](https://github.com/jantimon/html-webpack-plugin/compare/v3.0.1...v3.0.2) (2018-03-01)
+
+
+### Bug Fixes
+
+* **query-loader:** In case no query is provided, return an empty object. This fixes #727 ([7587754](https://github.com/jantimon/html-webpack-plugin/commit/7587754))
+
+
 
 <a name="3.0.1"></a>
 ## [3.0.1](https://github.com/jantimon/html-webpack-plugin/compare/v3.0.0...v3.0.1) (2018-03-01)
