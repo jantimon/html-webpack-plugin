@@ -1,6 +1,6 @@
 {
   "name": "html-webpack-plugin",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "license": "MIT",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "author": "Charles Blaxland <charles.blaxland@gmail.com> (https://github.com/ampedandwired)",

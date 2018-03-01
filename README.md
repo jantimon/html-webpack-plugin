@@ -20,12 +20,16 @@
 
 <h2 align="center">Install</h2>
 
-**package.json**
+
 ```bash
-{
-  "html-webpack-plugin": "webpack-contrib/html-webpack-plugin"
-}
+  npm i --save-dev html-webpack-plugin
 ```
+
+```bash
+  yarn add --dev html-webpack-plugin
+```
+
+
 
 This is a [webpack](http://webpack.js.org/) plugin that simplifies creation of HTML files to serve your `webpack` bundles. This is especially useful for `webpack` bundles that include a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you, supply
 your own template using `lodash` templates or use your own loader.
@@ -57,7 +61,7 @@ config as follows:
 
 **webpack.config.js**
 ```js
-const HTMLPlugin = require('html-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   entry: 'index.js',
@@ -66,7 +70,7 @@ module.exports = {
     filename: 'index_bundle.js'
   },
   plugins: [
-    new HTMLPlugin()
+    new HtmlWebpackPlugin()
   ]
 }
 ```
@@ -100,7 +104,7 @@ Allowed values are as follows
 |:--:|:--:|:-----:|:----------|
 |**[`title`](#)**|`{String}`|``|The title to use for the generated HTML document|
 |**[`filename`](#)**|`{String}`|`'index.html'`|The file to write the HTML to. Defaults to `index.html`. You can specify a subdirectory here too (eg: `assets/admin.html`)|
-|**[`template`](#)**|`{String}`|``|`webpack` require path to the template. Please see the [docs](https://github.com/webpack-contrib/html-webpack-plugin/blob/master/docs/template-option.md) for details|
+|**[`template`](#)**|`{String}`|``|`webpack` require path to the template. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details|
 |**[`inject`](#)**|`{Boolean\|String}`|`true`|`true \|\| 'head' \|\| 'body' \|\| false` Inject all assets into the given `template` or `templateContent`. When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element|
 |**[`favicon`](#)**|`{String}`|``|Adds the given favicon path to the output HTML|
 |**[`minify`](#)**|`{Boolean\|Object}`|`true`|Pass [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference)'s options as object to minify the output|
@@ -123,7 +127,7 @@ Here's an example webpack config illustrating how to use these options
     filename: 'index_bundle.js'
   },
   plugins: [
-    new HTMLPlugin({
+    new HtmlWebpackPlugin({
       title: 'My App',
       filename: 'assets/admin.html'
     })
@@ -145,8 +149,8 @@ once in your plugins array
     filename: 'index_bundle.js'
   },
   plugins: [
-    new HTMLPlugin(), // Generates default index.html
-    new HTMLPlugin({  // Also generate a test.html
+    new HtmlWebpackPlugin(), // Generates default index.html
+    new HtmlWebpackPlugin({  // Also generate a test.html
       filename: 'test.html',
       template: 'src/assets/test.html'
     })
@@ -163,7 +167,7 @@ and favicon files into the markup.
 
 ```js
 plugins: [
-  new HTMLPlugin({
+  new HtmlWebpackPlugin({
     title: 'Custom template',
     // Load a custom template (lodash by default see the FAQ for details)
     template: 'index.html'
@@ -195,7 +199,7 @@ module: {
   ]
 },
 plugins: [
-  new HTMLPlugin({
+  new HtmlWebpackPlugin({
     title: 'Custom template using Handlebars',
     template: 'index.hbs'
   })
@@ -250,7 +254,7 @@ To include only certain chunks you can limit the chunks being used
 **webpack.config.js**
 ```js
 plugins: [
-  new HTMLPlugin({
+  new HtmlWebpackPlugin({
     chunks: ['app']
   })
 ]
@@ -261,7 +265,7 @@ It is also possible to exclude certain chunks by setting the `excludeChunks` opt
 **webpack.config.js**
 ```js
 plugins: [
-  new HTMLPlugin({
+  new HtmlWebpackPlugin({
     excludeChunks: [ 'dev-helper' ]
   })
 ]
@@ -316,15 +320,37 @@ plugins: [
 ]
 ```
 
-Note that the callback must be passed the htmlPluginData in order to pass this onto any other plugins listening on the same `html-webpack-plugin-before-html-processing` event
+Note that the callback must be passed the HtmlWebpackPluginData in order to pass this onto any other plugins listening on the same `html-webpack-plugin-before-html-processing` event
 
 <h2 align="center">Contribution</h2>
 
-You're free to contribute to this project by submitting [issues](https://github.com/webpack-contrib/html-webpack-plugin/issues) and/or [pull requests](https://github.com/webpack-contrib/html-webpack-plugin/pulls). This project is test-driven, so keep in mind that every change and new feature should be covered by tests.
+You're free to contribute to this project by submitting [issues](https://github.com/jantimon/html-webpack-plugin/issues) and/or [pull requests](https://github.com/jantimon/html-webpack-plugin/pulls). This project is test-driven, so keep in mind that every change and new feature should be covered by tests.
 
 This project uses the [semistandard code style](https://github.com/Flet/semistandard).
 
 Before running the tests, make sure to execute `yarn link` and `yarn link html-webpack-plugin` (or the `npm` variant of this).
+
+
+<h2 align="center">Maintainers</h2>
+
+<table>
+  <tbody>
+    <tr>
+      <td align="center">
+        <img width="150" height="150"
+        src="https://avatars3.githubusercontent.com/u/4113649?v=3&s=150">
+        </br>
+        <a href="https://github.com/jantimon">Jan Nicklas</a>
+      </td>
+      <td align="center">
+        <img width="150" height="150"
+        src="https://avatars2.githubusercontent.com/u/4112409?v=3&s=150">
+        </br>
+        <a href="https://github.com/mastilver">Thomas Sileghem</a>
+      </td>
+    </tr>
+  <tbody>
+</table>
 
 
 [npm]: https://img.shields.io/npm/v/html-webpack-plugin.svg
@@ -333,14 +359,14 @@ Before running the tests, make sure to execute `yarn link` and `yarn link html-w
 [node]: https://img.shields.io/node/v/html-webpack-plugin.svg
 [node-url]: https://nodejs.org
 
-[deps]: https://david-dm.org/webpack-contrib/html-webpack-plugin.svg
-[deps-url]: https://david-dm.org/webpack-contrib/html-webpack-plugin
+[deps]: https://david-dm.org/jantimon/html-webpack-plugin.svg
+[deps-url]: https://david-dm.org/jantimon/html-webpack-plugin
 
-[tests]: http://img.shields.io/travis/webpack-contrib/html-webpack-plugin.svg
-[tests-url]: https://travis-ci.org/webpack-contrib/html-webpack-plugin
+[tests]: http://img.shields.io/travis/jantimon/html-webpack-plugin.svg
+[tests-url]: https://travis-ci.org/jantimon/html-webpack-plugin
 
-[cover]: https://img.shields.io/codecov/c/github/webpack-contrib/html-webpack-plugin.svg
-[cover-url]: https://codecov.io/gh/webpack-contrib/html-webpack-plugin
+[cover]: https://img.shields.io/codecov/c/github/jantimon/html-webpack-plugin.svg
+[cover-url]: https://codecov.io/gh/jantimon/html-webpack-plugin
 
 [chat]: https://badges.gitter.im/webpack/webpack.svg
 [chat-url]: https://gitter.im/webpack/webpack
