@@ -369,6 +369,21 @@ class HtmlWebpackPlugin {
   }
 
   /**
+   * Helper to filter chunk
+   */
+  testChunk (chunkName, test, shouldInclude) {
+    if (Array.isArray(test) && shouldInclude === (test.indexOf(chunkName) !== -1)) {
+      return true;
+    }
+
+    if (test instanceof RegExp && shouldInclude === test.test(chunkName)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
    * Return all chunks from the compilation result which match the exclude and include filters
    */
   filterChunks (chunks, includedChunks, excludedChunks) {
@@ -387,11 +402,11 @@ class HtmlWebpackPlugin {
         return false;
       }
       // Skip if the chunks should be filtered and the given chunk was not added explicity
-      if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
+      if (this.testChunk(chunkName, includedChunks, false)) {
         return false;
       }
       // Skip if the chunks should be filtered and the given chunk was excluded explicity
-      if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) {
+      if (this.testChunk(chunkName, excludedChunks, true)) {
         return false;
       }
       // Add otherwise
