@@ -348,6 +348,36 @@ describe('HtmlWebpackPlugin', function () {
     }, ['<script type="text/javascript" src="app_bundle.js"'], null, done);
   });
 
+  it('allows you to inject a specified asset by regular expression into a given html file', function (done) {
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js'),
+        util: path.join(__dirname, 'fixtures/util.js'),
+        'app~commons': path.join(__dirname, 'fixtures/util.js'),
+        'util~commons': path.join(__dirname, 'fixtures/util.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          chunksSortMode: function (a, b) {
+            if (a.names[0] < b.names[0]) {
+              return 1;
+            }
+            if (a.names[0] > b.names[0]) {
+              return -1;
+            }
+            return 0;
+          },
+          chunks: /app/
+        })
+      ]
+    }, [
+      /<script type="text\/javascript" src="app~commons_bundle.js">.+<script type="text\/javascript" src="app_bundle.js">/], null, done);
+  });
+
   it('allows you to inject a specified asset into a given html file', function (done) {
     testHtmlPlugin({
       entry: {
@@ -364,6 +394,36 @@ describe('HtmlWebpackPlugin', function () {
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
     }, ['<script type="text/javascript" src="app_bundle.js"'], null, done);
+  });
+
+  it('allows you to inject a specified asset by regular expression into a given html file', function (done) {
+    testHtmlPlugin({
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js'),
+        util: path.join(__dirname, 'fixtures/util.js'),
+        'app~commons': path.join(__dirname, 'fixtures/util.js'),
+        'util~commons': path.join(__dirname, 'fixtures/util.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          chunksSortMode: function (a, b) {
+            if (a.names[0] < b.names[0]) {
+              return 1;
+            }
+            if (a.names[0] > b.names[0]) {
+              return -1;
+            }
+            return 0;
+          },
+          excludeChunks: /util/
+        })
+      ]
+    }, [
+      /<script type="text\/javascript" src="app~commons_bundle.js">.+<script type="text\/javascript" src="app_bundle.js">/], null, done);
   });
 
   it('allows you to use chunkhash with asset into a given html file', function (done) {
