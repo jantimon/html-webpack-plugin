@@ -453,13 +453,13 @@ class HtmlWebpackPlugin {
       }
 
       // Webpack outputs an array for each chunk when using sourcemaps
-      // But we need only the initial entry file in case it is a js file
-      const entry = chunkFiles[0];
-      if (/.js($|\?)/.test(entry)) {
+      // or when one chunk hosts js and css simultaneously
+      const js = chunkFiles.find(chunkFile => /.js($|\?)/.test(chunkFile));
+      if (js) {
         assets.chunks[chunkName].size = chunk.size;
-        assets.chunks[chunkName].entry = entry;
+        assets.chunks[chunkName].entry = js;
         assets.chunks[chunkName].hash = chunk.hash;
-        assets.js.push(entry);
+        assets.js.push(js);
       }
 
       // Gather all css files
