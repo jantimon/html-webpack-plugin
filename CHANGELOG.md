@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.0.5"></a>
+## [3.0.5](https://github.com/jantimon/html-webpack-plugin/compare/v3.0.2...v3.0.5) (2018-03-06)
+
+
+### Bug Fixes
+
+* **entries:** do not ignore JS if there is also CSS ([020b714](https://github.com/jantimon/html-webpack-plugin/commit/020b714))
+* **entries:** Don't add css entries twice ([0348d6b](https://github.com/jantimon/html-webpack-plugin/commit/0348d6b))
+* **hooks:** Remove deprecated tapable calls [#879](https://github.com/jantimon/html-webpack-plugin/issues/879) ([2288f20](https://github.com/jantimon/html-webpack-plugin/commit/2288f20))
+
+
+
 <a name="3.0.4"></a>
 ## [3.0.4](https://github.com/jantimon/html-webpack-plugin/compare/v3.0.2...v3.0.4) (2018-03-01)
 
