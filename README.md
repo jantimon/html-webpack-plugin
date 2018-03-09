@@ -143,7 +143,7 @@ Here's an example webpack config illustrating how to use these options
 To generate more than one HTML file, declare the plugin more than
 once in your plugins array
 
-**webpack.confg.js**
+**webpack.config.js**
 ```js
 {
   entry: 'index.js',
