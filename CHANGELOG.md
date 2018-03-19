@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.0.7"></a>
+## [3.0.7](https://github.com/jantimon/html-webpack-plugin/compare/v3.0.6...v3.0.7) (2018-03-19)
+
+
+### Bug Fixes
+
+* **compiler:** Set single entry name [#895](https://github.com/jantimon/html-webpack-plugin/issues/895) ([26dcb98](https://github.com/jantimon/html-webpack-plugin/commit/26dcb98))
+
+
+
 <a name="3.0.6"></a>
 ## [3.0.6](https://github.com/jantimon/html-webpack-plugin/compare/v3.0.5...v3.0.6) (2018-03-06)
 
