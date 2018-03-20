@@ -2,7 +2,9 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <% if (htmlWebpackPlugin.options.title != null) { %>
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <% } %>
   </head>
   <body>
   </body>
