@@ -500,7 +500,8 @@ class HtmlWebpackPlugin {
 
       attributes: {
         href: stylePath,
-        rel: 'stylesheet'
+        rel: 'stylesheet',
+        type: 'text/css'
       }
     }));
     // Injection targets
