@@ -5,11 +5,6 @@
 /* eslint-env jasmine */
 'use strict';
 
-// Polyfill promisses for node 0.10.x
-if (!global.Promise) {
-  require('es6-promise').polyfill();
-}
-
 var path = require('path');
 var webpack = require('webpack');
 var rimraf = require('rimraf');

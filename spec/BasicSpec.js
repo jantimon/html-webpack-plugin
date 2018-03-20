@@ -5,12 +5,6 @@
 /* eslint-env jasmine */
 'use strict';
 
-// Workaround for css-loader issue
-// https://github.com/webpack/css-loader/issues/144
-if (!global.Promise) {
-  require('es6-promise').polyfill();
-}
-
 var path = require('path');
 var fs = require('fs');
 var webpack = require('webpack');
