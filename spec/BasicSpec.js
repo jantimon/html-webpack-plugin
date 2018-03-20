@@ -1546,67 +1546,6 @@ describe('HtmlWebpackPlugin', function () {
     }, [/<script type="text\/javascript" src="c_bundle.js">.+<script type="text\/javascript" src="b_bundle.js">.+<script type="text\/javascript" src="a_bundle.js">/], null, done);
   });
 
-  it('should sort the chunks by chunk dependencies', function (done) {
-    testHtmlPlugin({
-      entry: {
-        util: path.join(__dirname, 'fixtures/util.js'),
-        aTheme: path.join(__dirname, 'fixtures/theme.js')
-      },
-      output: {
-        path: OUTPUT_DIR,
-        filename: '[name]_bundle.js'
-      },
-      module: {
-        loaders: [
-          { test: /\.css$/, loader: 'css-loader' }
-        ]
-      },
-      __commonsChunk: {
-        name: 'common',
-        filename: 'common_bundle.js'
-      },
-      plugins: [
-        new HtmlWebpackPlugin({
-          chunksSortMode: 'dependency'
-        })
-      ]
-    }, [
-      // theme and util don't depend on each other, so the order of those doesn't matter
-      /<script type="text\/javascript" src="common_bundle.js">.+(<script type="text\/javascript" src="aTheme_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">|<script type="text\/javascript" src="util_bundle.js">.+<script type="text\/javascript" src="aTheme_bundle.js">)/
-    ], null, done);
-  });
-
-  it('should sort the chunks by chunk dependencies even if a parent chunk is excluded', function (done) {
-    testHtmlPlugin({
-      entry: {
-        util: path.join(__dirname, 'fixtures/util.js'),
-        aTheme: path.join(__dirname, 'fixtures/theme.js')
-      },
-      output: {
-        path: OUTPUT_DIR,
-        filename: '[name]_bundle.js'
-      },
-      module: {
-        loaders: [
-          { test: /\.css$/, loader: 'css-loader' }
-        ]
-      },
-      __commonsChunk: {
-        name: 'common',
-        filename: 'common_bundle.js'
-      },
-      plugins: [
-        new HtmlWebpackPlugin({
-          chunksSortMode: 'dependency',
-          excludeChunks: ['common']
-        })
-      ]
-    }, [
-      // theme and util don't depend on each other, so the order of those doesn't matter
-      /(<script type="text\/javascript" src="aTheme_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">|<script type="text\/javascript" src="util_bundle.js">.+<script type="text\/javascript" src="aTheme_bundle.js">)/
-    ], null, done);
-  });
-
   it('should sort manually by the chunks', function (done) {
     testHtmlPlugin({
       entry: {
