@@ -30,6 +30,7 @@ class HtmlWebpackPlugin {
       showErrors: true,
       chunks: 'all',
       excludeChunks: [],
+      meta: {},
       title: 'Webpack App',
       xhtml: false
     }, options);
@@ -179,7 +180,7 @@ class HtmlWebpackPlugin {
           const html = result.html;
           const assets = result.assets;
           // Prepare script and link tags
-          const assetTags = self.generateAssetTags(assets);
+          const assetTags = self.generateHtmlTags(assets);
           const pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, chunks: chunks, outputName: self.childCompilationOutputName};
           // Allow plugins to change the assetTag definitions
           return applyPluginsAsyncWaterfall('html-webpack-plugin-alter-asset-tags', true, pluginArgs)
@@ -483,14 +484,43 @@ class HtmlWebpackPlugin {
   }
 
   /**
+   * Generate meta tags
+   */
+  getMetaTags () {
+    if (this.options.meta === false) {
+      return [];
+    }
+    // Make tags self-closing in case of xhtml
+    // Turn { "viewport" : "width=500, initial-scale=1" } into
+    // [{ name:"viewport" content:"width=500, initial-scale=1" }]
+    const selfClosingTag = !!this.options.xhtml;
+    const metaTagAttributeObjects = Object.keys(this.options.meta).map((metaName) => {
+      const metaTagContent = this.options.meta[metaName];
+      return (typeof metaTagContent === 'object') ? metaTagContent : {
+        name: metaName,
+        content: metaTagContent
+      };
+    });
+    // Turn [{ name:"viewport" content:"width=500, initial-scale=1" }] into
+    // the html-webpack-plugin tag structure
+    return metaTagAttributeObjects.map((metaTagAttributes) => {
+      return {
+        tagName: 'meta',
+        voidTag: true,
+        selfClosingTag: selfClosingTag,
+        attributes: metaTagAttributes
+      };
+    });
+  }
+
+  /**
    * Injects the assets into the given html string
    */
-  generateAssetTags (assets) {
+  generateHtmlTags (assets) {
     // Turn script files into script tags
     const scripts = assets.js.map(scriptPath => ({
       tagName: 'script',
       closeTag: true,
-
       attributes: {
         type: 'text/javascript',
         src: scriptPath
@@ -502,14 +532,14 @@ class HtmlWebpackPlugin {
     const styles = assets.css.map(stylePath => ({
       tagName: 'link',
       selfClosingTag: selfClosingTag,
-
+      voidTag: true,
       attributes: {
         href: stylePath,
         rel: 'stylesheet'
       }
     }));
     // Injection targets
-    let head = [];
+    let head = this.getMetaTags();
     let body = [];
 
     // If there is a favicon present, add it to the head
@@ -517,6 +547,7 @@ class HtmlWebpackPlugin {
       head.push({
         tagName: 'link',
         selfClosingTag: selfClosingTag,
+        voidTag: true,
         attributes: {
           rel: 'shortcut icon',
           href: assets.favicon
@@ -541,8 +572,8 @@ class HtmlWebpackPlugin {
     const htmlRegExp = /(<html[^>]*>)/i;
     const headRegExp = /(<\/head\s*>)/i;
     const bodyRegExp = /(<\/body\s*>)/i;
-    const body = assetTags.body.map(this.createHtmlTag);
-    const head = assetTags.head.map(this.createHtmlTag);
+    const body = assetTags.body.map(this.createHtmlTag.bind(this));
+    const head = assetTags.head.map(this.createHtmlTag.bind(this));
 
     if (body.length) {
       if (bodyRegExp.test(html)) {

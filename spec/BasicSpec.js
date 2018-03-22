@@ -1300,6 +1300,43 @@ describe('HtmlWebpackPlugin', function () {
     }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
   });
 
+  it('adds a meta tag', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          meta: {
+            'viewport': {
+              'name': 'viewport',
+              'content': 'width=device-width, initial-scale=1, shrink-to-fit=no'
+            }
+          }
+        })
+      ]
+    }, [/<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">/], null, done);
+  });
+
+  it('adds a meta tag with short notation', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          meta: {
+            'viewport': 'width=device-width, initial-scale=1, shrink-to-fit=no'
+          }
+        })
+      ]
+    }, [/<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">/], null, done);
+  });
+
   it('adds a favicon with publicPath set to /some/', function (done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),
