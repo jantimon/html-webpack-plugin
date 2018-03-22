@@ -113,6 +113,7 @@ Allowed values are as follows
 |**[`templateParameters`](#)**|`{Boolean\|Object\|Function}`|``| Allows to overwrite the parameters used in the template |
 |**[`inject`](#)**|`{Boolean\|String}`|`true`|`true \|\| 'head' \|\| 'body' \|\| false` Inject all assets into the given `template` or `templateContent`. When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element|
 |**[`favicon`](#)**|`{String}`|``|Adds the given favicon path to the output HTML|
+|**[`meta`](#)**|`{Object}`|`{}`|Allows to inject `meta`-tags. E.g. `meta: {viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'}`|
 |**[`minify`](#)**|`{Boolean\|Object}`|`true`|Pass [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference)'s options as object to minify the output|
 |**[`hash`](#)**|`{Boolean}`|`false`|If `true` then append a unique `webpack` compilation hash to all included scripts and CSS files. This is useful for cache busting|
 |**[`cache`](#)**|`{Boolean}`|`true`|Emit the file only if it was changed|
