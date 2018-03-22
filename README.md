@@ -332,15 +332,6 @@ plugins: [
 
 Note that the callback must be passed the HtmlWebpackPluginData in order to pass this onto any other plugins listening on the same `html-webpack-plugin-before-html-processing` event
 
-<h2 align="center">Contribution</h2>
-
-You're free to contribute to this project by submitting [issues](https://github.com/jantimon/html-webpack-plugin/issues) and/or [pull requests](https://github.com/jantimon/html-webpack-plugin/pulls). This project is test-driven, so keep in mind that every change and new feature should be covered by tests.
-
-This project uses the [semistandard code style](https://github.com/Flet/semistandard).
-
-Before running the tests, make sure to execute `yarn link` and `yarn link html-webpack-plugin` (or the `npm` variant of this).
-
-
 <h2 align="center">Maintainers</h2>
 
 <table>
@@ -378,8 +369,13 @@ Before running the tests, make sure to execute `yarn link` and `yarn link html-w
 
 ## Contributors
 
-This project exists thanks to all the people who contribute. [Contribute](CONTRIBUTING.md).
-<a href="graphs/contributors"><img src="https://opencollective.com/html-webpack-plugin/contributors.svg?width=890&button=false" /></a>
+This project exists thanks to all the people who contribute.
+
+You're free to contribute to this project by submitting [issues](https://github.com/jantimon/html-webpack-plugin/issues) and/or [pull requests](https://github.com/jantimon/html-webpack-plugin/pulls). This project is test-driven, so keep in mind that every change and new feature should be covered by tests.
+
+This project uses the [semistandard code style](https://github.com/Flet/semistandard).
+
+<a href="https://github.com/jantimon/html-webpack-plugin/graphs/contributors"><img src="https://opencollective.com/html-webpack-plugin/contributors.svg?width=890&button=false" /></a>
 
 
 ## Backers
