@@ -14,7 +14,8 @@
     "pretest": "semistandard",
     "build-examples": "node examples/build-examples.js",
     "test": "jasmine",
-    "release": "standard-version"
+    "release": "standard-version",
+    "postinstall": "opencollective postinstall"
   },
   "semistandard": {
     "ignore": [
@@ -46,6 +47,7 @@
     "html-minifier": "^3.2.3",
     "loader-utils": "^0.2.16",
     "lodash": "^4.17.3",
+    "opencollective": "^1.0.3",
     "pretty-error": "^2.0.2",
     "tapable": "^1.0.0",
     "toposort": "^1.0.0",
@@ -65,5 +67,9 @@
   "repository": "https://github.com/jantimon/html-webpack-plugin.git",
   "engines": {
     "node": ">=6.11.5"
+  },
+  "collective": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/html-webpack-plugin"
   }
 }
