@@ -719,7 +719,6 @@ function trainCaseToCamelCase (word) {
 function templateParametersGenerator (compilation, assets, options) {
   return {
     compilation: compilation,
-    webpack: compilation.getStats().toJson(),
     webpackConfig: compilation.options,
     htmlWebpackPlugin: {
       files: assets,

@@ -1590,7 +1590,7 @@ describe('HtmlWebpackPlugin', function () {
           inject: false
         })
       ]
-    }, ['templateParams keys: "compilation,webpack,webpackConfig,htmlWebpackPlugin"'], null, done);
+    }, ['templateParams keys: "compilation,webpackConfig,htmlWebpackPlugin"'], null, done);
   });
 
   it('should allow to disable template parameters', function (done) {
