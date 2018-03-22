@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.1.0"></a>
+# [3.1.0](https://github.com/jantimon/html-webpack-plugin/compare/v3.0.8...v3.1.0) (2018-03-22)
+
+
+### Features
+
+* Allow to overwrite the templateParameter [#830](https://github.com/jantimon/html-webpack-plugin/issues/830) ([c5e32d3](https://github.com/jantimon/html-webpack-plugin/commit/c5e32d3))
+
+
+
 <a name="3.0.8"></a>
 ## [3.0.8](https://github.com/jantimon/html-webpack-plugin/compare/v3.0.7...v3.0.8) (2018-03-22)
 
