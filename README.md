@@ -1,6 +1,6 @@
 [![npm][npm]][npm-url]
 [![node][node]][node-url]
-[![npm](https://img.shields.io/npm/dw/html-webpack-plugin.svg)]
+![npm](https://img.shields.io/npm/dw/html-webpack-plugin.svg)
 [![deps][deps]][deps-url]
 [![tests][tests]][tests-url]
 [![Backers on Open Collective](https://opencollective.com/html-webpack-plugin/backers/badge.svg)](#backers)
