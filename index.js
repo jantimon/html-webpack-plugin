@@ -19,6 +19,7 @@ class HtmlWebpackPlugin {
     // Default options
     this.options = _.extend({
       template: path.join(__dirname, 'default_index.ejs'),
+      templateParameters: templateParametersGenerator,
       filename: 'index.html',
       hash: false,
       inject: true,
@@ -254,24 +255,28 @@ class HtmlWebpackPlugin {
   }
 
   /**
+   * Generate the template parameters for the template function
+   */
+  getTemplateParameters (compilation, assets) {
+    if (typeof this.options.templateParameters === 'function') {
+      return this.options.templateParameters(compilation, assets, this.options);
+    }
+    if (typeof this.options.templateParameters === 'object') {
+      return this.options.templateParameters;
+    }
+    return {};
+  }
+
+  /**
    * Html post processing
    *
    * Returns a promise
    */
   executeTemplate (templateFunction, chunks, assets, compilation) {
-    const self = this;
     return Promise.resolve()
       // Template processing
       .then(() => {
-        const templateParams = {
-          compilation: compilation,
-          webpack: compilation.getStats().toJson(),
-          webpackConfig: compilation.options,
-          htmlWebpackPlugin: {
-            files: assets,
-            options: self.options
-          }
-        };
+        const templateParams = this.getTemplateParameters(compilation, assets);
         let html = '';
         try {
           html = templateFunction(templateParams);
@@ -682,6 +687,22 @@ class HtmlWebpackPlugin {
  */
 function trainCaseToCamelCase (word) {
   return word.replace(/-([\w])/g, (match, p1) => p1.toUpperCase());
+}
+
+/**
+ * The default for options.templateParameter
+ * Generate the template parameters
+ */
+function templateParametersGenerator (compilation, assets, options) {
+  return {
+    compilation: compilation,
+    webpack: compilation.getStats().toJson(),
+    webpackConfig: compilation.options,
+    htmlWebpackPlugin: {
+      files: assets,
+      options: options
+    }
+  };
 }
 
 module.exports = HtmlWebpackPlugin;

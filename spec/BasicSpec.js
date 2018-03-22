@@ -1614,7 +1614,60 @@ describe('HtmlWebpackPlugin', function () {
           inject: false
         })
       ]
-    }, ['templateParams.compilation exists: true'], null, done);
+    }, ['templateParams keys: "compilation,webpack,webpackConfig,htmlWebpackPlugin"'], null, done);
+  });
+
+  it('should allow to disable template parameters', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          template: path.join(__dirname, 'fixtures/templateParam.js'),
+          inject: false,
+          templateParameters: false
+        })
+      ]
+    }, ['templateParams keys: ""'], null, done);
+  });
+
+  it('should allow to set specific template parameters', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          template: path.join(__dirname, 'fixtures/templateParam.js'),
+          inject: false,
+          templateParameters: { foo: 'bar' }
+        })
+      ]
+    }, ['templateParams keys: "foo"'], null, done);
+  });
+
+  it('should allow to set specific template parameters using a function', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          template: path.join(__dirname, 'fixtures/templateParam.js'),
+          inject: false,
+          templateParameters: function () {
+            return { 'foo': 'bar' };
+          }
+        })
+      ]
+    }, ['templateParams keys: "foo"'], null, done);
   });
 
   it('should not treat templateContent set to an empty string as missing', function (done) {
