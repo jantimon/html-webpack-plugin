@@ -30,6 +30,7 @@ class HtmlWebpackPlugin {
       showErrors: true,
       chunks: 'all',
       excludeChunks: [],
+      chunksSortMode: 'auto',
       meta: {},
       title: 'Webpack App',
       xhtml: false
@@ -109,7 +110,7 @@ class HtmlWebpackPlugin {
       // Filter chunks (options.chunks and options.excludeCHunks)
       let chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
       // Sort chunks
-      chunks = self.sortChunks(chunks, self.options.chunksSortMode, compilation.chunkGroups);
+      chunks = self.sortChunks(chunks, self.options.chunksSortMode, compilation);
       // Let plugins alter the chunks and the chunk sorting
       if (compilation.hooks) {
         chunks = compilation.hooks.htmlWebpackPluginAlterChunks.call(chunks, { plugin: self });
@@ -353,25 +354,14 @@ class HtmlWebpackPlugin {
   /**
    * Helper to sort chunks
    */
-  sortChunks (chunks, sortMode, chunkGroups) {
-    // Sort mode auto by default:
-    if (typeof sortMode === 'undefined') {
-      sortMode = 'auto';
-    }
+  sortChunks (chunks, sortMode, compilation) {
     // Custom function
     if (typeof sortMode === 'function') {
       return chunks.sort(sortMode);
     }
-    // Disabled sorting:
-    if (sortMode === 'none') {
-      return chunkSorter.none(chunks);
-    }
-    if (sortMode === 'manual') {
-      return chunkSorter.manual(chunks, this.options.chunks);
-    }
     // Check if the given sort mode is a valid chunkSorter sort mode
     if (typeof chunkSorter[sortMode] !== 'undefined') {
-      return chunkSorter[sortMode](chunks, chunkGroups);
+      return chunkSorter[sortMode](chunks, this.options, compilation);
     }
     throw new Error('"' + sortMode + '" is not a valid chunk sort mode');
   }
