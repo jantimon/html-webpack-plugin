@@ -109,6 +109,7 @@ Allowed values are as follows
 
 |Name|Type|Default|Description|
 |:--:|:--:|:-----:|:----------|
+|**[`entry`](#)**|`{String}`|``|The entry to get chunks for entrypoint|
 |**[`title`](#)**|`{String}`|``|The title to use for the generated HTML document|
 |**[`filename`](#)**|`{String}`|`'index.html'`|The file to write the HTML to. Defaults to `index.html`. You can specify a subdirectory here too (eg: `assets/admin.html`)|
 |**[`template`](#)**|`{String}`|``|`webpack` require path to the template. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details|
