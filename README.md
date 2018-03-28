@@ -386,8 +386,16 @@ This project uses the [semistandard code style](https://github.com/Flet/semistan
 
 Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/html-webpack-plugin#backer)
 
-<a href="https://opencollective.com/html-webpack-plugin#backers" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backers.svg?width=890"></a>
-
+<a href="https://opencollective.com/html-webpack-plugin/backer/0/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/0/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/1/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/1/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/2/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/2/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/3/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/3/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/4/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/4/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/5/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/5/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/6/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/6/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/7/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/7/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/8/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/8/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/9/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/9/avatar.svg?requireActive=false"></a>
 
 ## Sponsors
 
