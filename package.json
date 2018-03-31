@@ -67,7 +67,7 @@
   "homepage": "https://github.com/jantimon/html-webpack-plugin",
   "repository": "https://github.com/jantimon/html-webpack-plugin.git",
   "engines": {
-    "node": ">=6.11.5"
+    "node": ">=6.9"
   },
   "config": {
     "commitizen": {
