@@ -109,4 +109,8 @@ describe('HtmlWebpackPlugin Examples', function () {
   it('sort manually example', function (done) {
     runExample('sort-manually', done);
   });
+
+  it('template-parameters example', function (done) {
+    runExample('template-parameters', done);
+  });
 });
