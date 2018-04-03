@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.2.0"></a>
+# [3.2.0](https://github.com/jantimon/html-webpack-plugin/compare/v3.1.0...v3.2.0) (2018-04-03)
+
+
+### Bug Fixes
+
+* **loader:** Allow to add new template parameters ([f7eac19](https://github.com/jantimon/html-webpack-plugin/commit/f7eac19)), closes [#915](https://github.com/jantimon/html-webpack-plugin/issues/915)
+* **loader:** Use lodash inside the loader directly ([7b4eb7f](https://github.com/jantimon/html-webpack-plugin/commit/7b4eb7f)), closes [#786](https://github.com/jantimon/html-webpack-plugin/issues/786)
+
+
+### Features
+
+* Add meta tag option ([a7d37ca](https://github.com/jantimon/html-webpack-plugin/commit/a7d37ca))
+* Support node 6.9 ([74a22c4](https://github.com/jantimon/html-webpack-plugin/commit/74a22c4)), closes [#918](https://github.com/jantimon/html-webpack-plugin/issues/918)
+
+
+
 <a name="3.1.0"></a>
 # [3.1.0](https://github.com/jantimon/html-webpack-plugin/compare/v3.0.8...v3.1.0) (2018-03-22)
 
