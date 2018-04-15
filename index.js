@@ -162,12 +162,14 @@ class HtmlWebpackPlugin {
         })
         // Allow plugins to make changes to the assets before invoking the template
         // This only makes sense to use if `inject` is `false`
-        .then(compilationResult => applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-generation', false, {
-          assets: assets,
-          outputName: self.childCompilationOutputName,
-          plugin: self
-        })
-      .then(() => compilationResult))
+        .then(compilationResult =>
+          applyPluginsAsyncWaterfall('html-webpack-plugin-before-html-generation', false, {
+            assets: assets,
+            outputName: self.childCompilationOutputName,
+            plugin: self
+          })
+          .then(() => compilationResult)
+        )
         // Execute the template
         .then(compilationResult => typeof compilationResult !== 'function'
         ? compilationResult
