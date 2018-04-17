@@ -449,7 +449,7 @@ class HtmlWebpackPlugin {
 
       // Append a hash for cache busting
       if (this.options.hash) {
-        chunkFiles = chunkFiles.map(chunkFile => self.appendHash(chunkFile, compilationHash));
+        chunkFiles = chunkFiles.map(chunkFile => self.appendHash(chunkFile, chunk.hash));
       }
 
       // Webpack outputs an array for each chunk when using sourcemaps
