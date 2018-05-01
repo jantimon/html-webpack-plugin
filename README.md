@@ -204,7 +204,7 @@ Please note that this will also happen if you specifiy the html-loader and use `
 ```js
 module: {
   loaders: [
-    { test: /\.hbs$/, loader: "handlebars" }
+    { test: /\.hbs$/, loader: "handlebars-loader" }
   ]
 },
 plugins: [
