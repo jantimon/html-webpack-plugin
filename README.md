@@ -289,11 +289,11 @@ plugins: [
 
 To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the HTML this plugin executes the following events:
 
-#### `Sync`
+#### `SyncWaterfallHook`
 
 * `htmlWebpackPluginAlterChunks`
 
-#### `Async`
+#### `AsyncSeriesWaterfallHook`
 
 * `htmlWebpackPluginBeforeHtmlGeneration`
 * `htmlWebpackPluginBeforeHtmlProcessing`
