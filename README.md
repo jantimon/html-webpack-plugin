@@ -289,17 +289,17 @@ plugins: [
 
 To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the HTML this plugin executes the following events:
 
-#### `Sync`
+#### `SyncWaterfallHook`
 
-* `html-webpack-plugin-alter-chunks`
+* `htmlWebpackPluginAlterChunks`
 
-#### `Async`
+#### `AsyncSeriesWaterfallHook`
 
-* `html-webpack-plugin-before-html-generation`
-* `html-webpack-plugin-before-html-processing`
-* `html-webpack-plugin-alter-asset-tags`
-* `html-webpack-plugin-after-html-processing`
-* `html-webpack-plugin-after-emit`
+* `htmlWebpackPluginBeforeHtmlGeneration`
+* `htmlWebpackPluginBeforeHtmlProcessing`
+* `htmlWebpackPluginAlterAssetTags`
+* `htmlWebpackPluginAfterHtmlProcessing`
+* `htmlWebpackPluginAfterEmit`
 
 Example implementation: [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
 
@@ -310,11 +310,11 @@ function MyPlugin(options) {
 }
 
 MyPlugin.prototype.apply = function (compiler) {
-  compiler.plugin('compilation', (compilation) => {
+  compiler.hooks.compilation.tap('MyPlugin', (compilation) => {
     console.log('The compiler is starting a new compilation...');
 
-    compilation.plugin(
-      'html-webpack-plugin-before-html-processing',
+    compilation.hooks.htmlWebpackPluginAfterHtmlProcessing.tapAsync(
+      'MyPlugin',
       (data, cb) => {
         data.html += 'The Magic Footer'
 
