@@ -114,7 +114,7 @@ class HtmlWebpackPlugin {
       if (self.options.entryPoint) {
         const entryChunks = compilation.getStats().toJson(chunkOnlyConfig).entrypoints;
         // get just chunks for the entry point
-        allChunks = entryChunks[self.options.entryPoint];
+        //allChunks = entryChunks[self.options.entryPoint];
         if (theseChunks === 'all') {
           // if chunks is default "all" use all chunks defined in entry point
           // otherwise, use the chunks already in options
