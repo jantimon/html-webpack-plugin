@@ -29,6 +29,7 @@ class HtmlWebpackPlugin {
       cache: true,
       showErrors: true,
       chunks: 'all',
+      entryPoint: false,
       excludeChunks: [],
       chunksSortMode: 'auto',
       meta: {},
@@ -106,9 +107,22 @@ class HtmlWebpackPlugin {
         timings: false,
         version: false
       };
-      const allChunks = compilation.getStats().toJson(chunkOnlyConfig).chunks;
+      let allChunks = compilation.getStats().toJson(chunkOnlyConfig).chunks;
+      // get chunks from options
+      let theseChunks = self.options.chunks;
+      // if we have an entry point defined
+      if (self.options.entryPoint) {
+        const entryChunks = compilation.getStats().toJson(chunkOnlyConfig).entrypoints;
+        // get just chunks for the entry point
+        //allChunks = entryChunks[self.options.entryPoint];
+        if (theseChunks === 'all') {
+          // if chunks is default "all" use all chunks defined in entry point
+          // otherwise, use the chunks already in options
+          theseChunks = entryChunks[self.options.entryPoint].chunks;
+        }
+      }
       // Filter chunks (options.chunks and options.excludeCHunks)
-      let chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
+      let chunks = self.filterChunks(allChunks, theseChunks, self.options.excludeChunks);
       // Sort chunks
       chunks = self.sortChunks(chunks, self.options.chunksSortMode, compilation);
       // Let plugins alter the chunks and the chunk sorting
