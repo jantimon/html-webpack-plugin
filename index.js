@@ -29,6 +29,7 @@ class HtmlWebpackPlugin {
       cache: true,
       showErrors: true,
       chunks: 'all',
+      includeSiblingChunks: false,
       excludeChunks: [],
       chunksSortMode: 'auto',
       meta: {},
@@ -109,6 +110,10 @@ class HtmlWebpackPlugin {
       const allChunks = compilation.getStats().toJson(chunkOnlyConfig).chunks;
       // Filter chunks (options.chunks and options.excludeCHunks)
       let chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
+      // Add sibling chunks
+      if (self.options.includeSiblingChunks) {
+        chunks = self.includeSiblingChunks(allChunks, chunks);
+      }
       // Sort chunks
       chunks = self.sortChunks(chunks, self.options.chunksSortMode, compilation);
       // Let plugins alter the chunks and the chunk sorting
@@ -351,6 +356,20 @@ class HtmlWebpackPlugin {
       };
       return basename;
     });
+  }
+
+  /**
+   * Helper to include splitted sibling chunks
+   */
+  includeSiblingChunks (chunks, filteredChunks) {
+    return filteredChunks.reduce((prevChunk, curChunk) => {
+      const siblings = curChunk.siblings;
+      let siblingChunks = [];
+      if (siblings) {
+        siblingChunks = chunks.filter(chunk => siblings.indexOf(chunk.names[0]) !== -1);
+      }
+      return prevChunk.concat(curChunk, siblingChunks);
+    }, []);
   }
 
   /**
