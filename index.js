@@ -414,7 +414,7 @@ class HtmlWebpackPlugin {
       // Will contain all css files
       css: [],
       // Will contain the html5 appcache manifest files if it exists
-      manifest: Object.keys(compilation.assets).filter(assetFile => path.extname(assetFile) === '.appcache')[0]
+      manifest: Object.keys(compilation.assets).find(assetFile => path.extname(assetFile) === '.appcache')
     };
 
     // Append a hash for cache busting
