@@ -10,6 +10,8 @@ const path = require('path');
 const SyncWaterfallHook = require('tapable').SyncWaterfallHook;
 const AsyncSeriesWaterfallHook = require('tapable').AsyncSeriesWaterfallHook;
 
+const htmlTagObjectToString = require('./lib/html-tags').htmlTagObjectToString;
+
 const childCompiler = require('./lib/compiler.js');
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
@@ -549,8 +551,8 @@ class HtmlWebpackPlugin {
     const htmlRegExp = /(<html[^>]*>)/i;
     const headRegExp = /(<\/head\s*>)/i;
     const bodyRegExp = /(<\/body\s*>)/i;
-    const body = assetTags.body.map(this.createHtmlTag.bind(this));
-    const head = assetTags.head.map(this.createHtmlTag.bind(this));
+    const body = assetTags.body.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
+    const head = assetTags.head.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
 
     if (body.length) {
       if (bodyRegExp.test(html)) {
@@ -597,26 +599,6 @@ class HtmlWebpackPlugin {
       return url;
     }
     return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
-  }
-
-  /**
-   * Turn a tag definition into a html string
-   */
-  createHtmlTag (tagDefinition) {
-    const attributes = Object.keys(tagDefinition.attributes || {})
-      .filter(attributeName => tagDefinition.attributes[attributeName] !== false)
-      .map(attributeName => {
-        if (tagDefinition.attributes[attributeName] === true) {
-          return attributeName;
-        }
-        return attributeName + '="' + tagDefinition.attributes[attributeName] + '"';
-      });
-    // Backport of 3.x void tag definition
-    const voidTag = tagDefinition.voidTag !== undefined ? tagDefinition.voidTag : !tagDefinition.closeTag;
-    const selfClosingTag = tagDefinition.voidTag !== undefined ? tagDefinition.voidTag && this.options.xhtml : tagDefinition.selfClosingTag;
-    return '<' + [tagDefinition.tagName].concat(attributes).join(' ') + (selfClosingTag ? '/' : '') + '>' +
-      (tagDefinition.innerHTML || '') +
-      (voidTag ? '' : '</' + tagDefinition.tagName + '>');
   }
 
   /**
