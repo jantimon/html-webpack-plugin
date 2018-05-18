@@ -517,13 +517,12 @@ class HtmlWebpackPlugin {
     // Make tags self-closing in case of xhtml
     // Turn { "viewport" : "width=500, initial-scale=1" } into
     // [{ name:"viewport" content:"width=500, initial-scale=1" }]
-    const selfClosingTag = !!this.options.xhtml;
-    const metaTagAttributeObjects = Object.keys(this.options.meta).map((metaName) => {
-      const metaTagContent = this.options.meta[metaName];
-      return (typeof metaTagContent === 'object') ? metaTagContent : {
+    const metaTagAttributeObjects = Object.keys(metaOptions).map((metaName) => {
+      const metaTagContent = metaOptions[metaName];
+      return (typeof metaTagContent === 'string') ? {
         name: metaName,
         content: metaTagContent
-      };
+      } : metaTagContent;
     });
     // Turn [{ name:"viewport" content:"width=500, initial-scale=1" }] into
     // the html-webpack-plugin tag structure
@@ -531,7 +530,6 @@ class HtmlWebpackPlugin {
       return {
         tagName: 'meta',
         voidTag: true,
-        selfClosingTag: selfClosingTag,
         attributes: metaTagAttributes
       };
     });
@@ -552,22 +550,19 @@ class HtmlWebpackPlugin {
        body: HtmlTagObject[]
      }}
    */
-  generateHtmlTags (assets) {
+  generateHtmlTagObjects (assets) {
     // Turn script files into script tags
     const scripts = assets.js.map(scriptPath => ({
       tagName: 'script',
-      closeTag: true,
+      voidTag: false,
       attributes: {
         type: 'text/javascript',
         src: scriptPath
       }
     }));
-    // Make tags self-closing in case of xhtml
-    const selfClosingTag = !!this.options.xhtml;
     // Turn css files into link tags
     const styles = assets.css.map(stylePath => ({
       tagName: 'link',
-      selfClosingTag: selfClosingTag,
       voidTag: true,
       attributes: {
         href: stylePath,
@@ -582,7 +577,6 @@ class HtmlWebpackPlugin {
     if (assets.favicon) {
       head.push({
         tagName: 'link',
-        selfClosingTag: selfClosingTag,
         voidTag: true,
         attributes: {
           rel: 'shortcut icon',
