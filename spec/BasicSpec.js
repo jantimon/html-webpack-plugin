@@ -166,7 +166,7 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, [/<body>[\s]*<script type="text\/javascript" src="index_bundle.js"><\/script>[\s]*<\/body>/], null, done);
+    }, [/<body>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/body>/], null, done);
   });
 
   it('generates a default index.html file with multiple entry points', function (done) {
@@ -180,7 +180,7 @@ describe('HtmlWebpackPlugin', function () {
         filename: '[name]_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script type="text/javascript" src="util_bundle.js"', '<script type="text/javascript" src="app_bundle.js"'], null, done);
+    }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
   });
 
   it('allows you to specify a custom loader without injection', function (done) {
@@ -197,7 +197,7 @@ describe('HtmlWebpackPlugin', function () {
         template: 'jade-loader!' + path.join(__dirname, 'fixtures/template.jade')
       })]
     },
-    ['<script type="text/javascript" src="app_bundle.js', 'Some unique text'], null, done);
+    ['<script src="app_bundle.js', 'Some unique text'], null, done);
   });
 
   it('should pass through loader errors', function (done) {
@@ -236,7 +236,7 @@ describe('HtmlWebpackPlugin', function () {
         template: path.join(__dirname, 'fixtures/template.jade')
       })]
     },
-    ['<script type="text/javascript" src="app_bundle.js', 'Some unique text'], null, done);
+    ['<script src="app_bundle.js', 'Some unique text'], null, done);
   });
 
   it('works when using html-loader', function (done) {
@@ -253,7 +253,7 @@ describe('HtmlWebpackPlugin', function () {
         template: 'html-loader!' + path.join(__dirname, 'fixtures/plain.html')
       })]
     },
-    ['<script type="text/javascript" src="app_bundle.js"'], null, done);
+    ['<script src="app_bundle.js"'], null, done);
   });
 
   it('allows you to specify your own HTML template file', function (done) {
@@ -270,7 +270,7 @@ describe('HtmlWebpackPlugin', function () {
         inject: false
       })]
     },
-    ['<script type="text/javascript" src="app_bundle.js', 'Some unique text'], null, done);
+    ['<script src="app_bundle.js', 'Some unique text'], null, done);
   });
 
   it('allows you to inject the assets into a given html file', function (done) {
@@ -287,7 +287,7 @@ describe('HtmlWebpackPlugin', function () {
         inject: true,
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
-    }, ['<script type="text/javascript" src="util_bundle.js"', '<script type="text/javascript" src="app_bundle.js"'], null, done);
+    }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
   });
 
   it('allows you to inject the assets into the body of the given template', function (done) {
@@ -304,7 +304,7 @@ describe('HtmlWebpackPlugin', function () {
         inject: 'body',
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
-    }, ['<script type="text/javascript" src="util_bundle.js"', '<script type="text/javascript" src="app_bundle.js"'], null, done);
+    }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
   });
 
   it('allows you to inject the assets into the head of the given template', function (done) {
@@ -321,7 +321,7 @@ describe('HtmlWebpackPlugin', function () {
         inject: 'head',
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
-    }, ['<script type="text/javascript" src="util_bundle.js"', '<script type="text/javascript" src="app_bundle.js"'], null, done);
+    }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
   });
 
   it('allows you to inject a specified asset into a given html file', function (done) {
@@ -339,7 +339,7 @@ describe('HtmlWebpackPlugin', function () {
         chunks: ['app'],
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
-    }, ['<script type="text/javascript" src="app_bundle.js"'], null, done);
+    }, ['<script src="app_bundle.js"'], null, done);
   });
 
   it('allows you to inject a specified asset into a given html file', function (done) {
@@ -357,7 +357,7 @@ describe('HtmlWebpackPlugin', function () {
         excludeChunks: ['util'],
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
-    }, ['<script type="text/javascript" src="app_bundle.js"'], null, done);
+    }, ['<script src="app_bundle.js"'], null, done);
   });
 
   it('allows you to use chunkhash with asset into a given html file', function (done) {
@@ -376,7 +376,7 @@ describe('HtmlWebpackPlugin', function () {
     }, [{
       type: 'chunkhash',
       chunkName: 'app',
-      containStr: '<script type="text/javascript" src="app_bundle.js?%chunkhash%"'
+      containStr: '<script src="app_bundle.js?%chunkhash%"'
     }], null, done);
   });
 
@@ -410,7 +410,7 @@ describe('HtmlWebpackPlugin', function () {
         }
       })]
     },
-    ['<script type="text/javascript" src="app_bundle.js"'], null, done);
+    ['<script src="app_bundle.js"'], null, done);
   });
 
   it('works with source maps', function (done) {
@@ -422,7 +422,7 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script type="text/javascript" src="index_bundle.js"'], null, done);
+    }, ['<script src="index_bundle.js"'], null, done);
   });
 
   it('handles hashes in bundle filenames', function (done) {
@@ -433,7 +433,7 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'index_bundle_[hash].js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, [/<script type="text\/javascript" src="index_bundle_[0-9a-f]+\.js"*/], null, done);
+    }, [/<script src="index_bundle_[0-9a-f]+\.js"*/], null, done);
   });
 
   it('handles hashes in the directory which has the bundle file', function (done) {
@@ -445,7 +445,7 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'index_bundle_[hash].js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, [/<script type="text\/javascript" src="\/dist\/[0-9a-f]+\/index_bundle_[0-9a-f]+\.js"*/], null, done);
+    }, [/<script src="\/dist\/[0-9a-f]+\/index_bundle_[0-9a-f]+\.js"*/], null, done);
   });
 
   it('allows to append hashes to the assets', function (done) {
@@ -456,7 +456,7 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({hash: true})]
-    }, ['<script type="text/javascript" src="index_bundle.js?%hash%"'], null, done);
+    }, ['<script src="index_bundle.js?%hash%"'], null, done);
   });
 
   it('allows to append hashes to the assets', function (done) {
@@ -467,7 +467,7 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({hash: true, inject: true})]
-    }, ['<script type="text/javascript" src="index_bundle.js?%hash%"'], null, done);
+    }, ['<script src="index_bundle.js?%hash%"'], null, done);
   });
 
   it('should work with the css extract plugin', function (done) {
@@ -594,7 +594,7 @@ describe('HtmlWebpackPlugin', function () {
         publicPath: 'http://cdn.example.com/assets/'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script type="text/javascript" src="http://cdn.example.com/assets/index_bundle.js"'], null, done);
+    }, ['<script src="http://cdn.example.com/assets/index_bundle.js"'], null, done);
   });
 
   it('handles subdirectories in the webpack output bundles', function (done) {
@@ -605,7 +605,7 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'assets/index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script type="text/javascript" src="assets/index_bundle.js"'], null, done);
+    }, ['<script src="assets/index_bundle.js"'], null, done);
   });
 
   it('handles subdirectories in the webpack output bundles along with a public path', function (done) {
@@ -617,7 +617,7 @@ describe('HtmlWebpackPlugin', function () {
         publicPath: 'http://cdn.example.com/'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script type="text/javascript" src="http://cdn.example.com/assets/index_bundle.js"'], null, done);
+    }, ['<script src="http://cdn.example.com/assets/index_bundle.js"'], null, done);
   });
 
   it('allows you to configure the title of the generated HTML page', function (done) {
@@ -639,7 +639,7 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({filename: 'test.html'})]
-    }, ['<script type="text/javascript" src="index_bundle.js"'], 'test.html', done);
+    }, ['<script src="index_bundle.js"'], 'test.html', done);
   });
 
   it('will replace [hash] in the filename with the child compilation hash', function (done) {
@@ -652,7 +652,7 @@ describe('HtmlWebpackPlugin', function () {
       plugins: [new HtmlWebpackPlugin({
         filename: 'test-[hash].html'
       })]
-    }, ['<script type="text/javascript" src="index_bundle.js"'], /test-\S+\.html$/, done);
+    }, ['<script src="index_bundle.js"'], /test-\S+\.html$/, done);
   });
 
   it('allows you to use an absolute output filename', function (done) {
@@ -665,7 +665,7 @@ describe('HtmlWebpackPlugin', function () {
       plugins: [new HtmlWebpackPlugin({
         filename: path.resolve(OUTPUT_DIR, 'subfolder', 'test.html')
       })]
-    }, ['<script type="text/javascript" src="../index_bundle.js"'], path.join('subfolder', 'test.html'), done);
+    }, ['<script src="../index_bundle.js"'], path.join('subfolder', 'test.html'), done);
   });
 
   it('allows you to use an absolute output filename outside the output path', function (done) {
@@ -678,7 +678,7 @@ describe('HtmlWebpackPlugin', function () {
       plugins: [new HtmlWebpackPlugin({
         filename: path.resolve(OUTPUT_DIR, 'test.html')
       })]
-    }, ['<script type="text/javascript" src="app/index_bundle.js"'], 'test.html', done);
+    }, ['<script src="app/index_bundle.js"'], 'test.html', done);
   });
 
   it('allows you to use an relative output filename outside the output path', function (done) {
@@ -691,7 +691,7 @@ describe('HtmlWebpackPlugin', function () {
       plugins: [new HtmlWebpackPlugin({
         filename: '../test.html'
       })]
-    }, ['<script type="text/javascript" src="app/index_bundle.js"'], 'test.html', done);
+    }, ['<script src="app/index_bundle.js"'], 'test.html', done);
   });
 
   it('will try to use a relative name if the filename is in a subdirectory', function (done) {
@@ -702,7 +702,7 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({filename: 'assets/test.html'})]
-    }, ['<script type="text/javascript" src="../index_bundle.js"'], 'assets/test.html', done);
+    }, ['<script src="../index_bundle.js"'], 'assets/test.html', done);
   });
 
   it('will try to use a relative name if the filename and the script are in a subdirectory', function (done) {
@@ -713,7 +713,7 @@ describe('HtmlWebpackPlugin', function () {
         filename: 'assets/index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({filename: 'assets/demo/test.html'})]
-    }, ['<script type="text/javascript" src="../../assets/index_bundle.js"'], 'assets/demo/test.html', done);
+    }, ['<script src="../../assets/index_bundle.js"'], 'assets/demo/test.html', done);
   });
 
   it('allows you write multiple HTML files', function (done) {
@@ -736,7 +736,7 @@ describe('HtmlWebpackPlugin', function () {
           template: path.join(__dirname, 'fixtures/test.html')
         })
       ]
-    }, ['<script type="text/javascript" src="index_bundle.js"'], null, function () {
+    }, ['<script src="index_bundle.js"'], null, function () {
       expect(fs.existsSync(path.join(OUTPUT_DIR, 'second-file.html'))).toBe(true);
       expect(fs.existsSync(path.join(OUTPUT_DIR, 'third-file.html'))).toBe(true);
       done();
@@ -759,7 +759,7 @@ describe('HtmlWebpackPlugin', function () {
         new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/empty_html.html')}),
         new ExtractTextPlugin('styles.css')
       ]
-    }, ['<link href="styles.css"', '<script type="text/javascript" src="index_bundle.js"'], null, done);
+    }, ['<link href="styles.css"', '<script src="index_bundle.js"'], null, done);
   });
 
   it('exposes the webpack configuration to templates', function (done) {
@@ -874,7 +874,7 @@ describe('HtmlWebpackPlugin', function () {
         examplePlugin
       ]
     },
-    [/<body>[\s]*<script type="text\/javascript" src="app_bundle.js" async><\/script>[\s]*<\/body>/],
+    [/<body>[\s]*<script src="app_bundle.js" async><\/script>[\s]*<\/body>/],
     null, done, false, false);
   });
 
@@ -907,7 +907,7 @@ describe('HtmlWebpackPlugin', function () {
         examplePlugin
       ]
     },
-    [/<body>[\s]*<script type="text\/javascript" src="app_bundle.js"><\/script>[\s]*<\/body>/],
+    [/<body>[\s]*<script src="app_bundle.js"><\/script>[\s]*<\/body>/],
     null, done, false, false);
   });
 
@@ -1216,7 +1216,7 @@ describe('HtmlWebpackPlugin', function () {
         new HtmlWebpackPlugin(),
         examplePlugin
       ]
-    }, ['Injected by plugin', '<script type="text/javascript" src="funky-script.js"'], null, function () {
+    }, ['Injected by plugin', '<script src="funky-script.js"'], null, function () {
       expect(eventFired).toBe(true);
       done();
     }, false,
@@ -1251,7 +1251,7 @@ describe('HtmlWebpackPlugin', function () {
         }),
         examplePlugin
       ]
-    }, ['<script type="text/javascript" src="funky-script.js"'], null, function () {
+    }, ['<script src="funky-script.js"'], null, function () {
       expect(eventFired).toBe(true);
       done();
     });
@@ -1275,8 +1275,8 @@ describe('HtmlWebpackPlugin', function () {
         new HtmlWebpackPlugin()
       ]
     }, [
-      /<script type="text\/javascript" src="common_bundle.js">[\s\S]*<script type="text\/javascript" src="util_bundle.js">/,
-      /<script type="text\/javascript" src="common_bundle.js"[\s\S]*<script type="text\/javascript" src="index_bundle.js">/], null, done);
+      /<script src="common_bundle.js">[\s\S]*<script src="util_bundle.js">/,
+      /<script src="common_bundle.js"[\s\S]*<script src="index_bundle.js">/], null, done);
   });
 
   it('adds a favicon', function (done) {
@@ -1509,7 +1509,7 @@ describe('HtmlWebpackPlugin', function () {
         })
       ]
     }, [
-      /(<script type="text\/javascript" src="common_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">.+<script type="text\/javascript" src="index_bundle.js">)|(<script type="text\/javascript" src="common_bundle.js">.+<script type="text\/javascript" src="index_bundle.js">.+<script type="text\/javascript" src="util_bundle.js">)/
+      /(<script src="common_bundle.js">.+<script src="util_bundle.js">.+<script src="index_bundle.js">)|(<script src="common_bundle.js">.+<script src="index_bundle.js">.+<script src="util_bundle.js">)/
     ], null, done);
   });
 
@@ -1537,7 +1537,7 @@ describe('HtmlWebpackPlugin', function () {
           }
         })
       ]
-    }, [/<script type="text\/javascript" src="c_bundle.js">.+<script type="text\/javascript" src="b_bundle.js">.+<script type="text\/javascript" src="a_bundle.js">/], null, done);
+    }, [/<script src="c_bundle.js">.+<script src="b_bundle.js">.+<script src="a_bundle.js">/], null, done);
   });
 
   it('should sort manually by the chunks', function (done) {
@@ -1568,7 +1568,7 @@ describe('HtmlWebpackPlugin', function () {
         })
       ]
     }, [
-      /<script type="text\/javascript" src="common_bundle.js">.+<script type="text\/javascript" src="a_bundle.js">.+<script type="text\/javascript" src="b_bundle.js">.+<script type="text\/javascript" src="c_bundle.js">/], null, done);
+      /<script src="common_bundle.js">.+<script src="a_bundle.js">.+<script src="b_bundle.js">.+<script src="c_bundle.js">/], null, done);
   });
 
   it('should add the webpack compilation object as a property of the templateParam object', function (done) {
@@ -1651,7 +1651,7 @@ describe('HtmlWebpackPlugin', function () {
         templateContent: ''
       })]
     },
-    [/^<script type="text\/javascript" src="app_bundle\.js"><\/script>$/], null, done);
+    [/^<script src="app_bundle\.js"><\/script>$/], null, done);
   });
 
   it('allows you to inject the assets into the body of the given spaced closing tag template', function (done) {
@@ -1665,7 +1665,7 @@ describe('HtmlWebpackPlugin', function () {
         inject: 'body',
         template: path.join(__dirname, 'fixtures/spaced_plain.html')
       })]
-    }, [/<body>[\s]*<script type="text\/javascript" src="index_bundle.js"><\/script>[\s]*<\/body\s>/], null, done);
+    }, [/<body>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/body\s>/], null, done);
   });
 
   it('allows you to inject the assets into the head of the given spaced closing tag template', function (done) {
@@ -1679,6 +1679,6 @@ describe('HtmlWebpackPlugin', function () {
         inject: 'head',
         template: path.join(__dirname, 'fixtures/spaced_plain.html')
       })]
-    }, [/<head>[\s]*<script type="text\/javascript" src="index_bundle.js"><\/script>[\s]*<\/head\s>/], null, done);
+    }, [/<head>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/head\s>/], null, done);
   });
 });
