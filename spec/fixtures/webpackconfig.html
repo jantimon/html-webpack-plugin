@@ -6,6 +6,6 @@
   </head>
   <body>
     <p>Public path is <%= webpackConfig.output.publicPath %></p>
-    <script src="<%= htmlWebpackPlugin.files.chunks.app.entry %>?<%= htmlWebpackPlugin.files.chunks.app.hash %>"></script>
+    <script src="<%= htmlWebpackPlugin.files.js[0].path %></script>
   </body>
 </html>

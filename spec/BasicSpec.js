@@ -376,7 +376,7 @@ describe('HtmlWebpackPlugin', function () {
     }, [{
       type: 'chunkhash',
       chunkName: 'app',
-      containStr: '<script src="app_bundle.js?%chunkhash%"'
+      containStr: '<script src="app_bundle.js'
     }], null, done);
   });
 
@@ -1195,7 +1195,7 @@ describe('HtmlWebpackPlugin', function () {
         compiler.plugin('compilation', function (compilation) {
           tapCompilationEvent(compilation, 'html-webpack-plugin-before-html-processing', function (object, callback) {
             eventFired = true;
-            object.assets.js.push('funky-script.js');
+            object.assets.js.push({path: 'funky-script.js'});
             object.html += 'Injected by plugin';
             callback();
           });
@@ -1230,7 +1230,7 @@ describe('HtmlWebpackPlugin', function () {
         compiler.plugin('compilation', function (compilation) {
           tapCompilationEvent(compilation, 'html-webpack-plugin-before-html-generation', function (object, callback) {
             eventFired = true;
-            object.assets.js.push('funky-script.js');
+            object.assets.js.push({path: 'funky-script.js'});
             callback();
           });
         });

@@ -434,6 +434,18 @@ class HtmlWebpackPlugin {
     return assets.js.length && assets.js.every(name => /\.hot-update\.js$/.test(name));
   }
 
+  /**
+   *
+   * @param {WebpackCompilation} compilation
+   * @param {any} chunks
+   * @returns {{
+      publicPath: string,
+      js: Array<{entryName: string, path: string}>,
+      css: Array<{entryName: string, path: string}>,
+      manifest: string,
+      favicon?: string
+    }}
+   */
   htmlWebpackPluginAssets (compilation, chunks) {
     const compilationHash = compilation.hash;
 
@@ -449,11 +461,18 @@ class HtmlWebpackPlugin {
       publicPath += '/';
     }
 
+    /**
+     * @type {{
+        publicPath: string,
+        js: Array<{entryName: string, path: string}>,
+        css: Array<{entryName: string, path: string}>,
+        manifest: string,
+        favicon?: string
+      }}
+     */
     const assets = {
       // The public path
       publicPath: publicPath,
-      // Will contain all js & css files by chunk
-      chunks: {},
       // Will contain all js files
       js: [],
       // Will contain all css files
@@ -465,14 +484,11 @@ class HtmlWebpackPlugin {
     // Append a hash for cache busting
     if (this.options.hash) {
       assets.manifest = this.appendHash(assets.manifest, compilationHash);
-      assets.favicon = this.appendHash(assets.favicon, compilationHash);
     }
 
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
       const chunkName = chunk.names[0];
-
-      assets.chunks[chunkName] = {};
 
       // Prepend the public path to all chunk files
       let chunkFiles = [].concat(chunk.files).map(chunkFile => publicPath + chunkFile);
@@ -486,16 +502,20 @@ class HtmlWebpackPlugin {
       // or when one chunk hosts js and css simultaneously
       const js = chunkFiles.find(chunkFile => /.js($|\?)/.test(chunkFile));
       if (js) {
-        assets.chunks[chunkName].size = chunk.size;
-        assets.chunks[chunkName].entry = js;
-        assets.chunks[chunkName].hash = chunk.hash;
-        assets.js.push(js);
+        assets.js.push({
+          entryName: chunkName,
+          path: js
+        });
       }
 
       // Gather all css files
       const css = chunkFiles.filter(chunkFile => /.css($|\?)/.test(chunkFile));
-      assets.chunks[chunkName].css = css;
-      assets.css = assets.css.concat(css);
+      css.forEach((cssPath) => {
+        assets.css.push({
+          entryName: chunkName,
+          path: cssPath
+        });
+      });
     }
 
     // Duplicate css assets can occur on occasion if more than one chunk
@@ -552,19 +572,19 @@ class HtmlWebpackPlugin {
    */
   generateHtmlTagObjects (assets) {
     // Turn script files into script tags
-    const scripts = assets.js.map(scriptPath => ({
+    const scripts = assets.js.map(scriptAsset => ({
       tagName: 'script',
       voidTag: false,
       attributes: {
-        src: scriptPath
+        src: scriptAsset.path
       }
     }));
     // Turn css files into link tags
-    const styles = assets.css.map(stylePath => ({
+    const styles = assets.css.map(styleAsset => ({
       tagName: 'link',
       voidTag: true,
       attributes: {
-        href: stylePath,
+        href: styleAsset.path,
         rel: 'stylesheet'
       }
     }));
