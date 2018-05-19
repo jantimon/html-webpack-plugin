@@ -36,7 +36,7 @@ class HtmlWebpackPlugin {
     /**
      * @type {HtmlWebpackPluginOptions}
      */
-    this.options = _.extend({
+    this.options = Object.assign({
       template: path.join(__dirname, 'default_index.ejs'),
       templateContent: undefined,
       templateParameters: templateParametersGenerator,
@@ -125,138 +125,119 @@ class HtmlWebpackPlugin {
      * @param {WebpackCompilation} compilation
      * @param {() => void} callback
     */
-    (compilation, callback) => {
-      const applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
-      // Get chunks info as json
-      // Note: we're excluding stuff that we don't need to improve toJson serialization speed.
-      const chunkOnlyConfig = {
-        assets: false,
-        cached: false,
-        children: false,
-        chunks: true,
-        chunkModules: false,
-        chunkOrigins: false,
-        errorDetails: false,
-        hash: false,
-        modules: false,
-        reasons: false,
-        source: false,
-        timings: false,
-        version: false
-      };
-      const allChunks = compilation.getStats().toJson(chunkOnlyConfig).chunks;
-      // Filter chunks (options.chunks and options.excludeCHunks)
-      let chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
-      // Sort chunks
-      chunks = self.sortChunks(chunks, self.options.chunksSortMode, compilation);
-      // Let plugins alter the chunks and the chunk sorting
-      chunks = compilation.hooks.htmlWebpackPluginAlterChunks.call(chunks, { plugin: self });
-      // Get assets
-      const assets = self.htmlWebpackPluginAssets(compilation, chunks);
-      // If this is a hot update compilation, move on!
-      // This solves a problem where an `index.html` file is generated for hot-update js files
-      // It only happens in Webpack 2, where hot updates are emitted separately before the full bundle
-      if (self.isHotUpdateCompilation(assets)) {
-        return callback();
-      }
+      (compilation, callback) => {
+        const applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
+        // Get all entry point names for this html file
+        const entryNames = Array.from(compilation.entrypoints.keys());
+        const filteredEntryNames = self.filterChunks(entryNames, self.options.chunks, self.options.excludeChunks);
+        const sortedEntryNames = self.sortEntryChunks(filteredEntryNames, this.options.chunksSortMode, compilation);
+        // Turn the entry point names into file paths
+        const assets = self.htmlWebpackPluginAssets(compilation, sortedEntryNames);
 
-      // If the template and the assets did not change we don't have to emit the html
-      const assetJson = JSON.stringify(self.getAssetFiles(assets));
-      if (isCompilationCached && self.options.cache && assetJson === self.assetJson) {
-        return callback();
-      } else {
-        self.assetJson = assetJson;
-      }
+        // If this is a hot update compilation, move on!
+        // This solves a problem where an `index.html` file is generated for hot-update js files
+        // It only happens in Webpack 2, where hot updates are emitted separately before the full bundle
+        if (self.isHotUpdateCompilation(assets)) {
+          return callback();
+        }
 
-      Promise.resolve()
+        // If the template and the assets did not change we don't have to emit the html
+        const assetJson = JSON.stringify(self.getAssetFiles(assets));
+        if (isCompilationCached && self.options.cache && assetJson === self.assetJson) {
+          return callback();
+        } else {
+          self.assetJson = assetJson;
+        }
+
+        Promise.resolve()
         // Favicon
-        .then(() => {
-          if (self.options.favicon) {
-            return self.addFileToAssets(self.options.favicon, compilation)
-              .then(faviconBasename => {
-                let publicPath = compilation.mainTemplate.getPublicPath({hash: compilation.hash}) || '';
-                if (publicPath && publicPath.substr(-1) !== '/') {
-                  publicPath += '/';
-                }
-                assets.favicon = publicPath + faviconBasename;
-              });
-          }
-        })
+          .then(() => {
+            if (self.options.favicon) {
+              return self.addFileToAssets(self.options.favicon, compilation)
+                .then(faviconBasename => {
+                  let publicPath = compilation.mainTemplate.getPublicPath({hash: compilation.hash}) || '';
+                  if (publicPath && publicPath.substr(-1) !== '/') {
+                    publicPath += '/';
+                  }
+                  assets.favicon = publicPath + faviconBasename;
+                });
+            }
+          })
         // Wait for the compilation to finish
-        .then(() => compilationPromise)
-        .then(compiledTemplate => {
+          .then(() => compilationPromise)
+          .then(compiledTemplate => {
           // Allow to use a custom function / string instead
-          if (self.options.templateContent !== undefined) {
-            return self.options.templateContent;
-          }
-          // Once everything is compiled evaluate the html factory
-          // and replace it with its content
-          return self.evaluateCompilationResult(compilation, compiledTemplate);
-        })
+            if (self.options.templateContent !== undefined) {
+              return self.options.templateContent;
+            }
+            // Once everything is compiled evaluate the html factory
+            // and replace it with its content
+            return self.evaluateCompilationResult(compilation, compiledTemplate);
+          })
         // Allow plugins to make changes to the assets before invoking the template
         // This only makes sense to use if `inject` is `false`
-        .then(compilationResult => applyPluginsAsyncWaterfall('htmlWebpackPluginBeforeHtmlGeneration', false, {
-          assets: assets,
-          outputName: self.childCompilationOutputName,
-          plugin: self
-        })
-      .then(() => compilationResult))
+          .then(compilationResult => applyPluginsAsyncWaterfall('htmlWebpackPluginBeforeHtmlGeneration', false, {
+            assets: assets,
+            outputName: self.childCompilationOutputName,
+            plugin: self
+          })
+            .then(() => compilationResult))
         // Execute the template
-        .then(compilationResult => typeof compilationResult !== 'function'
-        ? compilationResult
-        : self.executeTemplate(compilationResult, chunks, assets, compilation))
+          .then(compilationResult => typeof compilationResult !== 'function'
+            ? compilationResult
+            : self.executeTemplate(compilationResult, assets, compilation))
         // Allow plugins to change the html before assets are injected
-        .then(html => {
-          const pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
-          return applyPluginsAsyncWaterfall('htmlWebpackPluginBeforeHtmlProcessing', true, pluginArgs);
-        })
-        .then(result => {
-          const html = result.html;
-          const assets = result.assets;
-          // Prepare script and link tags
-          const assetTags = self.generateHtmlTagObjects(assets);
-          const pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, chunks: chunks, outputName: self.childCompilationOutputName};
-          // Allow plugins to change the assetTag definitions
-          return applyPluginsAsyncWaterfall('htmlWebpackPluginAlterAssetTags', true, pluginArgs)
-            .then(result => self.postProcessHtml(html, assets, { body: result.body, head: result.head })
-            .then(html => _.extend(result, {html: html, assets: assets})));
-        })
+          .then(html => {
+            const pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
+            return applyPluginsAsyncWaterfall('htmlWebpackPluginBeforeHtmlProcessing', true, pluginArgs);
+          })
+          .then(result => {
+            const html = result.html;
+            const assets = result.assets;
+            // Prepare script and link tags
+            const assetTags = self.generateHtmlTagObjects(assets);
+            const pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, outputName: self.childCompilationOutputName};
+            // Allow plugins to change the assetTag definitions
+            return applyPluginsAsyncWaterfall('htmlWebpackPluginAlterAssetTags', true, pluginArgs)
+              .then(result => self.postProcessHtml(html, assets, { body: result.body, head: result.head })
+                .then(html => _.extend(result, {html: html, assets: assets})));
+          })
         // Allow plugins to change the html after assets are injected
-        .then(result => {
-          const html = result.html;
-          const assets = result.assets;
-          const pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
-          return applyPluginsAsyncWaterfall('htmlWebpackPluginAfterHtmlProcessing', true, pluginArgs)
-            .then(result => result.html);
-        })
-        .catch(err => {
+          .then(result => {
+            const html = result.html;
+            const assets = result.assets;
+            const pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
+            return applyPluginsAsyncWaterfall('htmlWebpackPluginAfterHtmlProcessing', true, pluginArgs)
+              .then(result => result.html);
+          })
+          .catch(err => {
           // In case anything went wrong the promise is resolved
           // with the error message and an error is logged
-          compilation.errors.push(prettyError(err, compiler.context).toString());
-          // Prevent caching
-          self.hash = null;
-          return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
-        })
-        .then(html => {
+            compilation.errors.push(prettyError(err, compiler.context).toString());
+            // Prevent caching
+            self.hash = null;
+            return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
+          })
+          .then(html => {
           // Replace the compilation result with the evaluated html code
-          compilation.assets[self.childCompilationOutputName] = {
-            source: () => html,
-            size: () => html.length
-          };
-        })
-        .then(() => applyPluginsAsyncWaterfall('htmlWebpackPluginAfterEmit', false, {
-          html: compilation.assets[self.childCompilationOutputName],
-          outputName: self.childCompilationOutputName,
-          plugin: self
-        }).catch(err => {
-          console.error(err);
-          return null;
-        }).then(() => null))
+            compilation.assets[self.childCompilationOutputName] = {
+              source: () => html,
+              size: () => html.length
+            };
+          })
+          .then(() => applyPluginsAsyncWaterfall('htmlWebpackPluginAfterEmit', false, {
+            html: compilation.assets[self.childCompilationOutputName],
+            outputName: self.childCompilationOutputName,
+            plugin: self
+          }).catch(err => {
+            console.error(err);
+            return null;
+          }).then(() => null))
         // Let webpack continue with it
-        .then(() => {
-          callback();
-        });
-    });
+          .then(() => {
+            callback();
+          });
+      });
   }
 
   /**
@@ -309,7 +290,7 @@ class HtmlWebpackPlugin {
    *
    * @returns Promise<string>
    */
-  executeTemplate (templateFunction, chunks, assets, compilation) {
+  executeTemplate (templateFunction, assets, compilation) {
     // Template processing
     const templateParams = this.getTemplateParameters(compilation, assets);
     let html = '';
@@ -363,35 +344,38 @@ class HtmlWebpackPlugin {
       fsStatAsync(filename),
       fsReadFileAsync(filename)
     ])
-    .then(([size, source]) => {
-      return {
-        size,
-        source
-      };
-    })
-    .catch(() => Promise.reject(new Error('HtmlWebpackPlugin: could not load file ' + filename)))
-    .then(results => {
-      const basename = path.basename(filename);
-      compilation.fileDependencies.add(filename);
-      compilation.assets[basename] = {
-        source: () => results.source,
-        size: () => results.size.size
-      };
-      return basename;
-    });
+      .then(([size, source]) => {
+        return {
+          size,
+          source
+        };
+      })
+      .catch(() => Promise.reject(new Error('HtmlWebpackPlugin: could not load file ' + filename)))
+      .then(results => {
+        const basename = path.basename(filename);
+        compilation.fileDependencies.add(filename);
+        compilation.assets[basename] = {
+          source: () => results.source,
+          size: () => results.size.size
+        };
+        return basename;
+      });
   }
 
   /**
    * Helper to sort chunks
+   * @param {string[]} entryNames
+   * @param {string|((entryNameA: string, entryNameB: string) => number)} sortMode
+   * @param {WebpackCompilation} compilation
    */
-  sortChunks (chunks, sortMode, compilation) {
+  sortEntryChunks (entryNames, sortMode, compilation) {
     // Custom function
     if (typeof sortMode === 'function') {
-      return chunks.sort(sortMode);
+      return entryNames.sort(sortMode);
     }
     // Check if the given sort mode is a valid chunkSorter sort mode
     if (typeof chunkSorter[sortMode] !== 'undefined') {
-      return chunkSorter[sortMode](chunks, this.options, compilation);
+      return chunkSorter[sortMode](entryNames, compilation, this.options);
     }
     throw new Error('"' + sortMode + '" is not a valid chunk sort mode');
   }
@@ -403,20 +387,7 @@ class HtmlWebpackPlugin {
    * @param {string[]} excludedChunks
    */
   filterChunks (chunks, includedChunks, excludedChunks) {
-    return chunks.filter(chunk => {
-      const chunkName = chunk.names[0];
-      // This chunk doesn't have a name. This script can't handled it.
-      if (chunkName === undefined) {
-        return false;
-      }
-      // Skip if the chunk should be lazy loaded
-      if (typeof chunk.isInitial === 'function') {
-        if (!chunk.isInitial()) {
-          return false;
-        }
-      } else if (!chunk.initial) {
-        return false;
-      }
+    return chunks.filter(chunkName => {
       // Skip if the chunks should be filtered and the given chunk was not added explicity
       if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
         return false;
@@ -435,9 +406,10 @@ class HtmlWebpackPlugin {
   }
 
   /**
-   *
+   * The htmlWebpackPluginAssets extracts the asset information of a webpack compilation
+   * for all given entry names
    * @param {WebpackCompilation} compilation
-   * @param {any} chunks
+   * @param {string[]} entryNames
    * @returns {{
       publicPath: string,
       js: Array<{entryName: string, path: string}>,
@@ -446,10 +418,14 @@ class HtmlWebpackPlugin {
       favicon?: string
     }}
    */
-  htmlWebpackPluginAssets (compilation, chunks) {
+  htmlWebpackPluginAssets (compilation, entryNames) {
     const compilationHash = compilation.hash;
 
-    // Use the configured public path or build a relative path
+    /**
+     * @type {string} the configured public path to the asset root
+     * if a publicPath is set in the current webpack config use it otherwise
+     * fallback to a realtive path
+     */
     let publicPath = typeof compilation.options.output.publicPath !== 'undefined'
       // If a hard coded public path exists use it
       ? compilation.mainTemplate.getPublicPath({hash: compilationHash})
@@ -478,7 +454,9 @@ class HtmlWebpackPlugin {
       // Will contain all css files
       css: [],
       // Will contain the html5 appcache manifest files if it exists
-      manifest: Object.keys(compilation.assets).find(assetFile => path.extname(assetFile) === '.appcache')
+      manifest: Object.keys(compilation.assets).find(assetFile => path.extname(assetFile) === '.appcache'),
+      // Favicon
+      favicon: undefined
     };
 
     // Append a hash for cache busting
@@ -486,42 +464,36 @@ class HtmlWebpackPlugin {
       assets.manifest = this.appendHash(assets.manifest, compilationHash);
     }
 
-    for (let i = 0; i < chunks.length; i++) {
-      const chunk = chunks[i];
-      const chunkName = chunk.names[0];
-
-      // Prepend the public path to all chunk files
-      let chunkFiles = [].concat(chunk.files).map(chunkFile => publicPath + chunkFile);
-
-      // Append a hash for cache busting
-      if (this.options.hash) {
-        chunkFiles = chunkFiles.map(chunkFile => this.appendHash(chunkFile, compilationHash));
-      }
-
-      // Webpack outputs an array for each chunk when using sourcemaps
-      // or when one chunk hosts js and css simultaneously
-      const js = chunkFiles.find(chunkFile => /.js($|\?)/.test(chunkFile));
-      if (js) {
-        assets.js.push({
-          entryName: chunkName,
-          path: js
+    // Extract paths to .js and .css files from the current compilation
+    const extensionRegexp = /\.(css|js)(\?|$)/;
+    for (let i = 0; i < entryNames.length; i++) {
+      const entryName = entryNames[i];
+      const entryPointFiles = compilation.entrypoints.get(entryName).getFiles();
+      // Prepend the publicPath and append the hash depending on the
+      // webpack.output.publicPath and hashOptions
+      // E.g. bundle.js -> /bundle.js?hash
+      const entryPointPublicPaths = entryPointFiles
+        .map(chunkFile => {
+          const entryPointPublicPath = publicPath + chunkFile;
+          return this.options.hash
+            ? this.appendHash(entryPointPublicPath, compilationHash)
+            : entryPointPublicPath;
         });
-      }
 
-      // Gather all css files
-      const css = chunkFiles.filter(chunkFile => /.css($|\?)/.test(chunkFile));
-      css.forEach((cssPath) => {
-        assets.css.push({
-          entryName: chunkName,
-          path: cssPath
+      entryPointPublicPaths.forEach((entryPointPublicPaths) => {
+        const extMatch = extensionRegexp.exec(entryPointPublicPaths);
+        // Skip if the public path is not a .css or .js file
+        if (!extMatch) {
+          return;
+        }
+        // ext will contain .js or .css
+        const ext = extMatch[1];
+        assets[ext].push({
+          entryName: entryName,
+          path: entryPointPublicPaths
         });
       });
     }
-
-    // Duplicate css assets can occur on occasion if more than one chunk
-    // requires the same css.
-    assets.css = _.uniq(assets.css);
-
     return assets;
   }
 
@@ -728,12 +700,12 @@ class HtmlWebpackPlugin {
         );
       }
       return compilation.hooks[eventName].promise(pluginArgs)
-      .then(result => {
-        if (requiresResult && !result) {
-          throw new Error('Using ' + eventName + ' did not return a result.');
-        }
-        return result;
-      });
+        .then(result => {
+          if (requiresResult && !result) {
+            throw new Error('Using ' + eventName + ' did not return a result.');
+          }
+          return result;
+        });
     };
   }
 }

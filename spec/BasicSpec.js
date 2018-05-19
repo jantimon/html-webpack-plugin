@@ -812,39 +812,6 @@ describe('HtmlWebpackPlugin', function () {
     shouldExpectWarnings);
   });
 
-  it('passes chunks to the html-webpack-plugin-alter-asset-tags event', function (done) {
-    var chunks;
-    var examplePlugin = {
-      apply: function (compiler) {
-        compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-alter-asset-tags', function (object, callback) {
-            chunks = object.chunks;
-            callback();
-          });
-        });
-      }
-    };
-
-    var shouldExpectWarnings = webpackMajorVersion < 4;
-    testHtmlPlugin({
-      entry: {
-        app: path.join(__dirname, 'fixtures/index.js')
-      },
-      output: {
-        path: OUTPUT_DIR,
-        filename: '[name]_bundle.js'
-      },
-      plugins: [
-        new HtmlWebpackPlugin(),
-        examplePlugin
-      ]
-    }, [], null, function () {
-      expect(chunks).toBeDefined();
-      done();
-    }, false,
-    shouldExpectWarnings);
-  });
-
   it('allows events to add a no-value attribute', function (done) {
     var examplePlugin = {
       apply: function (compiler) {
@@ -1527,10 +1494,10 @@ describe('HtmlWebpackPlugin', function () {
       plugins: [
         new HtmlWebpackPlugin({
           chunksSortMode: function (a, b) {
-            if (a.names[0] < b.names[0]) {
+            if (a < b) {
               return 1;
             }
-            if (a.names[0] > b.names[0]) {
+            if (a > b) {
               return -1;
             }
             return 0;
