@@ -51,7 +51,7 @@
   "dependencies": {
     "html-minifier": "^3.2.3",
     "loader-utils": "^1.1.0",
-    "lodash": "^4.17.3",
+    "lodash": "^4.17.10",
     "pretty-error": "^2.0.2",
     "tapable": "^1.0.0",
     "util.promisify": "1.0.0"
