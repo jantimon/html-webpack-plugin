@@ -6,7 +6,7 @@ const promisify = require('util.promisify');
 
 // Import types
 /* eslint-disable */
-/// <reference path="./index.d.ts" />
+/// <reference path="./typings.d.ts" />
 /* eslint-enable */
 /** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
 /** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
@@ -15,14 +15,14 @@ const vm = require('vm');
 const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
-const SyncWaterfallHook = require('tapable').SyncWaterfallHook;
-const AsyncSeriesWaterfallHook = require('tapable').AsyncSeriesWaterfallHook;
 
 const htmlTagObjectToString = require('./lib/html-tags').htmlTagObjectToString;
 
 const childCompiler = require('./lib/compiler.js');
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
+const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
+const getHtmlWebpackPluginHook = require('./lib/hooks.js').getHtmlWebpackPluginHook;
 
 const fsStatAsync = promisify(fs.stat);
 const fsReadFileAsync = promisify(fs.readFile);
@@ -86,18 +86,7 @@ class HtmlWebpackPlugin {
     }
 
     // setup hooks for third party plugins
-    compiler.hooks.compilation.tap('HtmlWebpackPluginHooks', compilation => {
-      // Setup the hooks only once
-      if (compilation.hooks.htmlWebpackPluginAlterChunks) {
-        return;
-      }
-      compilation.hooks.htmlWebpackPluginAlterChunks = new SyncWaterfallHook(['chunks', 'objectWithPluginRef']);
-      compilation.hooks.htmlWebpackPluginBeforeHtmlGeneration = new AsyncSeriesWaterfallHook(['pluginArgs']);
-      compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing = new AsyncSeriesWaterfallHook(['pluginArgs']);
-      compilation.hooks.htmlWebpackPluginAlterAssetTags = new AsyncSeriesWaterfallHook(['pluginArgs']);
-      compilation.hooks.htmlWebpackPluginAfterHtmlProcessing = new AsyncSeriesWaterfallHook(['pluginArgs']);
-      compilation.hooks.htmlWebpackPluginAfterEmit = new AsyncSeriesWaterfallHook(['pluginArgs']);
-    });
+    compiler.hooks.compilation.tap('HtmlWebpackPluginHooks', getHtmlWebpackPluginHooks);
 
     compiler.hooks.make.tapAsync('HtmlWebpackPlugin', (compilation, callback) => {
       // Compile the template (queued)
@@ -126,7 +115,6 @@ class HtmlWebpackPlugin {
      * @param {() => void} callback
     */
       (compilation, callback) => {
-        const applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
         // Get all entry point names for this html file
         const entryNames = Array.from(compilation.entrypoints.keys());
         const filteredEntryNames = self.filterChunks(entryNames, self.options.chunks, self.options.excludeChunks);
@@ -176,7 +164,7 @@ class HtmlWebpackPlugin {
           })
         // Allow plugins to make changes to the assets before invoking the template
         // This only makes sense to use if `inject` is `false`
-          .then(compilationResult => applyPluginsAsyncWaterfall('htmlWebpackPluginBeforeHtmlGeneration', false, {
+          .then(compilationResult => getHtmlWebpackPluginHook(compilation, 'htmlWebpackPluginBeforeHtmlGeneration').promise({
             assets: assets,
             outputName: self.childCompilationOutputName,
             plugin: self
@@ -189,7 +177,7 @@ class HtmlWebpackPlugin {
         // Allow plugins to change the html before assets are injected
           .then(html => {
             const pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
-            return applyPluginsAsyncWaterfall('htmlWebpackPluginBeforeHtmlProcessing', true, pluginArgs);
+            return getHtmlWebpackPluginHook(compilation, 'htmlWebpackPluginBeforeHtmlProcessing').promise(pluginArgs);
           })
           .then(result => {
             const html = result.html;
@@ -198,7 +186,7 @@ class HtmlWebpackPlugin {
             const assetTags = self.generateHtmlTagObjects(assets);
             const pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, outputName: self.childCompilationOutputName};
             // Allow plugins to change the assetTag definitions
-            return applyPluginsAsyncWaterfall('htmlWebpackPluginAlterAssetTags', true, pluginArgs)
+            return getHtmlWebpackPluginHook(compilation, 'htmlWebpackPluginAlterAssetTags').promise(pluginArgs)
               .then(result => self.postProcessHtml(html, assets, { body: result.body, head: result.head })
                 .then(html => _.extend(result, {html: html, assets: assets})));
           })
@@ -207,7 +195,7 @@ class HtmlWebpackPlugin {
             const html = result.html;
             const assets = result.assets;
             const pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
-            return applyPluginsAsyncWaterfall('htmlWebpackPluginAfterHtmlProcessing', true, pluginArgs)
+            return getHtmlWebpackPluginHook(compilation, 'htmlWebpackPluginAfterHtmlProcessing').promise(pluginArgs)
               .then(result => result.html);
           })
           .catch(err => {
@@ -225,7 +213,7 @@ class HtmlWebpackPlugin {
               size: () => html.length
             };
           })
-          .then(() => applyPluginsAsyncWaterfall('htmlWebpackPluginAfterEmit', false, {
+          .then(() => getHtmlWebpackPluginHook(compilation, 'htmlWebpackPluginAfterEmit').promise({
             html: compilation.assets[self.childCompilationOutputName],
             outputName: self.childCompilationOutputName,
             plugin: self
@@ -683,30 +671,6 @@ class HtmlWebpackPlugin {
     const files = _.uniq(Object.keys(assets).filter(assetType => assetType !== 'chunks' && assets[assetType]).reduce((files, assetType) => files.concat(assets[assetType]), []));
     files.sort();
     return files;
-  }
-
-  /**
-   * Helper to promisify compilation.applyPluginsAsyncWaterfall that returns
-   * a function that helps to merge given plugin arguments with processed ones
-   *
-   * @param {WebpackCompilation} compilation
-   *
-   */
-  applyPluginsAsyncWaterfall (compilation) {
-    return (eventName, requiresResult, pluginArgs) => {
-      if (!compilation.hooks[eventName]) {
-        compilation.errors.push(
-          new Error('No hook found for ' + eventName)
-        );
-      }
-      return compilation.hooks[eventName].promise(pluginArgs)
-        .then(result => {
-          if (requiresResult && !result) {
-            throw new Error('Using ' + eventName + ' did not return a result.');
-          }
-          return result;
-        });
-    };
   }
 }
 

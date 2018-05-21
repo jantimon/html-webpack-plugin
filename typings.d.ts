@@ -2,7 +2,7 @@
 /**
  * The plugin options
  */
-type HtmlWebpackPluginOptions = {
+interface HtmlWebpackPluginOptions {
     /**
      * The title to use for the generated HTML document
      */
@@ -22,7 +22,7 @@ type HtmlWebpackPluginOptions = {
     templateParameters:
       false // Pass an empty object to the template function
       | ((compilation: any, assets, options: HtmlWebpackPluginOptions) => {})
-      | Object
+      | {[option: string]: any}
     /**
      * The file to write the HTML to.
      * Defaults to `index.html`.
@@ -76,6 +76,12 @@ type HtmlWebpackPluginOptions = {
      * Enforce self closing tags e.g. <link />
      */
     xhtml: boolean
+
+    /**
+     * In addition to the options actually used by this plugin, you can use this hash to pass arbitrary data through
+     * to your template.
+     */
+    [option: string]: any;
 }
 
 /**
