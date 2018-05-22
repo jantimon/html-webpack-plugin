@@ -61,6 +61,10 @@ class HtmlWebpackPlugin {
     this.childCompilationOutputName = undefined;
     this.assetJson = undefined;
     this.hash = undefined;
+    /**
+     * The major version number of this plugin
+     */
+    this.version = 4;
   }
 
   /**
