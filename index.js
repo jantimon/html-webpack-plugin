@@ -38,7 +38,7 @@ class HtmlWebpackPlugin {
      */
     this.options = Object.assign({
       template: path.join(__dirname, 'default_index.ejs'),
-      templateContent: undefined,
+      templateContent: false,
       templateParameters: templateParametersGenerator,
       filename: 'index.html',
       hash: false,
@@ -155,7 +155,7 @@ class HtmlWebpackPlugin {
           .then(() => compilationPromise)
           .then(compiledTemplate => {
           // Allow to use a custom function / string instead
-            if (self.options.templateContent !== undefined) {
+            if (self.options.templateContent !== false) {
               return self.options.templateContent;
             }
             // Once everything is compiled evaluate the html factory
@@ -402,7 +402,7 @@ class HtmlWebpackPlugin {
       publicPath: string,
       js: Array<{entryName: string, path: string}>,
       css: Array<{entryName: string, path: string}>,
-      manifest: string,
+      manifest?: string,
       favicon?: string
     }}
    */
@@ -430,7 +430,7 @@ class HtmlWebpackPlugin {
         publicPath: string,
         js: Array<{entryName: string, path: string}>,
         css: Array<{entryName: string, path: string}>,
-        manifest: string,
+        manifest?: string,
         favicon?: string
       }}
      */
@@ -448,7 +448,7 @@ class HtmlWebpackPlugin {
     };
 
     // Append a hash for cache busting
-    if (this.options.hash) {
+    if (this.options.hash && assets.manifest) {
       assets.manifest = this.appendHash(assets.manifest, compilationHash);
     }
 

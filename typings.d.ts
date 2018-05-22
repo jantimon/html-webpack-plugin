@@ -8,14 +8,17 @@ interface HtmlWebpackPluginOptions {
      */
     title: string,
     /**
-     * `webpack` require path to the template.
+     * The `webpack` require path to the template.
      * @see https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md
      */
     template: string,
     /**
-     *
+     * Allow to use a html string instead of reading from a file
      */
-    templateContent: string | (() => string),
+    templateContent:
+      false // Use the template option instead to load a file
+      | string
+      | Promise<string>,
     /**
      * Allows to overwrite the parameters used in the template
      */
