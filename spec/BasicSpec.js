@@ -1771,7 +1771,7 @@ describe('HtmlWebpackPlugin', function () {
           .toEqual('// Content will be hashed in tests, do not change.\n');
         expect(compilation.assets[expectedFilename].size())
           .toEqual(51);
-        expect(compilation.fileDependencies.files).toEqual(['/Users/toby/dev/html-webpack-plugin/spec/fixtures/additional_asset.js']);
+        expect(compilation.fileDependencies.files).toEqual([`${__dirname}/fixtures/additional_asset.js`]);
         done();
       });
   });
