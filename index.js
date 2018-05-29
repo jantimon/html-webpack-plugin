@@ -7,6 +7,7 @@ const vm = require('vm');
 const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
+const crypto = require('crypto');
 const childCompiler = require('./lib/compiler.js');
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
@@ -338,7 +339,13 @@ class HtmlWebpackPlugin {
     })
     .catch(() => Promise.reject(new Error('HtmlWebpackPlugin: could not load file ' + filename)))
     .then(results => {
-      const basename = outputName || path.basename(filename);
+      const basename = outputName
+        ? outputName.replace(/\[contenthash]/gi, () => {
+          const hash = crypto.createHash('md5');
+          hash.update(results.source);
+          return hash.digest('hex');
+        })
+        : path.basename(filename);
       if (compilation.fileDependencies.add) {
         compilation.fileDependencies.add(filename);
       } else {

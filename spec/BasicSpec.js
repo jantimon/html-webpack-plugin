@@ -1748,4 +1748,31 @@ describe('HtmlWebpackPlugin', function () {
       })]
     }, [/<head>[\s]*<script type="text\/javascript" src="index_bundle.js"><\/script>[\s]*<\/head\s>/], null, done);
   });
+
+  it('addFileToAssets allows you to override output name of asset', function (done) {
+    const plugin = new HtmlWebpackPlugin();
+    const compilation = {
+      compiler: {
+        context: __dirname
+      },
+      assets: {},
+      fileDependencies: {
+        add (f) { this.files.push(f); },
+        files: []
+      }
+    };
+
+    plugin
+      .addFileToAssets('fixtures/additional_asset.js', compilation, 'foo.[contentHash].js')
+      .then(filename => {
+        const expectedFilename = 'foo.a507be46681ab5fdc64d829da4a0fc92.js';
+        expect(filename).toEqual(expectedFilename);
+        expect(compilation.assets[expectedFilename].source().toString())
+          .toEqual('// Content will be hashed in tests, do not change.\n');
+        expect(compilation.assets[expectedFilename].size())
+          .toEqual(51);
+        expect(compilation.fileDependencies.files).toEqual(['/Users/toby/dev/html-webpack-plugin/spec/fixtures/additional_asset.js']);
+        done();
+      });
+  });
 });
