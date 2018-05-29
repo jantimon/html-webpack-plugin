@@ -1763,9 +1763,9 @@ describe('HtmlWebpackPlugin', function () {
     };
 
     plugin
-      .addFileToAssets('fixtures/additional_asset.js', compilation, 'foo.[contentHash].js')
+      .addFileToAssets('fixtures/additional_asset.js', compilation, '[name].foo.[contentHash].js')
       .then(filename => {
-        const expectedFilename = 'foo.a507be46681ab5fdc64d829da4a0fc92.js';
+        const expectedFilename = 'additional_asset.foo.a507be46681ab5fdc64d829da4a0fc92.js';
         expect(filename).toEqual(expectedFilename);
         expect(compilation.assets[expectedFilename].source().toString())
           .toEqual('// Content will be hashed in tests, do not change.\n');

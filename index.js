@@ -339,13 +339,17 @@ class HtmlWebpackPlugin {
     })
     .catch(() => Promise.reject(new Error('HtmlWebpackPlugin: could not load file ' + filename)))
     .then(results => {
-      const basename = outputName
-        ? outputName.replace(/\[contenthash]/gi, () => {
-          const hash = crypto.createHash('md5');
-          hash.update(results.source);
-          return hash.digest('hex');
-        })
-        : path.basename(filename);
+      let basename = path.basename(filename);
+      if (outputName != null) {
+        basename = outputName
+          .replace(/\[contenthash]/gi, () => {
+            const hash = crypto.createHash('md5');
+            hash.update(results.source);
+            return hash.digest('hex');
+          })
+          // name without the extension
+          .replace(/\[name]/gi, () => basename.replace(/\.[^/.]+$/, ''));
+      }
       if (compilation.fileDependencies.add) {
         compilation.fileDependencies.add(filename);
       } else {
