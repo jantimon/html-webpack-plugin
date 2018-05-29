@@ -324,7 +324,7 @@ class HtmlWebpackPlugin {
   /*
    * Pushes the content of the given filename to the compilation assets
    */
-  addFileToAssets (filename, compilation) {
+  addFileToAssets (filename, compilation, outputName) {
     filename = path.resolve(compilation.compiler.context, filename);
     return Promise.all([
       fsStatAsync(filename),
@@ -338,7 +338,7 @@ class HtmlWebpackPlugin {
     })
     .catch(() => Promise.reject(new Error('HtmlWebpackPlugin: could not load file ' + filename)))
     .then(results => {
-      const basename = path.basename(filename);
+      const basename = outputName || path.basename(filename);
       if (compilation.fileDependencies.add) {
         compilation.fileDependencies.add(filename);
       } else {
