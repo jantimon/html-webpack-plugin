@@ -13,11 +13,9 @@ lockComment: >
   related bugs.
 
 # Number of days of inactivity before a closed issue or pull request is locked
-daysUntilLock: 180
+daysUntilLock: 30
 
 pulls:
-   daysUntilLock: 30
-     # Comment to post before locking. Set to `false` to disable
   lockComment: >
     This pull request has been automatically locked since there has not been
     any recent activity after it was closed. Please [open a new issue](https://github.com/jantimon/html-webpack-plugin/issues/new) for
