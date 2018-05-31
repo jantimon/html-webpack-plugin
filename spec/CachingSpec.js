@@ -157,4 +157,34 @@ describe('HtmlWebpackPluginCaching', function () {
       })
       .then(done);
   });
+  it('should not compile the webpack html if any file is changed if only allowed to build on first compile', function (done) {
+    var template = path.join(__dirname, 'fixtures/plain.html');
+    var entry = path.join(__dirname, 'fixtures/index.js');
+    var htmlWebpackPlugin = new HtmlWebpackPlugin({
+      template: template,
+      onlyBuildOnce: true
+    });
+    var childCompilerHash;
+    var compiler = setUpCompiler(htmlWebpackPlugin);
+    compiler.run()
+      // Change the template and entry files and compile again
+      .then(function () {
+        childCompilerHash = htmlWebpackPlugin.childCompilerHash;
+        compiler.simulateFileChange(template, {footer: '<!-- 1 -->'});
+        compiler.simulateFileChange(entry, {footer: '//1'});
+        return compiler.run();
+      })
+      .then(function (stats) {
+        // Verify that only one file was built
+        expect(getCompiledModuleCount(stats.toJson()))
+          .toBe(1);
+        // Verify that the html was processed only during the initial build
+        expect(htmlWebpackPlugin.evaluateCompilationResult.calls.count())
+          .toBe(1);
+        // Verify that the child compilation was executed only once
+        expect(htmlWebpackPlugin.childCompilerHash)
+          .toBe(childCompilerHash);
+      })
+      .then(done);
+  });
 });
