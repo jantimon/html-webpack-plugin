@@ -84,12 +84,19 @@ class HtmlWebpackPlugin {
       this.options.filename = path.relative(compiler.options.output.path, filename);
     }
 
+    // Clear the cache once a new HtmlWebpackPlugin is added
+    childCompiler.clearCache(compiler);
+
+    compiler.hooks.compile.tap('HtmlWebpackPlugin', () => {
+      childCompiler.addTemplateToCompiler(compiler, this.options.template);
+    });
+
     // setup hooks for third party plugins
     compiler.hooks.compilation.tap('HtmlWebpackPluginHooks', getHtmlWebpackPluginHooks);
 
     compiler.hooks.make.tapAsync('HtmlWebpackPlugin', (compilation, callback) => {
       // Compile the template (queued)
-      compilationPromise = childCompiler.compileTemplate(self.options.template, compiler.context, self.options.filename, compilation)
+      compilationPromise = childCompiler.compileTemplate(self.options.template, self.options.filename, compilation)
         .catch(err => {
           compilation.errors.push(prettyError(err, compiler.context).toString());
           return {
@@ -114,6 +121,9 @@ class HtmlWebpackPlugin {
      * @param {() => void} callback
     */
       (compilation, callback) => {
+        // Clear the childCompilerCache
+        childCompiler.clearCache(compiler);
+
         // Get all entry point names for this html file
         const entryNames = Array.from(compilation.entrypoints.keys());
         const filteredEntryNames = self.filterChunks(entryNames, self.options.chunks, self.options.excludeChunks);
