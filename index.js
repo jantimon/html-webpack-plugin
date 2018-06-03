@@ -1,15 +1,14 @@
 // @ts-check
-'use strict';
-
-// use Polyfill for util.promisify in node versions < v8
-const promisify = require('util.promisify');
-
 // Import types
 /* eslint-disable */
 /// <reference path="./typings.d.ts" />
 /* eslint-enable */
 /** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
 /** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
+'use strict';
+
+// use Polyfill for util.promisify in node versions < v8
+const promisify = require('util.promisify');
 
 const vm = require('vm');
 const fs = require('fs');
@@ -33,10 +32,8 @@ class HtmlWebpackPlugin {
    */
   constructor (options) {
     // Default options
-    /**
-     * @type {HtmlWebpackPluginOptions}
-     */
-    this.options = Object.assign({
+    /** @type {HtmlWebpackPluginOptions} */
+    const defaultOptions = {
       template: path.join(__dirname, 'default_index.ejs'),
       templateContent: false,
       templateParameters: templateParametersGenerator,
@@ -54,7 +51,9 @@ class HtmlWebpackPlugin {
       meta: {},
       title: 'Webpack App',
       xhtml: false
-    }, options);
+    };
+    /** @type {HtmlWebpackPluginOptions} */
+    this.options = Object.assign(defaultOptions, options);
     // Instance variables to keep caching information
     // for multiple builds
     this.childCompilerHash = undefined;

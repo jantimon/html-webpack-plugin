@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "pretest": "semistandard",
-    "posttest": "tsc --pretty",
+    "posttest": "tsc",
     "commit": "git-cz",
     "build-examples": "node examples/build-examples.js",
     "test": "jasmine",
@@ -41,7 +41,7 @@
     "semistandard": "8.0.0",
     "standard-version": "^4.3.0",
     "style-loader": "^0.13.1",
-    "typescript": "2.9.0-dev.20180518",
+    "typescript": "2.9.1",
     "underscore-template-loader": "^0.7.3",
     "url-loader": "^0.5.7",
     "webpack": "4.8.3",
