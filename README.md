@@ -130,6 +130,7 @@ Allowed values are as follows
 |**[`cache`](#)**|`{Boolean}`|`true`|Emit the file only if it was changed|
 |**[`showErrors`](#)**|`{Boolean}`|`true`|Errors details will be written into the HTML page|
 |**[`chunks`](#)**|`{?}`|`?`|Allows you to add only some chunks (e.g only the unit-test chunk)|
+|**[`chunkName`](#)**|`{String}`|``|将chunkName相关的chunk打包到页面|
 |**[`chunksSortMode`](#plugins)**|`{String\|Function}`|`auto`|Allows to control how chunks should be sorted before they are included to the HTML. Allowed values are `'none' \| 'auto' \| 'dependency' \| 'manual' \| {Function}`|
 |**[`excludeChunks`](#)**|`{Array.<string>}`|``|Allows you to skip some chunks (e.g don't add the unit-test chunk)|
 |**[`xhtml`](#)**|`{Boolean}`|`false`|If `true` render the `link` tags as self-closing (XHTML compliant)|

@@ -96,6 +96,7 @@ class HtmlWebpackPlugin {
         cached: false,
         children: false,
         chunks: true,
+        chunkName: true,
         chunkModules: false,
         chunkOrigins: false,
         errorDetails: false,
@@ -107,8 +108,25 @@ class HtmlWebpackPlugin {
         version: false
       };
       const allChunks = compilation.getStats().toJson(chunkOnlyConfig).chunks;
-      // Filter chunks (options.chunks and options.excludeCHunks)
-      let chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
+			let chunks = null;
+			if (self.options.chunkSorter) {
+				// Filter chunks (options.chunks and options.excludeCHunks)
+        chunks = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
+			} else if (self.options.chunkName) {
+        let chunkGroups = compilation.chunkGroups;
+				let matchChunkGroups = chunkGroups.filter((chunk) => {
+					return chunk.options.name === self.options.chunkName
+				});
+				let chunkIds = matchChunkGroups.map(matchChunkGroup => {
+					return matchChunkGroup.chunks.map(chunk => {
+						return chunk.id;
+					})
+				});
+				chunkIds = _.concat(...chunkIds);
+				chunks = allChunks.filter(chunk => {
+					return chunkIds.indexOf(chunk.id) > -1
+				});
+			}
       // Sort chunks
       chunks = self.sortChunks(chunks, self.options.chunksSortMode, compilation);
       // Let plugins alter the chunks and the chunk sorting
