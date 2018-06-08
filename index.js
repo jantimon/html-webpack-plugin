@@ -87,7 +87,10 @@ class HtmlWebpackPlugin {
     // Clear the cache once a new HtmlWebpackPlugin is added
     childCompiler.clearCache(compiler);
 
-    compiler.hooks.compile.tap('HtmlWebpackPlugin', () => {
+    compiler.hooks.compilation.tap('HtmlWebpackPlugin', (compilation) => {
+      if (childCompiler.hasOutDatedTemplateCache(compilation)) {
+        childCompiler.clearCache(compiler);
+      }
       childCompiler.addTemplateToCompiler(compiler, this.options.template);
     });
 
@@ -101,12 +104,13 @@ class HtmlWebpackPlugin {
           compilation.errors.push(prettyError(err, compiler.context).toString());
           return {
             content: self.options.showErrors ? prettyError(err, compiler.context).toJsonHtml() : 'ERROR',
-            outputName: self.options.filename
+            outputName: self.options.filename,
+            hash: ''
           };
         })
         .then(compilationResult => {
           // If the compilation change didnt change the cache is valid
-          isCompilationCached = compilationResult.hash && self.childCompilerHash === compilationResult.hash;
+          isCompilationCached = Boolean(compilationResult.hash) && self.childCompilerHash === compilationResult.hash;
           self.childCompilerHash = compilationResult.hash;
           self.childCompilationOutputName = compilationResult.outputName;
           callback();
@@ -121,9 +125,6 @@ class HtmlWebpackPlugin {
      * @param {() => void} callback
     */
       (compilation, callback) => {
-        // Clear the childCompilerCache
-        childCompiler.clearCache(compiler);
-
         // Get all entry point names for this html file
         const entryNames = Array.from(compilation.entrypoints.keys());
         const filteredEntryNames = self.filterChunks(entryNames, self.options.chunks, self.options.excludeChunks);
