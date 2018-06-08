@@ -132,6 +132,7 @@ describe('HtmlWebpackPluginCaching', function () {
     });
     var childCompilerHash;
     var compiler = setUpCompiler(htmlWebpackPlugin);
+    compiler.simulateFileChange(template, {footer: '<!-- 0 -->'});
     compiler.run()
       // Change the template file and compile again
       .then(function () {
@@ -149,6 +150,50 @@ describe('HtmlWebpackPluginCaching', function () {
         // Verify that the child compilation was executed twice
         expect(htmlWebpackPlugin.childCompilerHash)
           .not.toBe(childCompilerHash);
+      })
+      .then(done);
+  });
+
+  it('should keep watching the webpack html if only a js file was changed', function (done) {
+    var template = path.join(__dirname, 'fixtures/plain.html');
+    const jsFile = path.join(__dirname, 'fixtures/index.js');
+    var htmlWebpackPlugin = new HtmlWebpackPlugin({
+      template: template
+    });
+    var compiler = setUpCompiler(htmlWebpackPlugin);
+    compiler.simulateFileChange(template, {footer: ' '});
+    compiler.simulateFileChange(jsFile, {footer: ' '});
+    // Build the template file for the first time
+    compiler.run()
+      // Change the template file (second build)
+      .then(() => {
+        compiler.simulateFileChange(template, {footer: '<!-- 1 -->'});
+        return compiler.run();
+      })
+      // Change js
+      .then(() => {
+        compiler.simulateFileChange(jsFile, {footer: '// 1'});
+        return compiler.run();
+      })
+      // Change js
+      .then(() => {
+        compiler.simulateFileChange(jsFile, {footer: '// 2'});
+        return compiler.run();
+      })
+      // Change js
+      .then(() => {
+        compiler.simulateFileChange(jsFile, {footer: '// 3'});
+        return compiler.run();
+      })
+      // Change the template file (third build)
+      .then(() => {
+        compiler.simulateFileChange(template, {footer: '<!-- 2 -->'});
+        return compiler.run();
+      })
+      .then(() => {
+        // Verify that the html was processed trice
+        expect(htmlWebpackPlugin.evaluateCompilationResult.calls.count())
+          .toBe(3);
       })
       .then(done);
   });
