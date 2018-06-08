@@ -39,8 +39,8 @@ class HtmlWebpackPlugin {
 
   apply (compiler) {
     const self = this;
-    let isCompilationCached = false;
     let compilationPromise;
+    this.templateModifiedTimestamp = Date.now();
 
     this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
 
@@ -77,8 +77,6 @@ class HtmlWebpackPlugin {
           };
         })
         .then(compilationResult => {
-          // If the compilation change didnt change the cache is valid
-          isCompilationCached = compilationResult.hash && self.childCompilerHash === compilationResult.hash;
           self.childCompilerHash = compilationResult.hash;
           self.childCompilationOutputName = compilationResult.outputName;
           callback();
@@ -128,11 +126,8 @@ class HtmlWebpackPlugin {
       }
 
       // If the template and the assets did not change we don't have to emit the html
-      const assetJson = JSON.stringify(self.getAssetFiles(assets));
-      if (isCompilationCached && self.options.cache && assetJson === self.assetJson) {
+      if (!self.needsRebuild(compilation, assets)) {
         return callback();
-      } else {
-        self.assetJson = assetJson;
       }
 
       Promise.resolve()
@@ -401,6 +396,45 @@ class HtmlWebpackPlugin {
 
   isHotUpdateCompilation (assets) {
     return assets.js.length && assets.js.every(name => /\.hot-update\.js$/.test(name));
+  }
+
+  needsRebuild (compilation, assets) {
+    // If caching is disabled, always rebuild!
+    if (!this.options.cache) return true;
+    let templateChanged = false;
+    let assetsChanged = false;
+    // Check if template file was modified
+    const template = this.options.template.replace(/^.+!/, '').replace(/\?.+$/, '');
+    // If the compilation file timestamps map is empty, it probably means that
+    // this is the first compilation
+    if (compilation.fileTimestamps.size < 1) {
+      // Always build for first compilation
+      templateChanged = true;
+    } else {
+      // Older versions of webpack used Objects/Dates, newer use Map/Number
+      let fileTimestamps = compilation.fileTimestamps;
+      if (!(fileTimestamps instanceof Map)) {
+        fileTimestamps = new Map(Object.entries(compilation.fileTimestamps));
+      }
+      let compilationTimestamp = fileTimestamps.get(template);
+      if (compilationTimestamp instanceof Date) {
+        compilationTimestamp = compilationTimestamp.getTime();
+      }
+      // If compilation timestamp is missing, template is not being watched
+      if (this.templateModifiedTimestamp < (compilationTimestamp || 0)) {
+        if (compilationTimestamp) {
+          this.templateModifiedTimestamp = compilationTimestamp;
+        }
+        templateChanged = true;
+      }
+    }
+    // Check if assets have changed
+    const assetJson = JSON.stringify(this.getAssetFiles(assets));
+    if (assetJson !== this.assetJson) {
+      assetsChanged = true;
+      this.assetJson = assetJson;
+    }
+    return templateChanged || assetsChanged;
   }
 
   htmlWebpackPluginAssets (compilation, chunks) {
