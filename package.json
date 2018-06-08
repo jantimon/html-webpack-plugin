@@ -15,7 +15,7 @@
     "posttest": "tsc",
     "commit": "git-cz",
     "build-examples": "node examples/build-examples.js",
-    "test": "jest --runInBand",
+    "test": "jest --runInBand --verbose --coverage",
     "test-watch": "jest --runInBand --watch",
     "release": "standard-version"
   },
