@@ -33,8 +33,10 @@ class HtmlWebpackPlugin {
       chunksSortMode: 'auto',
       meta: {},
       title: 'Webpack App',
-      xhtml: false
+      xhtml: false,
+      onlyBuildOnce: false
     }, options);
+    this.isBuilt = false;
   }
 
   apply (compiler) {
@@ -67,6 +69,10 @@ class HtmlWebpackPlugin {
 
     // Backwards compatible version of: compiler.hooks.make.tapAsync()
     (compiler.hooks ? compiler.hooks.make.tapAsync.bind(compiler.hooks.make, 'HtmlWebpackPlugin') : compiler.plugin.bind(compiler, 'make'))((compilation, callback) => {
+      if (self.options.onlyBuildOnce && self.isBuilt) {
+        callback();
+        return;
+      }
       // Compile the template (queued)
       compilationPromise = childCompiler.compileTemplate(self.options.template, compiler.context, self.options.filename, compilation)
         .catch(err => {
@@ -88,6 +94,7 @@ class HtmlWebpackPlugin {
 
     // Backwards compatible version of: compiler.plugin.emit.tapAsync()
     (compiler.hooks ? compiler.hooks.emit.tapAsync.bind(compiler.hooks.emit, 'HtmlWebpackPlugin') : compiler.plugin.bind(compiler, 'emit'))((compilation, callback) => {
+      if (self.options.onlyBuildOnce && self.isBuilt) return callback();
       const applyPluginsAsyncWaterfall = self.applyPluginsAsyncWaterfall(compilation);
       // Get chunks info as json
       // Note: we're excluding stuff that we don't need to improve toJson serialization speed.
@@ -223,6 +230,7 @@ class HtmlWebpackPlugin {
         }).then(() => null))
         // Let webpack continue with it
         .then(() => {
+          if (self.options.onlyBuildOnce) self.isBuilt = true;
           callback();
         });
     });
