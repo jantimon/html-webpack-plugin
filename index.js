@@ -120,7 +120,7 @@ class HtmlWebpackPlugin {
      * @param {() => void} callback
     */
       (compilation, callback) => {
-        if (self.options.cache && !childCompiler.needsRebuild(compilation)) {
+        if (self.options.cache && !childCompiler.hasOutdatedTemplateCache(compilation)) {
           return callback();
         }
         // Get all entry point names for this html file
@@ -226,6 +226,14 @@ class HtmlWebpackPlugin {
             callback();
           });
       });
+
+    compiler.hooks.done.tap('HtmlWebpackPlugin', () => {
+      // Note: failing to clear the cache after each compilation causes a bizarre
+      // bug where template files stop being watched after the first compilation
+      // i.e., watcher goes missing from compiler.watchFileSystem.watcher.fileWatchers
+      // - @dwoznicki
+      childCompiler.clearCachedPromise(compiler);
+    });
   }
 
   /**
