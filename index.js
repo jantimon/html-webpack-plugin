@@ -73,6 +73,7 @@ class HtmlWebpackPlugin {
   apply (compiler) {
     const self = this;
     let compilationPromise;
+    let isTemplateCacheOutdated;
 
     this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
 
@@ -86,7 +87,8 @@ class HtmlWebpackPlugin {
     // Clear the cache once a new HtmlWebpackPlugin is added
     childCompiler.clearCache(compiler);
 
-    compiler.hooks.compilation.tap('HtmlWebpackPlugin', (compilation) => {
+    compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin', (compilation) => {
+      isTemplateCacheOutdated = childCompiler.hasOutdatedTemplateCache(compilation);
       childCompiler.addTemplateToCompiler(compiler, this.options.template);
     });
 
@@ -120,7 +122,7 @@ class HtmlWebpackPlugin {
      * @param {() => void} callback
     */
       (compilation, callback) => {
-        if (self.options.cache && !childCompiler.hasOutdatedTemplateCache(compilation)) {
+        if (self.options.cache && !isTemplateCacheOutdated) {
           return callback();
         }
         // Get all entry point names for this html file
