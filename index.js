@@ -97,7 +97,8 @@ class HtmlWebpackPlugin {
     // Clear the cache once a new HtmlWebpackPlugin is added
     childCompiler.clearCache(compiler);
 
-    compiler.hooks.compilation.tap('HtmlWebpackPlugin', (compilation) => {
+    // Clear the cache if the child compiler is outdated
+    compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin', (compilation) => {
       if (childCompiler.hasOutDatedTemplateCache(compilation)) {
         childCompiler.clearCache(compiler);
       }
