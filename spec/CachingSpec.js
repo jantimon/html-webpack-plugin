@@ -19,6 +19,8 @@ jasmine.getEnv().defaultTimeoutInterval = 30000;
 function setUpCompiler (htmlWebpackPlugin) {
   spyOn(htmlWebpackPlugin, 'evaluateCompilationResult').and.callThrough();
   var webpackConfig = {
+    // Caching works only in development
+    mode: 'development',
     entry: path.join(__dirname, 'fixtures/index.js'),
     output: {
       path: OUTPUT_DIR,
@@ -53,6 +55,7 @@ describe('HtmlWebpackPluginCaching', function () {
     });
     var childCompilerHash;
     var compiler = setUpCompiler(htmlWebpackPlugin);
+    compiler.addTestFile(path.join(__dirname, 'fixtures/index.js'));
     compiler.run()
       // Change the template file and compile again
       .then(function () {
@@ -77,6 +80,7 @@ describe('HtmlWebpackPluginCaching', function () {
     var htmlWebpackPlugin = new HtmlWebpackPlugin();
     var compiler = setUpCompiler(htmlWebpackPlugin);
     var childCompilerHash;
+    compiler.addTestFile(path.join(__dirname, 'fixtures/index.js'));
     compiler.run()
       // Change a js file and compile again
       .then(function () {
@@ -104,6 +108,7 @@ describe('HtmlWebpackPluginCaching', function () {
     });
     var childCompilerHash;
     var compiler = setUpCompiler(htmlWebpackPlugin);
+    compiler.addTestFile(path.join(__dirname, 'fixtures/index.js'));
     compiler.run()
       // Change a js file and compile again
       .then(function () {
@@ -132,7 +137,7 @@ describe('HtmlWebpackPluginCaching', function () {
     });
     var childCompilerHash;
     var compiler = setUpCompiler(htmlWebpackPlugin);
-    compiler.simulateFileChange(template, {footer: '<!-- 0 -->'});
+    compiler.addTestFile(template);
     compiler.run()
       // Change the template file and compile again
       .then(function () {
@@ -161,8 +166,8 @@ describe('HtmlWebpackPluginCaching', function () {
       template: template
     });
     var compiler = setUpCompiler(htmlWebpackPlugin);
-    compiler.simulateFileChange(template, {footer: ' '});
-    compiler.simulateFileChange(jsFile, {footer: ' '});
+    compiler.addTestFile(template);
+    compiler.addTestFile(jsFile);
     // Build the template file for the first time
     compiler.run()
       // Change the template file (second build)
