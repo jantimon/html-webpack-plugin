@@ -47,12 +47,14 @@
   },
   "dependencies": {
     "html-minifier": "^3.2.3",
+    "isurl": "1.0.0",
     "loader-utils": "^0.2.16",
     "lodash": "^4.17.3",
     "pretty-error": "^2.0.2",
     "tapable": "^1.0.0",
     "toposort": "^1.0.0",
-    "util.promisify": "1.0.0"
+    "util.promisify": "1.0.0",
+    "valid-data-url": "0.1.6"
   },
   "peerDependencies": {
     "webpack": "^1.0.0 || ^2.0.0 || ^3.0.0 || ^4.0.0"
