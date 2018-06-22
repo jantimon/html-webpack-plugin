@@ -20,7 +20,22 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'HtmlWebpackPlugin example',
       favicon: 'favicon.ico',
-      filename: 'favicon.html'
+      filename: 'favicon1.html'
+    }),
+    new HtmlWebpackPlugin({
+      title: 'HtmlWebpackPlugin example',
+      favicon: 'http://placehold.it/160x160?text=favicon.ico',
+      filename: 'favicon2.html'
+    }),
+    new HtmlWebpackPlugin({
+      title: 'HtmlWebpackPlugin example',
+      favicon: 'https://placehold.it/160x160?text=favicon.ico',
+      filename: 'favicon3.html'
+    }),
+    new HtmlWebpackPlugin({
+      title: 'HtmlWebpackPlugin example',
+      favicon: 'data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII=',
+      filename: 'favicon4.html'
     }),
     new ExtractTextPlugin('styles.css')
   ]

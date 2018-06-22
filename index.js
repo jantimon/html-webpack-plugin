@@ -7,7 +7,7 @@ const vm = require('vm');
 const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
-const URL = require('url');
+const url = require('url');
 const isURL = require('isurl');
 const validDataUrl = require('valid-data-url');
 const childCompiler = require('./lib/compiler.js');
@@ -143,18 +143,27 @@ class HtmlWebpackPlugin {
         .then(() => {
           const favicon = self.options.favicon;
           if (favicon) {
-            if (isURL(new URL(favicon)) || validDataUrl(favicon)) {
-              assets.favicon = favicon;
-              return Promise.resolve();
-            } else {
-              return self.addFileToAssets(favicon, compilation)
-                .then(faviconBasename => {
-                  let publicPath = compilation.mainTemplate.getPublicPath({hash: compilation.hash}) || '';
-                  if (publicPath && publicPath.substr(-1) !== '/') {
-                    publicPath += '/';
-                  }
-                  assets.favicon = publicPath + faviconBasename;
-                });
+            try {
+              if (isURL(new url.URL(favicon))) {
+                assets.favicon = favicon;
+                return Promise.resolve();
+              }
+            } catch (err) {
+              if (err.code === 'ERR_INVALID_URL') {
+                if (validDataUrl(favicon)) {
+                  assets.favicon = favicon;
+                  return Promise.resolve();
+                } else {
+                  return self.addFileToAssets(favicon, compilation)
+                    .then(faviconBasename => {
+                      let publicPath = compilation.mainTemplate.getPublicPath({hash: compilation.hash}) || '';
+                      if (publicPath && publicPath.substr(-1) !== '/') {
+                        publicPath += '/';
+                      }
+                      assets.favicon = publicPath + faviconBasename;
+                    });
+                }
+              }
             }
           }
         })
