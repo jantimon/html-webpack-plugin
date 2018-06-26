@@ -70,6 +70,8 @@ class TempWebpackRecompilationSimulator extends WebpackRecompilationSimulator {
 function setUpCompiler (htmlWebpackPlugin) {
   spyOn(htmlWebpackPlugin, 'evaluateCompilationResult').and.callThrough();
   var webpackConfig = {
+    // Caching works only in development
+    mode: 'development',
     entry: path.join(__dirname, 'fixtures/index.js'),
     output: {
       path: OUTPUT_DIR,
@@ -105,7 +107,8 @@ describe('HtmlWebpackPluginCaching', function () {
     });
     var childCompilerHash;
     var compiler = setUpCompiler(htmlWebpackPlugin);
-    compiler.addMapping(template, tempTemplate);
+    // compiler.addMapping(template, tempTemplate);
+    compiler.addTestFile(path.join(__dirname, 'fixtures/index.js'));
     compiler.run()
       // Change the template file and compile again
       .then(function () {
@@ -133,6 +136,7 @@ describe('HtmlWebpackPluginCaching', function () {
     var compiler = setUpCompiler(htmlWebpackPlugin);
     compiler.addMapping(jsFile, tempJsFile);
     var childCompilerHash;
+    compiler.addTestFile(path.join(__dirname, 'fixtures/index.js'));
     compiler.run()
       // Change a js file and compile again
       .then(function () {
@@ -162,7 +166,8 @@ describe('HtmlWebpackPluginCaching', function () {
     });
     var childCompilerHash;
     var compiler = setUpCompiler(htmlWebpackPlugin);
-    compiler.addMapping(jsFile, tempJsFile);
+    // compiler.addMapping(jsFile, tempJsFile);
+    compiler.addTestFile(path.join(__dirname, 'fixtures/index.js'));
     compiler.run()
       // Change a js file and compile again
       .then(function () {
@@ -192,8 +197,9 @@ describe('HtmlWebpackPluginCaching', function () {
     });
     var childCompilerHash;
     var compiler = setUpCompiler(htmlWebpackPlugin);
-    compiler.addMapping(template, tempTemplate);
-    compiler.simulateFileChange(tempTemplate, {footer: '<!-- 0 -->'});
+    // compiler.addMapping(template, tempTemplate);
+    // compiler.simulateFileChange(tempTemplate, {footer: '<!-- 0 -->'});
+    compiler.addTestFile(template);
     compiler.run()
       // Change the template file and compile again
       .then(function () {
@@ -216,6 +222,7 @@ describe('HtmlWebpackPluginCaching', function () {
   });
 
   it('should keep watching the webpack html if only a js file was changed', function (done) {
+      /*
     const template = path.join(__dirname, 'fixtures/plain.html');
     const jsFile = path.join(__dirname, 'fixtures/index.js');
     const tempTemplate = TempWebpackRecompilationSimulator.createTempFile(template);
@@ -226,31 +233,45 @@ describe('HtmlWebpackPluginCaching', function () {
     var compiler = setUpCompiler(htmlWebpackPlugin);
     compiler.simulateFileChange(tempTemplate, {footer: ' '});
     compiler.simulateFileChange(tempJsFile, {footer: ' '});
+    */
+    var template = path.join(__dirname, 'fixtures/plain.html');
+    const jsFile = path.join(__dirname, 'fixtures/index.js');
+    var htmlWebpackPlugin = new HtmlWebpackPlugin({
+      template: template
+    });
+    var compiler = setUpCompiler(htmlWebpackPlugin);
+    compiler.addTestFile(template);
+    compiler.addTestFile(jsFile);
     // Build the template file for the first time
     compiler.run()
       // Change the template file (second build)
       .then(() => {
-        compiler.simulateFileChange(tempTemplate, {footer: '<!-- 1 -->'});
+        // compiler.simulateFileChange(tempTemplate, {footer: '<!-- 1 -->'});
+        compiler.simulateFileChange(template, {footer: '<!-- 1 -->'});
         return compiler.run();
       })
       // Change js
       .then(() => {
-        compiler.simulateFileChange(tempJsFile, {footer: '// 1'});
+        // compiler.simulateFileChange(tempJsFile, {footer: '// 1'});
+        compiler.simulateFileChange(jsFile, {footer: '// 1'});
         return compiler.run();
       })
       // Change js
       .then(() => {
-        compiler.simulateFileChange(tempJsFile, {footer: '// 2'});
+        // compiler.simulateFileChange(tempJsFile, {footer: '// 2'});
+        compiler.simulateFileChange(jsFile, {footer: '// 2'});
         return compiler.run();
       })
       // Change js
       .then(() => {
-        compiler.simulateFileChange(tempJsFile, {footer: '// 3'});
+        // compiler.simulateFileChange(tempJsFile, {footer: '// 3'});
+        compiler.simulateFileChange(jsFile, {footer: '// 3'});
         return compiler.run();
       })
       // Change the template file (third build)
       .then(() => {
-        compiler.simulateFileChange(tempTemplate, {footer: '<!-- 2 -->'});
+        // compiler.simulateFileChange(tempTemplate, {footer: '<!-- 2 -->'});
+        compiler.simulateFileChange(template, {footer: '<!-- 2 -->'});
         return compiler.run();
       })
       .then(() => {

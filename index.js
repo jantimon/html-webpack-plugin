@@ -108,6 +108,7 @@ class HtmlWebpackPlugin {
         })
         .then(compilationResult => {
           // If the compilation change didnt change the cache is valid
+          isCompilationCached = Boolean(compilationResult.hash) && self.childCompilerHash === compilationResult.hash;
           self.childCompilerHash = compilationResult.hash;
           self.childCompilationOutputName = compilationResult.outputName;
           callback();
