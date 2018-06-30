@@ -203,3 +203,4 @@ describe('HtmlWebpackPluginCaching', function () {
       .then(done);
   });
 });
+

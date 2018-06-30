@@ -72,8 +72,8 @@ class HtmlWebpackPlugin {
    */
   apply (compiler) {
     const self = this;
-    let isCompilationCached = false;
     let compilationPromise;
+    let isTemplateCacheOutdated;
 
     this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
 
@@ -87,10 +87,12 @@ class HtmlWebpackPlugin {
     // Clear the cache once a new HtmlWebpackPlugin is added
     childCompiler.clearCache(compiler);
 
-    // Clear the cache if the child compiler is outdated
     compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin', (compilation) => {
-      if (childCompiler.hasOutDatedTemplateCache(compilation)) {
-        childCompiler.clearCache(compiler);
+      isTemplateCacheOutdated = childCompiler.hasOutdatedTemplateCache(compilation);
+      if (isTemplateCacheOutdated) {
+        childCompiler.clearCachedPromise(compiler);
+      } else {
+        childCompiler.injectFileDependencies(compilation);
       }
       childCompiler.addTemplateToCompiler(compiler, this.options.template);
     });
@@ -111,7 +113,6 @@ class HtmlWebpackPlugin {
         })
         .then(compilationResult => {
           // If the compilation change didnt change the cache is valid
-          isCompilationCached = Boolean(compilationResult.hash) && self.childCompilerHash === compilationResult.hash;
           self.childCompilerHash = compilationResult.hash;
           self.childCompilationOutputName = compilationResult.outputName;
           callback();
@@ -126,6 +127,9 @@ class HtmlWebpackPlugin {
      * @param {() => void} callback
     */
       (compilation, callback) => {
+        if (self.options.cache && !isTemplateCacheOutdated) {
+          return callback();
+        }
         // Get all entry point names for this html file
         const entryNames = Array.from(compilation.entrypoints.keys());
         const filteredEntryNames = self.filterChunks(entryNames, self.options.chunks, self.options.excludeChunks);
@@ -138,14 +142,6 @@ class HtmlWebpackPlugin {
         // It only happens in Webpack 2, where hot updates are emitted separately before the full bundle
         if (self.isHotUpdateCompilation(assets)) {
           return callback();
-        }
-
-        // If the template and the assets did not change we don't have to emit the html
-        const assetJson = JSON.stringify(self.getAssetFiles(assets));
-        if (isCompilationCached && self.options.cache && assetJson === self.assetJson) {
-          return callback();
-        } else {
-          self.assetJson = assetJson;
         }
 
         Promise.resolve()
