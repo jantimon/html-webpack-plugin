@@ -89,6 +89,11 @@ class HtmlWebpackPlugin {
 
     compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin', (compilation) => {
       isTemplateCacheOutdated = childCompiler.hasOutdatedTemplateCache(compilation);
+      if (isTemplateCacheOutdated) {
+        childCompiler.clearCachedPromise(compiler);
+      } else {
+        childCompiler.injectFileDependencies(compilation);
+      }
       childCompiler.addTemplateToCompiler(compiler, this.options.template);
     });
 
@@ -108,7 +113,6 @@ class HtmlWebpackPlugin {
         })
         .then(compilationResult => {
           // If the compilation change didnt change the cache is valid
-          isCompilationCached = Boolean(compilationResult.hash) && self.childCompilerHash === compilationResult.hash;
           self.childCompilerHash = compilationResult.hash;
           self.childCompilationOutputName = compilationResult.outputName;
           callback();
@@ -229,14 +233,6 @@ class HtmlWebpackPlugin {
             callback();
           });
       });
-
-    compiler.hooks.done.tap('HtmlWebpackPlugin', () => {
-      // Note: failing to clear the cache after each compilation causes a bizarre
-      // bug where template files stop being watched after the first compilation
-      // i.e., watcher goes missing from compiler.watchFileSystem.watcher.fileWatchers
-      // - @dwoznicki
-      childCompiler.clearCachedPromise(compiler);
-    });
   }
 
   /**
