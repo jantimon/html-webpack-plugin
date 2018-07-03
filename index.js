@@ -562,15 +562,15 @@ class HtmlWebpackPlugin {
    */
   injectAssetsIntoHtml (html, assets, assetTags) {
     const htmlRegExp = /(<html[^>]*>)/i;
-    const headRegExp = /(<\/head\s*>)/i;
-    const bodyRegExp = /(<\/body\s*>)/i;
+    const headRegExp = /(<!--\s*HEAD_PLACEHOLDER\s*-->|<\/head\s*>)/i;
+    const bodyRegExp = /(<!--\s*BODY_PLACEHOLDER\s*-->|<\/body\s*>)/i;
     const body = assetTags.body.map(this.createHtmlTag.bind(this));
     const head = assetTags.head.map(this.createHtmlTag.bind(this));
 
     if (body.length) {
       if (bodyRegExp.test(html)) {
         // Append assets to body element
-        html = html.replace(bodyRegExp, match => body.join('') + match);
+        html = html.replace(bodyRegExp, match => body.join('') + (match.toLowerCase().indexOf('placeholder')===-1 ? match : ''));
       } else {
         // Append scripts to the end of the file if no <body> element exists:
         html += body.join('');
@@ -588,7 +588,7 @@ class HtmlWebpackPlugin {
       }
 
       // Append assets to head element
-      html = html.replace(headRegExp, match => head.join('') + match);
+      html = html.replace(headRegExp, match => head.join('') + (match.toLowerCase().indexOf('placeholder')===-1 ? match : ''));
     }
 
     // Inject manifest into the opening html tag
