@@ -308,8 +308,7 @@ function MyPlugin(options) {
 MyPlugin.prototype.apply = function (compiler) {
   compiler.hooks.compilation.tap('MyPlugin', (compilation) => {
     console.log('The compiler is starting a new compilation...');
-
-    compilation.hooks.htmlWebpackPluginAfterHtmlProcessing.tapAsync(
+    HtmlWebpackPlugin.getHooks(compilation).htmlWebpackPluginAfterHtmlProcessing.tapAsync(
       'MyPlugin',
       (data, cb) => {
         data.html += 'The Magic Footer'

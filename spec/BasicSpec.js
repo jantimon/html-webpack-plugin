@@ -136,7 +136,7 @@ function getChunksInfoFromStats (stats) {
 function tapCompilationEvent (compilation, eventName, handler) {
   // Webpack 4 has a new interface
   if (compilation.hooks) {
-    return compilation.hooks[trainCaseToCamelCase(eventName)].tapAsync(
+    return HtmlWebpackPlugin.getHooks(compilation)[trainCaseToCamelCase(eventName)].tapAsync(
       'AsyncPlugin' + tapCompilationEvent.counter++,
       handler
     );
