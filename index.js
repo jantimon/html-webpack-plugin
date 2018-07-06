@@ -97,12 +97,22 @@ class HtmlWebpackPlugin {
     // Clear the cache once a new HtmlWebpackPlugin is added
     childCompiler.clearCache(compiler);
 
-    // Clear the cache if the child compiler is outdated
+    // Register all HtmlWebpackPlugins instances at the child compiler
     compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin', (compilation) => {
+      // Clear the cache if the child compiler is outdated
       if (childCompiler.hasOutDatedTemplateCache(compilation)) {
         childCompiler.clearCache(compiler);
       }
+      // Add this instances template to the child compiler
       childCompiler.addTemplateToCompiler(compiler, this.options.template);
+      // Add file dependencies of child compiler to parent compiler
+      // to keep them watched even if we get the result from the cache
+      compilation.hooks.additionalChunkAssets.tap('HtmlWebpackPlugin', () => {
+        const childCompilerDependencies = childCompiler.getFileDependencies(compiler);
+        childCompilerDependencies.forEach(fileDependency => {
+          compilation.compilationDependencies.add(fileDependency);
+        });
+      });
     });
 
     // setup hooks for third party plugins
