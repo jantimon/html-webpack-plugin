@@ -30,6 +30,9 @@ class HtmlWebpackPlugin {
    * @param {Partial<HtmlWebpackPluginOptions>} [options]
    */
   constructor (options) {
+    /** @type {Partial<HtmlWebpackPluginOptions>} */
+    const userOptions = options || {};
+
     // Default options
     /** @type {HtmlWebpackPluginOptions} */
     const defaultOptions = {
@@ -51,8 +54,19 @@ class HtmlWebpackPlugin {
       title: 'Webpack App',
       xhtml: false
     };
+
     /** @type {HtmlWebpackPluginOptions} */
-    this.options = Object.assign(defaultOptions, options);
+    this.options = Object.assign(defaultOptions, userOptions);
+
+    // Default metaOptions if no template is provided
+    if (!userOptions.template && this.options.templateContent === false && this.options.meta) {
+      const defaultMeta = {
+        // From https://developer.mozilla.org/en-US/docs/Mozilla/Mobile/Viewport_meta_tag
+        viewport: 'width=device-width, initial-scale=1'
+      };
+      this.options.meta = Object.assign({}, this.options.meta, defaultMeta, userOptions.meta);
+    }
+
     // Instance variables to keep caching information
     // for multiple builds
     this.childCompilerHash = undefined;
@@ -502,16 +516,21 @@ class HtmlWebpackPlugin {
     // Make tags self-closing in case of xhtml
     // Turn { "viewport" : "width=500, initial-scale=1" } into
     // [{ name:"viewport" content:"width=500, initial-scale=1" }]
-    const metaTagAttributeObjects = Object.keys(metaOptions).map((metaName) => {
+    const metaTagAttributeObjects = Object.keys(metaOptions)
+    .map((metaName) => {
       const metaTagContent = metaOptions[metaName];
       return (typeof metaTagContent === 'string') ? {
         name: metaName,
         content: metaTagContent
       } : metaTagContent;
-    });
+    })
+    .filter((attribute) => attribute !== false);
     // Turn [{ name:"viewport" content:"width=500, initial-scale=1" }] into
     // the html-webpack-plugin tag structure
     return metaTagAttributeObjects.map((metaTagAttributes) => {
+      if (metaTagAttributes === false) {
+        throw new Error('Invalid meta tag');
+      }
       return {
         tagName: 'meta',
         voidTag: true,
