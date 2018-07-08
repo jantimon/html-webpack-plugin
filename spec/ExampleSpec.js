@@ -3,7 +3,7 @@
  * and matches them against their dist folder
  */
 
- /* eslint-env jasmine */
+/* eslint-env jasmine */
 'use strict';
 
 var path = require('path');

@@ -21,14 +21,13 @@ const childCompiler = require('./lib/compiler.js');
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
 const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
-const getHtmlWebpackPluginHook = require('./lib/hooks.js').getHtmlWebpackPluginHook;
 
 const fsStatAsync = promisify(fs.stat);
 const fsReadFileAsync = promisify(fs.readFile);
 
 class HtmlWebpackPlugin {
   /**
-   * @param {Partial<HtmlWebpackPluginOptions>} options
+   * @param {Partial<HtmlWebpackPluginOptions>} [options]
    */
   constructor (options) {
     // Default options
@@ -60,10 +59,7 @@ class HtmlWebpackPlugin {
     this.childCompilationOutputName = undefined;
     this.assetJson = undefined;
     this.hash = undefined;
-    /**
-     * The major version number of this plugin
-     */
-    this.version = 4;
+    this.version = HtmlWebpackPlugin.version;
   }
 
   /**
@@ -173,7 +169,7 @@ class HtmlWebpackPlugin {
           })
         // Allow plugins to make changes to the assets before invoking the template
         // This only makes sense to use if `inject` is `false`
-          .then(compilationResult => getHtmlWebpackPluginHook(compilation, 'htmlWebpackPluginBeforeHtmlGeneration').promise({
+          .then(compilationResult => getHtmlWebpackPluginHooks(compilation).htmlWebpackPluginBeforeHtmlGeneration.promise({
             assets: assets,
             outputName: self.childCompilationOutputName,
             plugin: self
@@ -186,7 +182,7 @@ class HtmlWebpackPlugin {
         // Allow plugins to change the html before assets are injected
           .then(html => {
             const pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
-            return getHtmlWebpackPluginHook(compilation, 'htmlWebpackPluginBeforeHtmlProcessing').promise(pluginArgs);
+            return getHtmlWebpackPluginHooks(compilation).htmlWebpackPluginBeforeHtmlProcessing.promise(pluginArgs);
           })
           .then(result => {
             const html = result.html;
@@ -195,7 +191,7 @@ class HtmlWebpackPlugin {
             const assetTags = self.generateHtmlTagObjects(assets);
             const pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, outputName: self.childCompilationOutputName};
             // Allow plugins to change the assetTag definitions
-            return getHtmlWebpackPluginHook(compilation, 'htmlWebpackPluginAlterAssetTags').promise(pluginArgs)
+            return getHtmlWebpackPluginHooks(compilation).htmlWebpackPluginAlterAssetTags.promise(pluginArgs)
               .then(result => self.postProcessHtml(html, assets, { body: result.body, head: result.head })
                 .then(html => _.extend(result, {html: html, assets: assets})));
           })
@@ -204,7 +200,7 @@ class HtmlWebpackPlugin {
             const html = result.html;
             const assets = result.assets;
             const pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
-            return getHtmlWebpackPluginHook(compilation, 'htmlWebpackPluginAfterHtmlProcessing').promise(pluginArgs)
+            return getHtmlWebpackPluginHooks(compilation).htmlWebpackPluginAfterHtmlProcessing.promise(pluginArgs)
               .then(result => result.html);
           })
           .catch(err => {
@@ -222,7 +218,7 @@ class HtmlWebpackPlugin {
               size: () => html.length
             };
           })
-          .then(() => getHtmlWebpackPluginHook(compilation, 'htmlWebpackPluginAfterEmit').promise({
+          .then(() => getHtmlWebpackPluginHooks(compilation).htmlWebpackPluginAfterEmit.promise({
             html: compilation.assets[self.childCompilationOutputName],
             outputName: self.childCompilationOutputName,
             plugin: self
@@ -697,4 +693,18 @@ function templateParametersGenerator (compilation, assets, options) {
     }
   };
 }
+
+// Statics:
+/**
+ * The major version number of this plugin
+ */
+HtmlWebpackPlugin.version = 4;
+
+/**
+ * A static helper to get the hooks for this plugin
+ *
+ * Usage: HtmlWebpackPlugin.getHook(compilation, 'HookName').tap('YourPluginName', () => { ... });
+ */
+HtmlWebpackPlugin.getHooks = getHtmlWebpackPluginHooks;
+
 module.exports = HtmlWebpackPlugin;
