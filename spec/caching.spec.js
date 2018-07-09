@@ -2,7 +2,7 @@
  * Integration tests for caching
  */
 
-/* eslint-env jasmine */
+/* eslint-env jest */
 'use strict';
 
 var path = require('path');
@@ -12,12 +12,13 @@ var WebpackRecompilationSimulator = require('webpack-recompilation-simulator');
 var HtmlWebpackPlugin = require('../index.js');
 var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 
-var OUTPUT_DIR = path.join(__dirname, '../dist');
+var OUTPUT_DIR = path.join(__dirname, '../dist/caching-spec');
 
-jasmine.getEnv().defaultTimeoutInterval = 30000;
+jest.setTimeout(30000);
+process.on('unhandledRejection', r => console.log(r));
 
 function setUpCompiler (htmlWebpackPlugin) {
-  spyOn(htmlWebpackPlugin, 'evaluateCompilationResult').and.callThrough();
+  jest.spyOn(htmlWebpackPlugin, 'evaluateCompilationResult');
   var webpackConfig = {
     entry: path.join(__dirname, 'fixtures/index.js'),
     output: {
@@ -64,7 +65,7 @@ describe('HtmlWebpackPluginCaching', function () {
         expect(getCompiledModuleCount(stats.toJson()))
           .toBe(0);
         // Verify that the html was processed only during the inital build
-        expect(htmlWebpackPlugin.evaluateCompilationResult.calls.count())
+        expect(htmlWebpackPlugin.evaluateCompilationResult.mock.calls.length)
           .toBe(1);
         // Verify that the child compilation was executed twice
         expect(htmlWebpackPlugin.childCompilerHash)
@@ -89,7 +90,7 @@ describe('HtmlWebpackPluginCaching', function () {
         expect(getCompiledModuleCount(stats.toJson()))
           .toBe(1);
         // Verify that the html was processed only during the inital build
-        expect(htmlWebpackPlugin.evaluateCompilationResult.calls.count())
+        expect(htmlWebpackPlugin.evaluateCompilationResult.mock.calls.length)
           .toBe(1);
         // Verify that the child compilation was executed only once
         expect(htmlWebpackPlugin.childCompilerHash)
@@ -116,7 +117,7 @@ describe('HtmlWebpackPluginCaching', function () {
         expect(getCompiledModuleCount(stats.toJson()))
           .toBe(1);
         // Verify that the html was processed on every run
-        expect(htmlWebpackPlugin.evaluateCompilationResult.calls.count())
+        expect(htmlWebpackPlugin.evaluateCompilationResult.mock.calls.length)
           .toBe(2);
         // Verify that the child compilation was executed only once
         expect(htmlWebpackPlugin.childCompilerHash)
@@ -144,7 +145,7 @@ describe('HtmlWebpackPluginCaching', function () {
         expect(getCompiledModuleCount(stats.toJson()))
           .toBe(1);
         // Verify that the html was processed twice
-        expect(htmlWebpackPlugin.evaluateCompilationResult.calls.count())
+        expect(htmlWebpackPlugin.evaluateCompilationResult.mock.calls.length)
           .toBe(2);
         // Verify that the child compilation was executed twice
         expect(htmlWebpackPlugin.childCompilerHash)

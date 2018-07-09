@@ -111,11 +111,11 @@ class HtmlWebpackPlugin {
     });
 
     compiler.hooks.emit.tapAsync('HtmlWebpackPlugin',
-    /**
-     * Hook into the webpack emit phase
-     * @param {WebpackCompilation} compilation
-     * @param {() => void} callback
-    */
+      /**
+       * Hook into the webpack emit phase
+       * @param {WebpackCompilation} compilation
+       * @param {() => void} callback
+      */
       (compilation, callback) => {
         // Clear the childCompilerCache
         childCompiler.clearCache(compiler);
@@ -156,7 +156,7 @@ class HtmlWebpackPlugin {
                 });
             }
           })
-        // Wait for the compilation to finish
+          // Wait for the compilation to finish
           .then(() => compilationPromise)
           .then(compiledTemplate => {
           // Allow to use a custom function / string instead
@@ -167,22 +167,22 @@ class HtmlWebpackPlugin {
             // and replace it with its content
             return self.evaluateCompilationResult(compilation, compiledTemplate);
           })
-        // Allow plugins to make changes to the assets before invoking the template
-        // This only makes sense to use if `inject` is `false`
-          .then(compilationResult => getHtmlWebpackPluginHooks(compilation).htmlWebpackPluginBeforeHtmlGeneration.promise({
+          // Allow plugins to make changes to the assets before invoking the template
+          // This only makes sense to use if `inject` is `false`
+          .then(compilationResult => getHtmlWebpackPluginHooks(compilation).beforeHtmlGeneration.promise({
             assets: assets,
             outputName: self.childCompilationOutputName,
             plugin: self
           })
             .then(() => compilationResult))
-        // Execute the template
+          // Execute the template
           .then(compilationResult => typeof compilationResult !== 'function'
             ? compilationResult
             : self.executeTemplate(compilationResult, assets, compilation))
-        // Allow plugins to change the html before assets are injected
+          // Allow plugins to change the html before assets are injected
           .then(html => {
             const pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
-            return getHtmlWebpackPluginHooks(compilation).htmlWebpackPluginBeforeHtmlProcessing.promise(pluginArgs);
+            return getHtmlWebpackPluginHooks(compilation).beforeHtmlProcessing.promise(pluginArgs);
           })
           .then(result => {
             const html = result.html;
@@ -191,34 +191,34 @@ class HtmlWebpackPlugin {
             const assetTags = self.generateHtmlTagObjects(assets);
             const pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, outputName: self.childCompilationOutputName};
             // Allow plugins to change the assetTag definitions
-            return getHtmlWebpackPluginHooks(compilation).htmlWebpackPluginAlterAssetTags.promise(pluginArgs)
+            return getHtmlWebpackPluginHooks(compilation).alterAssetTags.promise(pluginArgs)
               .then(result => self.postProcessHtml(html, assets, { body: result.body, head: result.head })
                 .then(html => _.extend(result, {html: html, assets: assets})));
           })
-        // Allow plugins to change the html after assets are injected
+          // Allow plugins to change the html after assets are injected
           .then(result => {
             const html = result.html;
             const assets = result.assets;
             const pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
-            return getHtmlWebpackPluginHooks(compilation).htmlWebpackPluginAfterHtmlProcessing.promise(pluginArgs)
+            return getHtmlWebpackPluginHooks(compilation).afterHtmlProcessing.promise(pluginArgs)
               .then(result => result.html);
           })
           .catch(err => {
-          // In case anything went wrong the promise is resolved
-          // with the error message and an error is logged
+            // In case anything went wrong the promise is resolved
+            // with the error message and an error is logged
             compilation.errors.push(prettyError(err, compiler.context).toString());
             // Prevent caching
             self.hash = null;
             return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
           })
           .then(html => {
-          // Replace the compilation result with the evaluated html code
+            // Replace the compilation result with the evaluated html code
             compilation.assets[self.childCompilationOutputName] = {
               source: () => html,
               size: () => html.length
             };
           })
-          .then(() => getHtmlWebpackPluginHooks(compilation).htmlWebpackPluginAfterEmit.promise({
+          .then(() => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
             html: compilation.assets[self.childCompilationOutputName],
             outputName: self.childCompilationOutputName,
             plugin: self
@@ -226,7 +226,7 @@ class HtmlWebpackPlugin {
             console.error(err);
             return null;
           }).then(() => null))
-        // Let webpack continue with it
+           // Let webpack continue with it
           .then(() => {
             callback();
           });

@@ -15,7 +15,8 @@
     "posttest": "tsc",
     "commit": "git-cz",
     "build-examples": "node examples/build-examples.js",
-    "test": "jasmine",
+    "test": "jest --runInBand",
+    "test-watch": "jest --runInBand --watch",
     "release": "standard-version"
   },
   "semistandard": {
@@ -35,8 +36,7 @@
     "html-loader": "^0.4.4",
     "jade": "^1.11.0",
     "jade-loader": "^0.8.0",
-    "jasmine": "^2.5.2",
-    "jasmine-diff-matchers": "^2.0.0",
+    "jest": "23.3.0",
     "rimraf": "^2.5.4",
     "semistandard": "8.0.0",
     "standard-version": "^4.3.0",
@@ -76,5 +76,9 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "jest": {
+    "watchPathIgnorePatterns": ["<rootDir>/dist"],
+    "testEnvironment": "node"
   }
 }

@@ -287,15 +287,19 @@ plugins: [
 
 ### `Events`
 
-To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the HTML this plugin executes the following events:
+To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the HTML this plugin executes
+[tapable](https://github.com/webpack/tapable/tree/master) hooks.
 
-#### `AsyncSeriesWaterfallHook`
+The [lib/hooks.js](https://github.com/jantimon/html-webpack-plugin/blob/master/lib/hooks.js) contains all information
+about which values are passed.
 
-* `htmlWebpackPluginBeforeHtmlGeneration`
-* `htmlWebpackPluginBeforeHtmlProcessing`
-* `htmlWebpackPluginAlterAssetTags`
-* `htmlWebpackPluginAfterHtmlProcessing`
-* `htmlWebpackPluginAfterEmit`
+You can tap into the following async hooks:
+
+* `beforeHtmlGeneration`
+* `beforeHtmlProcessing`
+* `alterAssetTags`
+* `afterHtmlProcessing`
+* `afterEmit`
 
 Example implementation: [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
 
@@ -308,8 +312,10 @@ function MyPlugin(options) {
 MyPlugin.prototype.apply = function (compiler) {
   compiler.hooks.compilation.tap('MyPlugin', (compilation) => {
     console.log('The compiler is starting a new compilation...');
-    HtmlWebpackPlugin.getHooks(compilation).htmlWebpackPluginAfterHtmlProcessing.tapAsync(
-      'MyPlugin',
+
+    //                                      |      HOOK NAME   |
+    HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync(
+      'MyPlugin', // <-- Set a meaningful name here for stacktraces
       (data, cb) => {
         data.html += 'The Magic Footer'
 

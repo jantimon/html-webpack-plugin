@@ -10,17 +10,6 @@ var fs = require('fs');
 var path = require('path');
 var rimraf = require('rimraf');
 var webpack = require('webpack');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-
-if (Number(webpackMajorVersion) > 1) {
-  var extractOriginal = ExtractTextPlugin.extract;
-  ExtractTextPlugin.extract = function (fallback, use) {
-    return extractOriginal({
-      fallback: fallback,
-      use: use
-    });
-  };
-}
 
 var examples = fs.readdirSync(__dirname).filter(function (file) {
   return fs.statSync(path.join(__dirname, file)).isDirectory();
@@ -39,10 +28,6 @@ examples.forEach(function (exampleName) {
     }));
     config.mode = 'production';
     config.optimization = { minimizer: [] };
-    if (config.module && config.module.loaders) {
-      config.module.rules = config.module.loaders;
-      delete config.module.loaders;
-    }
   }
 
   rimraf.sync(path.join(examplePath, 'dist', 'webpack-' + webpackMajorVersion));

@@ -2,7 +2,7 @@
  * Integration and unit tests for all features but caching
  */
 
-/* eslint-env jasmine */
+/* eslint-env jest */
 'use strict';
 
 var path = require('path');
@@ -16,9 +16,7 @@ var webpackMajorVersion = Number(require('webpack/package.json').version.split('
 if (isNaN(webpackMajorVersion)) {
   throw new Error('Cannot parse webpack major version');
 }
-if (webpackMajorVersion < 4) {
-  var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
-}
+
 var HtmlWebpackPlugin = require('../index.js');
 
 if (Number(extractTextPluginMajorVersion) > 1) {
@@ -31,45 +29,12 @@ if (Number(extractTextPluginMajorVersion) > 1) {
   };
 }
 
-var OUTPUT_DIR = path.join(__dirname, '../dist');
+var OUTPUT_DIR = path.resolve(__dirname, '../dist/basic-spec');
 
-jasmine.getEnv().defaultTimeoutInterval = 30000;
-
-function transformCommonChunkConfigToOptimization (config) {
-  if (config.name === 'common') {
-    return {
-      splitChunks: {
-        cacheGroups: {
-          commons: {
-            chunks: 'initial',
-            name: config.name,
-            enforce: true
-          }
-        }
-      }
-    };
-  } else {
-    throw new Error('Unrecognized common chunk config');
-  }
-}
+jest.setTimeout(30000);
+process.on('unhandledRejection', r => console.log(r));
 
 function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expectErrors, expectWarnings) {
-  if (webpackMajorVersion >= 4) {
-    webpackConfig.mode = 'development';
-    if (webpackConfig.module && webpackConfig.module.loaders) {
-      webpackConfig.module.rules = webpackConfig.module.loaders;
-      delete webpackConfig.module.loaders;
-    }
-  }
-  if (webpackConfig.__commonsChunk) {
-    if (webpackMajorVersion < 4) {
-      webpackConfig.plugins = webpackConfig.plugins || [];
-      webpackConfig.plugins.unshift(new CommonsChunkPlugin(webpackConfig.__commonsChunk));
-    } else {
-      webpackConfig.optimization = transformCommonChunkConfigToOptimization(webpackConfig.__commonsChunk);
-    }
-    delete webpackConfig.__commonsChunk;
-  }
   outputFile = outputFile || 'index.html';
   webpack(webpackConfig, function (err, stats) {
     expect(err).toBeFalsy();
@@ -133,26 +98,6 @@ function getChunksInfoFromStats (stats) {
   return chunksInfo;
 }
 
-function tapCompilationEvent (compilation, eventName, handler) {
-  // Webpack 4 has a new interface
-  if (compilation.hooks) {
-    return HtmlWebpackPlugin.getHooks(compilation)[trainCaseToCamelCase(eventName)].tapAsync(
-      'AsyncPlugin' + tapCompilationEvent.counter++,
-      handler
-    );
-  } else {
-    return compilation.plugin(eventName, handler);
-  }
-}
-// There's probably a better way to do this
-tapCompilationEvent.counter = 0;
-
-function trainCaseToCamelCase (word) {
-  return word.replace(/-([\w])/g, function (match, p1) {
-    return p1.toUpperCase();
-  });
-}
-
 describe('HtmlWebpackPlugin', function () {
   beforeEach(function (done) {
     rimraf(OUTPUT_DIR, done);
@@ -160,6 +105,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('generates a default index.html file for a single entry point', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -171,6 +117,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('generates a default index.html file with multiple entry points', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
         app: path.join(__dirname, 'fixtures/index.js')
@@ -185,6 +132,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to specify a custom loader without injection', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -202,6 +150,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should pass through loader errors', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -219,11 +168,12 @@ describe('HtmlWebpackPlugin', function () {
 
   it('uses a custom loader from webpacks config', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
       module: {
-        loaders: [
+        rules: [
           {test: /\.jade$/, loader: 'jade-loader'}
         ]
       },
@@ -241,6 +191,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('works when using html-loader', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -258,6 +209,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to specify your own HTML template file', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -275,6 +227,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to inject the assets into a given html file', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
         app: path.join(__dirname, 'fixtures/index.js')
@@ -292,6 +245,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to inject the assets into the body of the given template', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
         app: path.join(__dirname, 'fixtures/index.js')
@@ -309,6 +263,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to inject the assets into the head of the given template', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
         app: path.join(__dirname, 'fixtures/index.js')
@@ -326,6 +281,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to inject a specified asset into a given html file', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
         app: path.join(__dirname, 'fixtures/index.js')
@@ -344,6 +300,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to inject a specified asset into a given html file', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
         app: path.join(__dirname, 'fixtures/index.js')
@@ -362,6 +319,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to use chunkhash with asset into a given html file', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -382,6 +340,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to disable injection', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
         app: path.join(__dirname, 'fixtures/index.js')
@@ -399,6 +358,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to specify your own HTML template function', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {app: path.join(__dirname, 'fixtures/index.js')},
       output: {
         path: OUTPUT_DIR,
@@ -415,6 +375,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('works with source maps', function (done) {
     testHtmlPlugin({
+      mode: 'development',
       devtool: 'sourcemap',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
@@ -427,6 +388,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('handles hashes in bundle filenames', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -438,9 +400,10 @@ describe('HtmlWebpackPlugin', function () {
 
   it('handles hashes in the directory which has the bundle file', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
-        path: path.join(__dirname, '../dist'),
+        path: OUTPUT_DIR,
         publicPath: '/dist/[hash]/',
         filename: 'index_bundle_[hash].js'
       },
@@ -450,6 +413,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows to append hashes to the assets', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -461,6 +425,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows to append hashes to the assets', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -472,13 +437,14 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should work with the css extract plugin', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
       module: {
-        loaders: [
+        rules: [
           { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
         ]
       },
@@ -491,6 +457,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should work with the css extract plugin on windows and protocol relative urls support (#205)', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
         path: OUTPUT_DIR,
@@ -498,7 +465,7 @@ describe('HtmlWebpackPlugin', function () {
         publicPath: '//localhost:8080/'
       },
       module: {
-        loaders: [
+        rules: [
           { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
         ]
       },
@@ -511,13 +478,14 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should allow to add cache hashes to with the css assets', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
       module: {
-        loaders: [
+        rules: [
           { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
         ]
       },
@@ -530,13 +498,14 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should inject css files when using the extract text plugin', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
       module: {
-        loaders: [
+        rules: [
           { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
         ]
       },
@@ -549,13 +518,14 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should allow to add cache hashes to with injected css assets', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
       module: {
-        loaders: [
+        rules: [
           { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
         ]
       },
@@ -568,13 +538,14 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should output xhtml link stylesheet tag', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
       module: {
-        loaders: [
+        rules: [
           { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
         ]
       },
@@ -587,6 +558,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('prepends the webpack public path to script src', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -599,6 +571,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('handles subdirectories in the webpack output bundles', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -610,6 +583,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('handles subdirectories in the webpack output bundles along with a public path', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -622,6 +596,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to configure the title of the generated HTML page', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -633,6 +608,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to configure the output filename', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -644,6 +620,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('will replace [hash] in the filename with the child compilation hash', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -657,6 +634,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to use an absolute output filename', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -670,6 +648,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to use an absolute output filename outside the output path', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: path.join(OUTPUT_DIR, 'app'),
@@ -683,6 +662,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to use an relative output filename outside the output path', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: path.join(OUTPUT_DIR, 'app'),
@@ -696,6 +676,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('will try to use a relative name if the filename is in a subdirectory', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -707,6 +688,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('will try to use a relative name if the filename and the script are in a subdirectory', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -718,6 +700,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you write multiple HTML files', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -745,13 +728,14 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should inject js css files even if the html file is incomplete', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/theme.js'),
       output: {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
       module: {
-        loaders: [
+        rules: [
           { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
         ]
       },
@@ -764,6 +748,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('exposes the webpack configuration to templates', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -782,7 +767,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-alter-asset-tags', function (object, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             expect(typeof object.body).toBe('object');
             expect(typeof object.head).toBe('object');
             eventFired = true;
@@ -794,6 +779,7 @@ describe('HtmlWebpackPlugin', function () {
 
     var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -816,7 +802,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-alter-asset-tags', function (pluginArgs, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('HtmlWebpackPluginTest', (pluginArgs, callback) => {
             pluginArgs.body = pluginArgs.body.map(function (tag) {
               if (tag.tagName === 'script') {
                 tag.attributes.async = true;
@@ -829,6 +815,7 @@ describe('HtmlWebpackPlugin', function () {
       }
     };
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -849,7 +836,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-alter-asset-tags', function (pluginArgs, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('HtmlWebpackPluginTest', (pluginArgs, callback) => {
             pluginArgs.body = pluginArgs.body.map(function (tag) {
               if (tag.tagName === 'script') {
                 tag.attributes.async = false;
@@ -862,6 +849,7 @@ describe('HtmlWebpackPlugin', function () {
       }
     };
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -883,7 +871,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-before-html-processing', function (object, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).beforeHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             callback();
           });
@@ -893,6 +881,7 @@ describe('HtmlWebpackPlugin', function () {
 
     var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -916,7 +905,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             callback();
           });
@@ -925,6 +914,7 @@ describe('HtmlWebpackPlugin', function () {
     };
     var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -948,7 +938,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-after-emit', function (object, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).afterEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             callback();
           });
@@ -956,6 +946,7 @@ describe('HtmlWebpackPlugin', function () {
       }
     };
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -978,7 +969,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             object.html += 'Injected by plugin';
             callback();
@@ -989,6 +980,7 @@ describe('HtmlWebpackPlugin', function () {
 
     var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -1013,7 +1005,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForFirstPlugin = true;
             object.html += 'Injected by first plugin';
             callback(null, object);
@@ -1024,7 +1016,7 @@ describe('HtmlWebpackPlugin', function () {
     var secondExamplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForSecondPlugin = true;
             object.html += ' Injected by second plugin';
             callback(null);
@@ -1035,6 +1027,7 @@ describe('HtmlWebpackPlugin', function () {
 
     var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -1061,7 +1054,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForFirstPlugin = true;
             var result = _.extend(object, {
               html: object.html + 'Injected by first plugin'
@@ -1074,7 +1067,7 @@ describe('HtmlWebpackPlugin', function () {
     var secondExamplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForSecondPlugin = true;
             object.html += ' Injected by second plugin';
             callback(null);
@@ -1085,6 +1078,7 @@ describe('HtmlWebpackPlugin', function () {
 
     var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -1111,7 +1105,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForFirstPlugin = true;
             var result = _.extend(object, {
               html: object.html + 'Injected by first plugin'
@@ -1124,7 +1118,7 @@ describe('HtmlWebpackPlugin', function () {
     var secondExamplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-after-html-processing', function (object, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForSecondPlugin = true;
             var result = _.extend(object, {
               html: object.html + ' Injected by second plugin'
@@ -1136,6 +1130,7 @@ describe('HtmlWebpackPlugin', function () {
     };
 
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -1160,7 +1155,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-before-html-processing', function (object, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).beforeHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             object.assets.js.push({path: 'funky-script.js'});
             object.html += 'Injected by plugin';
@@ -1172,6 +1167,7 @@ describe('HtmlWebpackPlugin', function () {
 
     var shouldExpectWarnings = webpackMajorVersion < 4;
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -1195,7 +1191,7 @@ describe('HtmlWebpackPlugin', function () {
     var examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', function (compilation) {
-          tapCompilationEvent(compilation, 'html-webpack-plugin-before-html-generation', function (object, callback) {
+          HtmlWebpackPlugin.getHooks(compilation).beforeHtmlGeneration.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             object.assets.js.push({path: 'funky-script.js'});
             callback();
@@ -1204,6 +1200,7 @@ describe('HtmlWebpackPlugin', function () {
       }
     };
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         app: path.join(__dirname, 'fixtures/index.js')
       },
@@ -1226,6 +1223,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('works with commons chunk plugin', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
         index: path.join(__dirname, 'fixtures/index.js')
@@ -1234,9 +1232,16 @@ describe('HtmlWebpackPlugin', function () {
         path: OUTPUT_DIR,
         filename: '[name]_bundle.js'
       },
-      __commonsChunk: {
-        name: 'common',
-        filename: 'common_bundle.js'
+      optimization: {
+        splitChunks: {
+          cacheGroups: {
+            commons: {
+              chunks: 'initial',
+              name: 'common',
+              enforce: true
+            }
+          }
+        }
       },
       plugins: [
         new HtmlWebpackPlugin()
@@ -1248,6 +1253,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('adds a favicon', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1263,6 +1269,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('adds a meta tag', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1283,6 +1290,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('adds a meta tag with short notation', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1300,6 +1308,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('adds a favicon with publicPath set to /some/', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1316,6 +1325,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('adds a favicon with publicPath set to /some', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1332,6 +1342,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('adds a favicon with a publichPath set to [hash]/ and replaces the hash', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1348,6 +1359,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('adds a favicon with inject enabled', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1364,6 +1376,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('adds a favicon with xhtml enabled', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1381,6 +1394,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('shows an error if the favicon could not be load', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1398,6 +1412,7 @@ describe('HtmlWebpackPlugin', function () {
   it('adds a manifest', function (done) {
     var AppCachePlugin = require('appcache-webpack-plugin');
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1413,6 +1428,7 @@ describe('HtmlWebpackPlugin', function () {
   it('does not add a manifest if already present', function (done) {
     var AppCachePlugin = require('appcache-webpack-plugin');
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1429,6 +1445,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('works with webpack bannerplugin', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1443,6 +1460,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('shows an error when a template fails to load', function (done) {
     testHtmlPlugin({
+      mode: 'development',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1458,6 +1476,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should sort the chunks in auto mode', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         util: path.join(__dirname, 'fixtures/util.js'),
         index: path.join(__dirname, 'fixtures/index.js')
@@ -1466,9 +1485,16 @@ describe('HtmlWebpackPlugin', function () {
         path: OUTPUT_DIR,
         filename: '[name]_bundle.js'
       },
-      __commonsChunk: {
-        name: 'common',
-        filename: 'common_bundle.js'
+      optimization: {
+        splitChunks: {
+          cacheGroups: {
+            commons: {
+              chunks: 'initial',
+              name: 'common',
+              enforce: true
+            }
+          }
+        }
       },
       plugins: [
         new HtmlWebpackPlugin({
@@ -1482,6 +1508,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should sort the chunks in custom (reverse alphabetical) order', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         b: path.join(__dirname, 'fixtures/index.js'),
         c: path.join(__dirname, 'fixtures/util.js'),
@@ -1509,6 +1536,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should sort manually by the chunks', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {
         b: path.join(__dirname, 'fixtures/util.js'),
         a: path.join(__dirname, 'fixtures/theme.js'),
@@ -1520,13 +1548,20 @@ describe('HtmlWebpackPlugin', function () {
         filename: '[name]_bundle.js'
       },
       module: {
-        loaders: [
+        rules: [
           { test: /\.css$/, loader: 'css-loader' }
         ]
       },
-      __commonsChunk: {
-        name: 'common',
-        filename: 'common_bundle.js'
+      optimization: {
+        splitChunks: {
+          cacheGroups: {
+            commons: {
+              chunks: 'initial',
+              name: 'common',
+              enforce: true
+            }
+          }
+        }
       },
       plugins: [
         new HtmlWebpackPlugin({
@@ -1540,6 +1575,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should add the webpack compilation object as a property of the templateParam object', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1556,6 +1592,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should allow to disable template parameters', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1573,6 +1610,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should allow to set specific template parameters', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1590,6 +1628,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should allow to set specific template parameters using a function', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1609,6 +1648,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('should not treat templateContent set to an empty string as missing', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: {app: path.join(__dirname, 'fixtures/index.js')},
       output: {
         path: OUTPUT_DIR,
@@ -1623,6 +1663,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to inject the assets into the body of the given spaced closing tag template', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1637,6 +1678,7 @@ describe('HtmlWebpackPlugin', function () {
 
   it('allows you to inject the assets into the head of the given spaced closing tag template', function (done) {
     testHtmlPlugin({
+      mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
