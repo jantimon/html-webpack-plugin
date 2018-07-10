@@ -1,7 +1,7 @@
 'use strict';
 require('./main.css');
 // Use the same template for the frontend code
-var template = require('./time.jade');
+var template = require('./time.pug');
 
 setInterval(function () {
   var div = document.getElementById('main');

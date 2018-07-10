@@ -14,17 +14,17 @@ module.exports = {
   module: {
     rules: [
       { test: /\.css$/, loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader' }) },
-      { test: /\.jade$/, loader: 'jade-loader' }
+      { test: /\.pug$/, loader: 'pug-loader' }
     ]
   },
   plugins: [
     new HtmlWebpackPlugin({
       inject: false,
       cache: false,
-      template: 'template.jade',
+      template: 'template.pug',
       filename: 'index.html',
       favicon: 'favicon.ico',
-      title: 'Jade demo'
+      title: 'pug demo'
     }),
     new ExtractTextPlugin('styles.css')
   ]

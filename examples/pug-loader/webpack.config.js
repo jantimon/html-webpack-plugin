@@ -14,15 +14,15 @@ module.exports = {
     rules: [
       { test: /\.css$/, loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader' }) },
       { test: /\.png$/, loader: 'file-loader' },
-      { test: /\.jade$/, loader: 'jade-loader' }
+      { test: /\.pug$/, loader: 'pug-loader' }
     ]
   },
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',
       favicon: 'favicon.ico',
-      template: 'template.jade',
-      title: 'Jade demo'
+      template: 'template.pug',
+      title: 'pug demo'
     }),
     new ExtractTextPlugin('styles.css')
   ]

@@ -5,7 +5,7 @@
 The version 2.x which was introduced last year (Sep, 2015) changed the way the template is processed.
 Instead of forcing all users to use the [blueimp](https://github.com/blueimp/JavaScript-Templates) template engine it allowed to use any webpack loader:
 
-* [jade/pug](https://github.com/pugjs/pug-loader)
+* [pug](https://github.com/pugjs/pug-loader)
 * [ejs](https://github.com/okonet/ejs-loader)
 * [underscore](https://github.com/emaphp/underscore-template-loader)
 * [handlebars](https://github.com/pcardune/handlebars-loader)

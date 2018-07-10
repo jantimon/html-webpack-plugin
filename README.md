@@ -258,7 +258,7 @@ The following variables are available in the template:
 - `compilation`: the webpack [compilation](https://webpack.js.org/api/compilation/) object.
   This can be used, for example, to get the contents of processed assets and inline them
   directly in the page, through `compilation.assets[...].source()`
-  (see [the inline template example](examples/inline/template.jade)).
+  (see [the inline template example](examples/inline/template.pug)).
 
 
 ### `Filtering Chunks`
