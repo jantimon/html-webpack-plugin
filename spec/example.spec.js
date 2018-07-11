@@ -6,24 +6,24 @@
 /* eslint-env jest */
 'use strict';
 
-var path = require('path');
-var webpack = require('webpack');
-var rimraf = require('rimraf');
-var fs = require('fs');
-var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
+const path = require('path');
+const webpack = require('webpack');
+const rimraf = require('rimraf');
+const fs = require('fs');
+const webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 
-var OUTPUT_DIR = path.resolve(__dirname, '../dist');
+const OUTPUT_DIR = path.resolve(__dirname, '../dist');
 
 jest.setTimeout(30000);
 process.traceDeprecation = true;
 
 function runExample (exampleName, done) {
-  var examplePath = path.resolve(__dirname, '..', 'examples', exampleName);
-  var exampleOutput = path.join(OUTPUT_DIR, exampleName);
-  var fixturePath = path.resolve(examplePath, 'dist', 'webpack-' + webpackMajorVersion);
+  const examplePath = path.resolve(__dirname, '..', 'examples', exampleName);
+  const exampleOutput = path.join(OUTPUT_DIR, exampleName);
+  const fixturePath = path.resolve(examplePath, 'dist', 'webpack-' + webpackMajorVersion);
   // Clear old results
-  rimraf(exampleOutput, function () {
-    var options = require(path.join(examplePath, 'webpack.config.js'));
+  rimraf(exampleOutput, () => {
+    const options = require(path.join(examplePath, 'webpack.config.js'));
     options.context = examplePath;
     options.output.path = exampleOutput + path.sep;
     if (Number(webpackMajorVersion) >= 4) {
@@ -40,18 +40,16 @@ function runExample (exampleName, done) {
       options.optimization = { minimizer: [] };
     }
 
-    webpack(options, function (err, stats) {
+    webpack(options, (err, stats) => {
       expect(err).toBeFalsy();
       expect(stats.compilation.errors).toEqual([]);
 
-      var dircompare = require('dir-compare');
-      var res = dircompare.compareSync(fixturePath, exampleOutput, {compareSize: true});
+      const dircompare = require('dir-compare');
+      const res = dircompare.compareSync(fixturePath, exampleOutput, {compareSize: true});
 
-      res.diffSet.filter(function (diff) {
-        return diff.state === 'distinct';
-      }).forEach(function (diff) {
-        var file1Contents = fs.readFileSync(path.join(diff.path1, diff.name1)).toString();
-        var file2Contents = fs.readFileSync(path.join(diff.path2, diff.name2)).toString();
+      res.diffSet.filter(diff => diff.state === 'distinct').forEach(diff => {
+        const file1Contents = fs.readFileSync(path.join(diff.path1, diff.name1)).toString();
+        const file2Contents = fs.readFileSync(path.join(diff.path2, diff.name2)).toString();
         expect(file1Contents).toEqual(file2Contents);
       });
 
@@ -61,48 +59,48 @@ function runExample (exampleName, done) {
   });
 }
 
-describe('HtmlWebpackPlugin Examples', function () {
-  it('appcache example', function (done) {
+describe('HtmlWebpackPlugin Examples', () => {
+  it('appcache example', done => {
     runExample('appcache', done);
   });
 
-  it('custom-template example', function (done) {
+  it('custom-template example', done => {
     runExample('custom-template', done);
   });
 
-  it('default example', function (done) {
+  it('default example', done => {
     runExample('default', done);
   });
 
-  it('favicon example', function (done) {
+  it('favicon example', done => {
     runExample('favicon', done);
   });
 
-  it('html-loader example', function (done) {
+  it('html-loader example', done => {
     runExample('html-loader', done);
   });
 
-  it('inline example', function (done) {
+  it('inline example', done => {
     runExample('inline', done);
   });
 
-  it('pug-loader example', function (done) {
+  it('pug-loader example', done => {
     runExample('pug-loader', done);
   });
 
-  it('javascript example', function (done) {
+  it('javascript example', done => {
     runExample('javascript', done);
   });
 
-  it('javascript-advanced example', function (done) {
+  it('javascript-advanced example', done => {
     runExample('javascript-advanced', done);
   });
 
-  it('sort manually example', function (done) {
+  it('sort manually example', done => {
     runExample('sort-manually', done);
   });
 
-  it('template-parameters example', function (done) {
+  it('template-parameters example', done => {
     runExample('template-parameters', done);
   });
 });

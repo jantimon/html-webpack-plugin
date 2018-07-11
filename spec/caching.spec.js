@@ -5,13 +5,13 @@
 /* eslint-env jest */
 'use strict';
 
-var path = require('path');
-var webpack = require('webpack');
-var rimraf = require('rimraf');
-var WebpackRecompilationSimulator = require('webpack-recompilation-simulator');
-var HtmlWebpackPlugin = require('../index.js');
+const path = require('path');
+const webpack = require('webpack');
+const rimraf = require('rimraf');
+const WebpackRecompilationSimulator = require('webpack-recompilation-simulator');
+const HtmlWebpackPlugin = require('../index.js');
 
-var OUTPUT_DIR = path.join(__dirname, '../dist/caching-spec');
+const OUTPUT_DIR = path.join(__dirname, '../dist/caching-spec');
 
 jest.setTimeout(30000);
 process.on('unhandledRejection', r => console.log(r));
@@ -19,7 +19,7 @@ process.traceDeprecation = true;
 
 function setUpCompiler (htmlWebpackPlugin) {
   jest.spyOn(htmlWebpackPlugin, 'evaluateCompilationResult');
-  var webpackConfig = {
+  const webpackConfig = {
     stats: {all: true},
     // Caching works only in development
     mode: 'development',
@@ -41,14 +41,12 @@ function setUpCompiler (htmlWebpackPlugin) {
     },
     plugins: [htmlWebpackPlugin]
   };
-  var compiler = new WebpackRecompilationSimulator(webpack(webpackConfig));
+  const compiler = new WebpackRecompilationSimulator(webpack(webpackConfig));
   return compiler;
 }
 
 function getCompiledModules (statsJson) {
-  const builtModules = statsJson.modules.filter(function (webpackModule) {
-    return webpackModule.built;
-  }).map((webpackModule) => {
+  const builtModules = statsJson.modules.filter(webpackModule => webpackModule.built).map((webpackModule) => {
     return module.userRequest;
   });
   statsJson.children.forEach((childCompilationStats) => {
@@ -80,26 +78,26 @@ function expectNoErrors (stats) {
   expect(errors.childCompilation).toEqual([]);
 }
 
-describe('HtmlWebpackPluginCaching', function () {
-  beforeEach(function (done) {
+describe('HtmlWebpackPluginCaching', () => {
+  beforeEach(done => {
     rimraf(OUTPUT_DIR, done);
   });
 
-  it('should compile nothing if no file was changed', function (done) {
-    var template = path.join(__dirname, 'fixtures/plain.html');
-    var htmlWebpackPlugin = new HtmlWebpackPlugin({
+  it('should compile nothing if no file was changed', done => {
+    const template = path.join(__dirname, 'fixtures/plain.html');
+    const htmlWebpackPlugin = new HtmlWebpackPlugin({
       template: template
     });
-    var childCompilerHash;
-    var compiler = setUpCompiler(htmlWebpackPlugin);
+    let childCompilerHash;
+    const compiler = setUpCompiler(htmlWebpackPlugin);
     compiler.addTestFile(path.join(__dirname, 'fixtures/index.js'));
     compiler.run()
       // Change the template file and compile again
-      .then(function () {
+      .then(() => {
         childCompilerHash = htmlWebpackPlugin.childCompilerHash;
         return compiler.run();
       })
-      .then(function (stats) {
+      .then(stats => {
         // Expect no errors:
         expectNoErrors(stats);
         // Verify that no file was built
@@ -115,19 +113,19 @@ describe('HtmlWebpackPluginCaching', function () {
       .then(done);
   });
 
-  it('should not compile the webpack html file if only a javascript file was changed', function (done) {
-    var htmlWebpackPlugin = new HtmlWebpackPlugin();
-    var compiler = setUpCompiler(htmlWebpackPlugin);
-    var childCompilerHash;
+  it('should not compile the webpack html file if only a javascript file was changed', done => {
+    const htmlWebpackPlugin = new HtmlWebpackPlugin();
+    const compiler = setUpCompiler(htmlWebpackPlugin);
+    let childCompilerHash;
     compiler.addTestFile(path.join(__dirname, 'fixtures/index.js'));
     compiler.run()
       // Change a js file and compile again
-      .then(function () {
+      .then(() => {
         childCompilerHash = htmlWebpackPlugin.childCompilerHash;
         compiler.simulateFileChange(path.join(__dirname, 'fixtures/index.js'), {footer: '//1'});
         return compiler.run();
       })
-      .then(function (stats) {
+      .then(stats => {
         // Expect no errors:
         expectNoErrors(stats);
         // Verify that only one file was built
@@ -143,21 +141,21 @@ describe('HtmlWebpackPluginCaching', function () {
       .then(done);
   });
 
-  it('should compile the webpack html file even if only a javascript file was changed if caching is disabled', function (done) {
-    var htmlWebpackPlugin = new HtmlWebpackPlugin({
+  it('should compile the webpack html file even if only a javascript file was changed if caching is disabled', done => {
+    const htmlWebpackPlugin = new HtmlWebpackPlugin({
       cache: false
     });
-    var childCompilerHash;
-    var compiler = setUpCompiler(htmlWebpackPlugin);
+    let childCompilerHash;
+    const compiler = setUpCompiler(htmlWebpackPlugin);
     compiler.addTestFile(path.join(__dirname, 'fixtures/index.js'));
     compiler.run()
       // Change a js file and compile again
-      .then(function () {
+      .then(() => {
         childCompilerHash = htmlWebpackPlugin.childCompilerHash;
         compiler.simulateFileChange(path.join(__dirname, 'fixtures/index.js'), {footer: '//1'});
         return compiler.run();
       })
-      .then(function (stats) {
+      .then(stats => {
         // Expect no errors:
         expectNoErrors(stats);
         // Verify that only one file was built
@@ -173,22 +171,22 @@ describe('HtmlWebpackPluginCaching', function () {
       .then(done);
   });
 
-  it('should compile the webpack html if the template file was changed', function (done) {
-    var template = path.join(__dirname, 'fixtures/plain.html');
-    var htmlWebpackPlugin = new HtmlWebpackPlugin({
+  it('should compile the webpack html if the template file was changed', done => {
+    const template = path.join(__dirname, 'fixtures/plain.html');
+    const htmlWebpackPlugin = new HtmlWebpackPlugin({
       template: template
     });
-    var childCompilerHash;
-    var compiler = setUpCompiler(htmlWebpackPlugin);
+    let childCompilerHash;
+    const compiler = setUpCompiler(htmlWebpackPlugin);
     compiler.addTestFile(template);
     compiler.run()
       // Change the template file and compile again
-      .then(function () {
+      .then(() => {
         childCompilerHash = htmlWebpackPlugin.childCompilerHash;
         compiler.simulateFileChange(template, {footer: '<!-- 1 -->'});
         return compiler.run();
       })
-      .then(function (stats) {
+      .then(stats => {
         // Expect no errors:
         expectNoErrors(stats);
         // Verify that only one file was built
@@ -204,13 +202,13 @@ describe('HtmlWebpackPluginCaching', function () {
       .then(done);
   });
 
-  it('should keep watching the webpack html if only a js file was changed', function (done) {
-    var template = path.join(__dirname, 'fixtures/plain.html');
+  it('should keep watching the webpack html if only a js file was changed', done => {
+    const template = path.join(__dirname, 'fixtures/plain.html');
     const jsFile = path.join(__dirname, 'fixtures/index.js');
-    var htmlWebpackPlugin = new HtmlWebpackPlugin({
+    const htmlWebpackPlugin = new HtmlWebpackPlugin({
       template: template
     });
-    var compiler = setUpCompiler(htmlWebpackPlugin);
+    const compiler = setUpCompiler(htmlWebpackPlugin);
     compiler.addTestFile(template);
     compiler.addTestFile(jsFile);
     // Build the template file for the first time
