@@ -1218,6 +1218,53 @@ describe('HtmlWebpackPlugin', () => {
     });
   });
 
+  it('fires the events in the correct order', done => {
+    const hookCallOrder = [
+      'beforeHtmlGeneration',
+      'beforeHtmlProcessing',
+      'alterAssetTags',
+      'afterHtmlProcessing',
+      'afterEmit'
+    ];
+    let eventsFired = [];
+    let hookLength = 0;
+    const examplePlugin = {
+      apply: function (compiler) {
+        compiler.plugin('compilation', compilation => {
+          const hooks = HtmlWebpackPlugin.getHooks(compilation);
+          hookLength = hooks.length;
+          // Hook into all hooks
+          Object.keys(hooks).forEach((hookName) => {
+            hooks[hookName].tapAsync('HtmlWebpackPluginTest', (object, callback) => {
+              eventsFired.push(hookName);
+              callback();
+            });
+          });
+        });
+      }
+    };
+    const shouldExpectWarnings = webpackMajorVersion < 4;
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    }, [], null, () => {
+      expect(hookLength).not.toBe(0);
+      expect(eventsFired).toEqual(hookCallOrder);
+      done();
+    }, false,
+    shouldExpectWarnings);
+  });
+
   it('works with commons chunk plugin', done => {
     testHtmlPlugin({
       mode: 'production',
