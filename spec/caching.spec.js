@@ -39,7 +39,7 @@ function setUpCompiler (htmlWebpackPlugin) {
       path: OUTPUT_DIR,
       filename: 'index_bundle.js'
     },
-    plugins: [htmlWebpackPlugin]
+    plugins: Array.from(arguments)
   };
   const compiler = new WebpackRecompilationSimulator(webpack(webpackConfig));
   return compiler;
@@ -200,6 +200,45 @@ describe('HtmlWebpackPluginCaching', () => {
           .not.toBe(childCompilerHash);
       })
       .then(done);
+  });
+
+  it('should not slow down linear (15 plugins should not take twice as much time as a 1 plugin)', done => {
+    const template = path.join(__dirname, 'fixtures/plain.html');
+    const createHtmlWebpackPlugin = () => new HtmlWebpackPlugin({
+      template: template
+    });
+    let singlePluginCompileStart;
+    let singleCompileRunDuration;
+    let multiPluginComileStart;
+    let multiCompileRunDuration;
+
+    let singleCompiler = setUpCompiler(createHtmlWebpackPlugin());
+    let multiCompiler = setUpCompiler.apply(null, Array(15).fill(0).map(() => createHtmlWebpackPlugin()));
+
+    Promise.resolve()
+      .then(function singleCompileRun () {
+        singlePluginCompileStart = process.hrtime();
+        return singleCompiler.run()
+          // Change the template file and compile again
+          .then(() => {
+            singleCompileRunDuration = process.hrtime(singlePluginCompileStart);
+          });
+      })
+      .then(function multiCompileRun () {
+        multiPluginComileStart = process.hrtime();
+        return multiCompiler.run()
+          // Change the template file and compile again
+          .then(() => {
+            multiCompileRunDuration = process.hrtime(multiPluginComileStart);
+          });
+      }).then(function meassureTime () {
+        const singleCompileRunDurationInNs = singleCompileRunDuration[0] * 1e9 + singleCompileRunDuration[1];
+        const multiCompileRunDurationInNs = multiCompileRunDuration[0] * 1e9 + multiCompileRunDuration[1];
+        const speedComarision = multiCompileRunDurationInNs / singleCompileRunDurationInNs * 100;
+
+        expect(speedComarision).toBeLessThan(200);
+        done();
+      });
   });
 
   it('should keep watching the webpack html if only a js file was changed', done => {
