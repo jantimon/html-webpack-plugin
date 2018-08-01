@@ -1734,4 +1734,20 @@ describe('HtmlWebpackPlugin', () => {
       })]
     }, [/<head>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/head\s>/], null, done);
   });
+
+  it('should add resource hint if import with webpackPreload/webpackPrefetch flag', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index-dynamic-import.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, [
+      '<head><link href="index_bundle.js" rel="preload" as="script">',
+      '<link href="1.index_bundle.js" rel="preload" as="script">',
+      '<link href="2.index_bundle.js" rel="prefetch" as="script">'
+    ], null, done);
+  });
 });

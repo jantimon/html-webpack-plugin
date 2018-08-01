@@ -717,7 +717,7 @@ class HtmlWebpackPlugin {
         }
       }
 
-      // Append assets to head element
+      // add assets to head element
       html = html.replace(headBeginRegExp, match => match + headBegin.join(''));
       html = html.replace(headEndRegExp, match => headEnd.join('') + match);
     }
