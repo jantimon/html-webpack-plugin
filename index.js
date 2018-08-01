@@ -25,6 +25,18 @@ const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPlugin
 const fsStatAsync = promisify(fs.stat);
 const fsReadFileAsync = promisify(fs.readFile);
 
+const preloadDirective = {
+  '.js': 'script',
+  '.css': 'style',
+  '.woff': 'font',
+  '.woff2': 'font',
+  '.jpeg': 'image',
+  '.jpg': 'image',
+  '.gif': 'image',
+  '.png': 'image',
+  '.svg': 'image'
+};
+
 class HtmlWebpackPlugin {
   /**
    * @param {Partial<HtmlWebpackPluginOptions>} [options]
@@ -215,10 +227,10 @@ class HtmlWebpackPlugin {
             const assets = result.assets;
             // Prepare script and link tags
             const assetTags = self.generateHtmlTagObjects(assets);
-            const pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, outputName: self.childCompilationOutputName};
+            const pluginArgs = {head: assetTags.head, body: assetTags.body, prependHead: assetTags.prependHead, plugin: self, outputName: self.childCompilationOutputName};
             // Allow plugins to change the assetTag definitions
             return getHtmlWebpackPluginHooks(compilation).alterAssetTags.promise(pluginArgs)
-              .then(result => self.postProcessHtml(html, assets, { body: result.body, head: result.head })
+              .then(result => self.postProcessHtml(html, assets, { body: result.body, head: result.head, prependHead: result.prependHead })
                 .then(html => _.extend(result, {html: html, assets: assets})));
           })
           // Allow plugins to change the html after assets are injected
@@ -461,6 +473,8 @@ class HtmlWebpackPlugin {
         publicPath: string,
         js: Array<{entryName: string, path: string}>,
         css: Array<{entryName: string, path: string}>,
+        preload: Array<string>,
+        prefetch: Array<string>,
         manifest?: string,
         favicon?: string
       }}
@@ -472,6 +486,10 @@ class HtmlWebpackPlugin {
       js: [],
       // Will contain all css files
       css: [],
+      // will contain all preload js/css files
+      preload: [],
+      // will contain all prefetch js/css files
+      prefetch: [],
       // Will contain the html5 appcache manifest files if it exists
       manifest: Object.keys(compilation.assets).find(assetFile => path.extname(assetFile) === '.appcache'),
       // Favicon
@@ -513,6 +531,28 @@ class HtmlWebpackPlugin {
         });
       });
     }
+
+    // process preload/prefetch assets
+    const stat = compilation.getStats().toJson();
+
+    Object.keys(stat.entrypoints).forEach((entrypointName) => {
+      const entrypoint = stat.entrypoints[entrypointName];
+      if (entrypoint.childAssets) {
+        if (Array.isArray(entrypoint.childAssets.preload)) {
+          assets.preload = assets.preload.concat(entrypoint.childAssets.preload.map(path => `${publicPath}${path}`));
+        }
+
+        if (Array.isArray(entrypoint.childAssets.prefetch)) {
+          assets.prefetch = assets.prefetch.concat(entrypoint.childAssets.prefetch.map(path => `${publicPath}${path}`));
+        }
+      }
+    });
+
+    // add entrypoints to preload list only if they do have childAssets
+    if (assets.preload.length !== 0 || assets.prefetch.length !== 0) {
+      assets.js.concat(assets.css).reverse().forEach(asset => assets.preload.unshift(asset.path));
+    }
+
     return assets;
   }
 
@@ -558,12 +598,15 @@ class HtmlWebpackPlugin {
    * @param {{
       js: {entryName: string, path: string}[],
       css: {entryName: string, path: string}[],
+      preload: Array<string>,
+      prefetch: Array<string>,
       favicon?: string
     }} assets
    *
    * @returns {{
        head: HtmlTagObject[],
-       body: HtmlTagObject[]
+       body: HtmlTagObject[],
+       prependHead: HtmlTagObject[],
      }}
    */
   generateHtmlTagObjects (assets) {
@@ -584,9 +627,29 @@ class HtmlWebpackPlugin {
         rel: 'stylesheet'
       }
     }));
+
     // Injection targets
+    let prependHead = [];
     let head = this.getMetaTags();
     let body = [];
+
+    const addResourceHintForType = type => (assetPath) => {
+      const ext = path.extname(assetPath);
+      const asType = preloadDirective[ext];
+
+      prependHead.push({
+        tagName: 'link',
+        voidTag: true,
+        attributes: {
+          href: assetPath,
+          rel: type,
+          as: asType
+        }
+      });
+    };
+
+    assets.preload.forEach(addResourceHintForType('preload'));
+    assets.prefetch.forEach(addResourceHintForType('prefetch'));
 
     // If there is a favicon present, add it to the head
     if (assets.favicon) {
@@ -607,7 +670,7 @@ class HtmlWebpackPlugin {
     } else {
       body = body.concat(scripts);
     }
-    return {head: head, body: body};
+    return {prependHead: prependHead, head: head, body: body};
   }
 
   /**
@@ -618,7 +681,8 @@ class HtmlWebpackPlugin {
    * The input html
    * @param {{
        head: HtmlTagObject[],
-       body: HtmlTagObject[]
+       body: HtmlTagObject[],
+       prependHead: HtmlTagObject[]
      }} assetTags
    * The asset tags to inject
    *
@@ -626,10 +690,12 @@ class HtmlWebpackPlugin {
    */
   injectAssetsIntoHtml (html, assets, assetTags) {
     const htmlRegExp = /(<html[^>]*>)/i;
-    const headRegExp = /(<\/head\s*>)/i;
+    const headBeginRegExp = /(<head>)/i;
+    const headEndRegExp = /(<\/head\s*>)/i;
     const bodyRegExp = /(<\/body\s*>)/i;
     const body = assetTags.body.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
-    const head = assetTags.head.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
+    const headBegin = assetTags.prependHead.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
+    const headEnd = assetTags.head.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
 
     if (body.length) {
       if (bodyRegExp.test(html)) {
@@ -641,9 +707,9 @@ class HtmlWebpackPlugin {
       }
     }
 
-    if (head.length) {
+    if (headBegin.length || headEnd.length) {
       // Create a head tag if none exists
-      if (!headRegExp.test(html)) {
+      if (!headEndRegExp.test(html)) {
         if (!htmlRegExp.test(html)) {
           html = '<head></head>' + html;
         } else {
@@ -652,7 +718,8 @@ class HtmlWebpackPlugin {
       }
 
       // Append assets to head element
-      html = html.replace(headRegExp, match => head.join('') + match);
+      html = html.replace(headBeginRegExp, match => match + headBegin.join(''));
+      html = html.replace(headEndRegExp, match => headEnd.join('') + match);
     }
 
     // Inject manifest into the opening html tag
