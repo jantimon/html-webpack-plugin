@@ -293,36 +293,101 @@ To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter 
 The [lib/hooks.js](https://github.com/jantimon/html-webpack-plugin/blob/master/lib/hooks.js) contains all information
 about which values are passed.
 
-You can tap into the following async hooks:
+[![Concept flow uml](https://raw.githubusercontent.com/jantimon/html-webpack-plugin/master/flow.png)](https://github.com/jantimon/html-webpack-plugin/blob/master/flow.puml)
 
-* `beforeHtmlGeneration`
-* `beforeHtmlProcessing`
-* `alterAssetTags`
-* `afterHtmlProcessing`
-* `afterEmit`
+#### `beforeAssetTagGeneration` hook
+
+```
+    AsyncSeriesWaterfallHook<{
+      assets: {
+        publicPath: string,
+        js: Array<{entryName: string, path: string}>,
+        css: Array<{entryName: string, path: string}>,
+        favicon?: string | undefined,
+        manifest?: string | undefined
+      },
+      outputName: string,
+      plugin: HtmlWebpackPlugin
+    }>
+```
+
+#### `alterAssetTags` hook
+
+```
+    AsyncSeriesWaterfallHook<{
+      assetTags: {
+        scripts: Array<HtmlTagObject>,
+        styles: Array<HtmlTagObject>,
+        meta: Array<HtmlTagObject>,
+      },
+      outputName: string,
+      plugin: HtmlWebpackPlugin
+    }>
+```
+
+#### `alterAssetTagGroups` hook
+
+```
+    AsyncSeriesWaterfallHook<{
+      headTags: Array<HtmlTagObject | HtmlTagObject>,
+      bodyTags: Array<HtmlTagObject | HtmlTagObject>,
+      outputName: string,
+      plugin: HtmlWebpackPlugin
+    }>
+```
+
+#### `afterTemplateExecution` hook
+
+```
+    AsyncSeriesWaterfallHook<{
+      html: string,
+      headTags: Array<HtmlTagObject | HtmlTagObject>,
+      bodyTags: Array<HtmlTagObject | HtmlTagObject>,
+      outputName: string,
+      plugin: HtmlWebpackPlugin,
+    }>
+```
+
+#### `beforeEmit` hook
+
+```
+    AsyncSeriesWaterfallHook<{
+      html: string,
+      outputName: string,
+      plugin: HtmlWebpackPlugin,
+    }>
+```
+
+#### `afterEmit` hook
+
+```
+    AsyncSeriesWaterfallHook<{
+      outputName: string,
+      plugin: HtmlWebpackPlugin
+    }>
+```
 
 Example implementation: [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
 
 **plugin.js**
 ```js
-function MyPlugin(options) {
-  // Configure your plugin with options...
-}
+class MyPlugin {
+  apply (compiler) {
+    compiler.hooks.compilation.tap('MyPlugin', (compilation) => {
+      console.log('The compiler is starting a new compilation...')
 
-MyPlugin.prototype.apply = function (compiler) {
-  compiler.hooks.compilation.tap('MyPlugin', (compilation) => {
-    console.log('The compiler is starting a new compilation...');
-
-    //                                      |      HOOK NAME   |
-    HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync(
-      'MyPlugin', // <-- Set a meaningful name here for stacktraces
-      (data, cb) => {
-        data.html += 'The Magic Footer'
-
-        cb(null, data)
-      }
-    )
-  })
+      // Staic Plugin interface |compilation |HOOK NAME | register listener 
+      HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
+        'MyPlugin', // <-- Set a meaningful name here for stacktraces
+        (data, cb) => {
+          // Manipulate the content
+          data.html += 'The Magic Footer'
+          // Tell webpack to move on
+          cb(null, data)
+        }
+      )
+    })
+  }
 }
 
 module.exports = MyPlugin
@@ -335,7 +400,7 @@ plugins: [
 ]
 ```
 
-Note that the callback must be passed the HtmlWebpackPluginData in order to pass this onto any other plugins listening on the same `html-webpack-plugin-before-html-processing` event
+Note that the callback must be passed the HtmlWebpackPluginData in order to pass this onto any other plugins listening on the same `beforeEmit` event
 
 <h2 align="center">Maintainers</h2>
 

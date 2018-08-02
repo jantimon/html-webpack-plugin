@@ -16,7 +16,7 @@ const _ = require('lodash');
 const path = require('path');
 const loaderUtils = require('loader-utils');
 
-const htmlTagObjectToString = require('./lib/html-tags').htmlTagObjectToString;
+const { createHtmlTagObject, htmlTagObjectToString } = require('./lib/html-tags');
 
 const childCompiler = require('./lib/compiler.js');
 const prettyError = require('./lib/errors.js');
@@ -71,6 +71,9 @@ class HtmlWebpackPlugin {
     // Instance variables to keep caching information
     // for multiple builds
     this.childCompilerHash = undefined;
+    /**
+     * @type {string | undefined}
+     */
     this.childCompilationOutputName = undefined;
     this.assetJson = undefined;
     this.hash = undefined;
@@ -84,6 +87,7 @@ class HtmlWebpackPlugin {
   apply (compiler) {
     const self = this;
     let isCompilationCached = false;
+    /** @type Promise<string> */
     let compilationPromise;
 
     this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
@@ -115,9 +119,6 @@ class HtmlWebpackPlugin {
         });
       });
     });
-
-    // setup hooks for third party plugins
-    compiler.hooks.compilation.tap('HtmlWebpackPluginHooks', getHtmlWebpackPluginHooks);
 
     compiler.hooks.make.tapAsync('HtmlWebpackPlugin', (compilation, callback) => {
       // Compile the template (queued)
@@ -151,8 +152,14 @@ class HtmlWebpackPlugin {
         const entryNames = Array.from(compilation.entrypoints.keys());
         const filteredEntryNames = self.filterChunks(entryNames, self.options.chunks, self.options.excludeChunks);
         const sortedEntryNames = self.sortEntryChunks(filteredEntryNames, this.options.chunksSortMode, compilation);
+        const childCompilationOutputName = self.childCompilationOutputName;
+
+        if (childCompilationOutputName === undefined) {
+          throw new Error('Did not receive child compilation result');
+        }
+
         // Turn the entry point names into file paths
-        const assets = self.htmlWebpackPluginAssets(compilation, sortedEntryNames);
+        const assets = self.htmlWebpackPluginAssets(compilation, childCompilationOutputName, sortedEntryNames);
 
         // If this is a hot update compilation, move on!
         // This solves a problem where an `index.html` file is generated for hot-update js files
@@ -169,112 +176,131 @@ class HtmlWebpackPlugin {
           self.assetJson = assetJson;
         }
 
-        Promise.resolve()
-        // Favicon
-          .then(() => {
-            if (self.options.favicon) {
-              return self.addFileToAssets(self.options.favicon, compilation)
-                .then(faviconBasename => {
-                  let publicPath = compilation.mainTemplate.getPublicPath({hash: compilation.hash}) || '';
-                  if (publicPath && publicPath.substr(-1) !== '/') {
-                    publicPath += '/';
-                  }
-                  assets.favicon = publicPath + faviconBasename;
-                });
-            }
-          })
-          // Wait for the compilation to finish
-          .then(() => compilationPromise)
+        // The html-webpack plugin uses a object representation for the html-tags which will be injected
+        // to allow altering them more easily
+        // Just before they are converted a third-party-plugin author might change the order and content
+        const assetsPromise = this.getFaviconPublicPath(this.options.favicon, compilation, assets.publicPath)
+          .then((faviconPath) => {
+            assets.favicon = faviconPath;
+            return getHtmlWebpackPluginHooks(compilation).beforeAssetTagGeneration.promise({
+              assets: assets,
+              outputName: childCompilationOutputName,
+              plugin: self
+            });
+          });
+
+        // Turn the js and css paths into grouped HtmlTagObjects
+        const assetTagGroupsPromise = assetsPromise
+          // And allow third-party-plugin authors to reorder and change the assetTags before they are grouped
+          .then(({assets}) => getHtmlWebpackPluginHooks(compilation).alterAssetTags.promise({
+            assetTags: {
+              scripts: self.generatedScriptTags(assets.js),
+              styles: self.generateStyleTags(assets.css),
+              meta: [
+                ...self.generatedMetaTags(self.options.meta),
+                ...self.generateFaviconTags(assets.favicon)
+              ]
+            },
+            outputName: childCompilationOutputName,
+            plugin: self
+          }))
+          .then(({assetTags}) => {
+            // Inject scripts to body unless it set explictly to head
+            const scriptTarget = self.options.inject === 'head' ? 'head' : 'body';
+            // Group assets to `head` and `body` tag arrays
+            const assetGroups = this.generateAssetGroups(assetTags, scriptTarget);
+            // Allow third-party-plugin authors to reorder and change the assetTags once they are grouped
+            return getHtmlWebpackPluginHooks(compilation).alterAssetTagGroups.promise({
+              headTags: assetGroups.headTags,
+              bodyTags: assetGroups.bodyTags,
+              outputName: childCompilationOutputName,
+              plugin: self
+            });
+          });
+
+        // Turn the compiled tempalte into a nodejs function or into a nodejs string
+        const templateEvaluationPromise = compilationPromise
           .then(compiledTemplate => {
-          // Allow to use a custom function / string instead
+            // Allow to use a custom function / string instead
             if (self.options.templateContent !== false) {
               return self.options.templateContent;
             }
             // Once everything is compiled evaluate the html factory
             // and replace it with its content
             return self.evaluateCompilationResult(compilation, compiledTemplate);
-          })
-          // Allow plugins to make changes to the assets before invoking the template
-          // This only makes sense to use if `inject` is `false`
-          .then(compilationResult => getHtmlWebpackPluginHooks(compilation).beforeHtmlGeneration.promise({
-            assets: assets,
-            outputName: self.childCompilationOutputName,
-            plugin: self
-          })
-            .then(() => compilationResult))
-          // Execute the template
-          .then(compilationResult => typeof compilationResult !== 'function'
-            ? compilationResult
-            : self.executeTemplate(compilationResult, assets, compilation))
-          // Allow plugins to change the html before assets are injected
-          .then(html => {
-            const pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
-            return getHtmlWebpackPluginHooks(compilation).beforeHtmlProcessing.promise(pluginArgs);
-          })
-          .then(result => {
-            const html = result.html;
-            const assets = result.assets;
-            // Prepare script and link tags
-            const assetTags = self.generateHtmlTagObjects(assets);
-            const pluginArgs = {head: assetTags.head, body: assetTags.body, plugin: self, outputName: self.childCompilationOutputName};
-            // Allow plugins to change the assetTag definitions
-            return getHtmlWebpackPluginHooks(compilation).alterAssetTags.promise(pluginArgs)
-              .then(result => self.postProcessHtml(html, assets, { body: result.body, head: result.head })
-                .then(html => _.extend(result, {html: html, assets: assets})));
-          })
-          // Allow plugins to change the html after assets are injected
-          .then(result => {
-            const html = result.html;
-            const assets = result.assets;
-            const pluginArgs = {html: html, assets: assets, plugin: self, outputName: self.childCompilationOutputName};
-            return getHtmlWebpackPluginHooks(compilation).afterHtmlProcessing.promise(pluginArgs)
-              .then(result => result.html);
-          })
-          .catch(err => {
-            // In case anything went wrong the promise is resolved
-            // with the error message and an error is logged
-            compilation.errors.push(prettyError(err, compiler.context).toString());
-            // Prevent caching
-            self.hash = null;
-            return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
-          })
-          .then(html => {
-            // Allow to use [contenthash] as placeholder for the html-webpack-plugin name
-            // From https://github.com/webpack-contrib/extract-text-webpack-plugin/blob/8de6558e33487e7606e7cd7cb2adc2cccafef272/src/index.js#L212-L214
-            const finalOutputName = self.childCompilationOutputName.replace(/\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, function () {
-              return loaderUtils.getHashDigest(html, arguments[1], arguments[2], parseInt(arguments[3], 10));
-            });
-            // Replace the compilation result with the evaluated html code
-            compilation.assets[finalOutputName] = {
-              source: () => html,
-              size: () => html.length
-            };
-            return finalOutputName;
-          })
-          .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
-            html: compilation.assets[self.childCompilationOutputName],
-            outputName: finalOutputName,
-            plugin: self
-          }).catch(err => {
-            console.error(err);
-            return null;
-          }).then(() => null))
-           // Let webpack continue with it
-          .then(() => {
-            callback();
           });
+
+        const templateExectutionPromise = Promise.all([assetsPromise, assetTagGroupsPromise, templateEvaluationPromise])
+          // Execute the template
+          .then(([assetsHookResult, assetTags, compilationResult]) => typeof compilationResult !== 'function'
+            ? compilationResult
+            : self.executeTemplate(compilationResult, assetsHookResult.assets, { headTags: assetTags.headTags, bodyTags: assetTags.bodyTags }, compilation));
+
+        const injectedHtmlPromise = Promise.all([assetTagGroupsPromise, templateExectutionPromise])
+            // Allow plugins to change the html before assets are injected
+            .then(([assetTags, html]) => {
+              const pluginArgs = {html, headTags: assetTags.headTags, bodyTags: assetTags.bodyTags, plugin: self, outputName: childCompilationOutputName};
+              return getHtmlWebpackPluginHooks(compilation).afterTemplateExecution.promise(pluginArgs);
+            })
+            .then(({html, headTags, bodyTags}) => {
+              return self.postProcessHtml(html, assets, {headTags, bodyTags});
+            });
+
+        const emitHtmlPromise = injectedHtmlPromise
+            // Allow plugins to change the html after assets are injected
+            .then((html) => {
+              const pluginArgs = {html, plugin: self, outputName: childCompilationOutputName};
+              return getHtmlWebpackPluginHooks(compilation).beforeEmit.promise(pluginArgs)
+                .then(result => result.html);
+            })
+            .catch(err => {
+              // In case anything went wrong the promise is resolved
+              // with the error message and an error is logged
+              compilation.errors.push(prettyError(err, compiler.context).toString());
+              // Prevent caching
+              self.hash = null;
+              return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
+            })
+            .then(html => {
+              // Allow to use [contenthash] as placeholder for the html-webpack-plugin name
+              // See also https://survivejs.com/webpack/optimizing/adding-hashes-to-filenames/
+              // From https://github.com/webpack-contrib/extract-text-webpack-plugin/blob/8de6558e33487e7606e7cd7cb2adc2cccafef272/src/index.js#L212-L214
+              const finalOutputName = childCompilationOutputName.replace(/\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, (_, hashType, digestType, maxLength) => {
+                return loaderUtils.getHashDigest(Buffer.from(html, 'utf8'), hashType, digestType, parseInt(maxLength, 10));
+              });
+              // Add the evaluated html code to the webpack assets
+              compilation.assets[finalOutputName] = {
+                source: () => html,
+                size: () => html.length
+              };
+              return finalOutputName;
+            })
+            .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
+              outputName: finalOutputName,
+              plugin: self
+            }).catch(err => {
+              console.error(err);
+              return null;
+            }).then(() => null));
+
+        // Once all files are added to the webpack compilation
+        // let the webpack compiler continue
+        emitHtmlPromise.then(() => {
+          callback();
+        });
       });
   }
 
   /**
    * Evaluates the child compilation result
-   * Returns a promise
+   * @param {WebpackCompilation} compilation
+   * @param {string} source
+   * @returns {Promise<string | (() => string | Promise<string>)>}
    */
   evaluateCompilationResult (compilation, source) {
     if (!source) {
       return Promise.reject('The child compilation didn\'t provide a result');
     }
-
     // The LibraryTemplatePlugin stores the template result in a local variable.
     // To extract the result during the evaluation this part has to be removed.
     source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
@@ -299,26 +325,55 @@ class HtmlWebpackPlugin {
   /**
    * Generate the template parameters for the template function
    * @param {WebpackCompilation} compilation
-   *
+   * @param {{
+      publicPath: string,
+      js: Array<{entryName: string, path: string}>,
+      css: Array<{entryName: string, path: string}>,
+      manifest?: string,
+      favicon?: string
+    }} assets
+   * @param {{
+       headTags: HtmlTagObject[],
+       bodyTags: HtmlTagObject[]
+     }} assetTags
+   * @returns {{[key: any]: any}}
    */
-  getTemplateParameters (compilation, assets) {
+  getTemplateParameters (compilation, assets, assetTags) {
+    if (this.options.templateParameters === false) {
+      return {};
+    }
     if (typeof this.options.templateParameters === 'function') {
-      return this.options.templateParameters(compilation, assets, this.options);
+      return this.options.templateParameters(compilation, assets, assetTags, this.options);
     }
     if (typeof this.options.templateParameters === 'object') {
       return this.options.templateParameters;
     }
-    return {};
+    throw new Error('templateParameters has to be either a function or an object');
   }
 
   /**
-   * Html post processing
+   * This function renders the actual html by executing the template function
+   *
+   * @param {(templatePArameters) => string | Promise<string>} templateFunction
+   * @param {{
+      publicPath: string,
+      js: Array<{entryName: string, path: string}>,
+      css: Array<{entryName: string, path: string}>,
+      manifest?: string,
+      favicon?: string
+    }} assets
+   * @param {{
+       headTags: HtmlTagObject[],
+       bodyTags: HtmlTagObject[]
+     }} assetTags
+   * @param {WebpackCompilation} compilation
    *
    * @returns Promise<string>
    */
-  executeTemplate (templateFunction, assets, compilation) {
+  executeTemplate (templateFunction, assets, assetTags, compilation) {
     // Template processing
-    const templateParams = this.getTemplateParameters(compilation, assets);
+    const templateParams = this.getTemplateParameters(compilation, assets, assetTags);
+    /** @type {string|Promise<string>} */
     let html = '';
     try {
       html = templateFunction(templateParams);
@@ -332,37 +387,38 @@ class HtmlWebpackPlugin {
   }
 
   /**
-   * Html post processing
+   * Html Post processing
    *
-   * Returns a promise
+   * @param {any} html
+   * The input html
+   * @param {any} assets
+   * @param {{
+       headTags: HtmlTagObject[],
+       bodyTags: HtmlTagObject[]
+     }} assetTags
+   * The asset tags to inject
+   *
+   * @returns {Promise<string>}
    */
   postProcessHtml (html, assets, assetTags) {
     if (typeof html !== 'string') {
       return Promise.reject('Expected html to be a string but got ' + JSON.stringify(html));
     }
-    return Promise.resolve()
-      // Inject
-      .then(() => {
-        if (this.options.inject) {
-          return this.injectAssetsIntoHtml(html, assets, assetTags);
-        } else {
-          return html;
-        }
-      })
-      // Minify
-      .then(html => {
-        if (this.options.minify) {
-          const minify = require('html-minifier').minify;
-          return minify(html, this.options.minify === true ? {} : this.options.minify);
-        }
-        return html;
-      });
+    const htmlAfterInjection = this.options.inject
+          ? this.injectAssetsIntoHtml(html, assets, assetTags)
+          : html;
+    const htmlAfterMinification = this.options.minify
+      ? require('html-minifier').minify(htmlAfterInjection, this.options.minify === true ? {} : this.options.minify)
+      : htmlAfterInjection;
+    return Promise.resolve(htmlAfterMinification);
   }
 
   /*
    * Pushes the content of the given filename to the compilation assets
    * @param {string} filename
    * @param {WebpackCompilation} compilation
+   *
+   * @returns {string} file basename
    */
   addFileToAssets (filename, compilation) {
     filename = path.resolve(compilation.compiler.context, filename);
@@ -427,8 +483,19 @@ class HtmlWebpackPlugin {
     });
   }
 
+  /**
+   * Check if the given asset object consists only of hot-update.js files
+   *
+   * @param {{
+      publicPath: string,
+      js: Array<{entryName: string, path: string}>,
+      css: Array<{entryName: string, path: string}>,
+      manifest?: string,
+      favicon?: string
+    }} assets
+   */
   isHotUpdateCompilation (assets) {
-    return assets.js.length && assets.js.every(name => /\.hot-update\.js$/.test(name));
+    return assets.js.length && assets.js.every(({entryName}) => /\.hot-update\.js$/.test(entryName));
   }
 
   /**
@@ -444,7 +511,7 @@ class HtmlWebpackPlugin {
       favicon?: string
     }}
    */
-  htmlWebpackPluginAssets (compilation, entryNames) {
+  htmlWebpackPluginAssets (compilation, childCompilationOutputName, entryNames) {
     const compilationHash = compilation.hash;
 
     /**
@@ -456,7 +523,7 @@ class HtmlWebpackPlugin {
       // If a hard coded public path exists use it
       ? compilation.mainTemplate.getPublicPath({hash: compilationHash})
       // If no public path was set get a relative url path
-      : path.relative(path.resolve(compilation.options.output.path, path.dirname(this.childCompilationOutputName)), compilation.options.output.path)
+      : path.relative(path.resolve(compilation.options.output.path, path.dirname(childCompilationOutputName)), compilation.options.output.path)
         .split(path.sep).join('/');
 
     if (publicPath.length && publicPath.substr(-1, 1) !== '/') {
@@ -524,6 +591,29 @@ class HtmlWebpackPlugin {
   }
 
   /**
+   * Converts a favicon file from disk to a webpack ressource
+   * and returns the url to the ressource
+   *
+   * @param {string|false} faviconFilePath
+   * @param {WebpackCompilation} compilation
+   * @parma {string} publicPath
+   * @returns {Promise<string|undefined>}
+   */
+  getFaviconPublicPath (faviconFilePath, compilation, publicPath) {
+    if (!faviconFilePath) {
+      return Promise.resolve(undefined);
+    }
+    return this.addFileToAssets(faviconFilePath, compilation)
+      .then((faviconName) => {
+        const faviconPath = publicPath + faviconName;
+        if (this.options.hash) {
+          return this.appendHash(faviconPath, compilation.hash);
+        }
+        return faviconPath;
+      });
+  }
+
+  /**
    * Generate meta tags
    * @returns {HtmlTagObject[]}
    */
@@ -559,73 +649,137 @@ class HtmlWebpackPlugin {
   }
 
   /**
-   * Turns the given asset information into tag object representations
-   * which is seperated into head and body
-   *
-   * @param {{
-      js: {entryName: string, path: string}[],
-      css: {entryName: string, path: string}[],
-      favicon?: string
-    }} assets
-   *
-   * @returns {{
-       head: HtmlTagObject[],
-       body: HtmlTagObject[]
-     }}
+   * Generate all tags script for the given file paths
+   * @param {Array<{ entryName: string; path: string; }>} jsAssets
+   * @returns {Array<HtmlTagObject>}
    */
-  generateHtmlTagObjects (assets) {
-    // Turn script files into script tags
-    const scripts = assets.js.map(scriptAsset => ({
+  generatedScriptTags (jsAssets) {
+    return jsAssets.map(scriptAsset => ({
       tagName: 'script',
       voidTag: false,
+      entry: scriptAsset.entryName,
       attributes: {
         src: scriptAsset.path
       }
     }));
-    // Turn css files into link tags
-    const styles = assets.css.map(styleAsset => ({
+  }
+
+  /**
+   * Generate all style tags for the given file paths
+   * @param {Array<{ entryName: string; path: string; }>} cssAssets
+   * @returns {Array<HtmlTagObject>}
+   */
+  generateStyleTags (cssAssets) {
+    return cssAssets.map(styleAsset => ({
       tagName: 'link',
       voidTag: true,
+      entry: styleAsset.entryName,
       attributes: {
         href: styleAsset.path,
         rel: 'stylesheet'
       }
     }));
-    // Injection targets
-    let head = this.getMetaTags();
-    let body = [];
+  }
 
-    // If there is a favicon present, add it to the head
-    if (assets.favicon) {
-      head.push({
-        tagName: 'link',
+  /**
+   * Generate all meta tags for the given meta configuration
+   * @param {false | {
+            [name: string]: string|false // name content pair e.g. {viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'}`
+            | {[attributeName: string]: string|boolean} // custom properties e.g. { name:"viewport" content:"width=500, initial-scale=1" }
+        }} metaOptions
+  * @returns {Array<HtmlTagObject>}
+  */
+  generatedMetaTags (metaOptions) {
+    if (metaOptions === false) {
+      return [];
+    }
+      // Make tags self-closing in case of xhtml
+      // Turn { "viewport" : "width=500, initial-scale=1" } into
+      // [{ name:"viewport" content:"width=500, initial-scale=1" }]
+    const metaTagAttributeObjects = Object.keys(metaOptions)
+      .map((metaName) => {
+        const metaTagContent = metaOptions[metaName];
+        return (typeof metaTagContent === 'string') ? {
+          name: metaName,
+          content: metaTagContent
+        } : metaTagContent;
+      })
+      .filter((attribute) => attribute !== false);
+      // Turn [{ name:"viewport" content:"width=500, initial-scale=1" }] into
+      // the html-webpack-plugin tag structure
+    return metaTagAttributeObjects.map((metaTagAttributes) => {
+      if (metaTagAttributes === false) {
+        throw new Error('Invalid meta tag');
+      }
+      return {
+        tagName: 'meta',
         voidTag: true,
-        attributes: {
-          rel: 'shortcut icon',
-          href: assets.favicon
-        }
-      });
+        attributes: metaTagAttributes
+      };
+    });
+  }
+
+  /**
+   * Generate a favicon tag for the given file path
+   * @param {string| undefined} faviconPath
+   * @returns {Array<HtmlTagObject>}
+   */
+  generateFaviconTags (faviconPath) {
+    if (!faviconPath) {
+      return [];
     }
-    // Add styles to the head
-    head = head.concat(styles);
-    // Add scripts to body or head
-    if (this.options.inject === 'head') {
-      head = head.concat(scripts);
+    return [{
+      tagName: 'link',
+      voidTag: true,
+      attributes: {
+        rel: 'shortcut icon',
+        href: faviconPath
+      }
+    }];
+  }
+
+  /**
+   * Group assets to head and bottom tags
+   *
+   * @param {{
+      scripts: Array<HtmlTagObject>;
+      styles: Array<HtmlTagObject>;
+      meta: Array<HtmlTagObject>;
+    }} assetTags
+  * @param {"body" | "head"} scriptTarget
+  * @returns {{
+      headTags: Array<HtmlTagObject>;
+      bodyTags: Array<HtmlTagObject>;
+    }}
+  */
+  generateAssetGroups (assetTags, scriptTarget) {
+    /** @type {{ headTags: Array<HtmlTagObject>; bodyTags: Array<HtmlTagObject>; }} */
+    const result = {
+      headTags: [
+        ...assetTags.meta,
+        ...assetTags.styles
+      ],
+      bodyTags: []
+    };
+    // Add script tags to head or body depending on
+    // the htmlPluginOptions
+    if (scriptTarget === 'body') {
+      result.bodyTags.push(...assetTags.scripts);
     } else {
-      body = body.concat(scripts);
+      result.headTags.push(...assetTags.scripts);
     }
-    return {head: head, body: body};
+    return result;
   }
 
   /**
    * Injects the assets into the given html string
    *
    * @param {string} html
-   * @param {any} assets
    * The input html
+   * @param {any} assets
    * @param {{
-       head: HtmlTagObject[],
-       body: HtmlTagObject[]
+       headTags: HtmlTagObject[],
+       bodyTags: HtmlTagObject[]
      }} assetTags
    * The asset tags to inject
    *
@@ -635,8 +789,8 @@ class HtmlWebpackPlugin {
     const htmlRegExp = /(<html[^>]*>)/i;
     const headRegExp = /(<\/head\s*>)/i;
     const bodyRegExp = /(<\/body\s*>)/i;
-    const body = assetTags.body.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
-    const head = assetTags.head.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
+    const body = assetTags.bodyTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
+    const head = assetTags.headTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
 
     if (body.length) {
       if (bodyRegExp.test(html)) {
@@ -720,12 +874,29 @@ class HtmlWebpackPlugin {
 /**
  * The default for options.templateParameter
  * Generate the template parameters
+ *
+ * Generate the template parameters for the template function
+ * @param {WebpackCompilation} compilation
+ * @param {{
+   publicPath: string,
+   js: Array<{entryName: string, path: string}>,
+   css: Array<{entryName: string, path: string}>,
+   manifest?: string,
+   favicon?: string
+ }} assets
+ * @param {{
+     headTags: HtmlTagObject[],
+     bodyTags: HtmlTagObject[]
+   }} assetTags
+ * @param {HtmlWebpackPluginOptions} options
+ * @returns {HtmlWebpackPluginTemplateParameter}
  */
-function templateParametersGenerator (compilation, assets, options) {
+function templateParametersGenerator (compilation, assets, assetTags, options) {
   return {
     compilation: compilation,
     webpackConfig: compilation.options,
     htmlWebpackPlugin: {
+      tags: assetTags,
       files: assets,
       options: options
     }
@@ -744,5 +915,6 @@ HtmlWebpackPlugin.version = 4;
  * Usage: HtmlWebpackPlugin.getHook(compilation, 'HookName').tap('YourPluginName', () => { ... });
  */
 HtmlWebpackPlugin.getHooks = getHtmlWebpackPluginHooks;
+HtmlWebpackPlugin.createHtmlTagObject = createHtmlTagObject;
 
 module.exports = HtmlWebpackPlugin;
