@@ -782,8 +782,7 @@ describe('HtmlWebpackPlugin', () => {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
-            expect(typeof object.body).toBe('object');
-            expect(typeof object.head).toBe('object');
+            expect(Object.keys(object.assetTags)).toEqual(['scripts', 'styles', 'meta']);
             eventFired = true;
             callback();
           });
@@ -817,9 +816,9 @@ describe('HtmlWebpackPlugin', () => {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('HtmlWebpackPluginTest', (pluginArgs, callback) => {
-            pluginArgs.body = pluginArgs.body.map(tag => {
+            pluginArgs.assetTags.scripts = pluginArgs.assetTags.scripts.map(tag => {
               if (tag.tagName === 'script') {
-                tag.attributes.async = true;
+                tag.attributes.specialAttribute = true;
               }
               return tag;
             });
@@ -842,7 +841,7 @@ describe('HtmlWebpackPlugin', () => {
         examplePlugin
       ]
     },
-    [/<body>[\s]*<script src="app_bundle.js" async><\/script>[\s]*<\/body>/],
+    [/<body>[\s]*<script src="app_bundle.js" specialAttribute><\/script>[\s]*<\/body>/],
     null, done, false, false);
   });
 
@@ -851,7 +850,7 @@ describe('HtmlWebpackPlugin', () => {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('HtmlWebpackPluginTest', (pluginArgs, callback) => {
-            pluginArgs.body = pluginArgs.body.map(tag => {
+            pluginArgs.assetTags.scripts = pluginArgs.assetTags.scripts.map(tag => {
               if (tag.tagName === 'script') {
                 tag.attributes.async = false;
               }
@@ -880,12 +879,12 @@ describe('HtmlWebpackPlugin', () => {
     null, done, false, false);
   });
 
-  it('fires the html-webpack-plugin-before-html-processing event', done => {
+  it('fires the html-webpack-plugin-after-template-execution event', done => {
     let eventFired = false;
     const examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
-          HtmlWebpackPlugin.getHooks(compilation).beforeHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
+          HtmlWebpackPlugin.getHooks(compilation).afterTemplateExecution.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             callback();
           });
@@ -914,12 +913,12 @@ describe('HtmlWebpackPlugin', () => {
     shouldExpectWarnings);
   });
 
-  it('fires the html-webpack-plugin-after-html-processing event', done => {
+  it('fires the html-webpack-plugin-before-emit event', done => {
     let eventFired = false;
     const examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
-          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
+          HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             callback();
           });
@@ -978,12 +977,12 @@ describe('HtmlWebpackPlugin', () => {
     });
   });
 
-  it('allows to modify the html during html-webpack-plugin-after-html-processing event', done => {
+  it('allows to modify the html during html-webpack-plugin-before-emit event', done => {
     let eventFired = false;
     const examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
-          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
+          HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             object.html += 'Injected by plugin';
             callback();
@@ -1013,13 +1012,50 @@ describe('HtmlWebpackPlugin', () => {
     shouldExpectWarnings);
   });
 
-  it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event by edit the given arguments object', done => {
+  it('allows to access all hooks from within a plugin', done => {
+    let hookNames;
+    const examplePlugin = {
+      apply: function (compiler) {
+        compiler.plugin('compilation', compilation => {
+          hookNames = Object.keys(HtmlWebpackPlugin.getHooks(compilation)).sort();
+        });
+      }
+    };
+
+    const shouldExpectWarnings = webpackMajorVersion < 4;
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    }, [], null, () => {
+      expect(hookNames).toEqual([
+        'afterEmit',
+        'afterTemplateExecution',
+        'alterAssetTagGroups',
+        'alterAssetTags',
+        'beforeAssetTagGeneration',
+        'beforeEmit']);
+      done();
+    }, false,
+    shouldExpectWarnings);
+  });
+
+  it('allows to modify sequentially the html during html-webpack-plugin-before-emit event by edit the given arguments object', done => {
     let eventFiredForFirstPlugin = false;
     let eventFiredForSecondPlugin = false;
     const examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
-          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
+          HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForFirstPlugin = true;
             object.html += 'Injected by first plugin';
             callback(null, object);
@@ -1030,7 +1066,7 @@ describe('HtmlWebpackPlugin', () => {
     const secondExamplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
-          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
+          HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForSecondPlugin = true;
             object.html += ' Injected by second plugin';
             callback(null);
@@ -1062,13 +1098,13 @@ describe('HtmlWebpackPlugin', () => {
     shouldExpectWarnings);
   });
 
-  it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event either by edit the given arguments object or by return a new object in the callback', done => {
+  it('allows to modify sequentially the html during html-webpack-plugin-before-emit event either by edit the given arguments object or by return a new object in the callback', done => {
     let eventFiredForFirstPlugin = false;
     let eventFiredForSecondPlugin = false;
     const examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
-          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
+          HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForFirstPlugin = true;
             const result = _.extend(object, {
               html: object.html + 'Injected by first plugin'
@@ -1081,7 +1117,7 @@ describe('HtmlWebpackPlugin', () => {
     const secondExamplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
-          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
+          HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForSecondPlugin = true;
             object.html += ' Injected by second plugin';
             callback(null);
@@ -1113,13 +1149,13 @@ describe('HtmlWebpackPlugin', () => {
     shouldExpectWarnings);
   });
 
-  it('allows to modify sequentially the html during html-webpack-plugin-after-html-processing event by return a new object in the callback', done => {
+  it('allows to modify sequentially the html during html-webpack-plugin-before-emit event by return a new object in the callback', done => {
     let eventFiredForFirstPlugin = false;
     let eventFiredForSecondPlugin = false;
     const examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
-          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
+          HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForFirstPlugin = true;
             const result = _.extend(object, {
               html: object.html + 'Injected by first plugin'
@@ -1132,7 +1168,7 @@ describe('HtmlWebpackPlugin', () => {
     const secondExamplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
-          HtmlWebpackPlugin.getHooks(compilation).afterHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
+          HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForSecondPlugin = true;
             const result = _.extend(object, {
               html: object.html + ' Injected by second plugin'
@@ -1164,14 +1200,14 @@ describe('HtmlWebpackPlugin', () => {
     });
   });
 
-  it('allows to modify the html during html-webpack-plugin-before-html-processing event', done => {
+  it('allows to modify the html during html-webpack-plugin-after-template-execution event', done => {
     let eventFired = false;
     const examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
-          HtmlWebpackPlugin.getHooks(compilation).beforeHtmlProcessing.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
+          HtmlWebpackPlugin.getHooks(compilation).afterTemplateExecution.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
-            object.assets.js.push({path: 'funky-script.js'});
+            object.bodyTags.push(HtmlWebpackPlugin.createHtmlTagObject('script', {src: 'funky-script.js'}));
             object.html += 'Injected by plugin';
             callback();
           });
@@ -1200,12 +1236,12 @@ describe('HtmlWebpackPlugin', () => {
     shouldExpectWarnings);
   });
 
-  it('allows to modify the html during html-webpack-plugin-before-html-generation event', done => {
+  it('allows to modify the html during html-webpack-plugin-before-asset-tag-generation event', done => {
     let eventFired = false;
     const examplePlugin = {
       apply: function (compiler) {
         compiler.plugin('compilation', compilation => {
-          HtmlWebpackPlugin.getHooks(compilation).beforeHtmlGeneration.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
+          HtmlWebpackPlugin.getHooks(compilation).beforeAssetTagGeneration.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             object.assets.js.push({path: 'funky-script.js'});
             callback();
@@ -1237,10 +1273,11 @@ describe('HtmlWebpackPlugin', () => {
 
   it('fires the events in the correct order', done => {
     const hookCallOrder = [
-      'beforeHtmlGeneration',
-      'beforeHtmlProcessing',
+      'beforeAssetTagGeneration',
       'alterAssetTags',
-      'afterHtmlProcessing',
+      'alterAssetTagGroups',
+      'afterTemplateExecution',
+      'beforeEmit',
       'afterEmit'
     ];
     let eventsFired = [];

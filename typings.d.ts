@@ -24,7 +24,7 @@ interface HtmlWebpackPluginOptions {
      */
     templateParameters:
       false // Pass an empty object to the template function
-      | ((compilation: any, assets, options: HtmlWebpackPluginOptions) => {})
+      | ((compilation: any, assets, assetTags: { headTags: Array<HtmlTagObject>, bodyTags: Array<HtmlTagObject> }, options: HtmlWebpackPluginOptions) => {})
       | {[option: string]: any}
     /**
      * The file to write the HTML to.
@@ -111,4 +111,28 @@ interface HtmlTagObject {
    * Inner HTML The
    */
   innerHTML?: string
+}
+
+/**
+ * The values which are available during template execution
+ *
+ * Please keep in mind that the `templateParameter` options allows to change them
+ */
+interface HtmlWebpackPluginTemplateParameter {
+  compilation: any,
+  webpackConfig: any
+  htmlWebpackPlugin: {
+    tags: {
+      headTags: HtmlTagObject[],
+      bodyTags: HtmlTagObject[]
+    },
+    files: {
+      publicPath: string,
+      js: Array<{entryName: string, path: string}>,
+      css: Array<{entryName: string, path: string}>,
+      manifest?: string,
+      favicon?: string
+    },
+    options: HtmlWebpackPluginOptions
+  }
 }
