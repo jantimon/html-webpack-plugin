@@ -65,7 +65,7 @@ The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webp
  * [html-webpack-inline-style-plugin](https://github.com/djaax/html-webpack-inline-style-plugin) for inlining styles to HTML elements using [juice](https://github.com/Automattic/juice). Useful for email generation automatisation.
  * [html-webpack-exclude-empty-assets-plugin](https://github.com/KnisterPeter/html-webpack-exclude-empty-assets-plugin) removes empty assets from being added to the html. This fixes some problems with extract-text-plugin with webpack 4.
  * [webpack-concat-plugin](https://github.com/hxlniada/webpack-concat-plugin) for concat and uglify files that needn't to be webpack bundles(for legacy files) and inject to html-webpack-plugin.
- 
+ * [html-webpack-reload-plugin](https://github.com/L-Chris/html-webpack-reload-plugin) reload browser when html changes
 
 <h2 align="center">Usage</h2>
 
