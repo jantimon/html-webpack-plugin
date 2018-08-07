@@ -50,8 +50,9 @@ function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expec
       expect(compilationWarnings).toBe('');
     }
     if (outputFile instanceof RegExp) {
+      const fileNames = Object.keys(stats.compilation.assets);
       const matches = Object.keys(stats.compilation.assets).filter(item => outputFile.test(item));
-      expect(matches.length).toBe(1);
+      expect(matches[0] || fileNames).not.toEqual(fileNames);
       outputFile = matches[0];
     }
     expect(outputFile.indexOf('[hash]') === -1).toBe(true);
@@ -627,6 +628,22 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'test-[hash].html'
       })]
     }, ['<script src="index_bundle.js"'], /test-\S+\.html$/, done);
+  });
+
+  it('will replace [contenthash] in the filename with a content hash of 32 hex characters', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        index: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({filename: 'index.[contenthash].html'})
+      ]
+    }, [], /index\.[a-f0-9]{32}\.html/, done);
   });
 
   it('allows you to use an absolute output filename', done => {
@@ -1264,7 +1281,6 @@ describe('HtmlWebpackPlugin', () => {
     }, false,
     shouldExpectWarnings);
   });
-
   it('works with commons chunk plugin', done => {
     testHtmlPlugin({
       mode: 'production',
