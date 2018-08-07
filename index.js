@@ -14,6 +14,7 @@ const vm = require('vm');
 const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
+const loaderUtils = require('loader-utils');
 
 const htmlTagObjectToString = require('./lib/html-tags').htmlTagObjectToString;
 
@@ -238,15 +239,21 @@ class HtmlWebpackPlugin {
             return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
           })
           .then(html => {
+            // Allow to use [contenthash] as placeholder for the html-webpack-plugin name
+            // From https://github.com/webpack-contrib/extract-text-webpack-plugin/blob/8de6558e33487e7606e7cd7cb2adc2cccafef272/src/index.js#L212-L214
+            const finalOutputName = self.childCompilationOutputName.replace(/\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, function () {
+              return loaderUtils.getHashDigest(html, arguments[1], arguments[2], parseInt(arguments[3], 10));
+            });
             // Replace the compilation result with the evaluated html code
-            compilation.assets[self.childCompilationOutputName] = {
+            compilation.assets[finalOutputName] = {
               source: () => html,
               size: () => html.length
             };
+            return finalOutputName;
           })
-          .then(() => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
+          .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
             html: compilation.assets[self.childCompilationOutputName],
-            outputName: self.childCompilationOutputName,
+            outputName: finalOutputName,
             plugin: self
           }).catch(err => {
             console.error(err);
