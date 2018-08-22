@@ -68,7 +68,11 @@ Although we did not specify any script tags or link tags they will be injected a
 ## Templating and variables
 
 As of 2.x blueimp was replaced by lodash/underscore/ejs templates as they are more common.
-This also removes the `o` in template variables. ` <body class="{%= o.htmlWebpackPlugin.options.environment %}">` becomes `<body class="<%= htmlWebpackPlugin.options.environment %>">` it also allows to escape variables by using `<%-` instead of `<%=` to prevent unexpected behaviours: `<body class="<%- htmlWebpackPlugin.options.environment %>">` 
+This brings the following notable changes:
+- Use of angle brackets over curly brackets: `{%= expr %}` becomes `<%= expr %>`
+- Template parameters are now exposed as local variables without the `o`: `<body class="{%= o.htmlWebpackPlugin.options.environment %}">` becomes `<body class="<%= htmlWebpackPlugin.options.environment %>">`.
+- Unescaped output is generated using `<%-`: `{%# expr }` becomes `<%- expr >%`.
+This list is non-exhaustive. Refer to the [lodash documentation](https://lodash.com/docs/#template) for details.
 
 # Loaders in templates
 Loaders may now be used inside the template the same way as you would expect in your javascript files.
