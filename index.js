@@ -239,9 +239,9 @@ class HtmlWebpackPlugin {
             return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
           })
           .then(html => {
-            // Allow to use [contenthash] as placeholder for the html-webpack-plugin name
+            // Allow to use [hashByContent] as placeholder for the html-webpack-plugin name
             // From https://github.com/webpack-contrib/extract-text-webpack-plugin/blob/8de6558e33487e7606e7cd7cb2adc2cccafef272/src/index.js#L212-L214
-            const finalOutputName = self.childCompilationOutputName.replace(/\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, function () {
+            const finalOutputName = self.childCompilationOutputName.replace(/\[(?:(\w+):)?hashByContent(?::([a-z]+\d*))?(?::(\d+))?\]/ig, function () {
               return loaderUtils.getHashDigest(html, arguments[1], arguments[2], parseInt(arguments[3], 10));
             });
             // Replace the compilation result with the evaluated html code

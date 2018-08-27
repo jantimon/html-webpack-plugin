@@ -630,7 +630,7 @@ describe('HtmlWebpackPlugin', () => {
     }, ['<script src="index_bundle.js"'], /test-\S+\.html$/, done);
   });
 
-  it('will replace [contenthash] in the filename with a content hash of 32 hex characters', done => {
+  it('will replace [hashByContent] in the filename with a content hash of 32 hex characters', done => {
     testHtmlPlugin({
       mode: 'production',
       entry: {
@@ -641,7 +641,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: '[name]_bundle.js'
       },
       plugins: [
-        new HtmlWebpackPlugin({filename: 'index.[contenthash].html'})
+        new HtmlWebpackPlugin({filename: 'index.[hashByContent].html'})
       ]
     }, [], /index\.[a-f0-9]{32}\.html/, done);
   });
