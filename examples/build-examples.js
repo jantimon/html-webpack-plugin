@@ -27,7 +27,8 @@ examples.forEach(function (exampleName) {
       }
     }));
     config.mode = 'production';
-    config.optimization = { minimizer: [] };
+    config.optimization = config.optimization || {};
+    config.optimization.minimizer = [];
   }
 
   rimraf.sync(path.join(examplePath, 'dist', 'webpack-' + webpackMajorVersion));
