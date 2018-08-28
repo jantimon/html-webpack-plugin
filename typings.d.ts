@@ -128,8 +128,8 @@ interface HtmlWebpackPluginTemplateParameter {
     },
     files: {
       publicPath: string,
-      js: Array<{entryName: string, path: string}>,
-      css: Array<{entryName: string, path: string}>,
+      js: Array<string>,
+      css: Array<string>,
       manifest?: string,
       favicon?: string
     },

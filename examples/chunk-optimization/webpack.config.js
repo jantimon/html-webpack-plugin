@@ -47,6 +47,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'entryB.html',
       chunks: ['entryB']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'entryC.html'
     })
   ]
 };

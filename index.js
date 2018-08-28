@@ -327,8 +327,8 @@ class HtmlWebpackPlugin {
    * @param {WebpackCompilation} compilation
    * @param {{
       publicPath: string,
-      js: Array<{entryName: string, path: string}>,
-      css: Array<{entryName: string, path: string}>,
+      js: Array<string>,
+      css: Array<string>,
       manifest?: string,
       favicon?: string
     }} assets
@@ -357,8 +357,8 @@ class HtmlWebpackPlugin {
    * @param {(templatePArameters) => string | Promise<string>} templateFunction
    * @param {{
       publicPath: string,
-      js: Array<{entryName: string, path: string}>,
-      css: Array<{entryName: string, path: string}>,
+      js: Array<string>,
+      css: Array<string>,
       manifest?: string,
       favicon?: string
     }} assets
@@ -488,14 +488,14 @@ class HtmlWebpackPlugin {
    *
    * @param {{
       publicPath: string,
-      js: Array<{entryName: string, path: string}>,
-      css: Array<{entryName: string, path: string}>,
+      js: Array<string>,
+      css: Array<string>,
       manifest?: string,
       favicon?: string
     }} assets
    */
   isHotUpdateCompilation (assets) {
-    return assets.js.length && assets.js.every(({entryName}) => /\.hot-update\.js$/.test(entryName));
+    return assets.js.length && assets.js.every((assetPath) => /\.hot-update\.js$/.test(assetPath));
   }
 
   /**
@@ -505,8 +505,8 @@ class HtmlWebpackPlugin {
    * @param {string[]} entryNames
    * @returns {{
       publicPath: string,
-      js: Array<{entryName: string, path: string}>,
-      css: Array<{entryName: string, path: string}>,
+      js: Array<string>,
+      css: Array<string>,
       manifest?: string,
       favicon?: string
     }}
@@ -533,8 +533,8 @@ class HtmlWebpackPlugin {
     /**
      * @type {{
         publicPath: string,
-        js: Array<{entryName: string, path: string}>,
-        css: Array<{entryName: string, path: string}>,
+        js: Array<string>,
+        css: Array<string>,
         manifest?: string,
         favicon?: string
       }}
@@ -558,6 +558,7 @@ class HtmlWebpackPlugin {
     }
 
     // Extract paths to .js and .css files from the current compilation
+    const entryPointPublicPathMap = {};
     const extensionRegexp = /\.(css|js)(\?|$)/;
     for (let i = 0; i < entryNames.length; i++) {
       const entryName = entryNames[i];
@@ -573,18 +574,21 @@ class HtmlWebpackPlugin {
             : entryPointPublicPath;
         });
 
-      entryPointPublicPaths.forEach((entryPointPublicPaths) => {
-        const extMatch = extensionRegexp.exec(entryPointPublicPaths);
+      entryPointPublicPaths.forEach((entryPointPublicPath) => {
+        const extMatch = extensionRegexp.exec(entryPointPublicPath);
         // Skip if the public path is not a .css or .js file
         if (!extMatch) {
           return;
         }
+        // Skip if this file is already known
+        // (e.g. because of common chunk optimizations)
+        if (entryPointPublicPathMap[entryPointPublicPath]) {
+          return;
+        }
+        entryPointPublicPathMap[entryPointPublicPath] = true;
         // ext will contain .js or .css
         const ext = extMatch[1];
-        assets[ext].push({
-          entryName: entryName,
-          path: entryPointPublicPaths
-        });
+        assets[ext].push(entryPointPublicPath);
       });
     }
     return assets;
@@ -650,32 +654,30 @@ class HtmlWebpackPlugin {
 
   /**
    * Generate all tags script for the given file paths
-   * @param {Array<{ entryName: string; path: string; }>} jsAssets
+   * @param {Array<string>} jsAssets
    * @returns {Array<HtmlTagObject>}
    */
   generatedScriptTags (jsAssets) {
     return jsAssets.map(scriptAsset => ({
       tagName: 'script',
       voidTag: false,
-      entry: scriptAsset.entryName,
       attributes: {
-        src: scriptAsset.path
+        src: scriptAsset
       }
     }));
   }
 
   /**
    * Generate all style tags for the given file paths
-   * @param {Array<{ entryName: string; path: string; }>} cssAssets
+   * @param {Array<string>} cssAssets
    * @returns {Array<HtmlTagObject>}
    */
   generateStyleTags (cssAssets) {
     return cssAssets.map(styleAsset => ({
       tagName: 'link',
       voidTag: true,
-      entry: styleAsset.entryName,
       attributes: {
-        href: styleAsset.path,
+        href: styleAsset,
         rel: 'stylesheet'
       }
     }));
@@ -879,8 +881,8 @@ class HtmlWebpackPlugin {
  * @param {WebpackCompilation} compilation
  * @param {{
    publicPath: string,
-   js: Array<{entryName: string, path: string}>,
-   css: Array<{entryName: string, path: string}>,
+   js: Array<string>,
+   css: Array<string>,
    manifest?: string,
    favicon?: string
  }} assets
@@ -892,6 +894,13 @@ class HtmlWebpackPlugin {
  * @returns {HtmlWebpackPluginTemplateParameter}
  */
 function templateParametersGenerator (compilation, assets, assetTags, options) {
+  const xhtml = options.xhtml;
+  assetTags.headTags.toString = function () {
+    return this.map((assetTagObject) => htmlTagObjectToString(assetTagObject, xhtml)).join('');
+  };
+  assetTags.bodyTags.toString = function () {
+    return this.map((assetTagObject) => htmlTagObjectToString(assetTagObject, xhtml)).join('');
+  };
   return {
     compilation: compilation,
     webpackConfig: compilation.options,
@@ -912,7 +921,7 @@ HtmlWebpackPlugin.version = 4;
 /**
  * A static helper to get the hooks for this plugin
  *
- * Usage: HtmlWebpackPlugin.getHook(compilation, 'HookName').tap('YourPluginName', () => { ... });
+ * Usage: HtmlWebpackPlugin.getHooks(compilation).HOOK_NAME.tapAsync('YourPluginName', () => { ... });
  */
 HtmlWebpackPlugin.getHooks = getHtmlWebpackPluginHooks;
 HtmlWebpackPlugin.createHtmlTagObject = createHtmlTagObject;

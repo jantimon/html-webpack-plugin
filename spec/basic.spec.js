@@ -1243,7 +1243,7 @@ describe('HtmlWebpackPlugin', () => {
         compiler.plugin('compilation', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).beforeAssetTagGeneration.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
-            object.assets.js.push({path: 'funky-script.js'});
+            object.assets.js.push('funky-script.js');
             callback();
           });
         });
