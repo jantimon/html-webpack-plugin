@@ -5,6 +5,6 @@ html
     title #{htmlWebpackPlugin.options.title}
   body
     each cssFile in htmlWebpackPlugin.files.css
-      style !{compilation.assets[cssFile.path.substr(htmlWebpackPlugin.files.publicPath.length)].source()}
+      style !{compilation.assets[cssFile.substr(htmlWebpackPlugin.files.publicPath.length)].source()}
     each jsFile in htmlWebpackPlugin.files.js
-      script !{compilation.assets[jsFile.path.substr(htmlWebpackPlugin.files.publicPath.length)].source()}
+      script !{compilation.assets[jsFile.substr(htmlWebpackPlugin.files.publicPath.length)].source()}

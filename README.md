@@ -301,8 +301,8 @@ about which values are passed.
     AsyncSeriesWaterfallHook<{
       assets: {
         publicPath: string,
-        js: Array<{entryName: string, path: string}>,
-        css: Array<{entryName: string, path: string}>,
+        js: Array<{string}>,
+        css: Array<{string}>,
         favicon?: string | undefined,
         manifest?: string | undefined
       },
