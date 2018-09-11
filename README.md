@@ -31,11 +31,30 @@
 ```
 
 
-
 This is a [webpack](http://webpack.js.org/) plugin that simplifies creation of HTML files to serve your `webpack` bundles. This is especially useful for `webpack` bundles that include a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you, supply
 your own template using `lodash` templates or use your own loader.
 
-### `Plugins`
+<h2 align="center">Sponsors</h2>
+
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/0/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/1/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/2/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/3/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/4/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/5/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/6/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/7/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/8/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/9/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/9/avatar.svg"></a>
+
+Thanks for supporting the ongoing improvements to the html-webpack-plugin!  
+
+<h2 align="center">Zero Config</h2>
+
+The `html-webpack-plugin` works without configuration.  
+It's a great addition to the [⚙️ webpack-config-plugins](https://github.com/namics/webpack-config-plugins/blob/master/README.md#zero-config-webpack-dev-server-example).
+
+<h2 align="center">Plugins</h2>
 
 The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webpack-plugin#events) to extend it to your needs. There are already some really powerful plugins which can be integrated with zero configuration
 
@@ -387,7 +406,7 @@ about which values are passed.
     }>
 ```
 
-Example implementation: [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
+Example implementation: [webpack-subresource-integrity](https://www.npmjs.com/package/webpack-subresource-integrity)
 
 **plugin.js**
 ```js
@@ -449,17 +468,21 @@ Note that the callback must be passed the HtmlWebpackPluginData in order to pass
 </table>
 
 
-[npm]: https://img.shields.io/npm/v/html-webpack-plugin.svg
-[npm-url]: https://npmjs.com/package/html-webpack-plugin
+## Backers
 
-[node]: https://img.shields.io/node/v/html-webpack-plugin.svg
-[node-url]: https://nodejs.org
+Thank you to all our backers!  
+If you want to support the project as well [become a sponsor](https://opencollective.com/html-webpack-plugin#sponsor) or a [a backer](https://opencollective.com/html-webpack-plugin#backer).
 
-[deps]: https://david-dm.org/jantimon/html-webpack-plugin.svg
-[deps-url]: https://david-dm.org/jantimon/html-webpack-plugin
-
-[tests]: http://img.shields.io/travis/jantimon/html-webpack-plugin.svg
-[tests-url]: https://travis-ci.org/jantimon/html-webpack-plugin
+<a href="https://opencollective.com/html-webpack-plugin/backer/0/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/0/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/1/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/1/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/2/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/2/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/3/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/3/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/4/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/4/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/5/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/5/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/6/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/6/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/7/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/7/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/8/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/8/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/9/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/9/avatar.svg?requireActive=false"></a>
 
 
 ## Contributors
@@ -473,34 +496,14 @@ This project uses the [semistandard code style](https://github.com/Flet/semistan
 <a href="https://github.com/jantimon/html-webpack-plugin/graphs/contributors"><img src="https://opencollective.com/html-webpack-plugin/contributors.svg?width=890&button=false" /></a>
 
 
-## Backers
+[npm]: https://img.shields.io/npm/v/html-webpack-plugin.svg
+[npm-url]: https://npmjs.com/package/html-webpack-plugin
 
-Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/html-webpack-plugin#backer)
+[node]: https://img.shields.io/node/v/html-webpack-plugin.svg
+[node-url]: https://nodejs.org
 
-<a href="https://opencollective.com/html-webpack-plugin/backer/0/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/0/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/1/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/1/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/2/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/2/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/3/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/3/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/4/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/4/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/5/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/5/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/6/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/6/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/7/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/7/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/8/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/8/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/9/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/9/avatar.svg?requireActive=false"></a>
+[deps]: https://david-dm.org/jantimon/html-webpack-plugin.svg
+[deps-url]: https://david-dm.org/jantimon/html-webpack-plugin
 
-## Sponsors
-
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [Become a sponsor](https://opencollective.com/html-webpack-plugin#sponsor)
-
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/0/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/0/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/1/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/1/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/2/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/2/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/3/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/3/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/4/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/4/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/5/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/5/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/6/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/6/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/7/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/7/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/8/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/8/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/9/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/9/avatar.svg"></a>
-
-
+[tests]: http://img.shields.io/travis/jantimon/html-webpack-plugin.svg
+[tests-url]: https://travis-ci.org/jantimon/html-webpack-plugin
