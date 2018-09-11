@@ -371,6 +371,11 @@ Example implementation: [html-webpack-harddisk-plugin](https://github.com/jantim
 
 **plugin.js**
 ```js
+// If your plugin is direct dependent to the html webpack plugin:
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+// If your plugins is using html-webpack-plugin you can use https://github.com/tallesl/node-safe-require
+const HtmlWebpackPlugin = require('safe-require')('html-webpack-plugin');
+
 class MyPlugin {
   apply (compiler) {
     compiler.hooks.compilation.tap('MyPlugin', (compilation) => {
