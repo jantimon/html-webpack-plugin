@@ -24,7 +24,8 @@ interface HtmlWebpackPluginOptions {
      */
     templateParameters:
       false // Pass an empty object to the template function
-      | ((compilation: any, assets, assetTags: { headTags: Array<HtmlTagObject>, bodyTags: Array<HtmlTagObject> }, options: HtmlWebpackPluginOptions) => {})
+      | ((compilation: any, assets, assetTags: { headTags: Array<HtmlTagObject>, bodyTags: Array<HtmlTagObject> }, options: HtmlWebpackPluginOptions) => {[option: string]: any})
+      | ((compilation: any, assets, assetTags: { headTags: Array<HtmlTagObject>, bodyTags: Array<HtmlTagObject> }, options: HtmlWebpackPluginOptions) => Promise<{[option: string]: any}>)
       | {[option: string]: any}
     /**
      * The file to write the HTML to.
