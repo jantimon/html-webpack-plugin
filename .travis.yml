@@ -8,9 +8,9 @@ env:
 before_install:
   - stty columns 120
 install:
-  - npm install --ignore-scripts
+  - travis_retry npm install --ignore-scripts
   - npm rm webpack
   - npm rm extract-text-webpack-plugin
   - npm install webpack@$WEBPACK_VERSION extract-text-webpack-plugin@$EXTRACT_PLUGIN_VERSION --ignore-scripts || true
 script:
-  - npm test
+  - travis_retry npm test
