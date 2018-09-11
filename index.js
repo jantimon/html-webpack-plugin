@@ -336,17 +336,20 @@ class HtmlWebpackPlugin {
        headTags: HtmlTagObject[],
        bodyTags: HtmlTagObject[]
      }} assetTags
-   * @returns {{[key: any]: any}}
+   * @returns {Promise<{[key: any]: any}>}
    */
   getTemplateParameters (compilation, assets, assetTags) {
-    if (this.options.templateParameters === false) {
-      return {};
+    const templateParameters = this.options.templateParameters;
+    if (templateParameters === false) {
+      return Promise.resolve({});
     }
-    if (typeof this.options.templateParameters === 'function') {
-      return this.options.templateParameters(compilation, assets, assetTags, this.options);
+    if (typeof templateParameters === 'function') {
+      return Promise
+        .resolve()
+        .then(() => templateParameters(compilation, assets, assetTags, this.options));
     }
-    if (typeof this.options.templateParameters === 'object') {
-      return this.options.templateParameters;
+    if (typeof templateParameters === 'object') {
+      return Promise.resolve(templateParameters);
     }
     throw new Error('templateParameters has to be either a function or an object');
   }
@@ -372,18 +375,17 @@ class HtmlWebpackPlugin {
    */
   executeTemplate (templateFunction, assets, assetTags, compilation) {
     // Template processing
-    const templateParams = this.getTemplateParameters(compilation, assets, assetTags);
-    /** @type {string|Promise<string>} */
-    let html = '';
-    try {
-      html = templateFunction(templateParams);
-    } catch (e) {
-      compilation.errors.push(new Error('Template execution failed: ' + e));
-      return Promise.reject(e);
-    }
-    // If html is a promise return the promise
-    // If html is a string turn it into a promise
-    return Promise.resolve().then(() => html);
+    const templateParamsPromise = this.getTemplateParameters(compilation, assets, assetTags);
+    return templateParamsPromise.then((templateParams) => {
+      try {
+        // If html is a promise return the promise
+        // If html is a string turn it into a promise
+        return templateFunction(templateParams);
+      } catch (e) {
+        compilation.errors.push(new Error('Template execution failed: ' + e));
+        return Promise.reject(e);
+      }
+    });
   }
 
   /**

@@ -1743,6 +1743,26 @@ describe('HtmlWebpackPlugin', () => {
     }, ['templateParams keys: "foo"'], null, done);
   });
 
+  it('should allow to set specific template parameters using a async function', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          template: path.join(__dirname, 'fixtures/templateParam.js'),
+          inject: false,
+          templateParameters: function () {
+            return Promise.resolve({ 'foo': 'bar' });
+          }
+        })
+      ]
+    }, ['templateParams keys: "foo"'], null, done);
+  });
+
   it('should not treat templateContent set to an empty string as missing', done => {
     testHtmlPlugin({
       mode: 'production',
