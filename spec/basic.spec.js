@@ -332,7 +332,7 @@ describe('HtmlWebpackPlugin', () => {
     }, [{
       type: 'chunkhash',
       chunkName: 'app',
-      containStr: '<script src="app_bundle.js'
+      containStr: '<script src="app_bundle.js"'
     }], null, done);
   });
 
@@ -351,7 +351,7 @@ describe('HtmlWebpackPlugin', () => {
         inject: false,
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
-    }, ['<body>\n</body>'], null, done);
+    }, ['<body></body>'], null, done);
   });
 
   it('allows you to specify your own HTML template function', done => {
@@ -548,7 +548,12 @@ describe('HtmlWebpackPlugin', () => {
         ]
       },
       plugins: [
-        new HtmlWebpackPlugin({xhtml: true}),
+        new HtmlWebpackPlugin({
+          xhtml: true,
+          minify: {
+            keepClosingSlash: true
+          }
+        }),
         new ExtractTextPlugin('styles.css')
       ]
     }, ['<link href="styles.css" rel="stylesheet"/>'], null, done);
@@ -841,7 +846,7 @@ describe('HtmlWebpackPlugin', () => {
         examplePlugin
       ]
     },
-    [/<body>[\s]*<script src="app_bundle.js" specialAttribute><\/script>[\s]*<\/body>/],
+    [/<body>[\s]*<script src="app_bundle.js" specialattribute><\/script>[\s]*<\/body>/],
     null, done, false, false);
   });
 
@@ -1382,7 +1387,7 @@ describe('HtmlWebpackPlugin', () => {
           }
         })
       ]
-    }, [/<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">/], null, done);
+    }, [/<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">/], null, done);
   });
 
   it('adds a meta tag with short notation', done => {
@@ -1400,7 +1405,7 @@ describe('HtmlWebpackPlugin', () => {
           }
         })
       ]
-    }, [/<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">/], null, done);
+    }, [/<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">/], null, done);
   });
 
   it('adds a favicon with publicPath set to /some/', done => {
@@ -1483,6 +1488,9 @@ describe('HtmlWebpackPlugin', () => {
         new HtmlWebpackPlugin({
           inject: true,
           xhtml: true,
+          minify: {
+            keepClosingSlash: true
+          },
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
@@ -1790,7 +1798,7 @@ describe('HtmlWebpackPlugin', () => {
         inject: 'body',
         template: path.join(__dirname, 'fixtures/spaced_plain.html')
       })]
-    }, [/<body>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/body\s>/], null, done);
+    }, [/<body>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/body>/], null, done);
   });
 
   it('allows you to inject the assets into the head of the given spaced closing tag template', done => {
@@ -1805,6 +1813,94 @@ describe('HtmlWebpackPlugin', () => {
         inject: 'head',
         template: path.join(__dirname, 'fixtures/spaced_plain.html')
       })]
-    }, [/<head>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/head\s>/], null, done);
+    }, [/<head>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/head>/], null, done);
+  });
+
+  it('should minify by default when mode is production', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, [/<!doctype html><html><head><meta charset="utf-8">/], null, done);
+  });
+
+  it('should not minify by default when mode is development', done => {
+    testHtmlPlugin({
+      mode: 'development',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, [/<!DOCTYPE html>\s+<html>\s+<head>\s+<meta charset="utf-8">/], null, done);
+  });
+
+  it('should minify in production if options.minify is true', done => {
+    testHtmlPlugin({
+      mode: 'development',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({ minify: true })]
+    }, [/<!doctype html><html><head><meta charset="utf-8">/], null, done);
+  });
+
+  it('should minify in development if options.minify is true', done => {
+    testHtmlPlugin({
+      mode: 'development',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({ minify: true })]
+    }, [/<!doctype html><html><head><meta charset="utf-8">/], null, done);
+  });
+
+  it('should not minify in production if options.minify is false', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({ minify: false })]
+    }, [/<!DOCTYPE html>\s+<html>\s+<head>\s+<meta charset="utf-8">/], null, done);
+  });
+
+  it('should not minify in development if options.minify is false', done => {
+    testHtmlPlugin({
+      mode: 'development',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({ minify: false })]
+    }, [/<!DOCTYPE html>\s+<html>\s+<head>\s+<meta charset="utf-8">/], null, done);
+  });
+
+  it('should allow custom minify options and not merge them with the defaults', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        minify: {
+          useShortDoctype: true
+        }
+      })]
+    }, [/<!doctype html>\s+<html>\s+<head>\s+<meta charset="utf-8">/], null, done);
   });
 });

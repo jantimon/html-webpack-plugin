@@ -53,7 +53,7 @@ interface HtmlWebpackPluginOptions {
      * HTML Minification options
      * @https://github.com/kangax/html-minifier#options-quick-reference
      */
-    minify: boolean | {},
+    minify: undefined | boolean | {},
     cache: boolean,
     /**
      * Render errors into the HTML page
