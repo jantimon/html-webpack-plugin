@@ -45,7 +45,7 @@ class HtmlWebpackPlugin {
       inject: true,
       compile: true,
       favicon: false,
-      minify: false,
+      minify: undefined,
       cache: true,
       showErrors: true,
       chunks: 'all',
@@ -97,6 +97,19 @@ class HtmlWebpackPlugin {
     const filename = this.options.filename;
     if (path.resolve(filename) === path.normalize(filename)) {
       this.options.filename = path.relative(compiler.options.output.path, filename);
+    }
+
+    const minify = this.options.minify;
+    if (minify === true || (minify === undefined && compiler.options.mode === 'production')) {
+      this.options.minify = {
+        // https://github.com/kangax/html-minifier#options-quick-reference
+        collapseWhitespace: true,
+        removeComments: true,
+        removeRedundantAttributes: true,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        useShortDoctype: true
+      };
     }
 
     // Clear the cache once a new HtmlWebpackPlugin is added
@@ -410,7 +423,7 @@ class HtmlWebpackPlugin {
           ? this.injectAssetsIntoHtml(html, assets, assetTags)
           : html;
     const htmlAfterMinification = this.options.minify
-      ? require('html-minifier').minify(htmlAfterInjection, this.options.minify === true ? {} : this.options.minify)
+      ? require('html-minifier').minify(htmlAfterInjection, this.options.minify)
       : htmlAfterInjection;
     return Promise.resolve(htmlAfterMinification);
   }

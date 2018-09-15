@@ -116,7 +116,7 @@ Allowed values are as follows
 |**[`inject`](#)**|`{Boolean\|String}`|`true`|`true \|\| 'head' \|\| 'body' \|\| false` Inject all assets into the given `template` or `templateContent`. When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element|
 |**[`favicon`](#)**|`{String}`|``|Adds the given favicon path to the output HTML|
 |**[`meta`](#)**|`{Object}`|`{}`|Allows to inject `meta`-tags. E.g. `meta: {viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'}`|
-|**[`minify`](#)**|`{Boolean\|Object}`|`false`|Pass [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference)'s options as object to minify the output|
+|**[`minify`](#)**|`{Boolean\|Object}`|`true` if `mode` is `'production'`, otherwise `false`|Controls if and in what ways the output should be minified. See [minification](#minification) below for more details.|
 |**[`hash`](#)**|`{Boolean}`|`false`|If `true` then append a unique `webpack` compilation hash to all included scripts and CSS files. This is useful for cache busting|
 |**[`cache`](#)**|`{Boolean}`|`true`|Emit the file only if it was changed|
 |**[`showErrors`](#)**|`{Boolean}`|`true`|Errors details will be written into the HTML page|
@@ -284,6 +284,26 @@ plugins: [
   })
 ]
 ```
+
+### Minification
+
+If the `minify` option is set to `true` (the default when webpack's `mode` is `'production'`),
+the generated HTML will be minified using [html-minifier](https://github.com/kangax/html-minifier)
+and the following options:
+
+```js
+{
+  collapseWhitespace: true,
+  removeComments: true,
+  removeRedundantAttributes: true,
+  removeScriptTypeAttributes: true,
+  removeStyleLinkTypeAttributes: true,
+  useShortDoctype: true
+}
+```
+
+To use custom [html-minifier options](https://github.com/kangax/html-minifier#options-quick-reference)
+pass an object to `minify` instead. This object will not be merged with the defaults above.
 
 ### `Events`
 
