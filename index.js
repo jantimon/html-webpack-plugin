@@ -99,8 +99,12 @@ class HtmlWebpackPlugin {
       this.options.filename = path.relative(compiler.options.output.path, filename);
     }
 
+    // Check if webpack is running in production mode
+    // @see https://github.com/webpack/webpack/blob/3366421f1784c449f415cda5930a8e445086f688/lib/WebpackOptionsDefaulter.js#L12-L14
+    const isProductionLikeMode = compiler.options.mode === 'production' || !compiler.options.mode;
+
     const minify = this.options.minify;
-    if (minify === true || (minify === undefined && compiler.options.mode === 'production')) {
+    if (minify === true || (minify === undefined && isProductionLikeMode)) {
       this.options.minify = {
         // https://github.com/kangax/html-minifier#options-quick-reference
         collapseWhitespace: true,
