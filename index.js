@@ -316,7 +316,7 @@ class HtmlWebpackPlugin {
    */
   evaluateCompilationResult (compilation, source) {
     if (!source) {
-      return Promise.reject('The child compilation didn\'t provide a result');
+      return Promise.reject(new Error('The child compilation didn\'t provide a result'));
     }
     // The LibraryTemplatePlugin stores the template result in a local variable.
     // To extract the result during the evaluation this part has to be removed.
@@ -336,7 +336,7 @@ class HtmlWebpackPlugin {
     }
     return typeof newSource === 'string' || typeof newSource === 'function'
       ? Promise.resolve(newSource)
-      : Promise.reject('The loader "' + this.options.template + '" didn\'t return html.');
+      : Promise.reject(new Error('The loader "' + this.options.template + '" didn\'t return html.'));
   }
 
   /**
@@ -421,11 +421,11 @@ class HtmlWebpackPlugin {
    */
   postProcessHtml (html, assets, assetTags) {
     if (typeof html !== 'string') {
-      return Promise.reject('Expected html to be a string but got ' + JSON.stringify(html));
+      return Promise.reject(new Error('Expected html to be a string but got ' + JSON.stringify(html)));
     }
     const htmlAfterInjection = this.options.inject
-          ? this.injectAssetsIntoHtml(html, assets, assetTags)
-          : html;
+      ? this.injectAssetsIntoHtml(html, assets, assetTags)
+      : html;
     const htmlAfterMinification = this.options.minify
       ? require('html-minifier').minify(htmlAfterInjection, this.options.minify)
       : htmlAfterInjection;
