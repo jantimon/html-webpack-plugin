@@ -406,9 +406,9 @@ class HtmlWebpackPlugin {
   isAbsolutePath (path) {
     if (!path) return false;
     // If the path start with '/'
-    if (path.indexOf("/") === 0) return true;
+    if (path.indexOf('/') === 0) return true;
     // If the path contain the '://' scheme
-    if (path.indexOf("://") !== -1) return true;
+    if (path.indexOf('://') !== -1) return true;
 
     return false;
   }
