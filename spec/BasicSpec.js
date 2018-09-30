@@ -626,6 +626,56 @@ describe('HtmlWebpackPlugin', function () {
     }, ['<script type="text/javascript" src="http://cdn.example.com/assets/index_bundle.js"'], null, done);
   });
 
+  it('allows webpack set a relative path to the public path (with ./)', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        publicPath: './some/'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, ['<script type="text/javascript" src="index_bundle.js"'], null, done);
+  });
+
+  it('allows webpack set a relative path to the public path (without ./)', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'assets/index_bundle.js',
+        publicPath: 'some/'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, ['<script type="text/javascript" src="assets/index_bundle.js"'], null, done);
+  });
+
+  it('allows webpack set a empty path to the public path', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        publicPath: ''
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, ['<script type="text/javascript" src="index_bundle.js"'], null, done);
+  });
+
+  it('allows webpack set a relative path and output html to subfolder', function (done) {
+    testHtmlPlugin({
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'assets/index_bundle.js',
+        publicPath: 'some/'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        filename: path.join('subfolder', 'test.html')
+      })]
+    }, ['<script type="text/javascript" src="../assets/index_bundle.js"'], path.join('subfolder', 'test.html'), done);
+  });
+
   it('allows you to configure the title of the generated HTML page', function (done) {
     testHtmlPlugin({
       entry: path.join(__dirname, 'fixtures/index.js'),
