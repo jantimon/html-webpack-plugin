@@ -403,12 +403,22 @@ class HtmlWebpackPlugin {
     return assets.js.length && assets.js.every(name => /\.hot-update\.js$/.test(name));
   }
 
+  isAbsolutePath (path) {
+    if (!path) return false;
+    // If the path start with '/'
+    if (path.indexOf("/") === 0) return true;
+    // If the path contain the '://' scheme
+    if (path.indexOf("://") !== -1) return true;
+
+    return false;
+  }
+
   htmlWebpackPluginAssets (compilation, chunks) {
     const self = this;
     const compilationHash = compilation.hash;
 
     // Use the configured public path or build a relative path
-    let publicPath = typeof compilation.options.output.publicPath !== 'undefined'
+    let publicPath = self.isAbsolutePath(compilation.options.output.publicPath)
       // If a hard coded public path exists use it
       ? compilation.mainTemplate.getPublicPath({hash: compilationHash})
       // If no public path was set get a relative url path
