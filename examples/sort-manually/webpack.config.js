@@ -38,6 +38,6 @@ module.exports = {
       chunksSortMode: 'manual',
       chunks: ['a', 'b', 'd']
     }),
-    new MiniCssExtractPlugin({ filename: 'style.css' })
+    new MiniCssExtractPlugin({ filename: 'styles.css' })
   ]
 };

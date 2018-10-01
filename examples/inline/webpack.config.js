@@ -26,6 +26,6 @@ module.exports = {
       favicon: 'favicon.ico',
       title: 'pug demo'
     }),
-    new MiniCssExtractPlugin({ filename: 'style.css' })
+    new MiniCssExtractPlugin({ filename: 'styles.css' })
   ]
 };
