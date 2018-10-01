@@ -22,6 +22,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'template.js'
     }),
-    new MiniCssExtractPlugin({ filename: 'style.css' })
+    new MiniCssExtractPlugin({ filename: 'styles.css' })
   ]
 };

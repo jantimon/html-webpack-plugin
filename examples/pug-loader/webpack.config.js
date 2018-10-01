@@ -25,6 +25,6 @@ module.exports = {
       template: 'template.pug',
       title: 'pug demo'
     }),
-    new MiniCssExtractPlugin({ filename: 'style.css' })
+    new MiniCssExtractPlugin({ filename: 'styles.css' })
   ]
 };

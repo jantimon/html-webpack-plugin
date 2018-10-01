@@ -29,6 +29,6 @@ module.exports = {
       favicon: 'favicon.ico',
       template: 'template.html'
     }),
-    new MiniCssExtractPlugin({ filename: 'style.css' })
+    new MiniCssExtractPlugin({ filename: 'styles.css' })
   ]
 };
