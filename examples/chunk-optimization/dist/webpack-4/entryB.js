@@ -2,8 +2,9 @@
 /******/ 	// install a JSONP callback for chunk loading
 /******/ 	function webpackJsonpCallback(data) {
 /******/ 		var chunkIds = data[0];
-/******/ 		var moreModules = data[1]
+/******/ 		var moreModules = data[1];
 /******/ 		var executeModules = data[2];
+/******/
 /******/ 		// add "moreModules" to the modules object,
 /******/ 		// then flag all "chunkIds" as loaded and fire callback
 /******/ 		var moduleId, chunkId, i = 0, resolves = [];
@@ -20,6 +21,7 @@
 /******/ 			}
 /******/ 		}
 /******/ 		if(parentJsonpFunction) parentJsonpFunction(data);
+/******/
 /******/ 		while(resolves.length) {
 /******/ 			resolves.shift()();
 /******/ 		}
@@ -34,12 +36,12 @@
 /******/ 		var result;
 /******/ 		for(var i = 0; i < deferredModules.length; i++) {
 /******/ 			var deferredModule = deferredModules[i];
-/******/ 			var fullfilled = true;
+/******/ 			var fulfilled = true;
 /******/ 			for(var j = 1; j < deferredModule.length; j++) {
 /******/ 				var depId = deferredModule[j];
-/******/ 				if(installedChunks[depId] !== 0) fullfilled = false;
+/******/ 				if(installedChunks[depId] !== 0) fulfilled = false;
 /******/ 			}
-/******/ 			if(fullfilled) {
+/******/ 			if(fulfilled) {
 /******/ 				deferredModules.splice(i--, 1);
 /******/ 				result = __webpack_require__(__webpack_require__.s = deferredModule[0]);
 /******/ 			}
@@ -51,6 +53,8 @@
 /******/ 	var installedModules = {};
 /******/
 /******/ 	// object to store loaded and loading chunks
+/******/ 	// undefined = chunk not loaded, null = chunk preloaded/prefetched
+/******/ 	// Promise = chunk loading, 0 = chunk loaded
 /******/ 	var installedChunks = {
 /******/ 		4: 0
 /******/ 	};
@@ -91,17 +95,32 @@
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
 /******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -128,18 +147,18 @@
 /******/
 /******/
 /******/ 	// add entry module to deferred list
-/******/ 	deferredModules.push([2,2,1,0]);
+/******/ 	deferredModules.push([8,0,1,2]);
 /******/ 	// run deferred modules when ready
 /******/ 	return checkDeferredModules();
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 2:
+/***/ 8:
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(1);
-var multiply = __webpack_require__(0);
+__webpack_require__(0);
+var multiply = __webpack_require__(1);
 var h1 = document.createElement('h1');
 h1.innerHTML = 'Hello world from Entry ' + multiply(1, 2);
 document.body.appendChild(h1);

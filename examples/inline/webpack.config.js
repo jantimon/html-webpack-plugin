@@ -1,6 +1,6 @@
 var path = require('path');
 var HtmlWebpackPlugin = require('../..');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 
 module.exports = {
@@ -13,7 +13,7 @@ module.exports = {
   },
   module: {
     rules: [
-      { test: /\.css$/, loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader' }) },
+      { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] },
       { test: /\.pug$/, loader: 'pug-loader' }
     ]
   },
@@ -26,6 +26,6 @@ module.exports = {
       favicon: 'favicon.ico',
       title: 'pug demo'
     }),
-    new ExtractTextPlugin('styles.css')
+    new MiniCssExtractPlugin({ filename: 'style.css' })
   ]
 };
