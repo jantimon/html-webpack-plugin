@@ -163,7 +163,7 @@ Here's an example webpack config illustrating how to use these options
 }
 ```
 
-### `Generating Multiple HTML Files`
+### Generating Multiple HTML Files
 
 To generate more than one HTML file, declare the plugin more than
 once in your plugins array
@@ -186,7 +186,7 @@ once in your plugins array
 }
 ```
 
-### `Writing Your Own Templates`
+### Writing Your Own Templates
 
 If the default generated HTML doesn't meet your needs you can supply
 your own template. The easiest way is to use the `template` option and pass a custom HTML file.
@@ -280,7 +280,7 @@ The following variables are available in the template:
   (see [the inline template example](examples/inline/template.pug)).
 
 
-### `Filtering Chunks`
+### Filtering Chunks
 
 To include only certain chunks you can limit the chunks being used
 
@@ -324,7 +324,54 @@ and the following options:
 To use custom [html-minifier options](https://github.com/kangax/html-minifier#options-quick-reference)
 pass an object to `minify` instead. This object will not be merged with the defaults above.
 
-### `Events`
+To disable minifcations during production mode set the `minfy` option to `false`.
+
+### Meta Tags
+
+If the `meta` option is set the html-webpack-plugin will inject meta tags.  
+For the default template the html-webpack-plugin will already provide a default for the `viewport` meta tag.
+
+Please take a look at this well maintained list of almost all [possible meta tags](https://github.com/joshbuchea/HEAD#meta).
+
+#### name/content meta tags 
+
+Most meta tags are configured by setting a `name` and a `content` attribute.  
+To add those use a key/value pair:
+
+**webpack.config.js**
+```js
+plugins: [
+  new HtmlWebpackPlugin({
+    'viewport': 'width=device-width, initial-scale=1, shrink-to-fit=no',
+    // Will generate: <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    'theme-color': '#4285f4'
+    // Will generate: <meta name="theme-color" content="#4285f4">
+  })
+]
+```
+
+#### Simulate http response headers
+
+The **http-equiv** attribute is essentially used to simulate a HTTP response header.  
+This format is supported using an object notation which allows you to add any attribute:
+
+**webpack.config.js**
+```js
+plugins: [
+  new HtmlWebpackPlugin({
+    'meta': {
+      'Content-Security-Policy': { 'http-equiv': 'Content-Security-Policy', 'content': 'default-src https:' },
+      // Will generate: <meta http-equiv="Content-Security-Policy" content="default-src https:">
+      // Which equals to the following http header: `Content-Security-Policy: default-src https:`
+      'set-cookie': { 'http-equiv': 'set-cookie', content: 'name=value; expires=date; path=url' },
+      // Will generate: <meta http-equiv="set-cookie" content="value; expires=date; path=url">
+      // Which equals to the following http header: `set-cookie: value; expires=date; path=url`
+    }
+  })
+]
+```
+
+### Events
 
 To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the HTML this plugin executes
 [tapable](https://github.com/webpack/tapable/tree/master) hooks.

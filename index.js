@@ -705,8 +705,10 @@ class HtmlWebpackPlugin {
   /**
    * Generate all meta tags for the given meta configuration
    * @param {false | {
-            [name: string]: string|false // name content pair e.g. {viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'}`
-            | {[attributeName: string]: string|boolean} // custom properties e.g. { name:"viewport" content:"width=500, initial-scale=1" }
+            [name: string]:
+              false // disabled
+              | string // name content pair e.g. {viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'}`
+              | {[attributeName: string]: string|boolean} // custom properties e.g. { name:"viewport" content:"width=500, initial-scale=1" }
         }} metaOptions
   * @returns {Array<HtmlTagObject>}
   */
