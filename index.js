@@ -279,10 +279,10 @@ class HtmlWebpackPlugin {
               return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
             })
             .then(html => {
-              // Allow to use [contenthash] as placeholder for the html-webpack-plugin name
+              // Allow to use [templatehash] as placeholder for the html-webpack-plugin name
               // See also https://survivejs.com/webpack/optimizing/adding-hashes-to-filenames/
               // From https://github.com/webpack-contrib/extract-text-webpack-plugin/blob/8de6558e33487e7606e7cd7cb2adc2cccafef272/src/index.js#L212-L214
-              const finalOutputName = childCompilationOutputName.replace(/\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, (_, hashType, digestType, maxLength) => {
+              const finalOutputName = childCompilationOutputName.replace(/\[(?:(\w+):)?templatehash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, (_, hashType, digestType, maxLength) => {
                 return loaderUtils.getHashDigest(Buffer.from(html, 'utf8'), hashType, digestType, parseInt(maxLength, 10));
               });
               // Add the evaluated html code to the webpack assets
