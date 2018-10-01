@@ -1,7 +1,7 @@
 var path = require('path');
 var AppCachePlugin = require('appcache-webpack-plugin');
 var HtmlWebpackPlugin = require('../..');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 
 module.exports = {
@@ -14,7 +14,7 @@ module.exports = {
   },
   module: {
     rules: [
-      { test: /\.css$/, loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader' }) },
+      { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] },
       { test: /\.png$/, loader: 'file-loader' },
       { test: /\.html$/, loader: 'html-loader?-removeOptionalTags' }
     ]
@@ -29,6 +29,6 @@ module.exports = {
         collapseWhitespace: true
       }
     }),
-    new ExtractTextPlugin('styles.css')
+    new MiniCssExtractPlugin({ filename: 'styles.css' })
   ]
 };

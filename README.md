@@ -218,7 +218,7 @@ plugins: [
 ```
 
 If you already have a template loader, you can use it to parse the template.
-Please note that this will also happen if you specifiy the html-loader and use `.html` file as template.
+Please note that this will also happen if you specify the html-loader and use `.html` file as template.
 
 **webpack.config.js**
 ```js

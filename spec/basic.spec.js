@@ -10,22 +10,13 @@ const fs = require('fs');
 const webpack = require('webpack');
 const rimraf = require('rimraf');
 const _ = require('lodash');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const extractTextPluginMajorVersion = require('extract-text-webpack-plugin/package.json').version.split('.')[0];
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpackMajorVersion = Number(require('webpack/package.json').version.split('.')[0]);
 if (isNaN(webpackMajorVersion)) {
   throw new Error('Cannot parse webpack major version');
 }
 
 const HtmlWebpackPlugin = require('../index.js');
-
-if (Number(extractTextPluginMajorVersion) > 1) {
-  const extractOriginal = ExtractTextPlugin.extract;
-  ExtractTextPlugin.extract = (fallback, use) => extractOriginal({
-    fallback: fallback,
-    use: use
-  });
-}
 
 const OUTPUT_DIR = path.resolve(__dirname, '../dist/basic-spec');
 
@@ -443,12 +434,12 @@ describe('HtmlWebpackPlugin', () => {
       },
       module: {
         rules: [
-          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
         ]
       },
       plugins: [
         new HtmlWebpackPlugin(),
-        new ExtractTextPlugin('styles.css')
+        new MiniCssExtractPlugin({filename: 'styles.css'})
       ]
     }, ['<link href="styles.css" rel="stylesheet">'], null, done);
   });
@@ -464,12 +455,12 @@ describe('HtmlWebpackPlugin', () => {
       },
       module: {
         rules: [
-          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
         ]
       },
       plugins: [
         new HtmlWebpackPlugin(),
-        new ExtractTextPlugin('styles.css')
+        new MiniCssExtractPlugin({filename: 'styles.css'})
       ]
     }, ['<link href="//localhost:8080/styles.css"'], null, done);
   });
@@ -484,12 +475,12 @@ describe('HtmlWebpackPlugin', () => {
       },
       module: {
         rules: [
-          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
         ]
       },
       plugins: [
         new HtmlWebpackPlugin({hash: true}),
-        new ExtractTextPlugin('styles.css')
+        new MiniCssExtractPlugin({filename: 'styles.css'})
       ]
     }, ['<link href="styles.css?%hash%"'], null, done);
   });
@@ -504,12 +495,12 @@ describe('HtmlWebpackPlugin', () => {
       },
       module: {
         rules: [
-          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
         ]
       },
       plugins: [
         new HtmlWebpackPlugin({inject: true}),
-        new ExtractTextPlugin('styles.css')
+        new MiniCssExtractPlugin({filename: 'styles.css'})
       ]
     }, ['<link href="styles.css"'], null, done);
   });
@@ -524,12 +515,12 @@ describe('HtmlWebpackPlugin', () => {
       },
       module: {
         rules: [
-          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
         ]
       },
       plugins: [
         new HtmlWebpackPlugin({hash: true, inject: true}),
-        new ExtractTextPlugin('styles.css')
+        new MiniCssExtractPlugin({filename: 'styles.css'})
       ]
     }, ['<link href="styles.css?%hash%"'], null, done);
   });
@@ -544,7 +535,7 @@ describe('HtmlWebpackPlugin', () => {
       },
       module: {
         rules: [
-          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
         ]
       },
       plugins: [
@@ -554,7 +545,7 @@ describe('HtmlWebpackPlugin', () => {
             keepClosingSlash: true
           }
         }),
-        new ExtractTextPlugin('styles.css')
+        new MiniCssExtractPlugin({filename: 'styles.css'})
       ]
     }, ['<link href="styles.css" rel="stylesheet"/>'], null, done);
   });
@@ -755,12 +746,12 @@ describe('HtmlWebpackPlugin', () => {
       },
       module: {
         rules: [
-          { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') }
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
         ]
       },
       plugins: [
         new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/empty_html.html')}),
-        new ExtractTextPlugin('styles.css')
+        new MiniCssExtractPlugin({filename: 'styles.css'})
       ]
     }, ['<link href="styles.css"', '<script src="index_bundle.js"'], null, done);
   });
