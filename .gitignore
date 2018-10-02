@@ -1,4 +1,4 @@
-/node_modules/
-/dist/
-/coverage/
+node_modules/
+dist/
+coverage/
 npm-debug.*.log
