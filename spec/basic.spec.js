@@ -626,6 +626,38 @@ describe('HtmlWebpackPlugin', () => {
     }, ['<script src="index_bundle.js"'], /test-\S+\.html$/, done);
   });
 
+  it('should allow filename in the format of [<hashType>:contenthash:<digestType>:<length>]', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        index: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({filename: 'index.[sha256:contenthash:base32:32].html'})
+      ]
+    }, [], /index\.[a-z0-9]{32}\.html/, done);
+  });
+
+  it('will replace [contenthash] in the filename with a content hash of 32 hex characters', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        index: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({filename: 'index.[contenthash].html'})
+      ]
+    }, [], /index\.[a-f0-9]{32}\.html/, done);
+  });
+
   it('will replace [templatehash] in the filename with a content hash of 32 hex characters', done => {
     testHtmlPlugin({
       mode: 'production',

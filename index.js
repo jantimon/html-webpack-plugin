@@ -99,6 +99,16 @@ class HtmlWebpackPlugin {
       this.options.filename = path.relative(compiler.options.output.path, filename);
     }
 
+    // `contenthash` is introduced in webpack v4.3
+    // which conflicts with the plugin's existing `contenthash` method, hence
+    // hence is renmaed to `templatehash` to avoid such conflicts
+    const REGEXP_CONTENTHASH = /\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig;
+    if (REGEXP_CONTENTHASH.test(this.options.filename)) {
+      this.options.filename = this.options.filename.replace(REGEXP_CONTENTHASH, (match) => {
+        return match.replace('contenthash', 'templatehash');
+      });
+    }
+
     // Check if webpack is running in production mode
     // @see https://github.com/webpack/webpack/blob/3366421f1784c449f415cda5930a8e445086f688/lib/WebpackOptionsDefaulter.js#L12-L14
     const isProductionLikeMode = compiler.options.mode === 'production' || !compiler.options.mode;
@@ -279,10 +289,11 @@ class HtmlWebpackPlugin {
               return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
             })
             .then(html => {
+              const REGEXP_TEMPLATEHASH = /\[(?:(\w+):)?templatehash(?::([a-z]+\d*))?(?::(\d+))?\]/ig;
               // Allow to use [templatehash] as placeholder for the html-webpack-plugin name
               // See also https://survivejs.com/webpack/optimizing/adding-hashes-to-filenames/
               // From https://github.com/webpack-contrib/extract-text-webpack-plugin/blob/8de6558e33487e7606e7cd7cb2adc2cccafef272/src/index.js#L212-L214
-              const finalOutputName = childCompilationOutputName.replace(/\[(?:(\w+):)?templatehash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, (_, hashType, digestType, maxLength) => {
+              const finalOutputName = childCompilationOutputName.replace(REGEXP_TEMPLATEHASH, (_, hashType, digestType, maxLength) => {
                 return loaderUtils.getHashDigest(Buffer.from(html, 'utf8'), hashType, digestType, parseInt(maxLength, 10));
               });
               // Add the evaluated html code to the webpack assets
