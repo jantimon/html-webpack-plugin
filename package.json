@@ -11,7 +11,7 @@
     "default_index.ejs"
   ],
   "scripts": {
-    "pretest": "semistandard",
+    "pretest": "npm run build-examples && semistandard",
     "posttest": "tsc",
     "commit": "git-cz",
     "build-examples": "node examples/build-examples.js",
