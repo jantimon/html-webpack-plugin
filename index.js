@@ -518,7 +518,7 @@ class HtmlWebpackPlugin {
   }
 
   /**
-   * Check the path is a absolute url path
+   * Return true if PATH is an absolute url path, otherwise false
    *
    * @param {string | undefined} path
    */
@@ -554,7 +554,7 @@ class HtmlWebpackPlugin {
      * fallback to a realtive path
      */
     let publicPath = this.isAbsolutePath(compilation.options.output.publicPath)
-      // If a absolute path is set in the publicPath use it
+      // If the absolute path is set in the publicPath use it
       ? compilation.mainTemplate.getPublicPath({hash: compilationHash})
       // If publicPath was a relative path get the realtive path
       : path.relative(path.resolve(compilation.options.output.path, path.dirname(childCompilationOutputName)), compilation.options.output.path)
