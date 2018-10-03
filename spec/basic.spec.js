@@ -485,6 +485,51 @@ describe('HtmlWebpackPlugin', () => {
     }, ['<link href="styles.css?%hash%"'], null, done);
   });
 
+  it('should allow to add cache hashes to with the css assets', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        publicPath: 'some/'
+      },
+      module: {
+        rules: [
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({hash: true}),
+        new MiniCssExtractPlugin({filename: 'styles.css'})
+      ]
+    }, ['<link href="styles.css?%hash%"'], null, done);
+  });
+
+  it('should allow to add cache hashes to with the css assets', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        publicPath: 'some/'
+      },
+      module: {
+        rules: [
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          hash: true,
+          filename: path.resolve(OUTPUT_DIR, 'subfolder', 'test.html')
+        }),
+        new MiniCssExtractPlugin({filename: 'styles.css'})
+      ]
+    }, ['<link href="../styles.css?%hash%"'], path.join('subfolder', 'test.html'), done);
+  });
+
   it('should inject css files when using the extract text plugin', done => {
     testHtmlPlugin({
       mode: 'production',
@@ -550,6 +595,19 @@ describe('HtmlWebpackPlugin', () => {
     }, ['<link href="styles.css" rel="stylesheet"/>'], null, done);
   });
 
+  it('prepends the webpack public path to relative path', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        publicPath: 'assets/'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, ['<script src="index_bundle.js"'], null, done);
+  });
+
   it('prepends the webpack public path to script src', done => {
     testHtmlPlugin({
       mode: 'production',
@@ -575,7 +633,35 @@ describe('HtmlWebpackPlugin', () => {
     }, ['<script src="assets/index_bundle.js"'], null, done);
   });
 
-  it('handles subdirectories in the webpack output bundles along with a public path', done => {
+  it('handles subdirectories in the webpack output bundles along with a relative path', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'assets/index_bundle.js',
+        publicPath: 'some/'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, ['<script src="assets/index_bundle.js"'], null, done);
+  });
+
+  it('handles subdirectories in the webpack output bundles along with a relative path', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'assets/index_bundle.js',
+        publicPath: 'some/'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        filename: path.resolve(OUTPUT_DIR, 'subfolder', 'test.html')
+      })]
+    }, ['<script src="../assets/index_bundle.js"'], path.join('subfolder', 'test.html'), done);
+  });
+
+  it('handles subdirectories in the webpack output bundles along with a absolute path', done => {
     testHtmlPlugin({
       mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
@@ -1433,7 +1519,42 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<link rel="shortcut icon" href="\/some\/+[^"]+\.ico">/], null, done);
   });
 
-  it('adds a favicon with a publichPath set to [hash]/ and replaces the hash', done => {
+  it('adds a favicon with publicPath set to some/', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        publicPath: 'some/',
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          favicon: path.join(__dirname, 'fixtures/favicon.ico')
+        })
+      ]
+    }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+  });
+
+  it('adds a favicon with publicPath set to some/', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        publicPath: 'some/',
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          favicon: path.join(__dirname, 'fixtures/favicon.ico'),
+          filename: path.resolve(OUTPUT_DIR, 'subfolder', 'test.html')
+        })
+      ]
+    }, [/<link rel="shortcut icon" href="\.\.\/[^"]+\.ico">/], path.join('subfolder', 'test.html'), done);
+  });
+
+  it('adds a favicon with a publichPath set to /[hash]/ and replaces the hash', done => {
     testHtmlPlugin({
       mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
@@ -1448,6 +1569,23 @@ describe('HtmlWebpackPlugin', () => {
         })
       ]
     }, [/<link rel="shortcut icon" href="\/[a-z0-9]{20}\/favicon\.ico">/], null, done);
+  });
+
+  it('adds a favicon with a publichPath set to [hash]/ and replaces the hash', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        publicPath: '[hash]/',
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          favicon: path.join(__dirname, 'fixtures/favicon.ico')
+        })
+      ]
+    }, [/<link rel="shortcut icon" href="favicon\.ico">/], null, done);
   });
 
   it('adds a favicon with inject enabled', done => {
