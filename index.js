@@ -261,51 +261,51 @@ class HtmlWebpackPlugin {
             : self.executeTemplate(compilationResult, assetsHookResult.assets, { headTags: assetTags.headTags, bodyTags: assetTags.bodyTags }, compilation));
 
         const injectedHtmlPromise = Promise.all([assetTagGroupsPromise, templateExectutionPromise])
-            // Allow plugins to change the html before assets are injected
-            .then(([assetTags, html]) => {
-              const pluginArgs = {html, headTags: assetTags.headTags, bodyTags: assetTags.bodyTags, plugin: self, outputName: childCompilationOutputName};
-              return getHtmlWebpackPluginHooks(compilation).afterTemplateExecution.promise(pluginArgs);
-            })
-            .then(({html, headTags, bodyTags}) => {
-              return self.postProcessHtml(html, assets, {headTags, bodyTags});
-            });
+          // Allow plugins to change the html before assets are injected
+          .then(([assetTags, html]) => {
+            const pluginArgs = {html, headTags: assetTags.headTags, bodyTags: assetTags.bodyTags, plugin: self, outputName: childCompilationOutputName};
+            return getHtmlWebpackPluginHooks(compilation).afterTemplateExecution.promise(pluginArgs);
+          })
+          .then(({html, headTags, bodyTags}) => {
+            return self.postProcessHtml(html, assets, {headTags, bodyTags});
+          });
 
         const emitHtmlPromise = injectedHtmlPromise
-            // Allow plugins to change the html after assets are injected
-            .then((html) => {
-              const pluginArgs = {html, plugin: self, outputName: childCompilationOutputName};
-              return getHtmlWebpackPluginHooks(compilation).beforeEmit.promise(pluginArgs)
-                .then(result => result.html);
-            })
-            .catch(err => {
-              // In case anything went wrong the promise is resolved
-              // with the error message and an error is logged
-              compilation.errors.push(prettyError(err, compiler.context).toString());
-              // Prevent caching
-              self.hash = null;
-              return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
-            })
-            .then(html => {
-              // Allow to use [templatehash] as placeholder for the html-webpack-plugin name
-              // See also https://survivejs.com/webpack/optimizing/adding-hashes-to-filenames/
-              // From https://github.com/webpack-contrib/extract-text-webpack-plugin/blob/8de6558e33487e7606e7cd7cb2adc2cccafef272/src/index.js#L212-L214
-              const finalOutputName = childCompilationOutputName.replace(/\[(?:(\w+):)?templatehash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, (_, hashType, digestType, maxLength) => {
-                return loaderUtils.getHashDigest(Buffer.from(html, 'utf8'), hashType, digestType, parseInt(maxLength, 10));
-              });
+          // Allow plugins to change the html after assets are injected
+          .then((html) => {
+            const pluginArgs = {html, plugin: self, outputName: childCompilationOutputName};
+            return getHtmlWebpackPluginHooks(compilation).beforeEmit.promise(pluginArgs)
+              .then(result => result.html);
+          })
+          .catch(err => {
+            // In case anything went wrong the promise is resolved
+            // with the error message and an error is logged
+            compilation.errors.push(prettyError(err, compiler.context).toString());
+            // Prevent caching
+            self.hash = null;
+            return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
+          })
+          .then(html => {
+            // Allow to use [templatehash] as placeholder for the html-webpack-plugin name
+            // See also https://survivejs.com/webpack/optimizing/adding-hashes-to-filenames/
+            // From https://github.com/webpack-contrib/extract-text-webpack-plugin/blob/8de6558e33487e7606e7cd7cb2adc2cccafef272/src/index.js#L212-L214
+            const finalOutputName = childCompilationOutputName.replace(/\[(?:(\w+):)?templatehash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, (_, hashType, digestType, maxLength) => {
+              return loaderUtils.getHashDigest(Buffer.from(html, 'utf8'), hashType, digestType, parseInt(maxLength, 10));
+            });
               // Add the evaluated html code to the webpack assets
-              compilation.assets[finalOutputName] = {
-                source: () => html,
-                size: () => html.length
-              };
-              return finalOutputName;
-            })
-            .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
-              outputName: finalOutputName,
-              plugin: self
-            }).catch(err => {
-              console.error(err);
-              return null;
-            }).then(() => null));
+            compilation.assets[finalOutputName] = {
+              source: () => html,
+              size: () => html.length
+            };
+            return finalOutputName;
+          })
+          .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
+            outputName: finalOutputName,
+            plugin: self
+          }).catch(err => {
+            console.error(err);
+            return null;
+          }).then(() => null));
 
         // Once all files are added to the webpack compilation
         // let the webpack compiler continue
@@ -671,14 +671,14 @@ class HtmlWebpackPlugin {
     // Turn { "viewport" : "width=500, initial-scale=1" } into
     // [{ name:"viewport" content:"width=500, initial-scale=1" }]
     const metaTagAttributeObjects = Object.keys(metaOptions)
-    .map((metaName) => {
-      const metaTagContent = metaOptions[metaName];
-      return (typeof metaTagContent === 'string') ? {
-        name: metaName,
-        content: metaTagContent
-      } : metaTagContent;
-    })
-    .filter((attribute) => attribute !== false);
+      .map((metaName) => {
+        const metaTagContent = metaOptions[metaName];
+        return (typeof metaTagContent === 'string') ? {
+          name: metaName,
+          content: metaTagContent
+        } : metaTagContent;
+      })
+      .filter((attribute) => attribute !== false);
     // Turn [{ name:"viewport" content:"width=500, initial-scale=1" }] into
     // the html-webpack-plugin tag structure
     return metaTagAttributeObjects.map((metaTagAttributes) => {
@@ -738,9 +738,9 @@ class HtmlWebpackPlugin {
     if (metaOptions === false) {
       return [];
     }
-      // Make tags self-closing in case of xhtml
-      // Turn { "viewport" : "width=500, initial-scale=1" } into
-      // [{ name:"viewport" content:"width=500, initial-scale=1" }]
+    // Make tags self-closing in case of xhtml
+    // Turn { "viewport" : "width=500, initial-scale=1" } into
+    // [{ name:"viewport" content:"width=500, initial-scale=1" }]
     const metaTagAttributeObjects = Object.keys(metaOptions)
       .map((metaName) => {
         const metaTagContent = metaOptions[metaName];

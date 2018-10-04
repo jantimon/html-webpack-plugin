@@ -30,6 +30,7 @@ By default (if you don't specify any loader in any way) a [fallback lodash loade
   ]
 }
 ```
+
 Be aware, using `.html` as your template extention may unexpectedly trigger another loader.
 
 ## 2) Setting a loader directly for the template
