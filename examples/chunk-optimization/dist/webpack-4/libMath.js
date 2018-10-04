@@ -3,7 +3,7 @@
 /***/ 1:
 /***/ (function(module, exports, __webpack_require__) {
 
-var sum = __webpack_require__(6);
+var sum = __webpack_require__(7);
 module.exports = function multiply (a, b) {
   var m = 0;
   for (var i = 0; i < a; i = sum(i, 1)) {
@@ -15,7 +15,7 @@ module.exports = function multiply (a, b) {
 
 /***/ }),
 
-/***/ 6:
+/***/ 7:
 /***/ (function(module, exports) {
 
 module.exports = function sum (a, b) {
