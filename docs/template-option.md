@@ -36,7 +36,7 @@ Be aware, using `.html` as your template extention may unexpectedly trigger anot
 
 ```js
 new HtmlWebpackPlugin({
-  // For details on `!!` see https://webpack.github.io/docs/loaders.html#loader-order
+  // For details on `!!` see https://webpack.js.org/concepts/loaders/#loader-features
   template: '!!handlebars!src/index.hbs'
 })
 ```
