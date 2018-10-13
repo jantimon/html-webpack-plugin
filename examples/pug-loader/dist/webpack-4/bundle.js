@@ -92,7 +92,7 @@
 
 __webpack_require__(1);
 // Use the same template for the frontend code
-var template = __webpack_require__(3);
+var template = __webpack_require__(2);
 
 setInterval(function () {
   var div = document.getElementById('main');
@@ -108,17 +108,16 @@ setInterval(function () {
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 2 */,
-/* 3 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var pug = __webpack_require__(4);
+var pug = __webpack_require__(3);
 
 function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (time) {pug_html = pug_html + "\u003C!-- this partial is used for frontend and backend--\u003E\u003Cdiv class=\"time\"\u003E \u003Cb\u003ECurrent time\u003C\u002Fb\u003E\u003Cp\u003E" + (pug.escape(null == (pug_interp = time.toISOString()) ? "" : pug_interp)) + "\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cimg src=\"#{require('.\u002Flogo.png')}\"\u003E";}.call(this,"time" in locals_for_with?locals_for_with.time:typeof time!=="undefined"?time:undefined));;return pug_html;};
 module.exports = template;
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -351,7 +350,7 @@ function pug_rethrow(err, filename, lineno, str){
     throw err;
   }
   try {
-    str = str || __webpack_require__(5).readFileSync(filename, 'utf8')
+    str = str || __webpack_require__(4).readFileSync(filename, 'utf8')
   } catch (ex) {
     pug_rethrow(err, null, lineno)
   }
@@ -378,7 +377,7 @@ function pug_rethrow(err, filename, lineno, str){
 
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
