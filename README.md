@@ -495,7 +495,8 @@ Example implementation: [webpack-subresource-integrity](https://www.npmjs.com/pa
 ```js
 // If your plugin is direct dependent to the html webpack plugin:
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-// If your plugins is using html-webpack-plugin you can use https://github.com/tallesl/node-safe-require
+// If your plugin is using html-webpack-plugin as an optional dependency
+// you can use https://github.com/tallesl/node-safe-require instead:
 const HtmlWebpackPlugin = require('safe-require')('html-webpack-plugin');
 
 class MyPlugin {
