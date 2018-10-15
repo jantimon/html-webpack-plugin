@@ -1,14 +1,15 @@
 {
   "name": "html-webpack-plugin",
-  "version": "4.0.0-beta",
+  "version": "4.0.0-beta.2",
   "license": "MIT",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
-  "author": "Charles Blaxland <charles.blaxland@gmail.com> (https://github.com/ampedandwired)",
+  "author": "Jan Nicklas <j.nicklas@me.com> (https://github.com/jantimon)",
   "main": "index.js",
   "files": [
     "lib/",
     "index.js",
-    "default_index.ejs"
+    "default_index.ejs",
+    "typings.d.ts"
   ],
   "scripts": {
     "pretest": "semistandard",
