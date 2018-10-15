@@ -84,7 +84,7 @@ The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webp
  * [html-webpack-inline-style-plugin](https://github.com/djaax/html-webpack-inline-style-plugin) for inlining styles to HTML elements using [juice](https://github.com/Automattic/juice). Useful for email generation automatisation.
  * [html-webpack-exclude-empty-assets-plugin](https://github.com/KnisterPeter/html-webpack-exclude-empty-assets-plugin) removes empty assets from being added to the html. This fixes some problems with extract-text-plugin with webpack 4.
  * [webpack-concat-plugin](https://github.com/hxlniada/webpack-concat-plugin) for concat and uglify files that needn't to be webpack bundles(for legacy files) and inject to html-webpack-plugin.
- * [html-webpack-link-type-plugin](https://github.com/steadyapp/html-webpack-link-type-plugin) adds a configurable mimetype to resources injected as links (such as adding type="text/css" to external stylesheets) for compatability with "strict mode". 
+ * [html-webpack-link-type-plugin](https://github.com/steadyapp/html-webpack-link-type-plugin) adds a configurable mimetype to resources injected as links (such as adding type="text/css" to external stylesheets) for compatibility with "strict mode". 
  
  * [csp-html-webpack-plugin](https://github.com/slackhq/csp-html-webpack-plugin) to add [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) meta tags to the HTML output
 
@@ -336,7 +336,7 @@ and the following options:
 To use custom [html-minifier options](https://github.com/kangax/html-minifier#options-quick-reference)
 pass an object to `minify` instead. This object will not be merged with the defaults above.
 
-To disable minifcations during production mode set the `minfy` option to `false`.
+To disable minifcation during production mode set the `minfy` option to `false`.
 
 ### Meta Tags
 
@@ -382,6 +382,30 @@ plugins: [
   })
 ]
 ```
+
+### Long Term Caching
+
+For long term caching add `contenthash/templatehash` to the filename.
+
+**Example:**
+
+```js
+plugins: [
+  new HtmlWebpackPlugin({
+    filename: 'index.[contenthash].html'
+  })
+]
+```
+
+`contenthash/templatehash` is the hash of the content of the output file.
+
+Optionally, You can configure like `[<hashType>:contenthash:<digestType>:<length>]`
+
+* `hashType` - one of `sha1`, `md5`, `sha256`, `sha512`  or any other node.js supported hash type
+* `digestType` - one of `hex`, `base26`, `base32`, `base36`, `base49`, `base52`, `base58`, `base62`, `base64`
+* `length` - the length of the hash in chars
+
+**Defaults:** `[md5:contenthash:hex:9999]`
 
 ### Events
 
