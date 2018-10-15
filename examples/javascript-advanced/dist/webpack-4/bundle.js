@@ -88,7 +88,7 @@
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("__webpack_require__(1);\n\nvar universal = __webpack_require__(3);\nvar h1 = document.createElement('h1');\nh1.innerHTML = universal();\n\ndocument.body.appendChild(h1);\n\n\n//# sourceURL=webpack:///./example.js?");
+eval("__webpack_require__(1);\n\nvar universal = __webpack_require__(2);\nvar h1 = document.createElement('h1');\nh1.innerHTML = universal();\n\ndocument.body.appendChild(h1);\n\n\n//# sourceURL=webpack:///./example.js?");
 
 /***/ }),
 /* 1 */
@@ -97,8 +97,7 @@ eval("__webpack_require__(1);\n\nvar universal = __webpack_require__(3);\nvar h1
 eval("// extracted by mini-css-extract-plugin\n\n//# sourceURL=webpack:///./main.css?");
 
 /***/ }),
-/* 2 */,
-/* 3 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
