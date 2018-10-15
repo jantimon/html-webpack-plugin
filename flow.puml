@@ -1,0 +1,32 @@
+@startuml
+' See docs http://plantuml.com/sequence.html
+'
+' generate png:
+' npm run puml
+autonumber
+
+participant Webpack
+participant ChildCompiler
+participant TagCreator
+participant TemplateExecutor
+participant TagInjector
+
+Webpack -> ChildCompiler : start child compilation
+ChildCompiler -> ChildCompiler : compile html template
+ChildCompiler -> TemplateExecutor : handover compiled template
+Webpack -> TagCreator : hand over compilation\n assets
+note right of TagInjector: beforeAssetTagGeneration
+TagCreator -> TagCreator : create script style\n and meta tags
+note right of TagInjector: alterAssetTags
+TagCreator -> TagCreator : group tags to\n head and body groups
+note right of TagInjector: alterAssetTagGroups
+TagCreator -> TemplateExecutor : handover tag groups
+TemplateExecutor -> TemplateExecutor : execute compiled template
+note right of TagInjector: afterTemplateExecution
+TemplateExecutor -> TagInjector : handover html
+TagInjector -> TagInjector : inject script style\n and meta tags
+note right of TagInjector: beforeEmit
+TagInjector -> Webpack : add generated file to\n assets
+note right of TagInjector: afterEmit
+
+@enduml

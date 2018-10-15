@@ -3,17 +3,9 @@ node_js:
   - stable
   - lts/*
   - 6.9
-env:
-  - WEBPACK_VERSION=1 EXTRACT_PLUGIN_VERSION=1
-  - WEBPACK_VERSION=2 EXTRACT_PLUGIN_VERSION=2
-  - WEBPACK_VERSION=3 EXTRACT_PLUGIN_VERSION=3.0.0-beta.3
-  - WEBPACK_VERSION=4.0.0 EXTRACT_PLUGIN_VERSION=4.0.0-alpha.0
 before_install:
   - stty columns 120
 install:
-  - npm install --ignore-scripts
-  - npm rm webpack
-  - npm rm extract-text-webpack-plugin
-  - npm install webpack@$WEBPACK_VERSION extract-text-webpack-plugin@$EXTRACT_PLUGIN_VERSION --ignore-scripts || true
+  - travis_retry npm install --ignore-scripts
 script:
-  - npm test
+  - travis_retry npm test

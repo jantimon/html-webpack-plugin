@@ -68,11 +68,7 @@ Although we did not specify any script tags or link tags they will be injected a
 ## Templating and variables
 
 As of 2.x blueimp was replaced by lodash/underscore/ejs templates as they are more common.
-This brings the following notable changes:
-- Use of angle brackets over curly brackets: `{%= expr %}` becomes `<%= expr %>`
-- Template parameters are now exposed as local variables without the `o`: `<body class="{%= o.htmlWebpackPlugin.options.environment %}">` becomes `<body class="<%= htmlWebpackPlugin.options.environment %>">`.
-- Unescaped output is generated using `<%-`: `{%# expr }` becomes `<%- expr >%`.
-This list is non-exhaustive. Refer to the [lodash documentation](https://lodash.com/docs/#template) for details.
+This also removes the `o` in template variables. ` <body class="{%= o.htmlWebpackPlugin.options.environment %}">` becomes `<body class="<%= htmlWebpackPlugin.options.environment %>">` it also allows to escape variables by using `<%-` instead of `<%=` to prevent unexpected behaviours: `<body class="<%- htmlWebpackPlugin.options.environment %>">` 
 
 # Loaders in templates
 Loaders may now be used inside the template the same way as you would expect in your javascript files.
@@ -102,9 +98,9 @@ This configuration allows you to require partial html from your main `index.html
 
 ## Custom template engines
 
-Maybe you prefer jade or blueimp over underscore - or your project is using jade for the front end part.
+Maybe you prefer pug or blueimp over underscore - or your project is using pug for the front end part.
 With 2.x you can use the webpack loaders either once only for the template as in the following example
-where we use jade (requires the [jade-loader](https://github.com/webpack/jade-loader)):
+where we use pug (requires the [pug-loader](https://github.com/webpack/pug-loader)):
 
 ```js
 var HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -113,31 +109,31 @@ module.exports = {
     // ...
     plugins: [
         new HtmlWebpackPlugin({
-          template: 'jade!template.jade'
+          template: 'pug!template.pug'
         })
     ]
 };
 ```
 
-or by configuring webpack to handle all `.jade` files:
+or by configuring webpack to handle all `.pug` files:
 
 ```js
 module.exports = {
   // ...
   module: {
     loaders: [
-      { test: /\.jade$/, loader: 'jade' }
+      { test: /\.pug$/, loader: 'pug' }
     ]
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'template.jade'
+      template: 'template.pug'
     })
   ]
 };
 ```
 
-Please note that if you specify the loader and use 'jade!template.jade' webpack will try to apply the jade loader twice and fail.
+Please note that if you specify the loader and use 'pug!template.pug' webpack will try to apply the pug loader twice and fail.
 
 ## Isomorph apps
 
@@ -168,8 +164,8 @@ Using loaders inside a template.js
 ```js
   // This function has to return a string or promised string:
   module.exports = function(templateParams) {
-      // Play around with the arguments and then use the webpack jade loader to load the jade:
-      return require('./template.jade')({assets: templateParams.htmlWebpackPlugin.files});
+      // Play around with the arguments and then use the webpack pug loader to load the pug:
+      return require('./template.pug')({assets: templateParams.htmlWebpackPlugin.files});
   };
 ```
 
