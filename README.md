@@ -205,11 +205,13 @@ your own template. The easiest way is to use the `template` option and pass a cu
 The html-webpack-plugin will automatically inject all necessary CSS, JS, manifest
 and favicon files into the markup.
 
+Details of other template loaders are [documented here](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md).
+
 ```js
 plugins: [
   new HtmlWebpackPlugin({
     title: 'Custom template',
-    // Load a custom template (lodash by default see the FAQ for details)
+    // Load a custom template (lodash by default)
     template: 'index.html'
   })
 ]
