@@ -65,6 +65,6 @@ Copy your template file if it is part of this issue:
 - If your project is public, link to the repo so we can investigate directly.
 - **BONUS POINTS:** Create a [minimal reproduction](http://stackoverflow.com/help/mcve) and upload it to GitHub. This will get you the fastest support.
 
-## Additional contex
+## Additional context
 
 Add any other context about the problem here.
