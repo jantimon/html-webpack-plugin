@@ -595,6 +595,21 @@ describe('HtmlWebpackPlugin', () => {
     }, ['<link href="styles.css" rel="stylesheet"/>'], null, done);
   });
 
+  it('prepends the webpack public typeof function', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        publicPath () {
+          return '/';
+        }
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, ['<script src="/index_bundle.js"'], null, done);
+  });
+
   it('prepends the webpack public path to relative path', done => {
     testHtmlPlugin({
       mode: 'production',
@@ -605,7 +620,7 @@ describe('HtmlWebpackPlugin', () => {
         publicPath: 'assets/'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="index_bundle.js"'], null, done);
+    }, ['<script src="assets/index_bundle.js"'], null, done);
   });
 
   it('prepends the webpack public path to script src', done => {
