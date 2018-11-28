@@ -545,9 +545,11 @@ class HtmlWebpackPlugin {
      * if a path publicPath is set in the current webpack config use it otherwise
      * fallback to a realtive path
      */
-    let publicPath = compilation.mainTemplate.getPublicPath({hash: compilationHash}).trim() !== ''
+    const webpackPublicPath = compilation.mainTemplate.getPublicPath({hash: compilationHash});
+    const isPublicPathDefined = webpackPublicPath.trim() !== '';
+    let publicPath = isPublicPathDefined
       // If a hard coded public path exists use it
-      ? compilation.mainTemplate.getPublicPath({hash: compilationHash})
+      ? webpackPublicPath
       // If no public path was set get a relative url path
       : path.relative(path.resolve(compilation.options.output.path, path.dirname(childCompilationOutputName)), compilation.options.output.path)
         .split(path.sep).join('/');
