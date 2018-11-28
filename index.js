@@ -525,21 +525,6 @@ class HtmlWebpackPlugin {
   }
 
   /**
-   * Return true if PATH is an absolute url path, otherwise false
-   *
-   * @param {string | undefined} path
-   */
-  isAbsolutePath (path) {
-    if (typeof path === 'undefined' || path === '') return false;
-    // If the path start with '/'
-    if (path.indexOf('/') === 0) return true;
-    // If the path contain the '://' scheme
-    if (path.indexOf('://') !== -1) return true;
-
-    return false;
-  }
-
-  /**
    * The htmlWebpackPluginAssets extracts the asset information of a webpack compilation
    * for all given entry names
    * @param {WebpackCompilation} compilation
@@ -557,13 +542,15 @@ class HtmlWebpackPlugin {
 
     /**
      * @type {string} the configured public path to the asset root
-     * if the absolute path publicPath is set in the current webpack config use it otherwise
+     * if a path publicPath is set in the current webpack config use it otherwise
      * fallback to a realtive path
      */
-    let publicPath = this.isAbsolutePath(compilation.options.output.publicPath)
-      // If the absolute path is set in the publicPath use it
-      ? compilation.mainTemplate.getPublicPath({hash: compilationHash})
-      // If publicPath was a relative path get the realtive path
+    const webpackPublicPath = compilation.mainTemplate.getPublicPath({hash: compilationHash});
+    const isPublicPathDefined = webpackPublicPath.trim() !== '';
+    let publicPath = isPublicPathDefined
+      // If a hard coded public path exists use it
+      ? webpackPublicPath
+      // If no public path was set get a relative url path
       : path.relative(path.resolve(compilation.options.output.path, path.dirname(childCompilationOutputName)), compilation.options.output.path)
         .split(path.sep).join('/');
 
