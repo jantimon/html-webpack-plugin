@@ -1,10 +1,8 @@
 // @ts-check
 // Import types
 /* eslint-disable */
-/// <reference path="./typings.d.ts" />
+/// <reference types="webpack" />
 /* eslint-enable */
-/** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
-/** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
 'use strict';
 
 // use Polyfill for util.promisify in node versions < v8
@@ -28,14 +26,14 @@ const fsReadFileAsync = promisify(fs.readFile);
 
 class HtmlWebpackPlugin {
   /**
-   * @param {Partial<HtmlWebpackPluginOptions>} [options]
+   * @param {HtmlWebpackPlugin.Options} [options]
    */
   constructor (options) {
-    /** @type {Partial<HtmlWebpackPluginOptions>} */
+    /** @type {HtmlWebpackPlugin.} */
     const userOptions = options || {};
 
     // Default options
-    /** @type {HtmlWebpackPluginOptions} */
+    /** @type {HtmlWebpackPlugin.Options} */
     const defaultOptions = {
       template: path.join(__dirname, 'default_index.ejs'),
       templateContent: false,
@@ -56,7 +54,7 @@ class HtmlWebpackPlugin {
       xhtml: false
     };
 
-    /** @type {HtmlWebpackPluginOptions} */
+    /** @type {HtmlWebpackPlugin.Options} */
     this.options = Object.assign(defaultOptions, userOptions);
 
     // Default metaOptions if no template is provided
@@ -82,7 +80,7 @@ class HtmlWebpackPlugin {
 
   /**
    * apply is called by the webpack main compiler during the start phase
-   * @param {WebpackCompiler} compiler
+   * @param {webpack.Compiler} compiler
    */
   apply (compiler) {
     const self = this;
@@ -168,7 +166,7 @@ class HtmlWebpackPlugin {
     compiler.hooks.emit.tapAsync('HtmlWebpackPlugin',
       /**
        * Hook into the webpack emit phase
-       * @param {WebpackCompilation} compilation
+       * @param {webpack.Compilation} compilation
        * @param {() => void} callback
       */
       (compilation, callback) => {
@@ -317,7 +315,7 @@ class HtmlWebpackPlugin {
 
   /**
    * Evaluates the child compilation result
-   * @param {WebpackCompilation} compilation
+   * @param {webpack.Compilation} compilation
    * @param {string} source
    * @returns {Promise<string | (() => string | Promise<string>)>}
    */
@@ -348,7 +346,7 @@ class HtmlWebpackPlugin {
 
   /**
    * Generate the template parameters for the template function
-   * @param {WebpackCompilation} compilation
+   * @param {webpack.Compilation} compilation
    * @param {{
       publicPath: string,
       js: Array<string>,
@@ -393,7 +391,7 @@ class HtmlWebpackPlugin {
        headTags: HtmlTagObject[],
        bodyTags: HtmlTagObject[]
      }} assetTags
-   * @param {WebpackCompilation} compilation
+   * @param {webpack.Compilation} compilation
    *
    * @returns Promise<string>
    */
@@ -442,7 +440,7 @@ class HtmlWebpackPlugin {
   /*
    * Pushes the content of the given filename to the compilation assets
    * @param {string} filename
-   * @param {WebpackCompilation} compilation
+   * @param {webpack.Compilation} compilation
    *
    * @returns {string} file basename
    */
@@ -474,7 +472,7 @@ class HtmlWebpackPlugin {
    * Helper to sort chunks
    * @param {string[]} entryNames
    * @param {string|((entryNameA: string, entryNameB: string) => number)} sortMode
-   * @param {WebpackCompilation} compilation
+   * @param {webpack.Compilation} compilation
    */
   sortEntryChunks (entryNames, sortMode, compilation) {
     // Custom function
@@ -527,7 +525,7 @@ class HtmlWebpackPlugin {
   /**
    * The htmlWebpackPluginAssets extracts the asset information of a webpack compilation
    * for all given entry names
-   * @param {WebpackCompilation} compilation
+   * @param {webpack.Compilation} compilation
    * @param {string[]} entryNames
    * @returns {{
       publicPath: string,
@@ -627,7 +625,7 @@ class HtmlWebpackPlugin {
    * and returns the url to the ressource
    *
    * @param {string|false} faviconFilePath
-   * @param {WebpackCompilation} compilation
+   * @param {webpack.Compilation} compilation
    * @parma {string} publicPath
    * @returns {Promise<string|undefined>}
    */
@@ -908,7 +906,7 @@ class HtmlWebpackPlugin {
  * Generate the template parameters
  *
  * Generate the template parameters for the template function
- * @param {WebpackCompilation} compilation
+ * @param {webpack.Compilation} compilation
  * @param {{
    publicPath: string,
    js: Array<string>,
@@ -920,8 +918,8 @@ class HtmlWebpackPlugin {
      headTags: HtmlTagObject[],
      bodyTags: HtmlTagObject[]
    }} assetTags
- * @param {HtmlWebpackPluginOptions} options
- * @returns {HtmlWebpackPluginTemplateParameter}
+ * @param {HtmlWebpackPlugin.Options} options
+ * @returns {HtmlWebpackPlugin.TemplateParameter}
  */
 function templateParametersGenerator (compilation, assets, assetTags, options) {
   const xhtml = options.xhtml;
