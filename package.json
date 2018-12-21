@@ -5,6 +5,7 @@
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "author": "Jan Nicklas <j.nicklas@me.com> (https://github.com/jantimon)",
   "main": "index.js",
+  "types": "typings.d.ts",
   "files": [
     "lib/",
     "index.js",
