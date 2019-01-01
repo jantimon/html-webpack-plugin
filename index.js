@@ -1,8 +1,11 @@
 // @ts-check
 // Import types
-/* eslint-disable */
-/// <reference types="webpack" />
-/* eslint-enable */
+/** @typedef {import("./typings").HtmlTagObject} HtmlTagObject */
+/** @typedef {import("./typings").Options} HtmlWebpackOptions */
+/** @typedef {import("./typings").InternalOptions} HtmlWebpackInternalOptions */
+/** @typedef {import("./typings").TemplateParameter} TemplateParameter */
+/** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
+/** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
 'use strict';
 
 // use Polyfill for util.promisify in node versions < v8
@@ -26,14 +29,14 @@ const fsReadFileAsync = promisify(fs.readFile);
 
 class HtmlWebpackPlugin {
   /**
-   * @param {HtmlWebpackPlugin.Options} [options]
+   * @param {HtmlWebpackOptions} [options]
    */
   constructor (options) {
-    /** @type {HtmlWebpackPlugin.} */
+    /** @type {HtmlWebpackOptions} */
     const userOptions = options || {};
 
     // Default options
-    /** @type {HtmlWebpackPlugin.Options} */
+    /** @type {HtmlWebpackInternalOptions} */
     const defaultOptions = {
       template: path.join(__dirname, 'default_index.ejs'),
       templateContent: false,
@@ -54,7 +57,7 @@ class HtmlWebpackPlugin {
       xhtml: false
     };
 
-    /** @type {HtmlWebpackPlugin.Options} */
+    /** @type {HtmlWebpackInternalOptions} */
     this.options = Object.assign(defaultOptions, userOptions);
 
     // Default metaOptions if no template is provided
@@ -80,7 +83,7 @@ class HtmlWebpackPlugin {
 
   /**
    * apply is called by the webpack main compiler during the start phase
-   * @param {webpack.Compiler} compiler
+   * @param {WebpackCompiler} compiler
    */
   apply (compiler) {
     const self = this;
@@ -110,6 +113,7 @@ class HtmlWebpackPlugin {
 
     const minify = this.options.minify;
     if (minify === true || (minify === undefined && isProductionLikeMode)) {
+      /** @type { import('html-minifier').Options } */
       this.options.minify = {
         // https://github.com/kangax/html-minifier#options-quick-reference
         collapseWhitespace: true,
@@ -166,7 +170,7 @@ class HtmlWebpackPlugin {
     compiler.hooks.emit.tapAsync('HtmlWebpackPlugin',
       /**
        * Hook into the webpack emit phase
-       * @param {webpack.Compilation} compilation
+       * @param {WebpackCompilation} compilation
        * @param {() => void} callback
       */
       (compilation, callback) => {
@@ -315,7 +319,7 @@ class HtmlWebpackPlugin {
 
   /**
    * Evaluates the child compilation result
-   * @param {webpack.Compilation} compilation
+   * @param {WebpackCompilation} compilation
    * @param {string} source
    * @returns {Promise<string | (() => string | Promise<string>)>}
    */
@@ -346,7 +350,7 @@ class HtmlWebpackPlugin {
 
   /**
    * Generate the template parameters for the template function
-   * @param {webpack.Compilation} compilation
+   * @param {WebpackCompilation} compilation
    * @param {{
       publicPath: string,
       js: Array<string>,
@@ -379,7 +383,7 @@ class HtmlWebpackPlugin {
   /**
    * This function renders the actual html by executing the template function
    *
-   * @param {(templatePArameters) => string | Promise<string>} templateFunction
+   * @param {(templateParameters) => string | Promise<string>} templateFunction
    * @param {{
       publicPath: string,
       js: Array<string>,
@@ -391,7 +395,7 @@ class HtmlWebpackPlugin {
        headTags: HtmlTagObject[],
        bodyTags: HtmlTagObject[]
      }} assetTags
-   * @param {webpack.Compilation} compilation
+   * @param {WebpackCompilation} compilation
    *
    * @returns Promise<string>
    */
@@ -440,7 +444,7 @@ class HtmlWebpackPlugin {
   /*
    * Pushes the content of the given filename to the compilation assets
    * @param {string} filename
-   * @param {webpack.Compilation} compilation
+   * @param {WebpackCompilation} compilation
    *
    * @returns {string} file basename
    */
@@ -472,7 +476,7 @@ class HtmlWebpackPlugin {
    * Helper to sort chunks
    * @param {string[]} entryNames
    * @param {string|((entryNameA: string, entryNameB: string) => number)} sortMode
-   * @param {webpack.Compilation} compilation
+   * @param {WebpackCompilation} compilation
    */
   sortEntryChunks (entryNames, sortMode, compilation) {
     // Custom function
@@ -525,7 +529,7 @@ class HtmlWebpackPlugin {
   /**
    * The htmlWebpackPluginAssets extracts the asset information of a webpack compilation
    * for all given entry names
-   * @param {webpack.Compilation} compilation
+   * @param {WebpackCompilation} compilation
    * @param {string[]} entryNames
    * @returns {{
       publicPath: string,
@@ -625,7 +629,7 @@ class HtmlWebpackPlugin {
    * and returns the url to the ressource
    *
    * @param {string|false} faviconFilePath
-   * @param {webpack.Compilation} compilation
+   * @param {WebpackCompilation} compilation
    * @parma {string} publicPath
    * @returns {Promise<string|undefined>}
    */
@@ -875,7 +879,7 @@ class HtmlWebpackPlugin {
   /**
    * Helper to return the absolute template path with a fallback loader
    * @param {string} template
-   * The path to the tempalate e.g. './index.html'
+   * The path to the template e.g. './index.html'
    * @param {string} context
    * The webpack base resolution path for relative paths e.g. process.cwd()
    */
@@ -906,7 +910,7 @@ class HtmlWebpackPlugin {
  * Generate the template parameters
  *
  * Generate the template parameters for the template function
- * @param {webpack.Compilation} compilation
+ * @param {WebpackCompilation} compilation
  * @param {{
    publicPath: string,
    js: Array<string>,
@@ -918,8 +922,8 @@ class HtmlWebpackPlugin {
      headTags: HtmlTagObject[],
      bodyTags: HtmlTagObject[]
    }} assetTags
- * @param {HtmlWebpackPlugin.Options} options
- * @returns {HtmlWebpackPlugin.TemplateParameter}
+ * @param {HtmlWebpackInternalOptions} options
+ * @returns {TemplateParameter}
  */
 function templateParametersGenerator (compilation, assets, assetTags, options) {
   const xhtml = options.xhtml;
