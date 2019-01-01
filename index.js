@@ -630,7 +630,7 @@ class HtmlWebpackPlugin {
    *
    * @param {string|false} faviconFilePath
    * @param {WebpackCompilation} compilation
-   * @parma {string} publicPath
+   * @param {string} publicPath
    * @returns {Promise<string|undefined>}
    */
   getFaviconPublicPath (faviconFilePath, compilation, publicPath) {
