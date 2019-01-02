@@ -138,8 +138,13 @@ declare namespace HtmlWebpackPlugin {
   }
 
   /**
-   * The internally used options. This is a variant of the Options interface but with the types
-   * set up to match the expectations in index.js
+   * Options interface that matches the expectations of the index.js API:
+   *   - All fields are required
+   *   - The minify property matches what html-minifier expects (eg either a MinifyOptions or undefined).
+   *     html-minifier does not accept a boolean value. As TypeScript does not allow a property to be redefined
+   *     in an extended interface we need to omit it and then define it properly
+   *
+   *  The Required and Omit types are defined at the top of the file
    */
   interface InternalOptions extends Required<Omit<Options, "minify">> {
     minify: MinifyOptions | undefined;
