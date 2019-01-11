@@ -146,7 +146,7 @@ declare namespace HtmlWebpackPlugin {
    *
    *  The Required and Omit types are defined at the top of the file
    */
-  interface InternalOptions extends Required<Omit<Options, "minify">> {
+  interface ProcessedOptions extends Required<Omit<Options, "minify">> {
     minify: MinifyOptions | undefined;
   }
 

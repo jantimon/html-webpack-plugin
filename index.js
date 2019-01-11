@@ -2,7 +2,7 @@
 // Import types
 /** @typedef {import("./typings").HtmlTagObject} HtmlTagObject */
 /** @typedef {import("./typings").Options} HtmlWebpackOptions */
-/** @typedef {import("./typings").InternalOptions} HtmlWebpackInternalOptions */
+/** @typedef {import("./typings").ProcessedOptions} ProcessedHtmlWebpackOptions */
 /** @typedef {import("./typings").TemplateParameter} TemplateParameter */
 /** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
 /** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
@@ -36,7 +36,7 @@ class HtmlWebpackPlugin {
     const userOptions = options || {};
 
     // Default options
-    /** @type {HtmlWebpackInternalOptions} */
+    /** @type {ProcessedHtmlWebpackOptions} */
     const defaultOptions = {
       template: path.join(__dirname, 'default_index.ejs'),
       templateContent: false,
@@ -57,7 +57,7 @@ class HtmlWebpackPlugin {
       xhtml: false
     };
 
-    /** @type {HtmlWebpackInternalOptions} */
+    /** @type {ProcessedHtmlWebpackOptions} */
     this.options = Object.assign(defaultOptions, userOptions);
 
     // Default metaOptions if no template is provided
@@ -922,7 +922,7 @@ class HtmlWebpackPlugin {
      headTags: HtmlTagObject[],
      bodyTags: HtmlTagObject[]
    }} assetTags
- * @param {HtmlWebpackInternalOptions} options
+ * @param {ProcessedHtmlWebpackOptions} options
  * @returns {TemplateParameter}
  */
 function templateParametersGenerator (compilation, assets, assetTags, options) {
