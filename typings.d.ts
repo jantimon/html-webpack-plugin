@@ -1,139 +1,252 @@
+import { Plugin } from "webpack";
+import { AsyncSeriesWaterfallHook } from "tapable";
+import { Options as HtmlMinifierOptions } from "html-minifier";
 
-/**
- * The plugin options
- */
-interface HtmlWebpackPluginOptions {
+// https://github.com/Microsoft/TypeScript/issues/15012#issuecomment-365453623
+type Required<T> = T extends object
+  ? { [P in keyof T]-?: NonNullable<T[P]> }
+  : T;
+// https://stackoverflow.com/questions/48215950/exclude-property-from-type
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
+export = HtmlWebpackPlugin;
+
+declare class HtmlWebpackPlugin extends Plugin {
+  constructor(options?: HtmlWebpackPlugin.Options);
+}
+
+declare namespace HtmlWebpackPlugin {
+  type MinifyOptions = HtmlMinifierOptions;
+
+  /**
+   * The plugin options
+   */
+  interface Options {
     /**
-     * The title to use for the generated HTML document
+     * Emit the file only if it was changed.
+     * Default: `true`.
      */
-    title: string,
+    cache?: boolean;
     /**
-     * The `webpack` require path to the template.
-     * @see https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md
+     * List all entries which should be injected
      */
-    template: string,
+    chunks?: "all" | string[];
     /**
-     * Allow to use a html string instead of reading from a file
+     * Allows to control how chunks should be sorted before they are included to the html.
+     * Default: `'auto'`.
      */
-    templateContent:
-      false // Use the template option instead to load a file
-      | string
-      | Promise<string>,
+    chunksSortMode?:
+      | "auto"
+      | "manual"
+      | (((entryNameA: string, entryNameB: string) => number));
     /**
-     * Allows to overwrite the parameters used in the template
+     * List all entries which should not be injeccted
      */
-    templateParameters:
-      false // Pass an empty object to the template function
-      | ((compilation: any, assets, assetTags: { headTags: Array<HtmlTagObject>, bodyTags: Array<HtmlTagObject> }, options: HtmlWebpackPluginOptions) => {[option: string]: any})
-      | ((compilation: any, assets, assetTags: { headTags: Array<HtmlTagObject>, bodyTags: Array<HtmlTagObject> }, options: HtmlWebpackPluginOptions) => Promise<{[option: string]: any}>)
-      | {[option: string]: any}
+    excludeChunks?: string[];
+    /**
+     * Path to the favicon icon
+     */
+    favicon?: false | string;
     /**
      * The file to write the HTML to.
      * Defaults to `index.html`.
      * Supports subdirectories eg: `assets/admin.html`
      */
-    filename: string,
+    filename?: string;
     /**
      * If `true` then append a unique `webpack` compilation hash to all included scripts and CSS files.
      * This is useful for cache busting
      */
-    hash: boolean,
+    hash?: boolean;
     /**
      * Inject all assets into the given `template` or `templateContent`.
      */
-    inject: false // Don't inject scripts
-    | true    // Inject scripts into body
-    | 'body'  // Inject scripts into body
-    | 'head'  // Inject scripts into head
+    inject?:
+      | false // Don't inject scripts
+      | true // Inject scripts into body
+      | "body" // Inject scripts into body
+      | "head"; // Inject scripts into head
     /**
-     * Path to the favicon icon
+     * Inject meta tags
      */
-    favicon: false | string,
+    meta?:
+      | false // Disable injection
+      | {
+          [name: string]:
+            | string
+            | false // name content pair e.g. {viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'}`
+            | { [attributeName: string]: string | boolean }; // custom properties e.g. { name:"viewport" content:"width=500, initial-scale=1" }
+        };
     /**
      * HTML Minification options
      * @https://github.com/kangax/html-minifier#options-quick-reference
      */
-    minify?: boolean | {},
-    cache: boolean,
+    minify?: boolean | MinifyOptions;
     /**
      * Render errors into the HTML page
      */
-    showErrors: boolean,
+    showErrors?: boolean;
     /**
-     * List all entries which should be injected
+     * The `webpack` require path to the template.
+     * @see https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md
      */
-    chunks: 'all' | string[],
+    template?: string;
     /**
-     * List all entries which should not be injeccted
+     * Allow to use a html string instead of reading from a file
      */
-    excludeChunks: string[],
-    chunksSortMode: 'auto' | 'manual' | (((entryNameA: string, entryNameB: string) => number)),
+    templateContent?:
+      | false // Use the template option instead to load a file
+      | string
+      | Promise<string>;
     /**
-     * Inject meta tags
+     * Allows to overwrite the parameters used in the template
      */
-    meta: false // Disable injection
-      | {
-          [name: string]: string|false // name content pair e.g. {viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'}`
-          | {[attributeName: string]: string|boolean} // custom properties e.g. { name:"viewport" content:"width=500, initial-scale=1" }
-      },
+    templateParameters?:
+      | false // Pass an empty object to the template function
+      | ((
+          compilation: any,
+          assets,
+          assetTags: {
+            headTags: HtmlTagObject[];
+            bodyTags: HtmlTagObject[];
+          },
+          options: Options
+        ) => { [option: string]: any })
+      | ((
+          compilation: any,
+          assets,
+          assetTags: {
+            headTags: HtmlTagObject[];
+            bodyTags: HtmlTagObject[];
+          },
+          options: Options
+        ) => Promise<{ [option: string]: any }>)
+      | { [option: string]: any };
+    /**
+     * The title to use for the generated HTML document
+     */
+    title?: string;
     /**
      * Enforce self closing tags e.g. <link />
      */
-    xhtml: boolean
-
+    xhtml?: boolean;
     /**
      * In addition to the options actually used by this plugin, you can use this hash to pass arbitrary data through
      * to your template.
      */
     [option: string]: any;
-}
+  }
 
-/**
- * A tag element according to the htmlWebpackPlugin object notation
- */
-interface HtmlTagObject {
   /**
-   * Attributes of the html tag
-   * E.g. `{'disabled': true, 'value': 'demo'}`
+   * Options interface that matches the expectations of the index.js API:
+   *   - All fields are required
+   *   - The minify property matches what html-minifier expects (eg either a MinifyOptions or undefined).
+   *     html-minifier does not accept a boolean value. As TypeScript does not allow a property to be redefined
+   *     in an extended interface we need to omit it and then define it properly
+   *
+   *  The Required and Omit types are defined at the top of the file
    */
-  attributes: {
-    [attributeName: string]: string|boolean
-  },
-  /**
-   * Wether this html must not contain innerHTML
-   * @see https://www.w3.org/TR/html5/syntax.html#void-elements
-   */
-  voidTag: boolean,
-  /**
-   * The tag name e.g. `'div'`
-   */
-  tagName: string,
-  /**
-   * Inner HTML The
-   */
-  innerHTML?: string
-}
+  interface ProcessedOptions extends Required<Omit<Options, "minify">> {
+    minify: MinifyOptions | undefined;
+  }
 
-/**
- * The values which are available during template execution
- *
- * Please keep in mind that the `templateParameter` options allows to change them
- */
-interface HtmlWebpackPluginTemplateParameter {
-  compilation: any,
-  webpackConfig: any
-  htmlWebpackPlugin: {
-    tags: {
-      headTags: HtmlTagObject[],
-      bodyTags: HtmlTagObject[]
-    },
-    files: {
-      publicPath: string,
-      js: Array<string>,
-      css: Array<string>,
-      manifest?: string,
-      favicon?: string
-    },
-    options: HtmlWebpackPluginOptions
+  /**
+   * The values which are available during template execution
+   *
+   * Please keep in mind that the `templateParameter` options allows to change them
+   */
+  interface TemplateParameter {
+    compilation: any;
+    htmlWebpackPlugin: {
+      tags: {
+        headTags: HtmlTagObject[];
+        bodyTags: HtmlTagObject[];
+      };
+      files: {
+        publicPath: string;
+        js: Array<string>;
+        css: Array<string>;
+        manifest?: string;
+        favicon?: string;
+      };
+      options: Options;
+    };
+    webpackConfig: any;
+  }
+
+  interface Hooks {
+    alterAssetTags: AsyncSeriesWaterfallHook<{
+      assetTags: {
+        scripts: HtmlTagObject[];
+        styles: HtmlTagObject[];
+        meta: HtmlTagObject[];
+      };
+      outputName: string;
+      plugin: HtmlWebpackPlugin;
+    }>;
+
+    alterAssetTagGroups: AsyncSeriesWaterfallHook<{
+      headTags: HtmlTagObject[];
+      bodyTags: HtmlTagObject[];
+      outputName: string;
+      plugin: HtmlWebpackPlugin;
+    }>;
+
+    afterTemplateExecution: AsyncSeriesWaterfallHook<{
+      html: string;
+      headTags: HtmlTagObject[];
+      bodyTags: HtmlTagObject[];
+      outputName: string;
+      plugin: HtmlWebpackPlugin;
+    }>;
+
+    beforeAssetTagGeneration: AsyncSeriesWaterfallHook<{
+      assets: {
+        publicPath: string;
+        js: Array<string>;
+        css: Array<string>;
+        favicon?: string | undefined;
+        manifest?: string | undefined;
+      };
+      outputName: string;
+      plugin: HtmlWebpackPlugin;
+    }>;
+
+    beforeEmit: AsyncSeriesWaterfallHook<{
+      html: string;
+      outputName: string;
+      plugin: HtmlWebpackPlugin;
+    }>;
+
+    afterEmit: AsyncSeriesWaterfallHook<{
+      outputName: string;
+      plugin: HtmlWebpackPlugin;
+    }>;
+  }
+
+  /**
+   * A tag element according to the htmlWebpackPlugin object notation
+   */
+  interface HtmlTagObject {
+    /**
+     * Attributes of the html tag
+     * E.g. `{'disabled': true, 'value': 'demo'}`
+     */
+    attributes: {
+      [attributeName: string]: string | boolean;
+    };
+    /**
+     * The tag name e.g. `'div'`
+     */
+    tagName: string;
+    /**
+     * The inner HTML
+     */
+    innerHTML?: string;
+        /**
+     * Whether this html must not contain innerHTML
+     * @see https://www.w3.org/TR/html5/syntax.html#void-elements
+     */
+    voidTag: boolean;
   }
 }

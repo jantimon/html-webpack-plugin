@@ -1,8 +1,9 @@
 // @ts-check
 // Import types
-/* eslint-disable */
-/// <reference path="./typings.d.ts" />
-/* eslint-enable */
+/** @typedef {import("./typings").HtmlTagObject} HtmlTagObject */
+/** @typedef {import("./typings").Options} HtmlWebpackOptions */
+/** @typedef {import("./typings").ProcessedOptions} ProcessedHtmlWebpackOptions */
+/** @typedef {import("./typings").TemplateParameter} TemplateParameter */
 /** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
 /** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
 'use strict';
@@ -28,14 +29,14 @@ const fsReadFileAsync = promisify(fs.readFile);
 
 class HtmlWebpackPlugin {
   /**
-   * @param {Partial<HtmlWebpackPluginOptions>} [options]
+   * @param {HtmlWebpackOptions} [options]
    */
   constructor (options) {
-    /** @type {Partial<HtmlWebpackPluginOptions>} */
+    /** @type {HtmlWebpackOptions} */
     const userOptions = options || {};
 
     // Default options
-    /** @type {HtmlWebpackPluginOptions} */
+    /** @type {ProcessedHtmlWebpackOptions} */
     const defaultOptions = {
       template: path.join(__dirname, 'default_index.ejs'),
       templateContent: false,
@@ -56,7 +57,7 @@ class HtmlWebpackPlugin {
       xhtml: false
     };
 
-    /** @type {HtmlWebpackPluginOptions} */
+    /** @type {ProcessedHtmlWebpackOptions} */
     this.options = Object.assign(defaultOptions, userOptions);
 
     // Default metaOptions if no template is provided
@@ -112,6 +113,7 @@ class HtmlWebpackPlugin {
 
     const minify = this.options.minify;
     if (minify === true || (minify === undefined && isProductionLikeMode)) {
+      /** @type { import('html-minifier').Options } */
       this.options.minify = {
         // https://github.com/kangax/html-minifier#options-quick-reference
         collapseWhitespace: true,
@@ -381,7 +383,7 @@ class HtmlWebpackPlugin {
   /**
    * This function renders the actual html by executing the template function
    *
-   * @param {(templatePArameters) => string | Promise<string>} templateFunction
+   * @param {(templateParameters) => string | Promise<string>} templateFunction
    * @param {{
       publicPath: string,
       js: Array<string>,
@@ -628,7 +630,7 @@ class HtmlWebpackPlugin {
    *
    * @param {string|false} faviconFilePath
    * @param {WebpackCompilation} compilation
-   * @parma {string} publicPath
+   * @param {string} publicPath
    * @returns {Promise<string|undefined>}
    */
   getFaviconPublicPath (faviconFilePath, compilation, publicPath) {
@@ -877,7 +879,7 @@ class HtmlWebpackPlugin {
   /**
    * Helper to return the absolute template path with a fallback loader
    * @param {string} template
-   * The path to the tempalate e.g. './index.html'
+   * The path to the template e.g. './index.html'
    * @param {string} context
    * The webpack base resolution path for relative paths e.g. process.cwd()
    */
@@ -920,8 +922,8 @@ class HtmlWebpackPlugin {
      headTags: HtmlTagObject[],
      bodyTags: HtmlTagObject[]
    }} assetTags
- * @param {HtmlWebpackPluginOptions} options
- * @returns {HtmlWebpackPluginTemplateParameter}
+ * @param {ProcessedHtmlWebpackOptions} options
+ * @returns {TemplateParameter}
  */
 function templateParametersGenerator (compilation, assets, assetTags, options) {
   const xhtml = options.xhtml;
