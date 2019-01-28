@@ -1,4 +1,4 @@
-import { Plugin } from "webpack";
+import { compilation, Plugin } from "webpack";
 import { AsyncSeriesWaterfallHook } from "tapable";
 import { Options as HtmlMinifierOptions } from "html-minifier";
 
@@ -12,6 +12,30 @@ type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export = HtmlWebpackPlugin;
 
 declare class HtmlWebpackPlugin extends Plugin {
+  /**
+   * The major version number of this plugin
+   */
+  static version: number;
+
+  /**
+   * A static helper to get the hooks for this plugin
+   *
+   * Usage: HtmlWebpackPlugin.getHooks(compilation).HOOK_NAME.tapAsync('YourPluginName', () => { ... });
+   */
+  static getHooks(compilation: compilation.Compilation): HtmlWebpackPlugin.Hooks;
+
+  /**
+   * Static helper to create a tag object to be get injected into the dom
+   *
+   * @param tagName the name of the tage e.g. 'div'
+   * @param attributes tag attributes e.g. `{ 'class': 'example', disabled: true }`
+   */
+  static createHtmlTagObject(
+    tagName: string,
+    attributes: { [attributeName: string]: string | boolean },
+    innerHTML: string
+  ): HtmlWebpackPlugin.HtmlTagObject;
+
   constructor(options?: HtmlWebpackPlugin.Options);
 }
 
