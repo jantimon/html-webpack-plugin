@@ -338,7 +338,7 @@ and the following options:
 To use custom [html-minifier options](https://github.com/kangax/html-minifier#options-quick-reference)
 pass an object to `minify` instead. This object will not be merged with the defaults above.
 
-To disable minifcation during production mode set the `minify` option to `false`.
+To disable minification during production mode set the `minify` option to `false`.
 
 ### Meta Tags
 
