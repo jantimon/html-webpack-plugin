@@ -53,6 +53,7 @@ class HtmlWebpackPlugin {
       excludeChunks: [],
       chunksSortMode: 'auto',
       meta: {},
+      base: false,
       title: 'Webpack App',
       xhtml: false
     };
@@ -223,6 +224,7 @@ class HtmlWebpackPlugin {
               scripts: self.generatedScriptTags(assets.js),
               styles: self.generateStyleTags(assets.css),
               meta: [
+                ...self.generateBaseTag(self.options.base),
                 ...self.generatedMetaTags(self.options.meta),
                 ...self.generateFaviconTags(assets.favicon)
               ]
@@ -711,6 +713,28 @@ class HtmlWebpackPlugin {
         rel: 'stylesheet'
       }
     }));
+  }
+
+  /**
+   * Generate an optional base tag
+   * @param { false
+            | string
+            | {[attributeName: string]: string} // attributes e.g. { href:"http://example.com/page.html" target:"_blank" }
+            } baseOption
+  * @returns {Array<HtmlTagObject>}
+  */
+  generateBaseTag (baseOption) {
+    if (baseOption === false) {
+      return [];
+    } else {
+      return [{
+        tagName: 'base',
+        voidTag: true,
+        attributes: (typeof baseOption === 'string') ? {
+          href: baseOption
+        } : baseOption
+      }];
+    }
   }
 
   /**

@@ -1588,6 +1588,41 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
   });
 
+  it('adds a base tag with attributes', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          base: {
+            href: 'http://example.com/page.html',
+            target: '_blank'
+          }
+        })
+      ]
+    }, [/<base href="http:\/\/example\.com\/page\.html" target="_blank">/], null, done);
+  });
+
+  it('adds a base tag short syntax', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          base: 'http://example.com/page.html'
+        })
+      ]
+    }, [/<base href="http:\/\/example\.com\/page\.html">/], null, done);
+  });
+
   it('adds a meta tag', done => {
     testHtmlPlugin({
       mode: 'production',

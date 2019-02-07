@@ -147,6 +147,7 @@ Allowed values are as follows
 |**`inject`**|`{Boolean\|String}`|`true`|`true \|\| 'head' \|\| 'body' \|\| false` Inject all assets into the given `template` or `templateContent`. When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element|
 |**`favicon`**|`{String}`|``|Adds the given favicon path to the output HTML|
 |**`meta`**|`{Object}`|`{}`|Allows to inject `meta`-tags. E.g. `meta: {viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'}`|
+|**`base`**|`{Object\|String\|false}`|`false`|Inject a [`base`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) tag. E.g. `base: "https://example.com/path/page.html`|
 |**`minify`**|`{Boolean\|Object}`|`true` if `mode` is `'production'`, otherwise `false`|Controls if and in what ways the output should be minified. See [minification](#minification) below for more details.|
 |**`hash`**|`{Boolean}`|`false`|If `true` then append a unique `webpack` compilation hash to all included scripts and CSS files. This is useful for cache busting|
 |**`cache`**|`{Boolean}`|`true`|Emit the file only if it was changed|
@@ -386,6 +387,39 @@ plugins: [
   })
 ]
 ```
+
+### Base Tag
+
+When the `base` option is used,
+html-webpack-plugin will inject a [base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base).
+By default, a base tag will not be injected.
+
+The following two are identical and will both insert `<base href="http://example.com/some/page.html">`:
+
+```js
+new HtmlWebpackPlugin({
+  'base': 'http://example.com/some/page.html'
+})
+```
+
+```js
+new HtmlWebpackPlugin({
+  'base': { 'href': 'http://example.com/some/page.html' }
+})
+```
+
+The `target` can be specified with the corresponding key:
+
+```js
+new HtmlWebpackPlugin({
+  'base': {
+    'href': 'http://example.com/some/page.html',
+    'target': '_blank'
+  }
+})
+```
+
+which will inject the element `<base href="http://example.com/some/page.html" target="_blank">`.
 
 ### Long Term Caching
 
