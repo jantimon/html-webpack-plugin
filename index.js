@@ -46,7 +46,7 @@ class HtmlWebpackPlugin {
       inject: true,
       compile: true,
       favicon: false,
-      minify: undefined,
+      minify: 'auto',
       cache: true,
       showErrors: true,
       chunks: 'all',
@@ -112,7 +112,7 @@ class HtmlWebpackPlugin {
     const isProductionLikeMode = compiler.options.mode === 'production' || !compiler.options.mode;
 
     const minify = this.options.minify;
-    if (minify === true || (minify === undefined && isProductionLikeMode)) {
+    if (minify === true || (minify === 'auto' && isProductionLikeMode)) {
       /** @type { import('html-minifier').Options } */
       this.options.minify = {
         // https://github.com/kangax/html-minifier#options-quick-reference
@@ -435,7 +435,7 @@ class HtmlWebpackPlugin {
     const htmlAfterInjection = this.options.inject
       ? this.injectAssetsIntoHtml(html, assets, assetTags)
       : html;
-    const htmlAfterMinification = this.options.minify
+    const htmlAfterMinification = typeof this.options.minify === 'object'
       ? require('html-minifier').minify(htmlAfterInjection, this.options.minify)
       : htmlAfterInjection;
     return Promise.resolve(htmlAfterMinification);
