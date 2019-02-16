@@ -38,7 +38,7 @@ class HtmlWebpackPlugin {
     // Default options
     /** @type {ProcessedHtmlWebpackOptions} */
     const defaultOptions = {
-      template: path.join(__dirname, 'default_index.ejs'),
+      template: 'auto',
       templateContent: false,
       templateParameters: templateParametersGenerator,
       filename: 'index.html',
@@ -908,6 +908,12 @@ class HtmlWebpackPlugin {
    * The webpack base resolution path for relative paths e.g. process.cwd()
    */
   getFullTemplatePath (template, context) {
+    if (template === 'auto') {
+      template = path.resolve(context, 'src/index.ejs');
+      if (!fs.existsSync(template)) {
+        template = path.join(__dirname, 'default_index.ejs');
+      }
+    }
     // If the template doesn't use a loader use the lodash template loader
     if (template.indexOf('!') === -1) {
       template = require.resolve('./lib/loader.js') + '!' + path.resolve(context, template);

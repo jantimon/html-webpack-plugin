@@ -142,8 +142,8 @@ Allowed values are as follows
 |:--:|:--:|:-----:|:----------|
 |**`title`**|`{String}`|`Webpack App`|The title to use for the generated HTML document|
 |**`filename`**|`{String}`|`'index.html'`|The file to write the HTML to. Defaults to `index.html`. You can specify a subdirectory here too (eg: `assets/admin.html`)|
-|**`template`**|`{String}`|``|`webpack` require path to the template. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details|
-|**[`templateParameters`](#)**|`{Boolean\|Object\|Function}`|``| Allows to overwrite the parameters used in the template |
+|**`template`**|`{String}`|``|`webpack` relative or absolute path to the template. By default it will use `src/index.ejs` if it exists. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details|
+|**`templateParameters`**|`{Boolean\|Object\|Function}`|``| Allows to overwrite the parameters used in the template |
 |**`inject`**|`{Boolean\|String}`|`true`|`true \|\| 'head' \|\| 'body' \|\| false` Inject all assets into the given `template` or `templateContent`. When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element|
 |**`favicon`**|`{String}`|``|Adds the given favicon path to the output HTML|
 |**`meta`**|`{Object}`|`{}`|Allows to inject `meta`-tags. E.g. `meta: {viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'}`|
