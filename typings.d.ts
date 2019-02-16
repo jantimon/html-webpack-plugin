@@ -2,13 +2,6 @@ import { Plugin } from "webpack";
 import { AsyncSeriesWaterfallHook } from "tapable";
 import { Options as HtmlMinifierOptions } from "html-minifier";
 
-// https://github.com/Microsoft/TypeScript/issues/15012#issuecomment-365453623
-type Required<T> = T extends object
-  ? { [P in keyof T]-?: NonNullable<T[P]> }
-  : T;
-// https://stackoverflow.com/questions/48215950/exclude-property-from-type
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
 export = HtmlWebpackPlugin;
 
 declare class HtmlWebpackPlugin extends Plugin {
@@ -18,50 +11,52 @@ declare class HtmlWebpackPlugin extends Plugin {
 declare namespace HtmlWebpackPlugin {
   type MinifyOptions = HtmlMinifierOptions;
 
+  interface Options extends Partial<ProcessedOptions> {}
+
   /**
-   * The plugin options
+   * The plugin options after adding default values
    */
-  interface Options {
+  interface ProcessedOptions {
     /**
      * Emit the file only if it was changed.
      * Default: `true`.
      */
-    cache?: boolean;
+    cache: boolean;
     /**
      * List all entries which should be injected
      */
-    chunks?: "all" | string[];
+    chunks: "all" | string[];
     /**
      * Allows to control how chunks should be sorted before they are included to the html.
      * Default: `'auto'`.
      */
-    chunksSortMode?:
+    chunksSortMode:
       | "auto"
       | "manual"
       | (((entryNameA: string, entryNameB: string) => number));
     /**
      * List all entries which should not be injeccted
      */
-    excludeChunks?: string[];
+    excludeChunks: string[];
     /**
      * Path to the favicon icon
      */
-    favicon?: false | string;
+    favicon: false | string;
     /**
      * The file to write the HTML to.
      * Defaults to `index.html`.
      * Supports subdirectories eg: `assets/admin.html`
      */
-    filename?: string;
+    filename: string;
     /**
      * If `true` then append a unique `webpack` compilation hash to all included scripts and CSS files.
      * This is useful for cache busting
      */
-    hash?: boolean;
+    hash: boolean;
     /**
      * Inject all assets into the given `template` or `templateContent`.
      */
-    inject?:
+    inject:
       | false // Don't inject scripts
       | true // Inject scripts into body
       | "body" // Inject scripts into body
@@ -69,7 +64,7 @@ declare namespace HtmlWebpackPlugin {
     /**
      * Inject meta tags
      */
-    meta?:
+    meta:
       | false // Disable injection
       | {
           [name: string]:
@@ -78,30 +73,33 @@ declare namespace HtmlWebpackPlugin {
             | { [attributeName: string]: string | boolean }; // custom properties e.g. { name:"viewport" content:"width=500, initial-scale=1" }
         };
     /**
-     * HTML Minification options
+     * HTML Minification options accepts the following valeus:
+     * - Set to `false` to disable minifcation
+     * - Set to `'auto'` to enable minifcation only for production mode
+     * - Set to custom minification according to
      * @https://github.com/kangax/html-minifier#options-quick-reference
      */
-    minify?: boolean | MinifyOptions;
+    minify: 'auto' | boolean | MinifyOptions;
     /**
      * Render errors into the HTML page
      */
-    showErrors?: boolean;
+    showErrors: boolean;
     /**
      * The `webpack` require path to the template.
      * @see https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md
      */
-    template?: string;
+    template: string;
     /**
      * Allow to use a html string instead of reading from a file
      */
-    templateContent?:
+    templateContent:
       | false // Use the template option instead to load a file
       | string
       | Promise<string>;
     /**
      * Allows to overwrite the parameters used in the template
      */
-    templateParameters?:
+    templateParameters:
       | false // Pass an empty object to the template function
       | ((
           compilation: any,
@@ -110,7 +108,7 @@ declare namespace HtmlWebpackPlugin {
             headTags: HtmlTagObject[];
             bodyTags: HtmlTagObject[];
           },
-          options: Options
+          options: ProcessedOptions
         ) => { [option: string]: any })
       | ((
           compilation: any,
@@ -119,35 +117,22 @@ declare namespace HtmlWebpackPlugin {
             headTags: HtmlTagObject[];
             bodyTags: HtmlTagObject[];
           },
-          options: Options
+          options: ProcessedOptions
         ) => Promise<{ [option: string]: any }>)
       | { [option: string]: any };
     /**
      * The title to use for the generated HTML document
      */
-    title?: string;
+    title: string;
     /**
      * Enforce self closing tags e.g. <link />
      */
-    xhtml?: boolean;
+    xhtml: boolean;
     /**
      * In addition to the options actually used by this plugin, you can use this hash to pass arbitrary data through
      * to your template.
      */
     [option: string]: any;
-  }
-
-  /**
-   * Options interface that matches the expectations of the index.js API:
-   *   - All fields are required
-   *   - The minify property matches what html-minifier expects (eg either a MinifyOptions or undefined).
-   *     html-minifier does not accept a boolean value. As TypeScript does not allow a property to be redefined
-   *     in an extended interface we need to omit it and then define it properly
-   *
-   *  The Required and Omit types are defined at the top of the file
-   */
-  interface ProcessedOptions extends Required<Omit<Options, "minify">> {
-    minify: MinifyOptions | undefined;
   }
 
   /**
