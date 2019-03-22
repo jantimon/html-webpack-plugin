@@ -214,6 +214,22 @@ describe('HtmlWebpackPlugin', () => {
     ['<script src="app_bundle.js', 'Some unique text'], null, done);
   });
 
+  it('picks up src/index.ejs by default', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      context: path.join(__dirname, 'fixtures'),
+      entry: {
+        app: './index.js'
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    },
+    ['<script src="app_bundle.js', 'src/index.ejs'], null, done);
+  });
+
   it('allows you to inject the assets into a given html file', done => {
     testHtmlPlugin({
       mode: 'production',
