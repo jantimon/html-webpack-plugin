@@ -128,7 +128,7 @@ This will generate a file `dist/index.html` containing the following
 
 If you have multiple `webpack` entry points, they will all be included with `script` tags in the generated HTML.
 
-If you have any CSS assets in webpack's output (for example, CSS extracted with the [ExtractTextPlugin](https://github.com/webpack/extract-text-webpack-plugin))
+If you have any CSS assets in webpack's output (for example, CSS extracted with the [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin))
 then these will be included with `<link>` tags in the HTML head.
 
 If you have plugins that make use of it, `html-webpack-plugin` should be ordered first before any of the integrated plugins.
