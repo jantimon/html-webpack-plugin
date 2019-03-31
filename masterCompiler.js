@@ -131,8 +131,10 @@ class HtmlWebpackPluginUpdated {
              * @param {() => void} callback
             */
             (compilation, callback) => {
+                console.log('hook emit called');
+                let emitHtmlPromises = [];
+
                 this.htmlWebpackPlugins.forEach((plugin, index) => {
-                    console.log('hook emit called')
                     // Get all entry point names for this html file
                     const entryNames = Array.from(compilation.entrypoints.keys());
                     const filteredEntryNames = this.filterChunks(entryNames, plugin.options.chunks, plugin.options.excludeChunks);
@@ -213,7 +215,7 @@ class HtmlWebpackPluginUpdated {
                             }
                             // Once everything is compiled evaluate the html factory
                             // and replace it with its content
-                            
+
                             debugger;
                             return this.evaluateCompilationResult(compilation, compiledTemplate[index], plugin)
                         });
@@ -276,14 +278,16 @@ class HtmlWebpackPluginUpdated {
                             return null;
                         }).then(() => null));
 
-                    // Once all files are added to the webpack compilation
-                    // let the webpack compiler continue
-                    emitHtmlPromise.then(() => {
+                    emitHtmlPromises.push(emitHtmlPromise);
+                })
+
+                // Once all files are added to the webpack compilation
+                // let the webpack compiler continue
+                Promise.all(emitHtmlPromises)
+                    .then(() => {
                         console.log('hook emit finished')
                         callback();
                     });
-                })
-
             });
     }
 
