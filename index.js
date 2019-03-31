@@ -8,7 +8,7 @@
 /** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
 'use strict';
 const { htmlTagObjectToString } = require('./lib/html-tags');
-const pluginV2 = require('./masterCompiler.js');
+const masterCompiler = require('./masterCompiler.js');
 
 class HtmlWebpackPlugin {
   /**
@@ -79,7 +79,7 @@ class HtmlWebpackPlugin {
     console.info('apply has been called')
     const htmlWebpackPlugins = compiler.options.plugins.filter((plugin) => plugin.constructor.name === 'HtmlWebpackPlugin')
     compiler.options.plugins = compiler.options.plugins.filter((plugin) => plugin.constructor.name !== 'HtmlWebpackPlugin')
-    compiler.options.plugins.unshift(new pluginV2(htmlWebpackPlugins, compiler));
+    compiler.options.plugins.unshift(new masterCompiler(htmlWebpackPlugins, compiler));
 
     debugger;
     return;

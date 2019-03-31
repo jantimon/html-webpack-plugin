@@ -131,7 +131,8 @@ class HtmlWebpackPluginUpdated {
              * @param {() => void} callback
             */
             (compilation, callback) => {
-                this.htmlWebpackPlugins.forEach((plugin) => {
+                this.htmlWebpackPlugins.forEach((plugin, index) => {
+                    console.log('hook emit called')
                     // Get all entry point names for this html file
                     const entryNames = Array.from(compilation.entrypoints.keys());
                     const filteredEntryNames = this.filterChunks(entryNames, plugin.options.chunks, plugin.options.excludeChunks);
@@ -205,18 +206,16 @@ class HtmlWebpackPluginUpdated {
 
                     // Turn the compiled tempalte into a nodejs function or into a nodejs string
                     const templateEvaluationPromise = Promise.all(childCompilerPromises)
-                        .then(compiledTemplates => {
+                        .then(compiledTemplate => {
                             // Allow to use a custom function / string instead
                             if (plugin.options.templateContent !== false) {
                                 return plugin.options.templateContent;
                             }
                             // Once everything is compiled evaluate the html factory
                             // and replace it with its content
-                            const compiledTemplate = compiledTemplates.forEach((compiledTemplate) => {
-                                return this.evaluateCompilationResult(compilation, compiledTemplate, plugin)
-                            })
+                            
                             debugger;
-                            return compiledTemplate;
+                            return this.evaluateCompilationResult(compilation, compiledTemplate[index], plugin)
                         });
 
                     const templateExectutionPromise = Promise.all([assetsPromise, assetTagGroupsPromise, templateEvaluationPromise])
@@ -280,6 +279,7 @@ class HtmlWebpackPluginUpdated {
                     // Once all files are added to the webpack compilation
                     // let the webpack compiler continue
                     emitHtmlPromise.then(() => {
+                        console.log('hook emit finished')
                         callback();
                     });
                 })
