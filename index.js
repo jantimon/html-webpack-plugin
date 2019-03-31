@@ -7,8 +7,9 @@
 /** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
 /** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
 'use strict';
-const { htmlTagObjectToString } = require('./lib/html-tags');
+const { createHtmlTagObject, htmlTagObjectToString } = require('./lib/html-tags');
 const masterCompiler = require('./masterCompiler.js');
+const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
 
 class HtmlWebpackPlugin {
   /**
@@ -130,4 +131,13 @@ function templateParametersGenerator(compilation, assets, assetTags, options) {
  * The major version number of this plugin
  */
 HtmlWebpackPlugin.version = 4;
+
+/**
+ * A static helper to get the hooks for this plugin
+ *
+ * Usage: HtmlWebpackPlugin.getHooks(compilation).HOOK_NAME.tapAsync('YourPluginName', () => { ... });
+ */
+HtmlWebpackPlugin.getHooks = getHtmlWebpackPluginHooks;
+HtmlWebpackPlugin.createHtmlTagObject = createHtmlTagObject;
+
 module.exports = HtmlWebpackPlugin;

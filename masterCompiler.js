@@ -880,7 +880,6 @@ class HtmlWebpackPluginUpdated {
      * The webpack base resolution path for relative paths e.g. process.cwd()
      */
     getFullTemplatePath(template, context) {
-        debugger;
         if (template === 'auto') {
             template = path.resolve(context, 'src/index.ejs');
             if (!fs.existsSync(template)) {
@@ -907,13 +906,5 @@ class HtmlWebpackPluginUpdated {
         return files;
     }
 }
-
-/**
- * A static helper to get the hooks for this plugin
- *
- * Usage: HtmlWebpackPlugin.getHooks(compilation).HOOK_NAME.tapAsync('YourPluginName', () => { ... });
- */
-HtmlWebpackPluginUpdated.getHooks = getHtmlWebpackPluginHooks;
-HtmlWebpackPluginUpdated.createHtmlTagObject = createHtmlTagObject;
 
 module.exports = HtmlWebpackPluginUpdated;
