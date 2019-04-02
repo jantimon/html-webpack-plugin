@@ -175,9 +175,25 @@ class HtmlWebpackPlugin {
        * @param {() => void} callback
       */
       (compilation, callback) => {
-        // Get all entry point names for this html file
-        const entryNames = Array.from(compilation.entrypoints.keys());
-        const filteredEntryNames = self.filterChunks(entryNames, self.options.chunks, self.options.excludeChunks);
+        // Get chunks info as json
+        // Note: we're excluding stuff that we don't need to improve toJson serialization speed.
+        const chunkOnlyConfig = {
+          assets: false,
+          cached: false,
+          children: false,
+          chunks: true,
+          chunkModules: false,
+          chunkOrigins: false,
+          errorDetails: false,
+          hash: false,
+          modules: false,
+          reasons: false,
+          source: false,
+          timings: false,
+          version: false
+        };
+        const allChunks = compilation.getStats().toJson(chunkOnlyConfig).chunks;
+        const filteredEntryNames = self.filterChunks(allChunks, self.options.chunks, self.options.excludeChunks);
         const sortedEntryNames = self.sortEntryChunks(filteredEntryNames, this.options.chunksSortMode, compilation);
         const childCompilationOutputName = self.childCompilationOutputName;
 
@@ -495,11 +511,24 @@ class HtmlWebpackPlugin {
   /**
    * Return all chunks from the compilation result which match the exclude and include filters
    * @param {any} chunks
-   * @param {string[]|'all'} includedChunks
-   * @param {string[]} excludedChunks
+   * @param {string[]|Object|'all'} includedChunks
+   * @param {string[]|Object} excludedChunks
    */
   filterChunks (chunks, includedChunks, excludedChunks) {
-    return chunks.filter(chunkName => {
+    return chunks.filter(chunk => {
+      const chunkName = chunk.names[0];
+      // This chunk doesn't have a name. This script can't handled it.
+      if (chunkName === undefined) {
+        return false;
+      }
+      // Skip if the chunk should be lazy loaded
+      if (typeof chunk.isInitial === 'function') {
+        if (!chunk.isInitial()) {
+          return false;
+        }
+      } else if (!chunk.initial) {
+        return false;
+      }
       // Skip if the chunks should be filtered and the given chunk was not added explicity
       if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
         return false;
@@ -507,6 +536,14 @@ class HtmlWebpackPlugin {
       // Skip if the chunks should be filtered and the given chunk was excluded explicity
       if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) {
         return false;
+      }
+      // if included chunks is a method, test it
+      if(excludedChunks && {}.toString.call(excludedChunks) === '[object Function]'){
+        return !excludedChunks(chunk);
+      }
+      // if included chunks is a method, test it
+      if(includedChunks && {}.toString.call(includedChunks) === '[object Function]'){
+        return includedChunks(chunk);
       }
       // Add otherwise
       return true;
