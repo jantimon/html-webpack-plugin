@@ -3,14 +3,13 @@
 /** @typedef {import("./typings").HtmlTagObject} HtmlTagObject */
 /** @typedef {import("./typings").Options} HtmlWebpackOptions */
 /** @typedef {import("./typings").ProcessedOptions} ProcessedHtmlWebpackOptions */
-/** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
-/** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
+/** @typedef {import("./typings").WebpackCompiler} WebpackCompiler */
 'use strict';
 
 const log = require('webpack-log');
 
 const { createHtmlTagObject } = require('./lib/html-tags');
-const { multiHtmlWebpackPlugin } = require('./lib/multiHtmlWebpackPlugin.js');
+const { MultiHtmlWebpackPlugin } = require('./lib/MultiHtmlWebpackPlugin.js');
 const { defaultOptions } = require('./lib/optionsHelper');
 const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
 
@@ -51,18 +50,42 @@ class HtmlWebpackPlugin {
    * @param {WebpackCompiler} compiler
    */
   apply(compiler) {
-    const addedUpdatedplugin = compiler.options.plugins[0] instanceof multiHtmlWebpackPlugin;
+    // @ts-ignore
+    const addedMultiHtmlWebpackPlugin = compiler.options.plugins[0] instanceof MultiHtmlWebpackPlugin;
 
-    if (addedUpdatedplugin) {
+    if (addedMultiHtmlWebpackPlugin) {
       return;
     }
 
-    const htmlWebpackPlugins = compiler.options.plugins.filter((plugin) => plugin instanceof HtmlWebpackPlugin)
-    compiler.options.plugins = compiler.options.plugins.filter((plugin) => !(plugin instanceof HtmlWebpackPlugin))
-    compiler.options.plugins.unshift(new multiHtmlWebpackPlugin(htmlWebpackPlugins, compiler));
+    const logger = log({name: 'HtmlWebpackPlugin'});
 
-    const logger = log({ name: 'HtmlWebpackPlugin' })
-    logger.info('all HtmlWebpackPlugins have been removed and injected into multiHtmlWebpackPlugin')
+    const htmlWebpackPlugins = this.getAllHtmlWebpackPlugins(compiler);
+    compiler.options.plugins = this.getAllOtherPlugins(compiler);
+
+    logger.info('all HtmlWebpackPlugins have been removed and injected into multiHtmlWebpackPlugin');
+
+    // inject multiHtmlWebpackPlugin into webpack config.plugins
+    compiler.options.plugins.unshift(new MultiHtmlWebpackPlugin(htmlWebpackPlugins, compiler));
+  }
+
+  /**
+   * @param {WebpackCompiler} compiler
+   * returns all instances of HtmlWebpackPlugin from webpack config.plugins
+   * @private
+   */
+  getAllHtmlWebpackPlugins(compiler) {
+    // @ts-ignore
+    return compiler.options.plugins.filter((plugin) => plugin instanceof HtmlWebpackPlugin);
+  }
+
+  /**
+   * @param {WebpackCompiler} compiler
+   * return all instances of all other plugins other then HtmlWebpackPlugin
+   * @private
+   */
+  getAllOtherPlugins(compiler) {
+    // @ts-ignore
+    return compiler.options.plugins.filter((plugin) => !(plugin instanceof HtmlWebpackPlugin));
   }
 }
 
