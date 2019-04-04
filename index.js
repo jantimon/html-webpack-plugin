@@ -8,16 +8,16 @@
 
 const log = require('webpack-log');
 
-const { createHtmlTagObject } = require('./lib/html-tags');
-const { MultiHtmlWebpackPlugin } = require('./lib/MultiHtmlWebpackPlugin.js');
-const { defaultOptions } = require('./lib/optionsHelper');
-const { getHtmlWebpackPluginHooks } = require('./lib/hooks.js');
+const {createHtmlTagObject} = require('./lib/html-tags');
+const {MultiHtmlWebpackPlugin} = require('./lib/MultiHtmlWebpackPlugin.js');
+const {defaultOptions} = require('./lib/optionsHelper');
+const {getHtmlWebpackPluginHooks} = require('./lib/hooks.js');
 
 class HtmlWebpackPlugin {
   /**
    * @param {HtmlWebpackOptions} [options]
    */
-  constructor(options) {
+  constructor (options) {
     /** @type {HtmlWebpackOptions} */
     const userOptions = options || {};
 
@@ -49,7 +49,7 @@ class HtmlWebpackPlugin {
    * apply is called by the webpack main compiler during the start phase
    * @param {WebpackCompiler} compiler
    */
-  apply(compiler) {
+  apply (compiler) {
     // @ts-ignore
     const addedMultiHtmlWebpackPlugin = compiler.options.plugins[0] instanceof MultiHtmlWebpackPlugin;
 
@@ -62,7 +62,7 @@ class HtmlWebpackPlugin {
     const htmlWebpackPlugins = this.getAllHtmlWebpackPlugins(compiler);
     compiler.options.plugins = this.getAllOtherPlugins(compiler);
 
-    logger.info('all HtmlWebpackPlugins have been removed and injected into multiHtmlWebpackPlugin');
+    logger.debug('all HtmlWebpackPlugins have been removed and injected into multiHtmlWebpackPlugin');
 
     // inject multiHtmlWebpackPlugin into webpack config.plugins
     compiler.options.plugins.unshift(new MultiHtmlWebpackPlugin(htmlWebpackPlugins, compiler));
@@ -73,7 +73,7 @@ class HtmlWebpackPlugin {
    * returns all instances of HtmlWebpackPlugin from webpack config.plugins
    * @private
    */
-  getAllHtmlWebpackPlugins(compiler) {
+  getAllHtmlWebpackPlugins (compiler) {
     // @ts-ignore
     return compiler.options.plugins.filter((plugin) => plugin instanceof HtmlWebpackPlugin);
   }
@@ -83,7 +83,7 @@ class HtmlWebpackPlugin {
    * return all instances of all other plugins other then HtmlWebpackPlugin
    * @private
    */
-  getAllOtherPlugins(compiler) {
+  getAllOtherPlugins (compiler) {
     // @ts-ignore
     return compiler.options.plugins.filter((plugin) => !(plugin instanceof HtmlWebpackPlugin));
   }
