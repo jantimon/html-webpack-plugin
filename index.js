@@ -4,9 +4,12 @@
 /** @typedef {import("./typings").Options} HtmlWebpackOptions */
 /** @typedef {import("./typings").ProcessedOptions} ProcessedHtmlWebpackOptions */
 /** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
+/** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
 'use strict';
 
+const _ = require('lodash');
 const log = require('webpack-log');
+const vm = require('vm');
 
 const {createHtmlTagObject} = require('./lib/html-tags');
 const {MultiHtmlWebpackPlugin} = require('./lib/MultiHtmlWebpackPlugin.js');
@@ -86,6 +89,38 @@ class HtmlWebpackPlugin {
   getAllOtherPlugins (compiler) {
     // @ts-ignore
     return compiler.options.plugins.filter((plugin) => !(plugin instanceof HtmlWebpackPlugin));
+  }
+
+  /**
+   * Evaluates the child compilation result
+   * @param {WebpackCompilation} compilation
+   * @param {string} source
+   * @returns {Promise<string | (() => string | Promise<string>)>}
+   */
+  evaluateCompilationResult (compilation, source) {
+    if (!source) {
+      return Promise.reject(new Error('The child compilation didn\'t provide a result'));
+    }
+    // The LibraryTemplatePlugin stores the template result in a local variable.
+    // To extract the result during the evaluation this part has to be removed.
+    source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
+    const template = this.options.template.replace(/^.+!/, '').replace(/\?.+$/, '');
+    const vmContext = vm.createContext(_.extend({ HTML_WEBPACK_PLUGIN: true, require: require }, global));
+    const vmScript = new vm.Script(source, { filename: template });
+    // Evaluate code and cast to string
+    let newSource;
+    try {
+      newSource = vmScript.runInContext(vmContext);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+    if (typeof newSource === 'object' && newSource.__esModule && newSource.default) {
+      newSource = newSource.default;
+    }
+
+    return typeof newSource === 'string' || typeof newSource === 'function'
+      ? Promise.resolve(newSource)
+      : Promise.reject(new Error('The loader "' + this.options.template + '" didn\'t return html.'));
   }
 }
 
