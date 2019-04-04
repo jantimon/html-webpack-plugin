@@ -3,7 +3,7 @@
 /** @typedef {import("./typings").HtmlTagObject} HtmlTagObject */
 /** @typedef {import("./typings").Options} HtmlWebpackOptions */
 /** @typedef {import("./typings").ProcessedOptions} ProcessedHtmlWebpackOptions */
-/** @typedef {import("./typings").WebpackCompiler} WebpackCompiler */
+/** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
 'use strict';
 
 const log = require('webpack-log');
@@ -11,7 +11,7 @@ const log = require('webpack-log');
 const { createHtmlTagObject } = require('./lib/html-tags');
 const { MultiHtmlWebpackPlugin } = require('./lib/MultiHtmlWebpackPlugin.js');
 const { defaultOptions } = require('./lib/optionsHelper');
-const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
+const { getHtmlWebpackPluginHooks } = require('./lib/hooks.js');
 
 class HtmlWebpackPlugin {
   /**
