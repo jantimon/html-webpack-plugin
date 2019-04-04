@@ -3,12 +3,15 @@
 /** @typedef {import("./typings").HtmlTagObject} HtmlTagObject */
 /** @typedef {import("./typings").Options} HtmlWebpackOptions */
 /** @typedef {import("./typings").ProcessedOptions} ProcessedHtmlWebpackOptions */
-/** @typedef {import("./typings").TemplateParameter} TemplateParameter */
 /** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
 /** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
 'use strict';
-const { createHtmlTagObject, htmlTagObjectToString } = require('./lib/html-tags');
-const masterCompiler = require('./masterCompiler.js');
+
+const log = require('webpack-log');
+
+const { createHtmlTagObject } = require('./lib/html-tags');
+const { multiHtmlWebpackPlugin } = require('./lib/multiHtmlWebpackPlugin.js');
+const { defaultOptions } = require('./lib/optionsHelper');
 const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
 
 class HtmlWebpackPlugin {
@@ -19,31 +22,8 @@ class HtmlWebpackPlugin {
     /** @type {HtmlWebpackOptions} */
     const userOptions = options || {};
 
-    // Default options
     /** @type {ProcessedHtmlWebpackOptions} */
-    const defaultOptions = {
-      template: 'auto',
-      templateContent: false,
-      templateParameters: templateParametersGenerator,
-      filename: 'index.html',
-      hash: false,
-      inject: true,
-      compile: true,
-      favicon: false,
-      minify: 'auto',
-      cache: true,
-      showErrors: true,
-      chunks: 'all',
-      excludeChunks: [],
-      chunksSortMode: 'auto',
-      meta: {},
-      base: false,
-      title: 'Webpack App',
-      xhtml: false
-    };
-
-    /** @type {ProcessedHtmlWebpackOptions} */
-    this.options = Object.assign(defaultOptions, userOptions);
+    this.options = Object.assign({}, defaultOptions, userOptions);
 
     // Default metaOptions if no template is provided
     if (!userOptions.template && this.options.templateContent === false && this.options.meta) {
@@ -71,59 +51,19 @@ class HtmlWebpackPlugin {
    * @param {WebpackCompiler} compiler
    */
   apply(compiler) {
-    const addedUpdatedplugin = compiler.options.plugins[0].constructor.name === 'HtmlWebpackPluginUpdated';
+    const addedUpdatedplugin = compiler.options.plugins[0] instanceof multiHtmlWebpackPlugin;
 
     if (addedUpdatedplugin) {
       return;
     }
 
-    console.info('apply has been called')
-    const htmlWebpackPlugins = compiler.options.plugins.filter((plugin) => plugin.constructor.name === 'HtmlWebpackPlugin')
-    compiler.options.plugins = compiler.options.plugins.filter((plugin) => plugin.constructor.name !== 'HtmlWebpackPlugin')
-    compiler.options.plugins.unshift(new masterCompiler(htmlWebpackPlugins, compiler));
+    const htmlWebpackPlugins = compiler.options.plugins.filter((plugin) => plugin instanceof HtmlWebpackPlugin)
+    compiler.options.plugins = compiler.options.plugins.filter((plugin) => !(plugin instanceof HtmlWebpackPlugin))
+    compiler.options.plugins.unshift(new multiHtmlWebpackPlugin(htmlWebpackPlugins, compiler));
 
-    debugger;
-    return;
+    const logger = log({ name: 'HtmlWebpackPlugin' })
+    logger.info('all HtmlWebpackPlugins have been removed and injected into multiHtmlWebpackPlugin')
   }
-}
-
-/**
- * The default for options.templateParameter
- * Generate the template parameters
- *
- * Generate the template parameters for the template function
- * @param {WebpackCompilation} compilation
- * @param {{
-   publicPath: string,
-   js: Array<string>,
-   css: Array<string>,
-   manifest?: string,
-   favicon?: string
- }} assets
- * @param {{
-     headTags: HtmlTagObject[],
-     bodyTags: HtmlTagObject[]
-   }} assetTags
- * @param {ProcessedHtmlWebpackOptions} options
- * @returns {TemplateParameter}
- */
-function templateParametersGenerator(compilation, assets, assetTags, options) {
-  const xhtml = options.xhtml;
-  assetTags.headTags.toString = function () {
-    return this.map((assetTagObject) => htmlTagObjectToString(assetTagObject, xhtml)).join('');
-  };
-  assetTags.bodyTags.toString = function () {
-    return this.map((assetTagObject) => htmlTagObjectToString(assetTagObject, xhtml)).join('');
-  };
-  return {
-    compilation: compilation,
-    webpackConfig: compilation.options,
-    htmlWebpackPlugin: {
-      tags: assetTags,
-      files: assets,
-      options: options
-    }
-  };
 }
 
 // Statics:

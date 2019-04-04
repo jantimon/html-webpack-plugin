@@ -48,7 +48,8 @@
     "standard-version": "^4.4.0",
     "style-loader": "^0.23.0",
     "typescript": "^3.3.3",
-    "webpack": "^4.20.2",
+    "webpack": "^4.29.6",
+    "webpack-log": "^2.0.0",
     "webpack-recompilation-simulator": "^3.0.0"
   },
   "dependencies": {
