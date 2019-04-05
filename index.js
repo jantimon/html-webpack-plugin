@@ -12,7 +12,7 @@ const log = require('webpack-log');
 const vm = require('vm');
 
 const {createHtmlTagObject} = require('./lib/html-tags');
-const {MultiHtmlWebpackPlugin} = require('./lib/MultiHtmlWebpackPlugin.js');
+const {MultiHtmlWebpackPlugin} = require('./lib/multiHtmlWebpackPlugin.js');
 const {defaultOptions} = require('./lib/optionsHelper');
 const {getHtmlWebpackPluginHooks} = require('./lib/hooks.js');
 
