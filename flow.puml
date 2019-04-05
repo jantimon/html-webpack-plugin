@@ -6,12 +6,14 @@
 autonumber
 
 participant Webpack
+participant MultiHtmlWebpackPlugin
 participant ChildCompiler
 participant TagCreator
 participant TemplateExecutor
 participant TagInjector
 
-Webpack -> ChildCompiler : start child compilation
+Webpack -> MultiHtmlWebpackPlugin : injects all HtmlWebpackPlugin\ninto MultiHtmlWebpackPlugin from webpack.config.plugins
+MultiHtmlWebpackPlugin -> ChildCompiler : start child compilation
 ChildCompiler -> ChildCompiler : compile html template
 ChildCompiler -> TemplateExecutor : handover compiled template
 Webpack -> TagCreator : hand over compilation\n assets
