@@ -244,10 +244,10 @@ describe('HtmlWebpackPlugin', () => {
       },
       plugins: [new HtmlWebpackPlugin({
         inject: true,
-        template: 'html-loader!fake-module/test.html'
+        template: 'html-loader!fake-module/plain.html'
       })]
     },
-    ['<script src="app_bundle.js"', 'Some unique text'], null, done);
+    ['<script src="app_bundle.js"'], null, done);
   });
 
   it('picks up src/index.ejs by default', done => {
