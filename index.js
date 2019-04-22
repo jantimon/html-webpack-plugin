@@ -914,14 +914,27 @@ class HtmlWebpackPlugin {
         template = path.join(__dirname, 'default_index.ejs');
       }
     }
+
+    const getTemplatePath = (filepath, pathContext = '') => {
+      let resolvedPath = '';
+      try {
+        resolvedPath = require.resolve(filepath);
+      } catch (e) {
+      } finally {
+        resolvedPath = resolvedPath || path.resolve(pathContext, filepath);
+      }
+
+      return resolvedPath;
+    };
+
     // If the template doesn't use a loader use the lodash template loader
     if (template.indexOf('!') === -1) {
-      template = require.resolve('./lib/loader.js') + '!' + path.resolve(context, template);
+      template = require.resolve('./lib/loader.js') + '!' + getTemplatePath(template, context);
     }
     // Resolve template path
     return template.replace(
       /([!])([^/\\][^!?]+|[^/\\!?])($|\?[^!?\n]+$)/,
-      (match, prefix, filepath, postfix) => prefix + path.resolve(filepath) + postfix);
+      (match, prefix, filepath, postfix) => prefix + getTemplatePath(filepath) + postfix);
   }
 
   /**

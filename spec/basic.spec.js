@@ -214,6 +214,42 @@ describe('HtmlWebpackPlugin', () => {
     ['<script src="app_bundle.js', 'Some unique text'], null, done);
   });
 
+  it('allows you to specify a template file from a module', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: true,
+        template: 'html-loader!fake-module/test.html'
+      })]
+    },
+    ['<script src="app_bundle.js', 'Some unique text'], null, done);
+  });
+
+  it('allows you to specify a template file from a module using a loader', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: true,
+        template: 'html-loader!fake-module/test.html'
+      })]
+    },
+    ['<script src="app_bundle.js"', 'Some unique text'], null, done);
+  });
+
   it('picks up src/index.ejs by default', done => {
     testHtmlPlugin({
       mode: 'production',

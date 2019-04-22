@@ -80,6 +80,7 @@
     }
   },
   "jest": {
+    "moduleDirectories": ["node_modules", "__mocks__"],
     "watchPathIgnorePatterns": [
       "<rootDir>/dist"
     ],
