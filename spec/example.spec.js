@@ -45,7 +45,7 @@ function runExample (exampleName, done) {
       expect(stats.compilation.errors).toEqual([]);
 
       const dircompare = require('dir-compare');
-      const res = dircompare.compareSync(fixturePath, exampleOutput, {compareSize: true});
+      const res = dircompare.compareSync(fixturePath, exampleOutput, { compareSize: true });
 
       res.diffSet.filter(diff => diff.state === 'distinct').forEach(diff => {
         const file1Contents = fs.readFileSync(path.join(diff.path1, diff.name1)).toString();

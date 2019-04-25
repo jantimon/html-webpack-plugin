@@ -219,7 +219,7 @@ class HtmlWebpackPlugin {
         // Turn the js and css paths into grouped HtmlTagObjects
         const assetTagGroupsPromise = assetsPromise
           // And allow third-party-plugin authors to reorder and change the assetTags before they are grouped
-          .then(({assets}) => getHtmlWebpackPluginHooks(compilation).alterAssetTags.promise({
+          .then(({ assets }) => getHtmlWebpackPluginHooks(compilation).alterAssetTags.promise({
             assetTags: {
               scripts: self.generatedScriptTags(assets.js),
               styles: self.generateStyleTags(assets.css),
@@ -232,7 +232,7 @@ class HtmlWebpackPlugin {
             outputName: childCompilationOutputName,
             plugin: self
           }))
-          .then(({assetTags}) => {
+          .then(({ assetTags }) => {
             // Inject scripts to body unless it set explictly to head
             const scriptTarget = self.options.inject === 'head' ? 'head' : 'body';
             // Group assets to `head` and `body` tag arrays
@@ -267,17 +267,17 @@ class HtmlWebpackPlugin {
         const injectedHtmlPromise = Promise.all([assetTagGroupsPromise, templateExectutionPromise])
           // Allow plugins to change the html before assets are injected
           .then(([assetTags, html]) => {
-            const pluginArgs = {html, headTags: assetTags.headTags, bodyTags: assetTags.bodyTags, plugin: self, outputName: childCompilationOutputName};
+            const pluginArgs = { html, headTags: assetTags.headTags, bodyTags: assetTags.bodyTags, plugin: self, outputName: childCompilationOutputName };
             return getHtmlWebpackPluginHooks(compilation).afterTemplateExecution.promise(pluginArgs);
           })
-          .then(({html, headTags, bodyTags}) => {
-            return self.postProcessHtml(html, assets, {headTags, bodyTags});
+          .then(({ html, headTags, bodyTags }) => {
+            return self.postProcessHtml(html, assets, { headTags, bodyTags });
           });
 
         const emitHtmlPromise = injectedHtmlPromise
           // Allow plugins to change the html after assets are injected
           .then((html) => {
-            const pluginArgs = {html, plugin: self, outputName: childCompilationOutputName};
+            const pluginArgs = { html, plugin: self, outputName: childCompilationOutputName };
             return getHtmlWebpackPluginHooks(compilation).beforeEmit.promise(pluginArgs)
               .then(result => result.html);
           })
@@ -333,8 +333,8 @@ class HtmlWebpackPlugin {
     // To extract the result during the evaluation this part has to be removed.
     source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
     const template = this.options.template.replace(/^.+!/, '').replace(/\?.+$/, '');
-    const vmContext = vm.createContext(_.extend({HTML_WEBPACK_PLUGIN: true, require: require}, global));
-    const vmScript = new vm.Script(source, {filename: template});
+    const vmContext = vm.createContext(_.extend({ HTML_WEBPACK_PLUGIN: true, require: require }, global));
+    const vmScript = new vm.Script(source, { filename: template });
     // Evaluate code and cast to string
     let newSource;
     try {
@@ -549,7 +549,7 @@ class HtmlWebpackPlugin {
      * if a path publicPath is set in the current webpack config use it otherwise
      * fallback to a realtive path
      */
-    const webpackPublicPath = compilation.mainTemplate.getPublicPath({hash: compilationHash});
+    const webpackPublicPath = compilation.mainTemplate.getPublicPath({ hash: compilationHash });
     const isPublicPathDefined = webpackPublicPath.trim() !== '';
     let publicPath = isPublicPathDefined
       // If a hard coded public path exists use it

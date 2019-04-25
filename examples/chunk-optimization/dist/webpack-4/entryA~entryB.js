@@ -1,4 +1,4 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[2],[
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[0],[
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -30,13 +30,9 @@ if(false) {}
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(4)(false);
-// imports
-
-
-// module
+// Module
 exports.push([module.i, "body {\n  background: snow;\n}", ""]);
 
-// exports
 
 
 /***/ })
