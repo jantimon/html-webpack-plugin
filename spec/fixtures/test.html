@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8"/>
     <title>Test</title>
+
+    <link rel="preload" href="<%=htmlWebpackPlugin.files.chunks.app.js[0]%>" as="script" />
   </head>
   <body>
     <p>Some unique text</p>

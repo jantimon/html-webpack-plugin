@@ -197,21 +197,28 @@ describe('HtmlWebpackPlugin', () => {
   });
 
   it('allows you to specify your own HTML template file', done => {
-    testHtmlPlugin({
-      mode: 'production',
-      entry: {
-        app: path.join(__dirname, 'fixtures/index.js')
-      },
-      output: {
-        path: OUTPUT_DIR,
-        filename: '[name]_bundle.js'
-      },
-      plugins: [new HtmlWebpackPlugin({
-        template: path.join(__dirname, 'fixtures/test.html'),
-        inject: false
-      })]
-    },
-    ['<script src="app_bundle.js', 'Some unique text'], null, done);
+    testHtmlPlugin(
+      {
+        mode: 'production',
+        entry: {
+          app: path.join(__dirname, 'fixtures/index.js')
+        },
+        output: {
+          path: OUTPUT_DIR,
+          filename: '[name]_bundle.js'
+        },
+        plugins: [new HtmlWebpackPlugin({
+          template: path.join(__dirname, 'fixtures/test.html'),
+          inject: false
+        })]
+      }, [
+        '<script src="app_bundle.js',
+        '<link rel="preload" href="app_bundle.js" as="script"',
+        'Some unique text'
+      ],
+      null,
+      done
+    );
   });
 
   it('picks up src/index.ejs by default', done => {
@@ -441,23 +448,29 @@ describe('HtmlWebpackPlugin', () => {
   });
 
   it('should work with the css extract plugin', done => {
-    testHtmlPlugin({
-      mode: 'production',
-      entry: path.join(__dirname, 'fixtures/theme.js'),
-      output: {
-        path: OUTPUT_DIR,
-        filename: 'index_bundle.js'
-      },
-      module: {
-        rules: [
-          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
+    testHtmlPlugin(
+      {
+        mode: 'production',
+        entry: path.join(__dirname, 'fixtures/theme.js'),
+        output: {
+          path: OUTPUT_DIR,
+          filename: 'index_bundle.js'
+        },
+        module: {
+          rules: [
+            { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
+          ]
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            template: path.join(__dirname, 'fixtures/theme.html')
+          }),
+          new MiniCssExtractPlugin({filename: 'styles.css'})
         ]
-      },
-      plugins: [
-        new HtmlWebpackPlugin(),
-        new MiniCssExtractPlugin({filename: 'styles.css'})
-      ]
-    }, ['<link href="styles.css" rel="stylesheet">'], null, done);
+      }, [
+        '<link href="styles.css" rel="stylesheet">',
+        '<link rel="preload" href="styles.css" as="style"'
+      ], null, done);
   });
 
   it('should work with the css extract plugin on windows and protocol relative urls support (#205)', done => {
