@@ -263,11 +263,11 @@ The following variables are available in the template:
         "js": [ "assets/head_bundle.js", "assets/main_bundle.js"],
         "chunks": {
           "head": {
-            "entry": "assets/head_bundle.js",
+            "js": ["assets/head_bundle.js"],
             "css": [ "main.css" ]
           },
           "main": {
-            "entry": "assets/main_bundle.js",
+            "js": ["assets/main_bundle.js"],
             "css": []
           },
         }
