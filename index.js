@@ -27,6 +27,8 @@ const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPlugin
 const fsStatAsync = promisify(fs.stat);
 const fsReadFileAsync = promisify(fs.readFile);
 
+const EXTENSION_REG_EXP = /\.(css|js)(\?|$)/;
+
 class HtmlWebpackPlugin {
   /**
    * @param {HtmlWebpackOptions} [options]
@@ -565,6 +567,7 @@ class HtmlWebpackPlugin {
     /**
      * @type {{
         publicPath: string,
+        chunks: {[chunkGroupName: string]: {js: Array<string>, css: Array<string>}},
         js: Array<string>,
         css: Array<string>,
         manifest?: string,
@@ -574,6 +577,8 @@ class HtmlWebpackPlugin {
     const assets = {
       // The public path
       publicPath: publicPath,
+      // Will contain all js and css files by chunk.
+      chunks: {},
       // Will contain all js files
       js: [],
       // Will contain all css files
@@ -590,39 +595,69 @@ class HtmlWebpackPlugin {
     }
 
     // Extract paths to .js and .css files from the current compilation
-    const entryPointPublicPathMap = {};
-    const extensionRegexp = /\.(css|js)(\?|$)/;
+    const seenEntryPointFilePublicPaths = new Set();
     for (let i = 0; i < entryNames.length; i++) {
       const entryName = entryNames[i];
-      const entryPointFiles = compilation.entrypoints.get(entryName).getFiles();
+
+      const entryPointAssets = this.processFiles(
+        compilation.entrypoints.get(entryName).getFiles(),
+        publicPath,
+        compilationHash,
+        seenEntryPointFilePublicPaths
+      );
+
+      assets.js.push(...entryPointAssets.js);
+      assets.css.push(...entryPointAssets.css);
+    }
+
+    const stats = compilation.getStats().toJson({all: false, chunkGroups: true});
+
+    Object.entries(stats.namedChunkGroups).forEach(([chunkGroupName, chunkGroupStats]) => {
+      assets.chunks[chunkGroupName] = this.processFiles(chunkGroupStats.assets, publicPath, compilationHash, new Set());
+    });
+
+    return assets;
+  }
+
+  /**
+   * Process a list of files by adding the public path and compilation hash if necessary and grouping by file extension.
+   * @param {Array<string>} files
+   * @param {string} publicPath
+   * @param {string} compilationHash
+   * @param {Set<string>} seenFilePublicPaths
+   * @returns {{
+   *   js: Array<string>,
+   *   css: Array<string>
+   * }}
+   */
+  processFiles (files, publicPath, compilationHash, seenFilePublicPaths) {
+    const assets = {js: [], css: []};
+
+    files.forEach((file) => {
       // Prepend the publicPath and append the hash depending on the
       // webpack.output.publicPath and hashOptions
       // E.g. bundle.js -> /bundle.js?hash
-      const entryPointPublicPaths = entryPointFiles
-        .map(chunkFile => {
-          const entryPointPublicPath = publicPath + chunkFile;
-          return this.options.hash
-            ? this.appendHash(entryPointPublicPath, compilationHash)
-            : entryPointPublicPath;
-        });
+      let filePublicPath = publicPath + file;
+      if (this.options.hash) {
+        filePublicPath = this.appendHash(filePublicPath, compilationHash);
+      }
 
-      entryPointPublicPaths.forEach((entryPointPublicPath) => {
-        const extMatch = extensionRegexp.exec(entryPointPublicPath);
-        // Skip if the public path is not a .css or .js file
-        if (!extMatch) {
-          return;
-        }
-        // Skip if this file is already known
-        // (e.g. because of common chunk optimizations)
-        if (entryPointPublicPathMap[entryPointPublicPath]) {
-          return;
-        }
-        entryPointPublicPathMap[entryPointPublicPath] = true;
-        // ext will contain .js or .css
-        const ext = extMatch[1];
-        assets[ext].push(entryPointPublicPath);
-      });
-    }
+      const extMatch = EXTENSION_REG_EXP.exec(filePublicPath);
+      // Skip if the public path is not a .css or .js file
+      if (!extMatch) {
+        return;
+      }
+      // Skip if this file is already known
+      // (e.g. because of common chunk optimizations)
+      if (seenFilePublicPaths.has(filePublicPath)) {
+        return;
+      }
+      seenFilePublicPaths.add(filePublicPath);
+      // ext will contain .js or .css
+      const ext = extMatch[1];
+      assets[ext].push(filePublicPath);
+    });
+
     return assets;
   }
 
