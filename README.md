@@ -85,8 +85,8 @@ The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webp
  * [html-webpack-exclude-empty-assets-plugin](https://github.com/KnisterPeter/html-webpack-exclude-empty-assets-plugin) removes empty assets from being added to the html. This fixes some problems with extract-text-plugin with webpack 4.
  * [webpack-concat-plugin](https://github.com/hxlniada/webpack-concat-plugin) for concat and uglify files that needn't to be webpack bundles(for legacy files) and inject to html-webpack-plugin.
  * [html-webpack-link-type-plugin](https://github.com/steadyapp/html-webpack-link-type-plugin) adds a configurable mimetype to resources injected as links (such as adding type="text/css" to external stylesheets) for compatibility with "strict mode". 
- 
  * [csp-html-webpack-plugin](https://github.com/slackhq/csp-html-webpack-plugin) to add [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) meta tags to the HTML output
+ * [html-webpack-partials-plugin](https://github.com/colbyfayock/html-webpack-partials-plugin) to easily manage partials (such as HTML) without a custom template
 
 
 <h2 align="center">Usage</h2>
