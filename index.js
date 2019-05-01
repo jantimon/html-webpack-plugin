@@ -612,8 +612,13 @@ class HtmlWebpackPlugin {
 
     const stats = compilation.getStats().toJson({all: false, chunkGroups: true});
 
-    Object.entries(stats.namedChunkGroups).forEach(([chunkGroupName, chunkGroupStats]) => {
-      assets.chunks[chunkGroupName] = this.processFiles(chunkGroupStats.assets, publicPath, compilationHash, new Set());
+    Object.keys(stats.namedChunkGroups).forEach((chunkGroupName) => {
+      assets.chunks[chunkGroupName] = this.processFiles(
+        stats.namedChunkGroups[chunkGroupName].assets,
+        publicPath,
+        compilationHash,
+        new Set()
+      );
     });
 
     return assets;
