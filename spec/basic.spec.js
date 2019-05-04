@@ -163,7 +163,7 @@ describe('HtmlWebpackPlugin', () => {
       },
       module: {
         rules: [
-          {test: /\.pug$/, loader: 'pug-loader'}
+          { test: /\.pug$/, loader: 'pug-loader' }
         ]
       },
       output: {
@@ -364,7 +364,7 @@ describe('HtmlWebpackPlugin', () => {
   it('allows you to specify your own HTML template function', done => {
     testHtmlPlugin({
       mode: 'production',
-      entry: {app: path.join(__dirname, 'fixtures/index.js')},
+      entry: { app: path.join(__dirname, 'fixtures/index.js') },
       output: {
         path: OUTPUT_DIR,
         filename: 'app_bundle.js'
@@ -424,7 +424,7 @@ describe('HtmlWebpackPlugin', () => {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
-      plugins: [new HtmlWebpackPlugin({hash: true})]
+      plugins: [new HtmlWebpackPlugin({ hash: true })]
     }, ['<script src="index_bundle.js?%hash%"'], null, done);
   });
 
@@ -436,7 +436,7 @@ describe('HtmlWebpackPlugin', () => {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
-      plugins: [new HtmlWebpackPlugin({hash: true, inject: true})]
+      plugins: [new HtmlWebpackPlugin({ hash: true, inject: true })]
     }, ['<script src="index_bundle.js?%hash%"'], null, done);
   });
 
@@ -455,7 +455,7 @@ describe('HtmlWebpackPlugin', () => {
       },
       plugins: [
         new HtmlWebpackPlugin(),
-        new MiniCssExtractPlugin({filename: 'styles.css'})
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
       ]
     }, ['<link href="styles.css" rel="stylesheet">'], null, done);
   });
@@ -476,7 +476,7 @@ describe('HtmlWebpackPlugin', () => {
       },
       plugins: [
         new HtmlWebpackPlugin(),
-        new MiniCssExtractPlugin({filename: 'styles.css'})
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
       ]
     }, ['<link href="//localhost:8080/styles.css"'], null, done);
   });
@@ -500,7 +500,7 @@ describe('HtmlWebpackPlugin', () => {
           hash: true,
           filename: path.resolve(OUTPUT_DIR, 'subfolder', 'test.html')
         }),
-        new MiniCssExtractPlugin({filename: 'styles.css'})
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
       ]
     }, ['<link href="/some/styles.css?%hash%"'], path.join('subfolder', 'test.html'), done);
   });
@@ -520,8 +520,8 @@ describe('HtmlWebpackPlugin', () => {
         ]
       },
       plugins: [
-        new HtmlWebpackPlugin({hash: true}),
-        new MiniCssExtractPlugin({filename: 'styles.css'})
+        new HtmlWebpackPlugin({ hash: true }),
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
       ]
     }, ['<link href="/some/styles.css?%hash%"'], null, done);
   });
@@ -541,8 +541,8 @@ describe('HtmlWebpackPlugin', () => {
         ]
       },
       plugins: [
-        new HtmlWebpackPlugin({hash: true}),
-        new MiniCssExtractPlugin({filename: 'styles.css'})
+        new HtmlWebpackPlugin({ hash: true }),
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
       ]
     }, ['<link href="some/styles.css?%hash%"'], null, done);
   });
@@ -561,8 +561,8 @@ describe('HtmlWebpackPlugin', () => {
         ]
       },
       plugins: [
-        new HtmlWebpackPlugin({hash: true}),
-        new MiniCssExtractPlugin({filename: 'styles.css'})
+        new HtmlWebpackPlugin({ hash: true }),
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
       ]
     }, ['<link href="styles.css?%hash%"'], null, done);
   });
@@ -585,7 +585,7 @@ describe('HtmlWebpackPlugin', () => {
           hash: true,
           filename: path.resolve(OUTPUT_DIR, 'subfolder', 'test.html')
         }),
-        new MiniCssExtractPlugin({filename: 'styles.css'})
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
       ]
     }, ['<link href="../styles.css?%hash%"'], path.join('subfolder', 'test.html'), done);
   });
@@ -604,8 +604,8 @@ describe('HtmlWebpackPlugin', () => {
         ]
       },
       plugins: [
-        new HtmlWebpackPlugin({inject: true}),
-        new MiniCssExtractPlugin({filename: 'styles.css'})
+        new HtmlWebpackPlugin({ inject: true }),
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
       ]
     }, ['<link href="styles.css"'], null, done);
   });
@@ -624,8 +624,8 @@ describe('HtmlWebpackPlugin', () => {
         ]
       },
       plugins: [
-        new HtmlWebpackPlugin({hash: true, inject: true}),
-        new MiniCssExtractPlugin({filename: 'styles.css'})
+        new HtmlWebpackPlugin({ hash: true, inject: true }),
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
       ]
     }, ['<link href="styles.css?%hash%"'], null, done);
   });
@@ -650,7 +650,7 @@ describe('HtmlWebpackPlugin', () => {
             keepClosingSlash: true
           }
         }),
-        new MiniCssExtractPlugin({filename: 'styles.css'})
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
       ]
     }, ['<link href="styles.css" rel="stylesheet"/>'], null, done);
   });
@@ -808,7 +808,7 @@ describe('HtmlWebpackPlugin', () => {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
-      plugins: [new HtmlWebpackPlugin({title: 'My Cool App'})]
+      plugins: [new HtmlWebpackPlugin({ title: 'My Cool App' })]
     }, ['<title>My Cool App</title>'], null, done);
   });
 
@@ -820,7 +820,7 @@ describe('HtmlWebpackPlugin', () => {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
-      plugins: [new HtmlWebpackPlugin({filename: 'test.html'})]
+      plugins: [new HtmlWebpackPlugin({ filename: 'test.html' })]
     }, ['<script src="index_bundle.js"'], 'test.html', done);
   });
 
@@ -849,7 +849,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: '[name]_bundle.js'
       },
       plugins: [
-        new HtmlWebpackPlugin({filename: 'index.[sha256:contenthash:base32:32].html'})
+        new HtmlWebpackPlugin({ filename: 'index.[sha256:contenthash:base32:32].html' })
       ]
     }, [], /index\.[a-z0-9]{32}\.html/, done);
   });
@@ -865,7 +865,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: '[name]_bundle.js'
       },
       plugins: [
-        new HtmlWebpackPlugin({filename: 'index.[contenthash].html'})
+        new HtmlWebpackPlugin({ filename: 'index.[contenthash].html' })
       ]
     }, [], /index\.[a-f0-9]{32}\.html/, done);
   });
@@ -881,7 +881,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: '[name]_bundle.js'
       },
       plugins: [
-        new HtmlWebpackPlugin({filename: 'index.[templatehash].html'})
+        new HtmlWebpackPlugin({ filename: 'index.[templatehash].html' })
       ]
     }, [], /index\.[a-f0-9]{32}\.html/, done);
   });
@@ -936,7 +936,7 @@ describe('HtmlWebpackPlugin', () => {
         path: OUTPUT_DIR,
         filename: 'index_bundle.js'
       },
-      plugins: [new HtmlWebpackPlugin({filename: 'assets/test.html'})]
+      plugins: [new HtmlWebpackPlugin({ filename: 'assets/test.html' })]
     }, ['<script src="../index_bundle.js"'], 'assets/test.html', done);
   });
 
@@ -948,7 +948,7 @@ describe('HtmlWebpackPlugin', () => {
         path: OUTPUT_DIR,
         filename: 'assets/index_bundle.js'
       },
-      plugins: [new HtmlWebpackPlugin({filename: 'assets/demo/test.html'})]
+      plugins: [new HtmlWebpackPlugin({ filename: 'assets/demo/test.html' })]
     }, ['<script src="../../assets/index_bundle.js"'], 'assets/demo/test.html', done);
   });
 
@@ -994,8 +994,8 @@ describe('HtmlWebpackPlugin', () => {
         ]
       },
       plugins: [
-        new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/empty_html.html')}),
-        new MiniCssExtractPlugin({filename: 'styles.css'})
+        new HtmlWebpackPlugin({ template: path.join(__dirname, 'fixtures/empty_html.html') }),
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
       ]
     }, ['<link href="styles.css"', '<script src="index_bundle.js"'], null, done);
   });
@@ -1011,7 +1011,7 @@ describe('HtmlWebpackPlugin', () => {
         publicPath: 'https://cdn.com',
         filename: '[name]_bundle.js'
       },
-      plugins: [new HtmlWebpackPlugin({template: path.join(__dirname, 'fixtures/webpackconfig.html')})]
+      plugins: [new HtmlWebpackPlugin({ template: path.join(__dirname, 'fixtures/webpackconfig.html') })]
     },
     ['Public path is https://cdn.com'], null, done);
   });
@@ -1447,7 +1447,7 @@ describe('HtmlWebpackPlugin', () => {
         compiler.plugin('compilation', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).afterTemplateExecution.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
-            object.bodyTags.push(HtmlWebpackPlugin.createHtmlTagObject('script', {src: 'funky-script.js'}));
+            object.bodyTags.push(HtmlWebpackPlugin.createHtmlTagObject('script', { src: 'funky-script.js' }));
             object.html += 'Injected by plugin';
             callback();
           });
@@ -1861,7 +1861,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'index_bundle.js'
       },
       plugins: [
-        new AppCachePlugin({settings: ['prefer-online']}),
+        new AppCachePlugin({ settings: ['prefer-online'] }),
         new HtmlWebpackPlugin()
       ]
     }, ['<html manifest="manifest.appcache">'], null, done);
@@ -1877,7 +1877,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'index_bundle.js'
       },
       plugins: [
-        new AppCachePlugin({settings: ['prefer-online']}),
+        new AppCachePlugin({ settings: ['prefer-online'] }),
         new HtmlWebpackPlugin({
           template: path.join(__dirname, 'fixtures/plain.html')
         })
@@ -2111,7 +2111,7 @@ describe('HtmlWebpackPlugin', () => {
   it('should not treat templateContent set to an empty string as missing', done => {
     testHtmlPlugin({
       mode: 'production',
-      entry: {app: path.join(__dirname, 'fixtures/index.js')},
+      entry: { app: path.join(__dirname, 'fixtures/index.js') },
       output: {
         path: OUTPUT_DIR,
         filename: 'app_bundle.js'

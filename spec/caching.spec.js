@@ -20,7 +20,7 @@ process.traceDeprecation = true;
 function setUpCompiler (htmlWebpackPlugin) {
   jest.spyOn(htmlWebpackPlugin, 'evaluateCompilationResult');
   const webpackConfig = {
-    stats: {all: true},
+    stats: { all: true },
     // Caching works only in development
     mode: 'development',
     entry: path.join(__dirname, 'fixtures/index.js'),
@@ -72,7 +72,7 @@ function expectNoErrors (stats) {
     errors.main.forEach((error) => {
       console.log('Error => ', error);
     });
-    console.dir(stats.toJson({errorDetails: true, moduleTrace: true}), { depth: 5 });
+    console.dir(stats.toJson({ errorDetails: true, moduleTrace: true }), { depth: 5 });
   }
   expect(errors.main).toEqual([]);
   expect(errors.childCompilation).toEqual([]);
@@ -122,7 +122,7 @@ describe('HtmlWebpackPluginCaching', () => {
       // Change a js file and compile again
       .then(() => {
         childCompilerHash = htmlWebpackPlugin.childCompilerHash;
-        compiler.simulateFileChange(path.join(__dirname, 'fixtures/index.js'), {footer: '//1'});
+        compiler.simulateFileChange(path.join(__dirname, 'fixtures/index.js'), { footer: '//1' });
         return compiler.run();
       })
       .then(stats => {
@@ -152,7 +152,7 @@ describe('HtmlWebpackPluginCaching', () => {
       // Change a js file and compile again
       .then(() => {
         childCompilerHash = htmlWebpackPlugin.childCompilerHash;
-        compiler.simulateFileChange(path.join(__dirname, 'fixtures/index.js'), {footer: '//1'});
+        compiler.simulateFileChange(path.join(__dirname, 'fixtures/index.js'), { footer: '//1' });
         return compiler.run();
       })
       .then(stats => {
@@ -183,7 +183,7 @@ describe('HtmlWebpackPluginCaching', () => {
       // Change the template file and compile again
       .then(() => {
         childCompilerHash = htmlWebpackPlugin.childCompilerHash;
-        compiler.simulateFileChange(template, {footer: '<!-- 1 -->'});
+        compiler.simulateFileChange(template, { footer: '<!-- 1 -->' });
         return compiler.run();
       })
       .then(stats => {
@@ -254,27 +254,27 @@ describe('HtmlWebpackPluginCaching', () => {
     compiler.startWatching()
       // Change the template file (second build)
       .then(() => {
-        compiler.simulateFileChange(template, {footer: '<!-- 1 -->'});
+        compiler.simulateFileChange(template, { footer: '<!-- 1 -->' });
         return compiler.waitForWatchRunComplete();
       })
       // Change js
       .then(() => {
-        compiler.simulateFileChange(jsFile, {footer: '// 1'});
+        compiler.simulateFileChange(jsFile, { footer: '// 1' });
         return compiler.waitForWatchRunComplete();
       })
       // Change js
       .then(() => {
-        compiler.simulateFileChange(jsFile, {footer: '// 2'});
+        compiler.simulateFileChange(jsFile, { footer: '// 2' });
         return compiler.waitForWatchRunComplete();
       })
       // Change js
       .then(() => {
-        compiler.simulateFileChange(jsFile, {footer: '// 3'});
+        compiler.simulateFileChange(jsFile, { footer: '// 3' });
         return compiler.waitForWatchRunComplete();
       })
       // Change the template file (third build)
       .then(() => {
-        compiler.simulateFileChange(template, {footer: '<!-- 2 -->'});
+        compiler.simulateFileChange(template, { footer: '<!-- 2 -->' });
         return compiler.waitForWatchRunComplete();
       })
       .then(() => {
