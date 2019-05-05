@@ -574,7 +574,7 @@ class HtmlWebpackPlugin {
     const assets = {
       // The public path
       publicPath: publicPath,
-      // Will contain all js files
+      // Will contain all js and mjs files
       js: [],
       // Will contain all css files
       css: [],
@@ -589,9 +589,9 @@ class HtmlWebpackPlugin {
       assets.manifest = this.appendHash(assets.manifest, compilationHash);
     }
 
-    // Extract paths to .js and .css files from the current compilation
+    // Extract paths to .js, .mjs and .css files from the current compilation
     const entryPointPublicPathMap = {};
-    const extensionRegexp = /\.(css|js)(\?|$)/;
+    const extensionRegexp = /\.(css|js|mjs)(\?|$)/;
     for (let i = 0; i < entryNames.length; i++) {
       const entryName = entryNames[i];
       const entryPointFiles = compilation.entrypoints.get(entryName).getFiles();
@@ -608,7 +608,7 @@ class HtmlWebpackPlugin {
 
       entryPointPublicPaths.forEach((entryPointPublicPath) => {
         const extMatch = extensionRegexp.exec(entryPointPublicPath);
-        // Skip if the public path is not a .css or .js file
+        // Skip if the public path is not a .css, .mjs or .js file
         if (!extMatch) {
           return;
         }
@@ -618,8 +618,8 @@ class HtmlWebpackPlugin {
           return;
         }
         entryPointPublicPathMap[entryPointPublicPath] = true;
-        // ext will contain .js or .css
-        const ext = extMatch[1];
+        // ext will contain .js or .css, because .mjs recognizes as .js
+        const ext = extMatch[1] === 'mjs' ? 'js' : extMatch[1];
         assets[ext].push(entryPointPublicPath);
       });
     }
