@@ -92,39 +92,8 @@ class HtmlWebpackPlugin {
     /** @type Promise<string> */
     let compilationPromise;
 
-    this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
-
-    // convert absolute filename into relative so that webpack can
-    // generate it at correct location
-    const filename = this.options.filename;
-    if (path.resolve(filename) === path.normalize(filename)) {
-      this.options.filename = path.relative(compiler.options.output.path, filename);
-    }
-
-    // `contenthash` is introduced in webpack v4.3
-    // which conflicts with the plugin's existing `contenthash` method,
-    // hence it is renamed to `templatehash` to avoid conflicts
-    this.options.filename = this.options.filename.replace(/\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, (match) => {
-      return match.replace('contenthash', 'templatehash');
-    });
-
-    // Check if webpack is running in production mode
-    // @see https://github.com/webpack/webpack/blob/3366421f1784c449f415cda5930a8e445086f688/lib/WebpackOptionsDefaulter.js#L12-L14
-    const isProductionLikeMode = compiler.options.mode === 'production' || !compiler.options.mode;
-
-    const minify = this.options.minify;
-    if (minify === true || (minify === 'auto' && isProductionLikeMode)) {
-      /** @type { import('html-minifier').Options } */
-      this.options.minify = {
-        // https://github.com/kangax/html-minifier#options-quick-reference
-        collapseWhitespace: true,
-        removeComments: true,
-        removeRedundantAttributes: true,
-        removeScriptTypeAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        useShortDoctype: true
-      };
-    }
+    // Normalization options when plugin apply
+    this.normalizedOptions(compiler);
 
     // Clear the cache once a new HtmlWebpackPlugin is added
     childCompiler.clearCache(compiler);
@@ -317,6 +286,46 @@ class HtmlWebpackPlugin {
           callback();
         });
       });
+  }
+
+  /**
+   * Normalization options when plugin apply
+   * @param {WebpackCompiler} compiler
+   */
+  normalizedOptions (compiler) {
+    this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
+
+    // convert absolute filename into relative so that webpack can
+    // generate it at correct location
+    const filename = this.options.filename;
+    if (path.resolve(filename) === path.normalize(filename)) {
+      this.options.filename = path.relative(compiler.options.output.path, filename);
+    }
+
+    // `contenthash` is introduced in webpack v4.3
+    // which conflicts with the plugin's existing `contenthash` method,
+    // hence it is renamed to `templatehash` to avoid conflicts
+    this.options.filename = this.options.filename.replace(/\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, (match) => {
+      return match.replace('contenthash', 'templatehash');
+    });
+
+    // Check if webpack is running in production mode
+    // @see https://github.com/webpack/webpack/blob/3366421f1784c449f415cda5930a8e445086f688/lib/WebpackOptionsDefaulter.js#L12-L14
+    const isProductionLikeMode = compiler.options.mode === 'production' || !compiler.options.mode;
+
+    const minify = this.options.minify;
+    if (minify === true || (minify === 'auto' && isProductionLikeMode)) {
+      /** @type { import('html-minifier').Options } */
+      this.options.minify = {
+        // https://github.com/kangax/html-minifier#options-quick-reference
+        collapseWhitespace: true,
+        removeComments: true,
+        removeRedundantAttributes: true,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        useShortDoctype: true
+      };
+    }
   }
 
   /**
