@@ -82,7 +82,7 @@ For the above example you would have to configure a [html](https://github.com/we
 
 ```js
 module: {
-  loaders: [
+  rules: [
     {test: /\.png$/, loader: "file-loader"},
     {
       test: /\.html$/,
@@ -109,7 +109,7 @@ module.exports = {
     // ...
     plugins: [
         new HtmlWebpackPlugin({
-          template: 'pug!template.pug'
+          template: 'pug-loader!template.pug'
         })
     ]
 };
@@ -121,8 +121,8 @@ or by configuring webpack to handle all `.pug` files:
 module.exports = {
   // ...
   module: {
-    loaders: [
-      { test: /\.pug$/, loader: 'pug' }
+    rules: [
+      { test: /\.pug$/, loader: 'pug-loader' }
     ]
   },
   plugins: [
