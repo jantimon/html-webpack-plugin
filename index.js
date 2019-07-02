@@ -233,7 +233,11 @@ class HtmlWebpackPlugin {
             plugin: self
           }))
           .then(({ assetTags }) => {
-            // Inject scripts to body unless it set explictly to head
+            // Inject scripts to body unless it set explictly to a user defined tag
+            let scriptTarget = 'body'
+            if (typeof(self.options.inject) == 'string') {
+              scriptTarget = self.options.inject
+            }
             const scriptTarget = self.options.inject === 'head' ? 'head' : 'body';
             // Group assets to `head` and `body` tag arrays
             const assetGroups = this.generateAssetGroups(assetTags, scriptTarget);
@@ -241,6 +245,7 @@ class HtmlWebpackPlugin {
             return getHtmlWebpackPluginHooks(compilation).alterAssetTagGroups.promise({
               headTags: assetGroups.headTags,
               bodyTags: assetGroups.bodyTags,
+              userDefinedTags: assetGroups.userDefinedTags,
               outputName: childCompilationOutputName,
               plugin: self
             });
@@ -262,16 +267,16 @@ class HtmlWebpackPlugin {
           // Execute the template
           .then(([assetsHookResult, assetTags, compilationResult]) => typeof compilationResult !== 'function'
             ? compilationResult
-            : self.executeTemplate(compilationResult, assetsHookResult.assets, { headTags: assetTags.headTags, bodyTags: assetTags.bodyTags }, compilation));
+            : self.executeTemplate(compilationResult, assetsHookResult.assets, { headTags: assetTags.headTags, bodyTags: assetTags.bodyTags, userDefinedTags: assetTags.userDefinedTags }, compilation));
 
         const injectedHtmlPromise = Promise.all([assetTagGroupsPromise, templateExectutionPromise])
           // Allow plugins to change the html before assets are injected
           .then(([assetTags, html]) => {
-            const pluginArgs = { html, headTags: assetTags.headTags, bodyTags: assetTags.bodyTags, plugin: self, outputName: childCompilationOutputName };
+            const pluginArgs = { html, headTags: assetTags.headTags, bodyTags: assetTags.bodyTags, userDefinedTags: assetTags.userDefinedTags, plugin: self, outputName: childCompilationOutputName };
             return getHtmlWebpackPluginHooks(compilation).afterTemplateExecution.promise(pluginArgs);
           })
-          .then(({ html, headTags, bodyTags }) => {
-            return self.postProcessHtml(html, assets, { headTags, bodyTags });
+          .then(({ html, headTags, bodyTags, userDefinedTags }) => {
+            return self.postProcessHtml(html, assets, { headTags, bodyTags, userDefinedTags });
           });
 
         const emitHtmlPromise = injectedHtmlPromise
@@ -817,14 +822,17 @@ class HtmlWebpackPlugin {
         ...assetTags.meta,
         ...assetTags.styles
       ],
-      bodyTags: []
+      bodyTags: [],
+      userDefinedTags: []
     };
-    // Add script tags to head or body depending on
-    // the htmlPluginOptions
+    // Add script tags to head, body, or user defined tag depending
+    // on the htmlPluginOptions
     if (scriptTarget === 'body') {
       result.bodyTags.push(...assetTags.scripts);
-    } else {
+    } else  if (scriptTarget == 'head') {
       result.headTags.push(...assetTags.scripts);
+    } else {
+       result.userDefinedTags.push(...assetTags.scripts)
     }
     return result;
   }
@@ -847,8 +855,11 @@ class HtmlWebpackPlugin {
     const htmlRegExp = /(<html[^>]*>)/i;
     const headRegExp = /(<\/head\s*>)/i;
     const bodyRegExp = /(<\/body\s*>)/i;
+    const otherTagRegExp = new RegExp(`(<\/${this.options.inject}\\s*>)`, 'i')
+
     const body = assetTags.bodyTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
     const head = assetTags.headTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
+    const user_defined_tag = assetTags.userDefinedTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
 
     if (body.length) {
       if (bodyRegExp.test(html)) {
@@ -872,6 +883,16 @@ class HtmlWebpackPlugin {
 
       // Append assets to head element
       html = html.replace(headRegExp, match => head.join('') + match);
+    }
+
+    if (user_defined_tag.length) {
+        if (otherTagRegExp.test(html)) {
+        // Append assets to body element
+        html = html.replace(otherTagRegExp, match => user_defined_tag.join('') + match);
+      } else {
+        // Append scripts to the end of the file if no <other> element exists:
+        html += user_defined_tag.join('');
+      }
     }
 
     // Inject manifest into the opening html tag
