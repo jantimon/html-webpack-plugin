@@ -234,9 +234,9 @@ class HtmlWebpackPlugin {
           }))
           .then(({ assetTags }) => {
             // Inject scripts to body unless it set explictly to a user defined tag
-            let scriptTarget = 'body'
-            if (typeof(self.options.inject) == 'string') {
-              scriptTarget = self.options.inject
+            let scriptTarget = 'body';
+            if (typeof (self.options.inject) === 'string') {
+              scriptTarget = self.options.inject;
             }
             // Group assets to `head` and `body` tag arrays
             const assetGroups = this.generateAssetGroups(assetTags, scriptTarget);
@@ -828,10 +828,10 @@ class HtmlWebpackPlugin {
     // on the htmlPluginOptions
     if (scriptTarget === 'body') {
       result.bodyTags.push(...assetTags.scripts);
-    } else  if (scriptTarget == 'head') {
+    } else if (scriptTarget === 'head') {
       result.headTags.push(...assetTags.scripts);
     } else {
-       result.userDefinedTags.push(...assetTags.scripts)
+      result.userDefinedTags.push(...assetTags.scripts);
     }
     return result;
   }
@@ -854,11 +854,11 @@ class HtmlWebpackPlugin {
     const htmlRegExp = /(<html[^>]*>)/i;
     const headRegExp = /(<\/head\s*>)/i;
     const bodyRegExp = /(<\/body\s*>)/i;
-    const otherTagRegExp = new RegExp(`(<\/${this.options.inject}\\s*>)`, 'i')
+    const otherTagRegExp = new RegExp(`(<\/${this.options.inject}\\s*>)`, 'i');
 
     const body = assetTags.bodyTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
     const head = assetTags.headTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
-    const user_defined_tag = assetTags.userDefinedTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
+    const userDefinedTag = assetTags.userDefinedTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
 
     if (body.length) {
       if (bodyRegExp.test(html)) {
@@ -884,13 +884,13 @@ class HtmlWebpackPlugin {
       html = html.replace(headRegExp, match => head.join('') + match);
     }
 
-    if (user_defined_tag.length) {
-        if (otherTagRegExp.test(html)) {
+    if (userDefinedTag.length) {
+      if (otherTagRegExp.test(html)) {
         // Append assets to body element
-        html = html.replace(otherTagRegExp, match => user_defined_tag.join('') + match);
+        html = html.replace(otherTagRegExp, match => userDefinedTag.join('') + match);
       } else {
         // Append scripts to the end of the file if no <other> element exists:
-        html += user_defined_tag.join('');
+        html += userDefinedTag.join('');
       }
     }
 
