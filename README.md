@@ -543,7 +543,7 @@ class MyPlugin {
     compiler.hooks.compilation.tap('MyPlugin', (compilation) => {
       console.log('The compiler is starting a new compilation...')
 
-      // Staic Plugin interface |compilation |HOOK NAME | register listener 
+      // Static Plugin interface |compilation |HOOK NAME | register listener 
       HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
         'MyPlugin', // <-- Set a meaningful name here for stacktraces
         (data, cb) => {
@@ -614,7 +614,7 @@ This project exists thanks to all the people who contribute.
 
 You're free to contribute to this project by submitting [issues](https://github.com/jantimon/html-webpack-plugin/issues) and/or [pull requests](https://github.com/jantimon/html-webpack-plugin/pulls). This project is test-driven, so keep in mind that every change and new feature should be covered by tests.
 
-This project uses the [semistandard code style](https://github.com/Flet/semistandard).
+This project uses the [semindard code style](https://github.com/Flet/semistandard).
 
 <a href="https://github.com/jantimon/html-webpack-plugin/graphs/contributors"><img src="https://opencollective.com/html-webpack-plugin/contributors.svg?width=890&button=false" /></a>
 
