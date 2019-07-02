@@ -238,7 +238,6 @@ class HtmlWebpackPlugin {
             if (typeof(self.options.inject) == 'string') {
               scriptTarget = self.options.inject
             }
-            const scriptTarget = self.options.inject === 'head' ? 'head' : 'body';
             // Group assets to `head` and `body` tag arrays
             const assetGroups = this.generateAssetGroups(assetTags, scriptTarget);
             // Allow third-party-plugin authors to reorder and change the assetTags once they are grouped
