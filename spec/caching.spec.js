@@ -202,7 +202,7 @@ describe('HtmlWebpackPluginCaching', () => {
       .then(done);
   });
 
-  it('should not slow down linear (15 plugins should not take twice as much time as a 1 plugin)', done => {
+  it('should not slow down linear (10 plugins should not take twice as much time as a 1 plugin)', done => {
     const template = path.join(__dirname, 'fixtures/plain.html');
     const createHtmlWebpackPlugin = () => new HtmlWebpackPlugin({
       template: template
@@ -213,7 +213,7 @@ describe('HtmlWebpackPluginCaching', () => {
     let multiCompileRunDuration;
 
     let singleCompiler = setUpCompiler(createHtmlWebpackPlugin());
-    let multiCompiler = setUpCompiler.apply(null, Array(15).fill(0).map(() => createHtmlWebpackPlugin()));
+    let multiCompiler = setUpCompiler.apply(null, Array(10).fill(0).map(() => createHtmlWebpackPlugin()));
 
     Promise.resolve()
       .then(function singleCompileRun () {
