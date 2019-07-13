@@ -1,10 +1,13 @@
 import { AsyncSeriesWaterfallHook } from "tapable";
+import { Compiler } from 'webpack';
 import { Options as HtmlMinifierOptions } from "html-minifier";
 
 export = HtmlWebpackPlugin;
 
 declare class HtmlWebpackPlugin {
   constructor(options?: HtmlWebpackPlugin.Options);
+
+  apply(compiler: Compiler): void;
 }
 
 declare namespace HtmlWebpackPlugin {
