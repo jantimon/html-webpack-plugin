@@ -105,22 +105,19 @@ declare namespace HtmlWebpackPlugin {
       | false // Pass an empty object to the template function
       | ((
           compilation: any,
-          assets,
+          assets: {
+            publicPath: string,
+            js: Array<string>,
+            css: Array<string>,
+            manifest?: string,
+            favicon?: string
+          },
           assetTags: {
             headTags: HtmlTagObject[];
             bodyTags: HtmlTagObject[];
           },
           options: ProcessedOptions
-        ) => { [option: string]: any })
-      | ((
-          compilation: any,
-          assets,
-          assetTags: {
-            headTags: HtmlTagObject[];
-            bodyTags: HtmlTagObject[];
-          },
-          options: ProcessedOptions
-        ) => Promise<{ [option: string]: any }>)
+        ) => { [option: string]: any } | Promise<{ [option: string]: any }>)
       | { [option: string]: any };
     /**
      * The title to use for the generated HTML document
