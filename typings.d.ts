@@ -106,11 +106,11 @@ declare namespace HtmlWebpackPlugin {
       | ((
           compilation: any,
           assets: {
-            publicPath: string,
-            js: Array<string>,
-            css: Array<string>,
-            manifest?: string,
-            favicon?: string
+            publicPath: string;
+            js: Array<string>;
+            css: Array<string>;
+            manifest?: string;
+            favicon?: string;
           },
           assetTags: {
             headTags: HtmlTagObject[];
@@ -189,8 +189,8 @@ declare namespace HtmlWebpackPlugin {
         publicPath: string;
         js: Array<string>;
         css: Array<string>;
-        favicon?: string | undefined;
-        manifest?: string | undefined;
+        favicon?: string;
+        manifest?: string;
       };
       outputName: string;
       plugin: HtmlWebpackPlugin;
