@@ -290,7 +290,7 @@ The following variables are available in the template:
 - `webpackConfig`: the webpack configuration that was used for this compilation. This
   can be used, for example, to get the `publicPath` (`webpackConfig.output.publicPath`).
 
-- `compilation`: the webpack [compilation](https://webpack.js.org/api/compilation/) object.
+- `compilation`: the webpack [compilation](https://webpack.js.org/api/compilation-hooks/) object.
   This can be used, for example, to get the contents of processed assets and inline them
   directly in the page, through `compilation.assets[...].source()`
   (see [the inline template example](examples/inline/template.pug)).
