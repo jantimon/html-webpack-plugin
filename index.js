@@ -372,9 +372,13 @@ class HtmlWebpackPlugin {
       return Promise.resolve({});
     }
     if (typeof templateParameters === 'function') {
+      const preparedAssetTags = {
+        headTags: this.prepareAssetTagGroupForRendering(assetTags.headTags),
+        bodyTags: this.prepareAssetTagGroupForRendering(assetTags.bodyTags)
+      };
       return Promise
         .resolve()
-        .then(() => templateParameters(compilation, assets, assetTags, this.options));
+        .then(() => templateParameters(compilation, assets, preparedAssetTags, this.options));
     }
     if (typeof templateParameters === 'object') {
       return Promise.resolve(templateParameters);
@@ -830,6 +834,28 @@ class HtmlWebpackPlugin {
   }
 
   /**
+   * Add toString methods for easier rendering
+   * inside the template
+   *
+   * @param {Array<HtmlTagObject>} assetTagGroup
+   * @returns {Array<HtmlTagObject>}
+   */
+  prepareAssetTagGroupForRendering (assetTagGroup) {
+    const xhtml = this.options.xhtml;
+    const preparedTags = assetTagGroup.map((assetTag) => {
+      const copiedAssetTag = Object.assign({}, assetTag);
+      copiedAssetTag.toString = function () {
+        return htmlTagObjectToString(this, xhtml);
+      };
+      return copiedAssetTag;
+    });
+    preparedTags.toString = function () {
+      return this.join('');
+    };
+    return preparedTags;
+  }
+
+  /**
    * Injects the assets into the given html string
    *
    * @param {string} html
@@ -956,13 +982,6 @@ class HtmlWebpackPlugin {
  * @returns {TemplateParameter}
  */
 function templateParametersGenerator (compilation, assets, assetTags, options) {
-  const xhtml = options.xhtml;
-  assetTags.headTags.toString = function () {
-    return this.map((assetTagObject) => htmlTagObjectToString(assetTagObject, xhtml)).join('');
-  };
-  assetTags.bodyTags.toString = function () {
-    return this.map((assetTagObject) => htmlTagObjectToString(assetTagObject, xhtml)).join('');
-  };
   return {
     compilation: compilation,
     webpackConfig: compilation.options,
