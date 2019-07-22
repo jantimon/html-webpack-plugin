@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%= htmlWebpackPlugin.tags.headTags %>
+    <title>Custom insertion example</title>
+  </head>
+  <body>
+    All scripts are placed here:
+    <%= htmlWebpackPlugin.tags.bodyTags %>
+    <script>console.log("Executed after all other scripts")</script>
+  </body>
+</html>

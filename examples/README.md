@@ -7,6 +7,7 @@ Example | Link | Description
 Appcache | [appcache](./appcache)
 Chunk Optimization | [chunk-optimization](./chunk-optimization)
 Custom Template | [custom-template](./custom-template)
+Custom Script / Link tag position | [custom-insertion-point](./custom-insertion-point)
 Default | [default](./default)
 Favicon | [favicon](.\/favicon.)
 Html Loader | [html-loader](./.html-loader)
