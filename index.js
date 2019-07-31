@@ -134,9 +134,13 @@ class HtmlWebpackPlugin {
     // Register all HtmlWebpackPlugins instances at the child compiler
     compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin', (compilation) => {
       // Clear the cache if the child compiler is outdated
-      if (childCompiler.hasOutDatedTemplateCache(compilation)) {
-        childCompiler.clearCache(compiler);
-      }
+      childCompiler.hasOutDatedTemplateCache(compilation, (err, isValid) => {
+        if (err) console.error(err);
+
+        if (err || !isValid) {
+          childCompiler.clearCache(compiler);
+        }
+      });
       // Add this instances template to the child compiler
       childCompiler.addTemplateToCompiler(compiler, this.options.template);
       // Add file dependencies of child compiler to parent compiler
@@ -144,7 +148,7 @@ class HtmlWebpackPlugin {
       compilation.hooks.additionalChunkAssets.tap('HtmlWebpackPlugin', () => {
         const childCompilerDependencies = childCompiler.getFileDependencies(compiler);
         childCompilerDependencies.forEach(fileDependency => {
-          compilation.compilationDependencies.add(fileDependency);
+          compilation.missingDependencies.add(fileDependency);
         });
       });
     });
