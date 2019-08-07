@@ -104,6 +104,18 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<body>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/body>/], null, done);
   });
 
+  it('properly encodes file names in emitted URIs', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'foo/very fancy+name.js'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, [/<body>[\s]*<script src="foo\/very%20fancy%2Bname.js"><\/script>[\s]*<\/body>/], null, done);
+  });
+
   it('generates a default index.html file with multiple entry points', done => {
     testHtmlPlugin({
       mode: 'production',

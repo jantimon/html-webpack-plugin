@@ -604,7 +604,7 @@ class HtmlWebpackPlugin {
       // E.g. bundle.js -> /bundle.js?hash
       const entryPointPublicPaths = entryPointFiles
         .map(chunkFile => {
-          const entryPointPublicPath = publicPath + chunkFile;
+          const entryPointPublicPath = publicPath + this.urlencodePath(chunkFile);
           return this.options.hash
             ? this.appendHash(entryPointPublicPath, compilationHash)
             : entryPointPublicPath;
@@ -924,6 +924,16 @@ class HtmlWebpackPlugin {
       return url;
     }
     return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
+  }
+
+  /**
+   * Encode each path component using `encodeURIComponent` as files can contain characters
+   * which needs special encoding in URLs like `+ `.
+   *
+   * @param {string} filePath
+   */
+  urlencodePath (filePath) {
+    return filePath.split('/').map(encodeURIComponent).join('/');
   }
 
   /**
