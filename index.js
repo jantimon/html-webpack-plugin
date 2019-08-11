@@ -388,8 +388,24 @@ class HtmlWebpackPlugin {
       if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
         return false;
       }
+      // Skip if the chunks should be filtered and the given chunk doesn't match the `Include RegExp`
+      if (includedChunks instanceof RegExp && !includedChunks.test(chunkName)) {
+        return false;
+      }
+      // Skip if the chunks should be filtered and the given chunk doesn't pass the `Include Checker`
+      if (typeof includedChunks === 'function' && includedChunks(chunkName) !== true) {
+        return false;
+      }
       // Skip if the chunks should be filtered and the given chunk was excluded explicity
       if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) {
+        return false;
+      }
+      // Skip if the chunks should be filtered and the given chunk does match the `Exclude RegExp`
+      if (excludedChunks instanceof RegExp && excludedChunks.test(chunkName)) {
+        return false;
+      }
+      // Skip if the chunks should be filtered and the given chunk does pass the `Exclude Checker`
+      if (typeof excludedChunks === 'function' && excludedChunks(chunkName) === true) {
         return false;
       }
       // Add otherwise
