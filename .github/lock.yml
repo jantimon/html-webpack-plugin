@@ -1,0 +1,14 @@
+# Configuration for lock-threads - https://github.com/dessant/lock-threads
+
+# Issues and pull requests with these labels will not be locked. Set to `[]` to disable
+exemptLabels: []
+
+# Label to add before locking, such as `outdated`. Set to `false` to disable
+lockLabel: false
+
+# Comment to post before locking. Set to `false` to disable
+lockComment: false
+
+# Number of days of inactivity before a closed issue or pull request is locked
+daysUntilLock: 30
+

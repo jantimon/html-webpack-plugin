@@ -19,8 +19,17 @@
   <p>Plugin that simplifies creation of HTML files to serve your bundles</p>
 </div>
 
-<h2 align="center">Install</h2>
+<h2 align="center">Install Beta</h2>
 
+```bash
+  npm i --save-dev html-webpack-plugin@next
+```
+
+```bash
+  yarn add --dev html-webpack-plugin@next
+```
+
+<h2 align="center">Install Stable</h2>
 
 ```bash
   npm i --save-dev html-webpack-plugin
@@ -31,11 +40,30 @@
 ```
 
 
-
 This is a [webpack](http://webpack.js.org/) plugin that simplifies creation of HTML files to serve your `webpack` bundles. This is especially useful for `webpack` bundles that include a hash in the filename which changes every compilation. You can either let the plugin generate an HTML file for you, supply
 your own template using `lodash` templates or use your own loader.
 
-### `Plugins`
+<h2 align="center">Sponsors</h2>
+
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/0/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/1/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/2/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/3/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/4/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/5/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/6/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/7/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/8/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/html-webpack-plugin/sponsor/9/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/9/avatar.svg"></a>
+
+Thanks for supporting the ongoing improvements to the html-webpack-plugin!  
+
+<h2 align="center">Zero Config</h2>
+
+The `html-webpack-plugin` works without configuration.  
+It's a great addition to the [⚙️ webpack-config-plugins](https://github.com/namics/webpack-config-plugins/blob/master/README.md#zero-config-webpack-dev-server-example).
+
+<h2 align="center">Plugins</h2>
 
 The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webpack-plugin#events) to extend it to your needs. There are already some really powerful plugins which can be integrated with zero configuration
 
@@ -49,6 +77,7 @@ The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webp
  * [html-webpack-include-assets-plugin](https://github.com/jharris4/html-webpack-include-assets-plugin) for including lists of js or css file paths (such as those copied by the copy-webpack-plugin).
  * [script-ext-html-webpack-plugin](https://github.com/numical/script-ext-html-webpack-plugin) to add `async`, `defer` or `module` attributes to your `<script>` elements, or even inline them
  * [style-ext-html-webpack-plugin](https://github.com/numical/style-ext-html-webpack-plugin) to convert your `<link>`s to external stylesheets into `<style>` elements containing internal CSS
+ * [html-webpack-injector](https://github.com/thearchitgarg/html-webpack-injector) to inject chunks in `head` or `body` (different locations ) of same html document.
  * [resource-hints-webpack-plugin](https://github.com/jantimon/resource-hints-webpack-plugin) to add resource hints for faster initial page loads using `<link rel='preload'>` and `<link rel='prefetch'>`
  * [preload-webpack-plugin](https://github.com/GoogleChrome/preload-webpack-plugin) for automatically wiring up asynchronous (and other types) of JavaScript chunks using `<link rel='preload'>` helping with lazy-loading
  * [link-media-html-webpack-plugin](https://github.com/yaycmyk/link-media-html-webpack-plugin) allows for injected stylesheet `<link />` tags to have their media attribute set automatically; useful for providing specific desktop/mobile/print etc. stylesheets that the browser will conditionally download
@@ -56,7 +85,10 @@ The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webp
  * [html-webpack-inline-style-plugin](https://github.com/djaax/html-webpack-inline-style-plugin) for inlining styles to HTML elements using [juice](https://github.com/Automattic/juice). Useful for email generation automatisation.
  * [html-webpack-exclude-empty-assets-plugin](https://github.com/KnisterPeter/html-webpack-exclude-empty-assets-plugin) removes empty assets from being added to the html. This fixes some problems with extract-text-plugin with webpack 4.
  * [webpack-concat-plugin](https://github.com/hxlniada/webpack-concat-plugin) for concat and uglify files that needn't to be webpack bundles(for legacy files) and inject to html-webpack-plugin.
- 
+ * [html-webpack-link-type-plugin](https://github.com/steadyapp/html-webpack-link-type-plugin) adds a configurable mimetype to resources injected as links (such as adding type="text/css" to external stylesheets) for compatibility with "strict mode". 
+ * [csp-html-webpack-plugin](https://github.com/slackhq/csp-html-webpack-plugin) to add [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) meta tags to the HTML output
+ * [webpack-nomodule-plugin](https://github.com/swimmadude66/webpack-nomodule-plugin) allows you to add a `nomodule` attribute to specific injected scripts, which prevents the scripts from being loaded by newer browsers. Good for limiting loads of polyfills.
+
 
 <h2 align="center">Usage</h2>
 
@@ -86,7 +118,7 @@ This will generate a file `dist/index.html` containing the following
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <title>Webpack App</title>
   </head>
   <body>
@@ -97,7 +129,7 @@ This will generate a file `dist/index.html` containing the following
 
 If you have multiple `webpack` entry points, they will all be included with `script` tags in the generated HTML.
 
-If you have any CSS assets in webpack's output (for example, CSS extracted with the [ExtractTextPlugin](https://github.com/webpack/extract-text-webpack-plugin))
+If you have any CSS assets in webpack's output (for example, CSS extracted with the [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin))
 then these will be included with `<link>` tags in the HTML head.
 
 If you have plugins that make use of it, `html-webpack-plugin` should be ordered first before any of the integrated plugins.
@@ -144,7 +176,7 @@ Here's an example webpack config illustrating how to use these options
 }
 ```
 
-### `Generating Multiple HTML Files`
+### Generating Multiple HTML Files
 
 To generate more than one HTML file, declare the plugin more than
 once in your plugins array
@@ -167,18 +199,20 @@ once in your plugins array
 }
 ```
 
-### `Writing Your Own Templates`
+### Writing Your Own Templates
 
 If the default generated HTML doesn't meet your needs you can supply
 your own template. The easiest way is to use the `template` option and pass a custom HTML file.
 The html-webpack-plugin will automatically inject all necessary CSS, JS, manifest
 and favicon files into the markup.
 
+Details of other template loaders are [documented here](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md).
+
 ```js
 plugins: [
   new HtmlWebpackPlugin({
     title: 'Custom template',
-    // Load a custom template (lodash by default see the FAQ for details)
+    // Load a custom template (lodash by default)
     template: 'index.html'
   })
 ]
@@ -189,7 +223,7 @@ plugins: [
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8"/>
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
@@ -198,13 +232,13 @@ plugins: [
 ```
 
 If you already have a template loader, you can use it to parse the template.
-Please note that this will also happen if you specifiy the html-loader and use `.html` file as template.
+Please note that this will also happen if you specify the html-loader and use `.html` file as template.
 
 **webpack.config.js**
 ```js
 module: {
   loaders: [
-    { test: /\.hbs$/, loader: "handlebars" }
+    { test: /\.hbs$/, loader: "handlebars-loader" }
   ]
 },
 plugins: [
@@ -258,10 +292,10 @@ The following variables are available in the template:
 - `compilation`: the webpack [compilation](https://webpack.js.org/api/compilation/) object.
   This can be used, for example, to get the contents of processed assets and inline them
   directly in the page, through `compilation.assets[...].source()`
-  (see [the inline template example](examples/inline/template.jade)).
+  (see [the inline template example](examples/inline/template.pug)).
 
 
-### `Filtering Chunks`
+### Filtering Chunks
 
 To include only certain chunks you can limit the chunks being used
 
@@ -316,41 +350,239 @@ Also you can match by RegExp or Function, which is as same as Include
 
 ### `Events`
 
-To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the HTML this plugin executes the following events:
+If the `minify` option is set to `true` (the default when webpack's `mode` is `'production'`),
+the generated HTML will be minified using [html-minifier](https://github.com/kangax/html-minifier)
+and the following options:
 
-#### `Sync`
+```js
+{
+  collapseWhitespace: true,
+  removeComments: true,
+  removeRedundantAttributes: true,
+  removeScriptTypeAttributes: true,
+  removeStyleLinkTypeAttributes: true,
+  useShortDoctype: true
+}
+```
 
-* `html-webpack-plugin-alter-chunks`
+To use custom [html-minifier options](https://github.com/kangax/html-minifier#options-quick-reference)
+pass an object to `minify` instead. This object will not be merged with the defaults above.
 
-#### `Async`
+To disable minification during production mode set the `minify` option to `false`.
 
-* `html-webpack-plugin-before-html-generation`
-* `html-webpack-plugin-before-html-processing`
-* `html-webpack-plugin-alter-asset-tags`
-* `html-webpack-plugin-after-html-processing`
-* `html-webpack-plugin-after-emit`
+### Meta Tags
 
-Example implementation: [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin)
+If the `meta` option is set the html-webpack-plugin will inject meta tags.  
+For the default template the html-webpack-plugin will already provide a default for the `viewport` meta tag.
+
+Please take a look at this well maintained list of almost all [possible meta tags](https://github.com/joshbuchea/HEAD#meta).
+
+#### name/content meta tags 
+
+Most meta tags are configured by setting a `name` and a `content` attribute.  
+To add those use a key/value pair:
+
+**webpack.config.js**
+```js
+plugins: [
+  new HtmlWebpackPlugin({
+      'meta': {
+        'viewport': 'width=device-width, initial-scale=1, shrink-to-fit=no',
+        // Will generate: <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        'theme-color': '#4285f4'
+        // Will generate: <meta name="theme-color" content="#4285f4">
+      }
+  })
+]
+```
+
+#### Simulate http response headers
+
+The **http-equiv** attribute is essentially used to simulate a HTTP response header.  
+This format is supported using an object notation which allows you to add any attribute:
+
+**webpack.config.js**
+```js
+plugins: [
+  new HtmlWebpackPlugin({
+    'meta': {
+      'Content-Security-Policy': { 'http-equiv': 'Content-Security-Policy', 'content': 'default-src https:' },
+      // Will generate: <meta http-equiv="Content-Security-Policy" content="default-src https:">
+      // Which equals to the following http header: `Content-Security-Policy: default-src https:`
+      'set-cookie': { 'http-equiv': 'set-cookie', content: 'name=value; expires=date; path=url' },
+      // Will generate: <meta http-equiv="set-cookie" content="value; expires=date; path=url">
+      // Which equals to the following http header: `set-cookie: value; expires=date; path=url`
+    }
+  })
+]
+```
+
+### Base Tag
+
+When the `base` option is used,
+html-webpack-plugin will inject a [base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base).
+By default, a base tag will not be injected.
+
+The following two are identical and will both insert `<base href="http://example.com/some/page.html">`:
+
+```js
+new HtmlWebpackPlugin({
+  'base': 'http://example.com/some/page.html'
+})
+```
+
+```js
+new HtmlWebpackPlugin({
+  'base': { 'href': 'http://example.com/some/page.html' }
+})
+```
+
+The `target` can be specified with the corresponding key:
+
+```js
+new HtmlWebpackPlugin({
+  'base': {
+    'href': 'http://example.com/some/page.html',
+    'target': '_blank'
+  }
+})
+```
+
+which will inject the element `<base href="http://example.com/some/page.html" target="_blank">`.
+
+### Long Term Caching
+
+For long term caching add `contenthash/templatehash` to the filename.
+
+**Example:**
+
+```js
+plugins: [
+  new HtmlWebpackPlugin({
+    filename: 'index.[contenthash].html'
+  })
+]
+```
+
+`contenthash/templatehash` is the hash of the content of the output file.
+
+Optionally, You can configure like `[<hashType>:contenthash:<digestType>:<length>]`
+
+* `hashType` - one of `sha1`, `md5`, `sha256`, `sha512`  or any other node.js supported hash type
+* `digestType` - one of `hex`, `base26`, `base32`, `base36`, `base49`, `base52`, `base58`, `base62`, `base64`
+* `maxlength` - maximum length of the generated hash in chars
+
+**Defaults:** `[md5:contenthash:hex:9999]`
+
+### Events
+
+To allow other [plugins](https://github.com/webpack/docs/wiki/plugins) to alter the HTML this plugin executes
+[tapable](https://github.com/webpack/tapable/tree/master) hooks.
+
+The [lib/hooks.js](https://github.com/jantimon/html-webpack-plugin/blob/master/lib/hooks.js) contains all information
+about which values are passed.
+
+[![Concept flow uml](https://raw.githubusercontent.com/jantimon/html-webpack-plugin/master/flow.png)](https://github.com/jantimon/html-webpack-plugin/blob/master/flow.puml)
+
+#### `beforeAssetTagGeneration` hook
+
+```
+    AsyncSeriesWaterfallHook<{
+      assets: {
+        publicPath: string,
+        js: Array<{string}>,
+        css: Array<{string}>,
+        favicon?: string | undefined,
+        manifest?: string | undefined
+      },
+      outputName: string,
+      plugin: HtmlWebpackPlugin
+    }>
+```
+
+#### `alterAssetTags` hook
+
+```
+    AsyncSeriesWaterfallHook<{
+      assetTags: {
+        scripts: Array<HtmlTagObject>,
+        styles: Array<HtmlTagObject>,
+        meta: Array<HtmlTagObject>,
+      },
+      outputName: string,
+      plugin: HtmlWebpackPlugin
+    }>
+```
+
+#### `alterAssetTagGroups` hook
+
+```
+    AsyncSeriesWaterfallHook<{
+      headTags: Array<HtmlTagObject | HtmlTagObject>,
+      bodyTags: Array<HtmlTagObject | HtmlTagObject>,
+      outputName: string,
+      plugin: HtmlWebpackPlugin
+    }>
+```
+
+#### `afterTemplateExecution` hook
+
+```
+    AsyncSeriesWaterfallHook<{
+      html: string,
+      headTags: Array<HtmlTagObject | HtmlTagObject>,
+      bodyTags: Array<HtmlTagObject | HtmlTagObject>,
+      outputName: string,
+      plugin: HtmlWebpackPlugin,
+    }>
+```
+
+#### `beforeEmit` hook
+
+```
+    AsyncSeriesWaterfallHook<{
+      html: string,
+      outputName: string,
+      plugin: HtmlWebpackPlugin,
+    }>
+```
+
+#### `afterEmit` hook
+
+```
+    AsyncSeriesWaterfallHook<{
+      outputName: string,
+      plugin: HtmlWebpackPlugin
+    }>
+```
+
+Example implementation: [webpack-subresource-integrity](https://www.npmjs.com/package/webpack-subresource-integrity)
 
 **plugin.js**
 ```js
-function MyPlugin(options) {
-  // Configure your plugin with options...
-}
+// If your plugin is direct dependent to the html webpack plugin:
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+// If your plugin is using html-webpack-plugin as an optional dependency
+// you can use https://github.com/tallesl/node-safe-require instead:
+const HtmlWebpackPlugin = require('safe-require')('html-webpack-plugin');
 
-MyPlugin.prototype.apply = function (compiler) {
-  compiler.plugin('compilation', (compilation) => {
-    console.log('The compiler is starting a new compilation...');
+class MyPlugin {
+  apply (compiler) {
+    compiler.hooks.compilation.tap('MyPlugin', (compilation) => {
+      console.log('The compiler is starting a new compilation...')
 
-    compilation.plugin(
-      'html-webpack-plugin-before-html-processing',
-      (data, cb) => {
-        data.html += 'The Magic Footer'
-
-        cb(null, data)
-      }
-    )
-  })
+      // Static Plugin interface |compilation |HOOK NAME | register listener 
+      HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
+        'MyPlugin', // <-- Set a meaningful name here for stacktraces
+        (data, cb) => {
+          // Manipulate the content
+          data.html += 'The Magic Footer'
+          // Tell webpack to move on
+          cb(null, data)
+        }
+      )
+    })
+  }
 }
 
 module.exports = MyPlugin
@@ -363,7 +595,7 @@ plugins: [
 ]
 ```
 
-Note that the callback must be passed the HtmlWebpackPluginData in order to pass this onto any other plugins listening on the same `html-webpack-plugin-before-html-processing` event
+Note that the callback must be passed the HtmlWebpackPluginData in order to pass this onto any other plugins listening on the same `beforeEmit` event
 
 <h2 align="center">Maintainers</h2>
 
@@ -387,17 +619,21 @@ Note that the callback must be passed the HtmlWebpackPluginData in order to pass
 </table>
 
 
-[npm]: https://img.shields.io/npm/v/html-webpack-plugin.svg
-[npm-url]: https://npmjs.com/package/html-webpack-plugin
+## Backers
 
-[node]: https://img.shields.io/node/v/html-webpack-plugin.svg
-[node-url]: https://nodejs.org
+Thank you to all our backers!  
+If you want to support the project as well [become a sponsor](https://opencollective.com/html-webpack-plugin#sponsor) or a [a backer](https://opencollective.com/html-webpack-plugin#backer).
 
-[deps]: https://david-dm.org/jantimon/html-webpack-plugin.svg
-[deps-url]: https://david-dm.org/jantimon/html-webpack-plugin
-
-[tests]: http://img.shields.io/travis/jantimon/html-webpack-plugin.svg
-[tests-url]: https://travis-ci.org/jantimon/html-webpack-plugin
+<a href="https://opencollective.com/html-webpack-plugin/backer/0/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/0/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/1/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/1/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/2/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/2/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/3/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/3/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/4/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/4/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/5/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/5/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/6/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/6/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/7/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/7/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/8/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/8/avatar.svg?requireActive=false"></a>
+<a href="https://opencollective.com/html-webpack-plugin/backer/9/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/9/avatar.svg?requireActive=false"></a>
 
 
 ## Contributors
@@ -411,34 +647,14 @@ This project uses the [semistandard code style](https://github.com/Flet/semistan
 <a href="https://github.com/jantimon/html-webpack-plugin/graphs/contributors"><img src="https://opencollective.com/html-webpack-plugin/contributors.svg?width=890&button=false" /></a>
 
 
-## Backers
+[npm]: https://img.shields.io/npm/v/html-webpack-plugin.svg
+[npm-url]: https://npmjs.com/package/html-webpack-plugin
 
-Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/html-webpack-plugin#backer)
+[node]: https://img.shields.io/node/v/html-webpack-plugin.svg
+[node-url]: https://nodejs.org
 
-<a href="https://opencollective.com/html-webpack-plugin/backer/0/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/0/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/1/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/1/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/2/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/2/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/3/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/3/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/4/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/4/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/5/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/5/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/6/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/6/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/7/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/7/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/8/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/8/avatar.svg?requireActive=false"></a>
-<a href="https://opencollective.com/html-webpack-plugin/backer/9/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/9/avatar.svg?requireActive=false"></a>
+[deps]: https://david-dm.org/jantimon/html-webpack-plugin.svg
+[deps-url]: https://david-dm.org/jantimon/html-webpack-plugin
 
-## Sponsors
-
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [Become a sponsor](https://opencollective.com/html-webpack-plugin#sponsor)
-
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/0/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/0/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/1/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/1/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/2/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/2/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/3/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/3/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/4/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/4/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/5/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/5/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/6/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/6/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/7/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/7/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/8/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/8/avatar.svg"></a>
-<a href="https://opencollective.com/html-webpack-plugin/sponsor/9/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/9/avatar.svg"></a>
-
-
+[tests]: http://img.shields.io/travis/jantimon/html-webpack-plugin.svg
+[tests-url]: https://travis-ci.org/jantimon/html-webpack-plugin

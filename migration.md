@@ -82,7 +82,7 @@ For the above example you would have to configure a [html](https://github.com/we
 
 ```js
 module: {
-  loaders: [
+  rules: [
     {test: /\.png$/, loader: "file-loader"},
     {
       test: /\.html$/,
@@ -98,9 +98,9 @@ This configuration allows you to require partial html from your main `index.html
 
 ## Custom template engines
 
-Maybe you prefer jade or blueimp over underscore - or your project is using jade for the front end part.
+Maybe you prefer pug or blueimp over underscore - or your project is using pug for the front end part.
 With 2.x you can use the webpack loaders either once only for the template as in the following example
-where we use jade (requires the [jade-loader](https://github.com/webpack/jade-loader)):
+where we use pug (requires the [pug-loader](https://github.com/webpack/pug-loader)):
 
 ```js
 var HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -109,31 +109,31 @@ module.exports = {
     // ...
     plugins: [
         new HtmlWebpackPlugin({
-          template: 'jade!template.jade'
+          template: 'pug-loader!template.pug'
         })
     ]
 };
 ```
 
-or by configuring webpack to handle all `.jade` files:
+or by configuring webpack to handle all `.pug` files:
 
 ```js
 module.exports = {
   // ...
   module: {
-    loaders: [
-      { test: /\.jade$/, loader: 'jade' }
+    rules: [
+      { test: /\.pug$/, loader: 'pug-loader' }
     ]
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'template.jade'
+      template: 'template.pug'
     })
   ]
 };
 ```
 
-Please note that if you specify the loader and use 'jade!template.jade' webpack will try to apply the jade loader twice and fail.
+Please note that if you specify the loader and use 'pug!template.pug' webpack will try to apply the pug loader twice and fail.
 
 ## Isomorph apps
 
@@ -164,8 +164,8 @@ Using loaders inside a template.js
 ```js
   // This function has to return a string or promised string:
   module.exports = function(templateParams) {
-      // Play around with the arguments and then use the webpack jade loader to load the jade:
-      return require('./template.jade')({assets: templateParams.htmlWebpackPlugin.files});
+      // Play around with the arguments and then use the webpack pug loader to load the pug:
+      return require('./template.pug')({assets: templateParams.htmlWebpackPlugin.files});
   };
 ```
 

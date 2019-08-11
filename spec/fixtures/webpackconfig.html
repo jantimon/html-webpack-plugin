@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8"/>
     <title>Test</title>
   </head>
   <body>
     <p>Public path is <%= webpackConfig.output.publicPath %></p>
-    <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.app.entry %>?<%= htmlWebpackPlugin.files.chunks.app.hash %>"></script>
+    <script src="<%= htmlWebpackPlugin.files.js[0] %>"></script>
   </body>
 </html>
