@@ -2077,7 +2077,7 @@ describe('HtmlWebpackPlugin', () => {
           templateParameters: { foo: 'bar' }
         })
       ]
-    }, ['templateParams keys: "foo"'], null, done);
+    }, ['templateParams keys: "compilation,webpackConfig,htmlWebpackPlugin,foo"'], null, done);
   });
 
   it('should allow to set specific template parameters using a function', done => {
