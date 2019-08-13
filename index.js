@@ -371,17 +371,21 @@ class HtmlWebpackPlugin {
     if (templateParameters === false) {
       return Promise.resolve({});
     }
+    const preparedAssetTags = {
+      headTags: this.prepareAssetTagGroupForRendering(assetTags.headTags),
+      bodyTags: this.prepareAssetTagGroupForRendering(assetTags.bodyTags)
+    };
     if (typeof templateParameters === 'function') {
-      const preparedAssetTags = {
-        headTags: this.prepareAssetTagGroupForRendering(assetTags.headTags),
-        bodyTags: this.prepareAssetTagGroupForRendering(assetTags.bodyTags)
-      };
       return Promise
         .resolve()
         .then(() => templateParameters(compilation, assets, preparedAssetTags, this.options));
     }
-    if (typeof templateParameters === 'object') {
-      return Promise.resolve(templateParameters);
+    if (templateParameters && typeof templateParameters === 'object') {
+      const defaultTemplateParameters = templateParametersGenerator(compilation, assets, preparedAssetTags, this.options);
+      return Promise.resolve({
+        ...defaultTemplateParameters,
+        ...templateParameters,
+      });
     }
     throw new Error('templateParameters has to be either a function or an object');
   }
