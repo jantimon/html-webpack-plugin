@@ -384,7 +384,7 @@ class HtmlWebpackPlugin {
       const defaultTemplateParameters = templateParametersGenerator(compilation, assets, preparedAssetTags, this.options);
       return Promise.resolve({
         ...defaultTemplateParameters,
-        ...templateParameters,
+        ...templateParameters
       });
     }
     throw new Error('templateParameters has to be either a function or an object');
