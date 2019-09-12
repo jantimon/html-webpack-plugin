@@ -390,6 +390,45 @@ describe('HtmlWebpackPlugin', () => {
     ['<script src="app_bundle.js"'], null, done);
   });
 
+  it('allows you to add the prefix to js assets path', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        prefix: 'https://domain/'
+      })]
+    }, ['<script src="https://domain/util_bundle.js"', '<script src="https://domain/app_bundle.js"'], null, done);
+  });
+
+  it('allows you to add the prefix to css asset path', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      module: {
+        rules: [
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          prefix: 'https://domain/'
+        }),
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
+      ]
+    }, ['<link href="https://domain/styles.css" rel="stylesheet">'], null, done);
+  });
+
   it('works with source maps', done => {
     testHtmlPlugin({
       mode: 'development',

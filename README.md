@@ -157,6 +157,7 @@ Allowed values are as follows
 |**[`chunksSortMode`](#plugins)**|`{String\|Function}`|`auto`|Allows to control how chunks should be sorted before they are included to the HTML. Allowed values are `'none' \| 'auto' \| 'dependency' \| 'manual' \| {Function}`|
 |**`excludeChunks`**|`{Array.<string>}`|``|Allows you to skip some chunks (e.g don't add the unit-test chunk)|
 |**`xhtml`**|`{Boolean}`|`false`|If `true` render the `link` tags as self-closing (XHTML compliant)|
+|**`prefix`**|`{String}`|``|Adds the given prefix to CSS, JS path to the output HTML - see [example](https://github.com/jantimon/html-webpack-plugin/tree/master/examples/prefix)|
 
 Here's an example webpack config illustrating how to use these options
 

@@ -55,7 +55,8 @@ class HtmlWebpackPlugin {
       meta: {},
       base: false,
       title: 'Webpack App',
-      xhtml: false
+      xhtml: false,
+      prefix: ''
     };
 
     /** @type {ProcessedHtmlWebpackOptions} */
@@ -624,7 +625,9 @@ class HtmlWebpackPlugin {
         entryPointPublicPathMap[entryPointPublicPath] = true;
         // ext will contain .js or .css, because .mjs recognizes as .js
         const ext = extMatch[1] === 'mjs' ? 'js' : extMatch[1];
-        assets[ext].push(entryPointPublicPath);
+        // apply prefix for css, js paths
+        const path = this.options.prefix + entryPointPublicPath;
+        assets[ext].push(path);
       });
     }
     return assets;
