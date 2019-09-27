@@ -142,7 +142,7 @@ class HtmlWebpackPlugin {
       compilation.hooks.additionalChunkAssets.tap('HtmlWebpackPlugin', () => {
         const childCompilerDependencies = childCompiler.getFileDependencies(compiler);
         childCompilerDependencies.forEach(fileDependency => {
-          compilation.compilationDependencies.add(fileDependency);
+          compilation.fileDependencies.add(fileDependency);
         });
       });
     });
