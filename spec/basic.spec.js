@@ -1690,6 +1690,24 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">/], null, done);
   });
 
+  it('adds a meta tag that specifies the charset', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          meta: {
+            'charset': { 'charset': 'utf-8' }
+          }
+        })
+      ]
+    }, [/<meta charset="utf-8">/], null, done);
+  });
+
   it('adds a favicon with publicPath set to /some/', done => {
     testHtmlPlugin({
       mode: 'production',

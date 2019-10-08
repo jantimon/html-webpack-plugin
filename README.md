@@ -368,6 +368,26 @@ plugins: [
 ]
 ```
 
+#### charset meta tag
+
+This meta tag is very common. Since it requires a `charset` attribute instead of the `name` and `content` attributes, it should be added using:
+
+**webpack.config.js**
+```js
+plugins: [
+  new HtmlWebpackPlugin({
+    'meta': {
+      'charset': { 'charset': 'utf-8' },
+      // Will generate: <meta charset="utf-8">
+      'foobar': { 'charset': 'utf-8' }
+      // Will generate the same meta tag as the example above!
+    }
+  })
+]
+```
+
+Be aware that the key of the attribute object has no effect on the resulting meta tag. However, it is a good practice to give it a descriptive name.
+
 #### Simulate http response headers
 
 The **http-equiv** attribute is essentially used to simulate a HTTP response header.  
