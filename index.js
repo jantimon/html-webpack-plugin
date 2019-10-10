@@ -70,6 +70,9 @@ class HtmlWebpackPlugin {
       this.options.meta = Object.assign({}, this.options.meta, defaultMeta, userOptions.meta);
     }
 
+    // Apply global meta object
+    this.options.meta = Object.assign({}, this.options.meta, HtmlWebpackPlugin.globalMeta);
+
     // Instance variables to keep caching information
     // for multiple builds
     this.childCompilerHash = undefined;
@@ -1016,5 +1019,10 @@ HtmlWebpackPlugin.version = 4;
  */
 HtmlWebpackPlugin.getHooks = getHtmlWebpackPluginHooks;
 HtmlWebpackPlugin.createHtmlTagObject = createHtmlTagObject;
+
+/**
+ * Global meta object that is used for every instance
+ */
+HtmlWebpackPlugin.globalMeta = {};
 
 module.exports = HtmlWebpackPlugin;

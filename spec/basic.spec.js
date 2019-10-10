@@ -1690,6 +1690,26 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">/], null, done);
   });
 
+  it('adds a meta tag using the static globalMeta variable', done => {
+    HtmlWebpackPlugin.globalMeta = { 'foo': 'bar' };
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          meta: {}
+        })
+      ]
+    }, [/<meta name="foo" content="bar">/], null, done);
+
+    // unset for subsequent tests
+    HtmlWebpackPlugin.globalMeta = {};
+  });
+
   it('adds a favicon with publicPath set to /some/', done => {
     testHtmlPlugin({
       mode: 'production',
