@@ -349,6 +349,7 @@ For the default template the html-webpack-plugin will already provide a default 
 
 Please take a look at this well maintained list of almost all [possible meta tags](https://github.com/joshbuchea/HEAD#meta).
 
+
 #### name/content meta tags 
 
 Most meta tags are configured by setting a `name` and a `content` attribute.  
@@ -385,6 +386,33 @@ plugins: [
       // Will generate: <meta http-equiv="set-cookie" content="value; expires=date; path=url">
       // Which equals to the following http header: `set-cookie: value; expires=date; path=url`
     }
+  })
+]
+```
+
+#### Global meta settings
+
+If you want to generate multiple HTML files, they will most likely have similiar meta tags. In this case you can specify a static variable called `globalMeta` to set meta tags that every `HtmlWebpackPlugin` instance will take into account.
+
+**webpack.config.js**
+```js
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+// set static variable
+HtmlWebpackPlugin.globalMeta = {
+  'viewport': 'width=device-width, initial-scale=1, shrink-to-fit=no'
+}
+```
+```js
+plugins: [
+  new HtmlWebpackPlugin({
+    'filename': 'index.html',
+    'meta': { 'theme-color': '#4285f4' }
+    // Will generate 'theme-color' and the global 'viewport' meta tag
+  }),
+  new HtmlWebpackPlugin({
+    'filename': 'test.html',
+    'meta': {}
+    // Will generate the global 'viewport' meta tag
   })
 ]
 ```
