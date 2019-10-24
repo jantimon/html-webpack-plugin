@@ -246,7 +246,7 @@ class HtmlWebpackPlugin {
             });
           });
 
-        // Turn the compiled tempalte into a nodejs function or into a nodejs string
+        // Turn the compiled template into a nodejs function or into a nodejs string
         const templateEvaluationPromise = compilationPromise
           .then(compiledTemplate => {
             // Allow to use a custom function / string instead
