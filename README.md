@@ -144,7 +144,7 @@ Allowed values are as follows
 |**`title`**|`{String}`|`Webpack App`|The title to use for the generated HTML document|
 |**`filename`**|`{String}`|`'index.html'`|The file to write the HTML to. Defaults to `index.html`. You can specify a subdirectory here too (eg: `assets/admin.html`)|
 |**`template`**|`{String}`|``|`webpack` relative or absolute path to the template. By default it will use `src/index.ejs` if it exists. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details|
-|**[`templateContent`](#)**|`{String\|Function}`|``|A string that contains (or function that returns) the content of the template. `template` and `templateContent` options **may not both be used**. Overwrites `template` option|
+|**`templateContent`**|`{String\|Function}`|``|A string that contains (or function that returns) the content of the template. `template` and `templateContent` options **may not both be used**. Overwrites `template` option|
 |**`templateParameters`**|`{Boolean\|Object\|Function}`|``| Allows to overwrite the parameters used in the template - see [example](https://github.com/jantimon/html-webpack-plugin/tree/master/examples/template-parameters) |
 |**`inject`**|`{Boolean\|String}`|`true`|`true \|\| 'head' \|\| 'body' \|\| false` Inject all assets into the given `template` or `templateContent`. When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element - see the [inject:false example](https://github.com/jantimon/html-webpack-plugin/tree/master/examples/custom-insertion-position)|
 |**`favicon`**|`{String}`|``|Adds the given favicon path to the output HTML|
