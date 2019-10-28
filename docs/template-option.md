@@ -63,7 +63,7 @@ new HtmlWebpackPlugin({
 ```
 
 However this also means that in the following example webpack will use the [html loader for your template](https://webpack.js.org/loaders/html-loader/).
-This will **cause html minification** and it will also **disable the ejs fallback** loader.
+This will **cause html minification** and it will also **disable the lodash fallback** loader.
 
 ```js
 {
