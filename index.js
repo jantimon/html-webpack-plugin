@@ -33,7 +33,8 @@ class HtmlWebpackPlugin {
       chunksSortMode: 'auto',
       meta: {},
       title: 'Webpack App',
-      xhtml: false
+      xhtml: false,
+      cssInBody: false
     }, options);
   }
 
@@ -544,12 +545,12 @@ class HtmlWebpackPlugin {
         }
       });
     }
-    // Add styles to the head
-    head = head.concat(styles);
-    // Add scripts to body or head
+
     if (this.options.inject === 'head') {
+      head = head.concat(styles);
       head = head.concat(scripts);
     } else {
+      if (cssInBody) body = body.concat(styles);
       body = body.concat(scripts);
     }
     return {head: head, body: body};
@@ -571,7 +572,11 @@ class HtmlWebpackPlugin {
         html = html.replace(bodyRegExp, match => body.join('') + match);
       } else {
         // Append scripts to the end of the file if no <body> element exists:
-        html += body.join('');
+        if (cssInBody === false) {
+          html += body.join('');
+        } else {
+          html = body.join('') + html;
+        }
       }
     }
 
@@ -584,9 +589,11 @@ class HtmlWebpackPlugin {
           html = html.replace(htmlRegExp, match => match + '<head></head>');
         }
       }
-
       // Append assets to head element
       html = html.replace(headRegExp, match => head.join('') + match);
+    } else {
+      // Append assets to HTML
+      html = html.replace(htmlRegExp, match => head.join('') + match);
     }
 
     // Inject manifest into the opening html tag
