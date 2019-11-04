@@ -531,6 +531,27 @@ about which values are passed.
 Example implementation: [webpack-subresource-integrity](https://www.npmjs.com/package/webpack-subresource-integrity)
 
 **plugin.js**
+#### Version 3
+```js
+// If your plugin is direct dependent to the html webpack plugin:
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+class MyPlugin {
+  apply(compiler) {
+    compiler.hooks.compilation.tap('MyPlugin', (compilation) => {
+      console.log('The compiler is starting a new compilation...');
+
+      compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing.tap('MyPlugin', (data) => {
+        data.html += 'The Magic Footer';
+      });
+    });
+  }
+}
+
+module.exports = MyPlugin;
+```
+
+#### Version 4+
 ```js
 // If your plugin is direct dependent to the html webpack plugin:
 const HtmlWebpackPlugin = require('html-webpack-plugin');
