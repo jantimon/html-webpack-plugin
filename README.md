@@ -533,9 +533,6 @@ Example implementation: [webpack-subresource-integrity](https://www.npmjs.com/pa
 **plugin.js**
 #### Version 3
 ```js
-// If your plugin is direct dependent to the html webpack plugin:
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-
 class MyPlugin {
   apply(compiler) {
     compiler.hooks.compilation.tap('MyPlugin', (compilation) => {
