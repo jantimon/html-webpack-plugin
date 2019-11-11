@@ -52,7 +52,7 @@
     "webpack-recompilation-simulator": "3.0.0"
   },
   "dependencies": {
-    "html-minifier": "^4.0.0",
+    "html-minifier-terser": "^5.0.1",
     "loader-utils": "^1.2.3",
     "lodash": "^4.17.15",
     "pretty-error": "^2.1.1",
