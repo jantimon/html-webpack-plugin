@@ -323,7 +323,7 @@ plugins: [
 ### Minification
 
 If the `minify` option is set to `true` (the default when webpack's `mode` is `'production'`),
-the generated HTML will be minified using [html-minifier](https://github.com/kangax/html-minifier)
+the generated HTML will be minified using [html-minifier-terser](https://github.com/DanielRuf/html-minifier-terser)
 and the following options:
 
 ```js
@@ -337,7 +337,7 @@ and the following options:
 }
 ```
 
-To use custom [html-minifier options](https://github.com/kangax/html-minifier#options-quick-reference)
+To use custom [html-minifier options](https://github.com/DanielRuf/html-minifier-terser#options-quick-reference)
 pass an object to `minify` instead. This object will not be merged with the defaults above.
 
 To disable minification during production mode set the `minify` option to `false`.
