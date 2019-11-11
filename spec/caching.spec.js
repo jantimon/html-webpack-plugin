@@ -205,7 +205,8 @@ describe('HtmlWebpackPluginCaching', () => {
   it('should not slow down linear (10 plugins should not take 2.5 as much time as a 1 plugin)', done => {
     const template = path.join(__dirname, 'fixtures/plain.html');
     const createHtmlWebpackPlugin = () => new HtmlWebpackPlugin({
-      template: template
+      template: template,
+      minify: false
     });
     let singlePluginCompileStart;
     let singleCompileRunDuration;
