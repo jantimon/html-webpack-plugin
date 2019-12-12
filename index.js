@@ -519,8 +519,8 @@ class HtmlWebpackPlugin {
   /**
    * Return all chunks from the compilation result which match the exclude and include filters
    * @param {any} chunks
-   * @param {string[]|'all'} includedChunks
-   * @param {string[]} excludedChunks
+   * @param {string[]|RegExp|Function|'all'} includedChunks
+   * @param {string[]|RegExp|Function} excludedChunks
    */
   filterChunks (chunks, includedChunks, excludedChunks) {
     return chunks.filter(chunkName => {
