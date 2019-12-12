@@ -27,6 +27,26 @@ const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPlugin
 const fsStatAsync = promisify(fs.stat);
 const fsReadFileAsync = promisify(fs.readFile);
 
+function dataType(obj){
+    let str = Object.prototype.toString.call(obj);
+    let type = (str.substring(str.indexOf(" ") + 1, str.indexOf("]"))).toLowerCase();
+
+    return type;
+}
+function isRegExp(obj){
+    return "regexp" === dataType(obj);
+}
+function isFunction(obj){
+    return "function" === dataType(obj);
+}
+function isArray(obj){
+    if(Array.isArray){
+        return Array.isArray(obj);
+    }
+
+    return "array" === dataType(obj)
+}
+
 class HtmlWebpackPlugin {
   /**
    * @param {HtmlWebpackOptions} [options]
@@ -505,13 +525,28 @@ class HtmlWebpackPlugin {
   filterChunks (chunks, includedChunks, excludedChunks) {
     return chunks.filter(chunkName => {
       // Skip if the chunks should be filtered and the given chunk was not added explicity
-      if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
-        return false;
-      }
+      if(isArray(includedChunks)){ // chunks: Array
+        return includedChunks.indexOf(chunkName) !== -1;
+      }else if(isRegExp(includedChunks)){ // chunks: RegExp
+        return includedChunks.test(chunkName);
+      }else if(isFunction(includedChunks)){ // chunks: Function
+        return includedChunks(chunkName);
+      }      
+      // if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
+      //   return false;
+      // }
+      
       // Skip if the chunks should be filtered and the given chunk was excluded explicity
-      if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) {
-        return false;
-      }
+      if(isArray(excludedChunks)){ // chunks: Array
+        return excludedChunks.indexOf(chunkName) === -1;
+      }else if(isRegExp(excludedChunks)){ // chunks: RegExp
+        return excludedChunks.test(chunkName)
+      }else if(isFunction(excludedChunks)){ // chunks: Function
+        return excludedChunks(chunkName);
+      }      
+      // if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) {
+      //   return false;
+      // }
       // Add otherwise
       return true;
     });
