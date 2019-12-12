@@ -328,7 +328,87 @@ describe('HtmlWebpackPlugin', () => {
       },
       plugins: [new HtmlWebpackPlugin({
         inject: true,
+        chunks: /^app/,
+        template: path.join(__dirname, 'fixtures/plain.html')
+      })]
+    }, ['<script src="app_bundle.js"'], null, done);
+  });
+
+  it('allows you to inject a specified asset into a given html file', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: true,
+        chunks: function (chunkName) {
+          return /^app/.test(chunkName);
+        },
+        template: path.join(__dirname, 'fixtures/plain.html')
+      })]
+    }, ['<script src="app_bundle.js"'], null, done);
+  });
+
+  it('allows you to inject a specified asset into a given html file', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: true,
         excludeChunks: ['util'],
+        template: path.join(__dirname, 'fixtures/plain.html')
+      })]
+    }, ['<script src="app_bundle.js"'], null, done);
+  });
+
+  it('allows you to inject a specified asset into a given html file', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: true,
+        excludeChunks: /^util/,
+        template: path.join(__dirname, 'fixtures/plain.html')
+      })]
+    }, ['<script src="app_bundle.js"'], null, done);
+  });
+
+  it('allows you to inject a specified asset into a given html file', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        util: path.join(__dirname, 'fixtures/util.js'),
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: true,
+        excludeChunks: function (chunkName) {
+          return !/^util/.test(chunkName);
+        },
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
     }, ['<script src="app_bundle.js"'], null, done);
