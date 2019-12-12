@@ -27,26 +27,6 @@ const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPlugin
 const fsStatAsync = promisify(fs.stat);
 const fsReadFileAsync = promisify(fs.readFile);
 
-function dataType (obj) {
-  let str = Object.prototype.toString.call(obj);
-  let type = (str.substring(str.indexOf(' ') + 1, str.indexOf(']'))).toLowerCase();
-
-  return type;
-}
-function isRegExp (obj) {
-  return dataType(obj) === 'regexp';
-}
-function isFunction (obj) {
-  return dataType(obj) === 'function';
-}
-function isArray (obj) {
-  if (Array.isArray) {
-    return Array.isArray(obj);
-  }
-
-  return dataType(obj) === 'array';
-}
-
 class HtmlWebpackPlugin {
   /**
    * @param {HtmlWebpackOptions} [options]
@@ -519,17 +499,17 @@ class HtmlWebpackPlugin {
   /**
    * Return all chunks from the compilation result which match the exclude and include filters
    * @param {any} chunks
-   * @param {string[]|RegExp|Function|'all'} includedChunks
-   * @param {string[]|RegExp|Function} excludedChunks
+   * @param {string[]|{test(chunkName: string): boolean}|((chunkName: string) => boolean)|'all'} includedChunks
+   * @param {string[]|{test(chunkName: string): boolean}|((chunkName: string) => boolean)} excludedChunks
    */
   filterChunks (chunks, includedChunks, excludedChunks) {
     return chunks.filter(chunkName => {
       // Skip if the chunks should be filtered and the given chunk was not added explicity
-      if (isArray(includedChunks)) { // chunks: Array
-        return includedChunks.indexOf(chunkName) !== -1;
-      } else if (isRegExp(includedChunks)) { // chunks: RegExp
+      if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) { // chunks: Array
+        return false;
+      } else if (includedChunks instanceof RegExp) { // chunks: RegExp
         return includedChunks.test(chunkName);
-      } else if (isFunction(includedChunks)) { // chunks: Function
+      } else if (typeof includedChunks === 'function') { // chunks: Function
         return includedChunks(chunkName);
       }
       // if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
@@ -537,11 +517,11 @@ class HtmlWebpackPlugin {
       // }
 
       // Skip if the chunks should be filtered and the given chunk was excluded explicity
-      if (isArray(excludedChunks)) { // chunks: Array
-        return excludedChunks.indexOf(chunkName) === -1;
-      } else if (isRegExp(excludedChunks)) { // chunks: RegExp
-        return excludedChunks.test(chunkName);
-      } else if (isFunction(excludedChunks)) { // chunks: Function
+      if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) { // chunks: Array
+        return false;
+      } else if (excludedChunks instanceof RegExp) { // chunks: RegExp
+        return !excludedChunks.test(chunkName);
+      } else if (typeof excludedChunks === 'function') { // chunks: Function
         return excludedChunks(chunkName);
       }
       // if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) {
