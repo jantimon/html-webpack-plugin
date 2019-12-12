@@ -531,7 +531,7 @@ class HtmlWebpackPlugin {
         return includedChunks.test(chunkName);
       } else if (isFunction(includedChunks)) { // chunks: Function
         return includedChunks(chunkName);
-      }    
+      }
       // if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
       //   return false;
       // }
