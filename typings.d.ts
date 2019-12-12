@@ -27,7 +27,7 @@ declare namespace HtmlWebpackPlugin {
     /**
      * List all entries which should be injected
      */
-    chunks: "all" | string[];
+    chunks: "all" | string[] | RegExp | (((chunkName: string) => boolean));
     /**
      * Allows to control how chunks should be sorted before they are included to the html.
      * Default: `'auto'`.
@@ -39,7 +39,7 @@ declare namespace HtmlWebpackPlugin {
     /**
      * List all entries which should not be injeccted
      */
-    excludeChunks: string[];
+    excludeChunks: string[] | RegExp | (((chunkName: string) => boolean));
     /**
      * Path to the favicon icon
      */
