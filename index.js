@@ -34,17 +34,17 @@ function dataType (obj) {
   return type;
 }
 function isRegExp (obj) {
-    return 'regexp' === dataType(obj);
+  return dataType(obj) === 'regexp';
 }
 function isFunction (obj) {
-    return 'function' === dataType(obj);
+  return dataType(obj) === 'function';
 }
 function isArray (obj) {
-    if (Array.isArray) {
-        return Array.isArray(obj);
-    }
+  if (Array.isArray) {
+    return Array.isArray(obj);
+  }
 
-    return 'array' === dataType(obj)
+  return dataType(obj) === 'array';
 }
 
 class HtmlWebpackPlugin {
@@ -531,19 +531,19 @@ class HtmlWebpackPlugin {
         return includedChunks.test(chunkName);
       } else if (isFunction(includedChunks)) { // chunks: Function
         return includedChunks(chunkName);
-      }      
+      }    
       // if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
       //   return false;
       // }
-      
+
       // Skip if the chunks should be filtered and the given chunk was excluded explicity
       if (isArray(excludedChunks)) { // chunks: Array
         return excludedChunks.indexOf(chunkName) === -1;
       } else if (isRegExp(excludedChunks)) { // chunks: RegExp
-        return excludedChunks.test(chunkName)
+        return excludedChunks.test(chunkName);
       } else if (isFunction(excludedChunks)) { // chunks: Function
         return excludedChunks(chunkName);
-      }      
+      }
       // if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) {
       //   return false;
       // }
