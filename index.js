@@ -933,7 +933,7 @@ class HtmlWebpackPlugin {
    * @param {string} filePath
    */
   urlencodePath (filePath) {
-    return filePath.split('/').map(encodeURIComponent).join('/');
+    return filePath.split('/').map(encodeURI).join('/');
   }
 
   /**
