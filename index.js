@@ -371,19 +371,24 @@ class HtmlWebpackPlugin {
     if (templateParameters === false) {
       return Promise.resolve({});
     }
-    if (typeof templateParameters === 'function') {
-      const preparedAssetTags = {
-        headTags: this.prepareAssetTagGroupForRendering(assetTags.headTags),
-        bodyTags: this.prepareAssetTagGroupForRendering(assetTags.bodyTags)
-      };
-      return Promise
-        .resolve()
-        .then(() => templateParameters(compilation, assets, preparedAssetTags, this.options));
+    if (typeof templateParameters !== 'function' && typeof templateParameters !== 'object') {
+      throw new Error('templateParameters has to be either a function or an object');
     }
-    if (typeof templateParameters === 'object') {
-      return Promise.resolve(templateParameters);
-    }
-    throw new Error('templateParameters has to be either a function or an object');
+    const templateParameterFunction = typeof templateParameters === 'function'
+      // A custom function can overwrite the entire template parameter preparation
+      ? templateParameters
+      // If the template parameters is an object merge it with the default values
+      : (compilation, assets, assetTags, options) => Object.assign({},
+        templateParametersGenerator(compilation, assets, assetTags, options),
+        templateParameters
+      );
+    const preparedAssetTags = {
+      headTags: this.prepareAssetTagGroupForRendering(assetTags.headTags),
+      bodyTags: this.prepareAssetTagGroupForRendering(assetTags.bodyTags)
+    };
+    return Promise
+      .resolve()
+      .then(() => templateParameterFunction(compilation, assets, preparedAssetTags, this.options));
   }
 
   /**
