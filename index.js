@@ -442,7 +442,7 @@ class HtmlWebpackPlugin {
       ? this.injectAssetsIntoHtml(html, assets, assetTags)
       : html;
     const htmlAfterMinification = typeof this.options.minify === 'object'
-      ? require('html-minifier').minify(htmlAfterInjection, this.options.minify)
+      ? require('html-minifier-terser').minify(htmlAfterInjection, this.options.minify)
       : htmlAfterInjection;
     return Promise.resolve(htmlAfterMinification);
   }

@@ -202,10 +202,11 @@ describe('HtmlWebpackPluginCaching', () => {
       .then(done);
   });
 
-  it('should not slow down linear (10 plugins should not take twice as much time as a 1 plugin)', done => {
+  it('should not slow down linear (10 plugins should not take 2.5 as much time as a 1 plugin)', done => {
     const template = path.join(__dirname, 'fixtures/plain.html');
     const createHtmlWebpackPlugin = () => new HtmlWebpackPlugin({
-      template: template
+      template: template,
+      minify: false
     });
     let singlePluginCompileStart;
     let singleCompileRunDuration;
@@ -236,7 +237,7 @@ describe('HtmlWebpackPluginCaching', () => {
         const multiCompileRunDurationInNs = multiCompileRunDuration[0] * 1e9 + multiCompileRunDuration[1];
         const speedComarision = multiCompileRunDurationInNs / singleCompileRunDurationInNs * 100;
 
-        expect(speedComarision).toBeLessThan(200);
+        expect(speedComarision).toBeLessThan(250);
         done();
       });
   });

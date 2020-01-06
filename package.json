@@ -1,6 +1,6 @@
 {
   "name": "html-webpack-plugin",
-  "version": "4.0.0-beta.8",
+  "version": "4.0.0-beta.11",
   "license": "MIT",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "author": "Jan Nicklas <j.nicklas@me.com> (https://github.com/jantimon)",
@@ -52,7 +52,7 @@
     "webpack-recompilation-simulator": "3.0.0"
   },
   "dependencies": {
-    "html-minifier": "^4.0.0",
+    "html-minifier-terser": "^5.0.1",
     "loader-utils": "^1.2.3",
     "lodash": "^4.17.15",
     "pretty-error": "^2.1.1",
