@@ -446,9 +446,7 @@ class HtmlWebpackPlugin {
     const htmlAfterInjection = this.options.inject
       ? this.injectAssetsIntoHtml(html, assets, assetTags)
       : html;
-    const htmlAfterMinification = typeof this.options.minify === 'object'
-      ? require('html-minifier-terser').minify(htmlAfterInjection, this.options.minify)
-      : htmlAfterInjection;
+    const htmlAfterMinification = this.minifyHtml(htmlAfterInjection);
     return Promise.resolve(htmlAfterMinification);
   }
 
@@ -963,6 +961,38 @@ class HtmlWebpackPlugin {
     return template.replace(
       /([!])([^/\\][^!?]+|[^/\\!?])($|\?[^!?\n]+$)/,
       (match, prefix, filepath, postfix) => prefix + path.resolve(filepath) + postfix);
+  }
+
+  /**
+   * Minify the given string using html-minifier-terser
+   *
+   * As this is a breaking change to html-webpack-plugin 3.x
+   * provide an extended error message to explain how to get back
+   * to the old behaviour
+   *
+   * @param {string} html
+   */
+  minifyHtml (html) {
+    if (typeof this.options.minify !== 'object') {
+      return html;
+    }
+    try {
+      return require('html-minifier-terser').minify(html, this.options.minify);
+    } catch (e) {
+      const isParseError = String(e.message).indexOf('Parse Error') === 0;
+      if (isParseError) {
+        e.message = 'html-webpack-plugin could not minify the generated output.\n' +
+            'In production mode the html minifcation is enabled by default.\n' +
+            'If you are not generating a valid html output please disable it manually.\n' +
+            'You can do so by adding the following setting to your HtmlWebpackPlugin config:\n|\n|' +
+            '    minify: false\n|\n' +
+            'See https://github.com/jantimon/html-webpack-plugin#options for details.\n\n' +
+            'For parser dedicated bugs please create an issue here:\n' +
+            'https://danielruf.github.io/html-minifier-terser/' +
+          '\n' + e.message;
+      }
+      throw e;
+    }
   }
 
   /**
