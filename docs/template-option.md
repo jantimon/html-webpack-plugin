@@ -20,7 +20,7 @@ There are three ways to set the loader:
 ## 1) Don't set any loader
 
 By default (if you don't specify any loader in any way) a [fallback ejs loader](https://github.com/jantimon/html-webpack-plugin/blob/master/lib/loader.js) kicks in.
-Please note that this loader does not support the full ejs syntax as it is based of [lodash template](https://lodash.com/docs/#template).
+Please note that this loader does not support the full ejs syntax as it is based on [lodash template](https://lodash.com/docs/#template).
 
 ```js
 {
