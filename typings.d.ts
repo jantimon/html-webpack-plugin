@@ -62,7 +62,17 @@ declare namespace HtmlWebpackPlugin {
       | false // Don't inject scripts
       | true // Inject scripts into body
       | "body" // Inject scripts into body
-      | "head"; // Inject scripts into head
+      | "head" // Inject scripts into head
+    /**
+     * Set up script loading
+     * blocking will result in <script src="..."></script>
+     * defer will result in <script defer src="..."></script>
+     *
+     * The default behaviour is blocking
+     */
+    scriptLoading:
+      | "blocking"
+      | "defer"
     /**
      * Inject meta tags
      */

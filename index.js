@@ -43,7 +43,8 @@ class HtmlWebpackPlugin {
       templateParameters: templateParametersGenerator,
       filename: 'index.html',
       hash: false,
-      inject: true,
+      inject: userOptions.scriptLoading !== 'defer' ? 'body' : 'head',
+      scriptLoading: 'blocking',
       compile: true,
       favicon: false,
       minify: 'auto',
@@ -698,6 +699,7 @@ class HtmlWebpackPlugin {
       tagName: 'script',
       voidTag: false,
       attributes: {
+        defer: this.options.scriptLoading !== 'blocking',
         src: scriptAsset
       }
     }));

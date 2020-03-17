@@ -2252,4 +2252,34 @@ describe('HtmlWebpackPlugin', () => {
       })]
     }, [/<!doctype html>\s+<html>\s+<head>\s+<meta charset="utf-8">/], null, done);
   });
+
+  it('should allow to inject scripts with a defer attribute', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        scriptLoading: 'defer'
+
+      })]
+    }, [/<script defer="defer" .+<body>/], null, done);
+  });
+
+  it('should allow to inject scripts with a defer attribute to the body', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        scriptLoading: 'defer',
+        inject: 'body'
+      })]
+    }, [/<body>.*<script defer="defer"/], null, done);
+  });
 });
