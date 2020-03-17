@@ -2282,4 +2282,26 @@ describe('HtmlWebpackPlugin', () => {
       })]
     }, [/<body>.*<script defer="defer"/], null, done);
   });
+
+  it('should allow to inject scripts with a defer in front of styles', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        rules: [
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          scriptLoading: 'defer'
+        }),
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
+      ]
+    }, [/<script defer="defer".+<link href="styles.css"/], null, done);
+  });
 });

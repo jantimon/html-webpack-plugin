@@ -833,7 +833,10 @@ class HtmlWebpackPlugin {
     if (scriptTarget === 'body') {
       result.bodyTags.push(...assetTags.scripts);
     } else {
-      result.headTags.push(...assetTags.scripts);
+      // If script loading is blocking add the scripts to the end of the head
+      // If script loading is non-blocking add the scripts infront of the css files
+      const insertPosition = this.options.scriptLoading === 'blocking' ? result.headTags.length : assetTags.meta.length;
+      result.headTags.splice(insertPosition, 0, ...assetTags.scripts);
     }
     return result;
   }
