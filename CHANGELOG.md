@@ -2,6 +2,94 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [4.0.0](https://github.com/jantimon/html-webpack-plugin/compare/v3.2.0...v4.0.0) (2020-03-23)
+
+The summary can be found in the [**release blog post**](https://dev.to/jantimon/html-webpack-plugin-4-has-been-released-125d).
+
+### Bug Fixes
+
+* Add dependencies from the child compilation to the main compilation ([27c3e72](https://github.com/jantimon/html-webpack-plugin/commit/27c3e727b073701bfc739859d8325435d27cbf35))
+* Add typing for assets(Close jantimon[#1243](https://github.com/jantimon/html-webpack-plugin/issues/1243)) ([9fef060](https://github.com/jantimon/html-webpack-plugin/commit/9fef0603eb532b3e6a1e8871b4568e62f9bba1a3))
+* allow `contenthash` along with `templatehash` ([049d4d3](https://github.com/jantimon/html-webpack-plugin/commit/049d4d3436092b8beff3f5745e77b20f1c168c4c)), closes [#1033](https://github.com/jantimon/html-webpack-plugin/issues/1033)
+* Catch and ignore pretty-error errors ([2056139](https://github.com/jantimon/html-webpack-plugin/commit/2056139a9533ff9487506531491c0e5a94003607)), closes [#921](https://github.com/jantimon/html-webpack-plugin/issues/921)
+* Drop @types/webpack dependency ([d4eb1c7](https://github.com/jantimon/html-webpack-plugin/commit/d4eb1c749316af3964126606fe6c70a233c30fef))
+* Ignore foreign child compilers ([1422664](https://github.com/jantimon/html-webpack-plugin/commit/14226649aa1bbaf7b174bcacafdbe47d8ba6c851))
+* Improve perfomance for appcache files ([b94e043](https://github.com/jantimon/html-webpack-plugin/commit/b94e0434f5dbb06ee2179e91ebaa2ce7801937e0))
+* load script files before style files files in defer script loading mode ([97f9fb9](https://github.com/jantimon/html-webpack-plugin/commit/97f9fb9a68e4d3c3c9453296c352e831f7546937))
+* Prevent chunks from beeing added multiple times ([d65b37d](https://github.com/jantimon/html-webpack-plugin/commit/d65b37d2c588047e0d81a38f4645fcdb3ead0b9e))
+* Prevent lodash from being inlined to work around a babel-loader incompatibility ([7f21910](https://github.com/jantimon/html-webpack-plugin/commit/7f21910707a2b53a9a5da3ac9e4b01e36147402f)), closes [#1223](https://github.com/jantimon/html-webpack-plugin/issues/1223)
+* Remove compilation.getStats() call for performance reasons ([7005a55](https://github.com/jantimon/html-webpack-plugin/commit/7005a557529bee948c5ef0a1b8b44a1a41a28417))
+* remove useless links for options ([#1153](https://github.com/jantimon/html-webpack-plugin/issues/1153)) ([267e0e0](https://github.com/jantimon/html-webpack-plugin/commit/267e0e0eac155569c822c34f120490bdf3f56d43))
+* Update references to html-minifier ([24bf1b5](https://github.com/jantimon/html-webpack-plugin/commit/24bf1b5e2a0d087b30d057d1780d8f495aa01e26)), closes [#1311](https://github.com/jantimon/html-webpack-plugin/issues/1311)
+* **typings.d.ts:** added apply method type to HtmlWwbpackPlugin class definitoin ([8b7255f](https://github.com/jantimon/html-webpack-plugin/commit/8b7255f555423dd1bfa51a3c28700e4bd116f97b)), closes [jantimon#1244](https://github.com/jantimon/issues/1244)
+* rename `contenthash` to `templatehash` ([4c11c5d](https://github.com/jantimon/html-webpack-plugin/commit/4c11c5dfde9d87d71dce9cf51864648f8e42b912))
+* Repair typings ([#1166](https://github.com/jantimon/html-webpack-plugin/issues/1166)) ([f4cb241](https://github.com/jantimon/html-webpack-plugin/commit/f4cb241157a9a1fed4721b1abc1f390b09595494))
+* small type. minifcation instead of minification ([#1154](https://github.com/jantimon/html-webpack-plugin/issues/1154)) ([56037a6](https://github.com/jantimon/html-webpack-plugin/commit/56037a6b2ae4a7606b54f5af213b6a2b8145f95e))
+* Use src/index.ejs by default if present ([#1167](https://github.com/jantimon/html-webpack-plugin/issues/1167)) ([c27e5e4](https://github.com/jantimon/html-webpack-plugin/commit/c27e5e46a334d9c1e177a521ea7c9a5ba3c6d980))
+* **chunksorter:** Don't sort chunks by default ([22fb03f](https://github.com/jantimon/html-webpack-plugin/commit/22fb03fb17fdb37d5ce6de00af154b5575a02d3a))
+* **loader:** switch to loaderUtils.getOptions ([a0a0f0d](https://github.com/jantimon/html-webpack-plugin/commit/a0a0f0dc755fbc3249aa2e1d1c6a4dd307ab8e8a))
+* **README:** adds a link to template option documentation ([f40aeae](https://github.com/jantimon/html-webpack-plugin/commit/f40aeae312af73c6c5263cd99e81069f41d3b699))
+* **tests:** Upgrade webpack-recompilation-simulator ([dfe1d10](https://github.com/jantimon/html-webpack-plugin/commit/dfe1d10c4511b0da4354cacf79ca0d5ac7baf862))
+* Update lodash to 4.17.10 ([cc3bf49](https://github.com/jantimon/html-webpack-plugin/commit/cc3bf4909605879993c22e3048ee520dbdc8fa49))
+
+
+### Code Refactoring
+
+* Change the structure of the internal assets object ([37db086](https://github.com/jantimon/html-webpack-plugin/commit/37db0868efdbf334a1b60003fe5bd376cfd8ae01))
+* Changed hook names and arguments - the hook order is 'beforeAssetTagGeneration', 'alterAssetTags', 'alterAssetTagGroups', 'afterTemplateExecution', 'beforeEmit', 'afterEmit' ([14b4456](https://github.com/jantimon/html-webpack-plugin/commit/14b4456ba67a5b85421b558bbd5f1d59c7b410b3))
+* Use Webpack 4 APIs ([47efdea](https://github.com/jantimon/html-webpack-plugin/commit/47efdeaf17806f7d4e26aefacc748a92077f904a))
+
+
+### Features
+
+* add `.toString` implementation to htmlTags to allow easier rendering ([34d8aa5](https://github.com/jantimon/html-webpack-plugin/commit/34d8aa572c7acc59c26f3b5d15bf489a07aa4c24))
+* Add default viewport meta tag for default template ([302e39e](https://github.com/jantimon/html-webpack-plugin/commit/302e39e30013b5828bb6c9e7036db951f70d0cf5)), closes [#897](https://github.com/jantimon/html-webpack-plugin/issues/897) [#978](https://github.com/jantimon/html-webpack-plugin/issues/978)
+* Add defer script loading ([de315eb](https://github.com/jantimon/html-webpack-plugin/commit/de315eb98497f3e5f517d59dbbe120b48c9b8db9))
+* Add support for relative publicPath   ([dbbdd81](https://github.com/jantimon/html-webpack-plugin/commit/dbbdd81de570dd181ea0905a6445fdeb5a784912))
+* Add support for <base> tag ([#1160](https://github.com/jantimon/html-webpack-plugin/issues/1160)) ([c5d4b86](https://github.com/jantimon/html-webpack-plugin/commit/c5d4b869c196c59cdd6a9c30db58f1f8be07a820))
+* Add support for minifying inline ES6 inside html templates ([c66766c](https://github.com/jantimon/html-webpack-plugin/commit/c66766cdae3593091dee413b9c585359c24ef068)), closes [#1262](https://github.com/jantimon/html-webpack-plugin/issues/1262)
+* Add support for the [contenthash] placeholder inside htm file names ([ae8233a](https://github.com/jantimon/html-webpack-plugin/commit/ae8233a04d4105b6e970feaa2c5e11c0b48fd4b7))
+* Add typings to package.json ([a524e8f](https://github.com/jantimon/html-webpack-plugin/commit/a524e8f24e905d5e51fedd50d33a41328a9b87eb)), closes [#1132](https://github.com/jantimon/html-webpack-plugin/issues/1132)
+* Allow to return async template parameters ([99f9362](https://github.com/jantimon/html-webpack-plugin/commit/99f9362703055baf0029b8852cb5339b6218829d))
+* drop workaround for "Uncaught TypeError: __webpack_require__(...) is not a function" to be compatible with webpack 5 ([15ad0d2](https://github.com/jantimon/html-webpack-plugin/commit/15ad0d260443edfdcc953fa08c675c90c063bac7))
+* Export major version of this plugin ([6ae6f48](https://github.com/jantimon/html-webpack-plugin/commit/6ae6f48ecf92b080809d68092ee8c6825edfe5a4))
+* merge templateParameters with default template parameters ([1d66e53](https://github.com/jantimon/html-webpack-plugin/commit/1d66e5333bc2aeb8caadf96e572af756d3708d19))
+* Provide a verbose error message if html minification failed ([7df269f](https://github.com/jantimon/html-webpack-plugin/commit/7df269fd2a840d0800cb259bd559edb0b766e7ab))
+* **compiler:** Add file dependencies ([bbc07a3](https://github.com/jantimon/html-webpack-plugin/commit/bbc07a3a214e3b693e6c9e3d6404e146a0fc023a))
+* **compiler:** Use a single compiler for multiple plugin instances ([f29ae88](https://github.com/jantimon/html-webpack-plugin/commit/f29ae886d7fad50e7fbb78ac7ff7d5bd9bc47f49))
+* **compiler:** Use timestamps to verify cache validity ([0ebcd17](https://github.com/jantimon/html-webpack-plugin/commit/0ebcd1776132262b799f2814659f4d90c3f3c1b3))
+* Remove selfClosingTag ([5d3d8e4](https://github.com/jantimon/html-webpack-plugin/commit/5d3d8e4b73b7b97dba8bdf5fe1ecf50598040b54))
+* Remove type="text/javascript" from injected script tags ([b46bf67](https://github.com/jantimon/html-webpack-plugin/commit/b46bf67ae4492a12b60c42c7d26831e480522b49))
+* Replace jade with pug in examples ([d7ec407](https://github.com/jantimon/html-webpack-plugin/commit/d7ec4078c85b3ed9c2ff84e10fe75392f26a6130))
+* Switch from jasmine to jest ([ae1f435](https://github.com/jantimon/html-webpack-plugin/commit/ae1f43527945c8ae953c2ba549631f2d090e003a))
+* **hooks:** Add a helper for easier hook access ([b6dec4b](https://github.com/jantimon/html-webpack-plugin/commit/b6dec4bf1072509282756e8d83ef6ee447485f3a))
+* **hooks:** Provide static getHook method for access to all html-webpack-plugin hooks ([#995](https://github.com/jantimon/html-webpack-plugin/issues/995)) ([82b34a1](https://github.com/jantimon/html-webpack-plugin/commit/82b34a1dd2e96cbcd715fafe4e97073efd30cc9f))
+* Simplify <meta> element and charset attribute ([55313be](https://github.com/jantimon/html-webpack-plugin/commit/55313bee9b82ea79157085e48bba4fa2ebfef6a4))
+* support ES6 template string in default loader ([d6b65dd](https://github.com/jantimon/html-webpack-plugin/commit/d6b65dd1531038deac1be87c2087da5955903d24)), closes [#950](https://github.com/jantimon/html-webpack-plugin/issues/950)
+* Use jsdoc for static typing ([a6b8d2d](https://github.com/jantimon/html-webpack-plugin/commit/a6b8d2dcf3b1183d50589b869162b972ad32de4d))
+* Use webpack 4 entries api to extract asset information ([342867e](https://github.com/jantimon/html-webpack-plugin/commit/342867e1edb7c2a8748b0aca396f160f0b13d42e))
+* **html-tags:** Add a helper to create html-tags ([ee6a165](https://github.com/jantimon/html-webpack-plugin/commit/ee6a165425a6b47dff341fb651848ec5727d7f7e))
+
+
+### BREAKING CHANGES
+
+* **defaults:** Use src/index.ejs if no template option is set.
+* **defaults:** The default template has now a predefined viewport meta tag
+* **defaults:** The default meta utf-8 declaration was changed to <meta charset="utf-8"/>
+* **hooks:** Renamed beforeHtmlGeneration hook to beforeAssetTagGeneration
+* **hooks:** Renamed beforeHtmlProcessing hook to alterAssetTags
+* **hooks:** Renamed afterHtmlProcessing hook to beforeEmit
+* **hooks:** The html-webpack-plugin doesn't add its hooks to the compilation object anymore
+* The assets object which is used for the template parameters and inside hooks was changed. The chunks property was removed and the js and css property was converted from a string into an object `{ entryName: string, path: string}`
+* The mimetype information "text/javascript" is removed from all generated script
+tags
+* Remove selfClosingTag attribute
+* Template strings inside templates are now disabled by default
+* Dropped support for Webpack 1 - 3
+* Template variable webpack was removed
+* **chunksorter:** Chunks aren't sorted anymore by default
+
+
 <a name="3.2.0"></a>
 # [3.2.0](https://github.com/jantimon/html-webpack-plugin/compare/v3.1.0...v3.2.0) (2018-04-03)
 
