@@ -19,17 +19,7 @@
   <p>Plugin that simplifies creation of HTML files to serve your bundles</p>
 </div>
 
-<h2 align="center">Install Beta</h2>
-
-```bash
-  npm i --save-dev html-webpack-plugin@next
-```
-
-```bash
-  yarn add --dev html-webpack-plugin@next
-```
-
-<h2 align="center">Install Stable</h2>
+<h2 align="center">Install</h2>
 
 ```bash
   npm i --save-dev html-webpack-plugin
