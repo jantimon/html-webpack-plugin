@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.1](https://github.com/jantimon/html-webpack-plugin/compare/v4.0.0...v4.0.1) (2020-03-23)
+
+
+### Bug Fixes
+
+* update typedefs to match with html-minifier-terser ([2698c7e](https://github.com/jantimon/html-webpack-plugin/commit/2698c7e45a7f12113a07b256dc400ec89666130d))
+
+
+
 # [4.0.0](https://github.com/jantimon/html-webpack-plugin/compare/v3.2.0...v4.0.0) (2020-03-23)
 
 The summary can be found in the [**release blog post**](https://dev.to/jantimon/html-webpack-plugin-4-has-been-released-125d).
