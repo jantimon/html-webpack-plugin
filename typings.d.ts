@@ -1,6 +1,6 @@
 import { AsyncSeriesWaterfallHook } from "tapable";
 import { Compiler, compilation } from 'webpack';
-import { Options as HtmlMinifierOptions } from "html-minifier";
+import { Options as HtmlMinifierOptions } from "html-minifier-terser";
 
 export = HtmlWebpackPlugin;
 
