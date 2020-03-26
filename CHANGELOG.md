@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.2](https://github.com/jantimon/html-webpack-plugin/compare/v4.0.1...v4.0.2) (2020-03-26)
+
+
+### Bug Fixes
+
+* don't remove trailing slashes from self closing tags by default ([2281e4b](https://github.com/jantimon/html-webpack-plugin/commit/2281e4bfda9b91c4a83d63bfc8df8372d1e6ae9e))
+
+
+
 ## [4.0.1](https://github.com/jantimon/html-webpack-plugin/compare/v4.0.0...v4.0.1) (2020-03-23)
 
 
