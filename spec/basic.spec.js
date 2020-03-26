@@ -2304,4 +2304,27 @@ describe('HtmlWebpackPlugin', () => {
       ]
     }, [/<script defer="defer".+<link href="styles.css"/], null, done);
   });
+
+  it('should keep closing slashes from the template', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        rules: [
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          scriptLoading: 'defer',
+          templateContent: '<html><body> <selfclosed /> </body></html>'
+        }),
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
+      ]
+    }, [/<selfclosed\/>/], null, done);
+  });
 });

@@ -115,10 +115,11 @@ class HtmlWebpackPlugin {
 
     const minify = this.options.minify;
     if (minify === true || (minify === 'auto' && isProductionLikeMode)) {
-      /** @type { import('html-minifier').Options } */
+      /** @type { import('html-minifier-terser').Options } */
       this.options.minify = {
-        // https://github.com/kangax/html-minifier#options-quick-reference
+        // https://www.npmjs.com/package/html-minifier-terser#options-quick-reference
         collapseWhitespace: true,
+        keepClosingSlash: true,
         removeComments: true,
         removeRedundantAttributes: true,
         removeScriptTypeAttributes: true,
