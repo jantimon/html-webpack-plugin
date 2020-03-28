@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.3](https://github.com/jantimon/html-webpack-plugin/compare/v4.0.2...v4.0.3) (2020-03-28)
+
+
+### Bug Fixes
+
+* add webpack, tapable and html-minifier-terser as dependencies because of types.d.ts ([238da81](https://github.com/jantimon/html-webpack-plugin/commit/238da8123950f87267954fd448f3e6b0fb1ead17))
+
+
+
 ## [4.0.2](https://github.com/jantimon/html-webpack-plugin/compare/v4.0.1...v4.0.2) (2020-03-26)
 
 
