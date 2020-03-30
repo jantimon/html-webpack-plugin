@@ -405,7 +405,7 @@ describe('HtmlWebpackPlugin', () => {
   it('works with source maps', done => {
     testHtmlPlugin({
       mode: 'development',
-      devtool: 'sourcemap',
+      devtool: 'source-map',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
