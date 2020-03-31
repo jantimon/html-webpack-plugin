@@ -46,8 +46,9 @@ function setUpCompiler (htmlWebpackPlugin) {
 }
 
 function getCompiledModules (statsJson) {
+  console.log(statsJson);
   const builtModules = statsJson.modules.filter(webpackModule => webpackModule.built).map((webpackModule) => {
-    return module.userRequest;
+    return webpackModule.name;
   });
   statsJson.children.forEach((childCompilationStats) => {
     const builtChildModules = getCompiledModules(childCompilationStats);

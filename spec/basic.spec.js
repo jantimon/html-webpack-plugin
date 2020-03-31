@@ -1937,7 +1937,7 @@ describe('HtmlWebpackPlugin', () => {
           template: path.join(__dirname, 'fixtures/non-existing-template.html')
         })
       ]
-    }, ['Child compilation failed:\n  Entry module not found:'], null, done, true);
+    }, ['Child compilation failed:\n  Module not found:'], null, done, true);
   });
 
   it('should sort the chunks in auto mode', done => {

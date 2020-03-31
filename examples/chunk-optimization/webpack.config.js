@@ -15,7 +15,7 @@ module.exports = {
   },
   module: {
     rules: [
-      { test: /\.css$/, loader: 'style-loader!css-loader' },
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
       { test: /\.png$/, loader: 'file-loader' }
     ]
   },
@@ -25,7 +25,7 @@ module.exports = {
       minSize: 0,
       maxAsyncRequests: 9,
       maxInitialRequests: 9,
-      name: true,
+      name: false,
       cacheGroups: {
         libMath: {
           test: /lib-(multiply|sum)/,

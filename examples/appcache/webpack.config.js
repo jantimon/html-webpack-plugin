@@ -16,7 +16,7 @@ module.exports = {
     rules: [
       { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] },
       { test: /\.png$/, loader: 'file-loader' },
-      { test: /\.html$/, loader: 'html-loader?-removeOptionalTags' }
+      { test: /\.html$/, loader: 'html-loader', options: { removeOptionalTags: false } }
     ]
   },
   plugins: [
