@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.4](https://github.com/jantimon/html-webpack-plugin/compare/v4.0.3...v4.0.4) (2020-04-01)
+
+
+### Bug Fixes
+
+* Fix querystring encoding ([#1386](https://github.com/jantimon/html-webpack-plugin/issues/1386)) ([4f48a39](https://github.com/jantimon/html-webpack-plugin/commit/4f48a39e5738a5d431be2bec39c1b1f0de800d57)), closes [#1355](https://github.com/jantimon/html-webpack-plugin/issues/1355)
+
+
+
 ## [4.0.3](https://github.com/jantimon/html-webpack-plugin/compare/v4.0.2...v4.0.3) (2020-03-28)
 
 
