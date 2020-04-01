@@ -116,6 +116,18 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<body>[\s]*<script src="foo\/very%20fancy%2Bname.js"><\/script>[\s]*<\/body>/], null, done);
   });
 
+  it('properly encodes file names in emitted URIs but keeps the querystring', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'fo:o/very fancy+file-name.js?path=/home?value=abc&value=def#zzz'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, ['<script src="fo%3Ao/very%20fancy%2Bfile-name.js?path=/home?value=abc&value=def#zzz">'], null, done);
+  });
+
   it('generates a default index.html file with multiple entry points', done => {
     testHtmlPlugin({
       mode: 'production',
