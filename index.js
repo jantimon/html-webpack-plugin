@@ -19,7 +19,9 @@ const loaderUtils = require('loader-utils');
 
 const { createHtmlTagObject, htmlTagObjectToString } = require('./lib/html-tags');
 
-const childCompiler = require('./lib/compiler.js');
+const webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
+
+const childCompiler = require('./lib/compiler-webpack' + webpackMajorVersion + '.js');
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
 const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
@@ -943,35 +945,10 @@ class HtmlWebpackPlugin {
    * Encode each path component using `encodeURIComponent` as files can contain characters
    * which needs special encoding in URLs like `+ `.
    *
-   * Valid filesystem characters which need to be encoded for urls:
-   *
-   * # pound, % percent, & ampersand, { left curly bracket, } right curly bracket,
-   * \ back slash, < left angle bracket, > right angle bracket, * asterisk, ? question mark,
-   * blank spaces, $ dollar sign, ! exclamation point, ' single quotes, " double quotes,
-   * : colon, @ at sign, + plus sign, ` backtick, | pipe, = equal sign
-   *
-   * However the query string must not be encoded:
-   *
-   *  fo:demonstration-path/very fancy+name.js?path=/home?value=abc&value=def#zzz
-   *    ^             ^    ^    ^     ^    ^  ^    ^^    ^     ^   ^     ^   ^
-   *    |             |    |    |     |    |  |    ||    |     |   |     |   |
-   *    encoded       |    |    encoded    |  |    ||    |     |   |     |   |
-   *                 ignored              ignored  ignored     ignored   ignored
-   *
    * @param {string} filePath
    */
   urlencodePath (filePath) {
-    // People use the filepath in quite unexpected ways.
-    // Try to extract the first querystring of the url:
-    //
-    // some+path/demo.html?value=abc?def
-    //
-    const queryStringStart = filePath.indexOf('?');
-    const urlPath = queryStringStart === -1 ? filePath : filePath.substr(0, queryStringStart);
-    const queryString = filePath.substr(urlPath.length);
-    // Encode all parts except '/' which are not part of the querystring:
-    const encodedUrlPath = urlPath.split('/').map(encodeURIComponent).join('/');
-    return encodedUrlPath + queryString;
+    return filePath.split('/').map(encodeURIComponent).join('/');
   }
 
   /**
