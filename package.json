@@ -47,7 +47,7 @@
     "style-loader": "0.23.1",
     "typescript": "3.5.2",
     "webpack": "4.35.2",
-    "webpack-recompilation-simulator": "3.0.0"
+    "webpack-recompilation-simulator": "^3.2.0"
   },
   "dependencies": {
     "@types/html-minifier-terser": "^5.0.0",

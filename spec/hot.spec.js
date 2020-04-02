@@ -11,6 +11,10 @@ const webpack = require('webpack');
 const rimraf = require('rimraf');
 const WebpackRecompilationSimulator = require('webpack-recompilation-simulator');
 const HtmlWebpackPlugin = require('../index.js');
+const webpackMajorVersion = Number(require('webpack/package.json').version.split('.')[0]);
+if (isNaN(webpackMajorVersion)) {
+  throw new Error('Cannot parse webpack major version');
+}
 
 const OUTPUT_DIR = path.join(__dirname, '../dist/caching-spec');
 
@@ -81,8 +85,12 @@ describe('HtmlWebpackPluginHMR', () => {
         const hotUpdateJsFileNames = Object.keys(stats.compilation.assets).filter((fileName) => /\.hot-update\.js$/.test(fileName));
         expect(hotUpdateJsFileNames).not.toEqual([]);
         expect(hotUpdateJsFileNames.length).toEqual(1);
-        const hotUpdateFileSource = stats.compilation.assets[hotUpdateJsFileNames[0]].source();
-        expect(hotUpdateFileSource).not.toEqual('');
+        if (webpackMajorVersion < 5) {
+          const hotUpdateFileSource = stats.compilation.assets[hotUpdateJsFileNames[0]].source();
+          expect(hotUpdateFileSource).not.toEqual('');
+        }
+        const hotUpdateFileSize = stats.compilation.assets[hotUpdateJsFileNames[0]].size();
+        expect(hotUpdateFileSize).not.toEqual(0);
       })
       .then(() => compiler.stopWatching());
   });
