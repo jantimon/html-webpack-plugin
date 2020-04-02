@@ -1,0 +1,21 @@
+name: Node.js CI
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - run: npm install --ignore-scripts
+        env:
+          NODE_ENV: development
+      - run: npm install webpack@beta
+      - run: npm run test
+        env:
+          CI: true
