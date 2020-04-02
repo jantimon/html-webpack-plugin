@@ -14,7 +14,6 @@
   ],
   "scripts": {
     "pretest": "semistandard",
-    "fix": "semistandard --fix",
     "posttest": "tsc",
     "commit": "git-cz",
     "build-examples": "node examples/build-examples.js",
