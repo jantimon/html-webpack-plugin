@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "pretest": "semistandard",
+    "fix": "semistandard --fix",
     "posttest": "tsc",
     "commit": "git-cz",
     "build-examples": "node examples/build-examples.js",
@@ -42,7 +43,7 @@
     "pug": "2.0.3",
     "pug-loader": "2.4.0",
     "rimraf": "2.6.3",
-    "semistandard": "13.0.1",
+    "semistandard": "^13.0.1",
     "standard-version": "5.0.2",
     "style-loader": "0.23.1",
     "typescript": "3.5.2",
