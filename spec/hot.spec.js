@@ -11,10 +11,6 @@ const webpack = require('webpack');
 const rimraf = require('rimraf');
 const WebpackRecompilationSimulator = require('webpack-recompilation-simulator');
 const HtmlWebpackPlugin = require('../index.js');
-const webpackMajorVersion = Number(require('webpack/package.json').version.split('.')[0]);
-if (isNaN(webpackMajorVersion)) {
-  throw new Error('Cannot parse webpack major version');
-}
 
 const OUTPUT_DIR = path.join(__dirname, '../dist/caching-spec');
 

@@ -56,17 +56,6 @@ function getCompiledModules (statsJson) {
   return builtModules;
 }
 
-function getCompiledModuless (statsJson) {
-  const builtModules = statsJson.modules.filter(webpackModule => webpackModule.built).map((webpackModule) => {
-    return webpackModule;
-  });
-  statsJson.children.forEach((childCompilationStats) => {
-    const builtChildModules = getCompiledModuless(childCompilationStats);
-    Array.prototype.push.apply(builtModules, builtChildModules);
-  });
-  return builtModules;
-}
-
 function getCompiledModuleCount (statsJson) {
   return getCompiledModules(statsJson).length;
 }
@@ -139,7 +128,6 @@ describe('HtmlWebpackPluginCaching', () => {
       .then(stats => {
         // Expect no errors:
         expectNoErrors(stats);
-        console.log(getCompiledModuless(stats.toJson()));
         // Verify that only one file was built
         expect(getCompiledModuleCount(stats.toJson()))
           .toBe(1);
