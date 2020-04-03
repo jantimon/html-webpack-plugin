@@ -142,14 +142,15 @@ class HtmlWebpackPlugin {
           if (err || !isValid) {
             childCompiler.clearCache(compiler);
           }
+          childCompiler.addTemplateToCompiler(compiler, this.options.template);
         });
       } else {
         if (childCompiler.hasOutDatedTemplateCache(compilation)) {
           childCompiler.clearCache(compiler);
         }
+        // Add this instances template to the child compiler
+        childCompiler.addTemplateToCompiler(compiler, this.options.template);
       }
-      // Add this instances template to the child compiler
-      childCompiler.addTemplateToCompiler(compiler, this.options.template);
       // Add file dependencies of child compiler to parent compiler
       // to keep them watched even if we get the result from the cache
       compilation.hooks.additionalChunkAssets.tap('HtmlWebpackPlugin', () => {
