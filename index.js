@@ -157,7 +157,7 @@ class HtmlWebpackPlugin {
         const childCompilerDependencies = childCompiler.getFileDependencies(compiler);
         childCompilerDependencies.forEach(fileDependency => {
           if (Number(webpackMajorVersion) >= 5) {
-            compilation.missingDependencies.add(fileDependency);
+            compilation.fileDependencies.add(fileDependency);
           } else {
             compilation.compilationDependencies.add(fileDependency);
           }
