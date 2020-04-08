@@ -109,6 +109,7 @@ declare namespace HtmlWebpackPlugin {
     templateContent:
       | false // Use the template option instead to load a file
       | string
+      | ((templateParameters: { [option: string]: any }) => (string | Promise<string>))
       | Promise<string>;
     /**
      * Allows to overwrite the parameters used in the template
