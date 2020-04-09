@@ -134,6 +134,7 @@ Allowed values are as follows
 |**`title`**|`{String}`|`Webpack App`|The title to use for the generated HTML document|
 |**`filename`**|`{String}`|`'index.html'`|The file to write the HTML to. Defaults to `index.html`. You can specify a subdirectory here too (eg: `assets/admin.html`)|
 |**`template`**|`{String}`|``|`webpack` relative or absolute path to the template. By default it will use `src/index.ejs` if it exists. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details|
+|**`templateContent`**|`{string\|Function|false}`|false| Can be used instead of `template` to provide an inline template - please read the [Writing Your Own Templates](https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates) section |
 |**`templateParameters`**|`{Boolean\|Object\|Function}`|``| Allows to overwrite the parameters used in the template - see [example](https://github.com/jantimon/html-webpack-plugin/tree/master/examples/template-parameters) |
 |**`inject`**|`{Boolean\|String}`|`true`|`true \|\| 'head' \|\| 'body' \|\| false` Inject all assets into the given `template` or `templateContent`. When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element - see the [inject:false example](https://github.com/jantimon/html-webpack-plugin/tree/master/examples/custom-insertion-position)|
 |**`scriptLoading`**|`{'blocking'\|'defer'}`|`'blocking'`| Modern browsers support non blocking javascript loading (`'defer'`) to improve the page startup performance. |
@@ -243,40 +244,40 @@ plugins: [
 
 You can use the `lodash` syntax out of the box. If the `inject` feature doesn't fit your needs and you want full control over the asset placement use the [default template](https://github.com/jaketrent/html-webpack-template/blob/86f285d5c790a6c15263f5cc50fd666d51f974fd/index.html) of the [html-webpack-template project](https://github.com/jaketrent/html-webpack-template) as a starting point for writing your own.
 
-The following variables are available in the template:
+The following variables are available in the template by default (you can extend them using the `templateParameters` option):
+
 - `htmlWebpackPlugin`: data specific to this plugin
-  - `htmlWebpackPlugin.files`: a massaged representation of the
-    `assetsByChunkName` attribute of webpack's [stats](https://github.com/webpack/docs/wiki/node.js-api#stats)
-    object. It contains a mapping from entry point name to the bundle filename, eg:
-    ```json
-    "htmlWebpackPlugin": {
-      "files": {
-        "css": [ "main.css" ],
-        "js": [ "assets/head_bundle.js", "assets/main_bundle.js"],
-        "chunks": {
-          "head": {
-            "entry": "assets/head_bundle.js",
-            "css": [ "main.css" ]
-          },
-          "main": {
-            "entry": "assets/main_bundle.js",
-            "css": []
-          },
-        }
-      }
-    }
-    ```
-    If you've set a publicPath in your webpack config this will be reflected
-    correctly in this assets hash.
 
   - `htmlWebpackPlugin.options`: the options hash that was passed to
      the plugin. In addition to the options actually used by this plugin,
      you can use this hash to pass arbitrary data through to your template.
 
-- `webpack`: the webpack [stats](https://github.com/webpack/docs/wiki/node.js-api#stats)
-  object. Note that this is the stats object as it was at the time the HTML template
-  was emitted and as such may not have the full set of stats that are available
-  after the webpack run is complete.
+  - `htmlWebpackPlugin.tags`: the prepared `headTags` and `bodyTags` Array to render the `<base>`, `<meta>`, `<script>` and `<link>` tags.
+     Can be used directly in templates and literals. For example: 
+     ```html
+     <html>
+       <head>
+         <%= htmlWebpackPlugin.tags.headTags %>
+       </head>
+       <body>
+         <%= htmlWebpackPlugin.tags.bodyTags %>
+       </body>
+     </html>
+     ```
+  
+  - `htmlWebpackPlugin.files`: direct access to the files used during the compilation.
+
+    ```typescript
+    publicPath: string;
+    js: string[];
+    css: string[];
+    manifest?: string;
+    favicon?: string;
+    ```
+
+  - `htmlWebpackPlugin.options`: the options hash that was passed to
+     the plugin. In addition to the options actually used by this plugin,
+     you can use this hash to pass arbitrary data through to your template.
 
 - `webpackConfig`: the webpack configuration that was used for this compilation. This
   can be used, for example, to get the `publicPath` (`webpackConfig.output.publicPath`).
@@ -286,6 +287,43 @@ The following variables are available in the template:
   directly in the page, through `compilation.assets[...].source()`
   (see [the inline template example](examples/inline/template.pug)).
 
+
+The template can also be directly inlined directly into the options object.  
+⚠️ **This approach does not allow to use weboack loaders for your template and will not update the template on changes**
+
+**webpack.config.js**
+```js
+new HtmlWebpackPlugin({
+  templateContent: `
+    <html>
+      <body>
+        <h1>Hello World</h1>
+      </body>
+    </html>
+  `
+})
+```
+
+The `templateContent` can also access all `templateParameters` values.  
+⚠️ **This approach does not allow to use weboack loaders for your template and will not update the template on changes**
+
+**webpack.config.js**
+```js
+new HtmlWebpackPlugin({
+  injext: false
+  templateContent: ({htmlWebpackPlugin}) => `
+    <html>
+      <head>
+        ${htmlWebpackPlugin.tags.headTags}
+      </head>
+      <body>
+        <h1>Hello World</h1>
+        ${htmlWebpackPlugin.tags.bodyTags}
+      </body>
+    </html>
+  `
+})
+```
 
 ### Filtering Chunks
 

@@ -18,7 +18,7 @@ const path = require('path');
 const loaderUtils = require('loader-utils');
 const { CachedChildCompilation } = require('./lib/cached-child-compiler');
 
-const { createHtmlTagObject, htmlTagObjectToString } = require('./lib/html-tags');
+const { createHtmlTagObject, htmlTagObjectToString, HtmlTagArray } = require('./lib/html-tags');
 
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
@@ -822,17 +822,13 @@ class HtmlWebpackPlugin {
    */
   prepareAssetTagGroupForRendering (assetTagGroup) {
     const xhtml = this.options.xhtml;
-    const preparedTags = assetTagGroup.map((assetTag) => {
+    return HtmlTagArray.from(assetTagGroup.map((assetTag) => {
       const copiedAssetTag = Object.assign({}, assetTag);
       copiedAssetTag.toString = function () {
         return htmlTagObjectToString(this, xhtml);
       };
       return copiedAssetTag;
-    });
-    preparedTags.toString = function () {
-      return this.join('');
-    };
-    return preparedTags;
+    }));
   }
 
   /**

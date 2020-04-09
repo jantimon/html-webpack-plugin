@@ -2342,4 +2342,32 @@ describe('HtmlWebpackPlugin', () => {
       ]
     }, [/<selfclosed\/>/], null, done);
   });
+
+  it('should allow to use headTags and bodyTags directly in string literals', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        rules: [
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
+        ]
+      },
+      plugins: [
+        new MiniCssExtractPlugin({ filename: 'styles.css' }),
+        new HtmlWebpackPlugin({
+          inject: false,
+          templateContent: ({ htmlWebpackPlugin }) => `
+            <html>
+              <head>${htmlWebpackPlugin.tags.headTags}</head>
+              <body>${htmlWebpackPlugin.tags.bodyTags}</body>
+            </html>
+            `
+        })
+      ]
+    }, ['<head><link href="styles.css" rel="stylesheet"></head>', '<script src="index_bundle.js"></script></body>'], null, done);
+  });
 });
