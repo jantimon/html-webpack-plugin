@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [4.2.0](https://github.com/jantimon/html-webpack-plugin/compare/v4.1.0...v4.2.0) (2020-04-09)
+
+
+### Features
+
+* Add template content ([#1401](https://github.com/jantimon/html-webpack-plugin/issues/1401)) ([4740bf7](https://github.com/jantimon/html-webpack-plugin/commit/4740bf7))
+
+
+
 # [4.1.0](https://github.com/jantimon/html-webpack-plugin/compare/v4.0.4...v4.1.0) (2020-04-09)
 
 
