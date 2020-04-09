@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [4.1.0](https://github.com/jantimon/html-webpack-plugin/compare/v4.0.4...v4.1.0) (2020-04-09)
+
+
+### Features
+
+* Add webpack 5 support ([39c38a4](https://github.com/jantimon/html-webpack-plugin/commit/39c38a4))
+* Allow webpack 5 as peer dependency ([9c571e2](https://github.com/jantimon/html-webpack-plugin/commit/9c571e2))
+
+
+
 ## [4.0.4](https://github.com/jantimon/html-webpack-plugin/compare/v4.0.3...v4.0.4) (2020-04-01)
 
 
