@@ -16,10 +16,10 @@ const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
 const loaderUtils = require('loader-utils');
+const { CachedChildCompilation } = require('./lib/cached-child-compiler');
 
 const { createHtmlTagObject, htmlTagObjectToString } = require('./lib/html-tags');
 
-const childCompiler = require('./lib/compiler.js');
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
 const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
@@ -74,10 +74,6 @@ class HtmlWebpackPlugin {
     // Instance variables to keep caching information
     // for multiple builds
     this.childCompilerHash = undefined;
-    /**
-     * @type {string | undefined}
-     */
-    this.childCompilationOutputName = undefined;
     this.assetJson = undefined;
     this.hash = undefined;
     this.version = HtmlWebpackPlugin.version;
@@ -89,11 +85,14 @@ class HtmlWebpackPlugin {
    */
   apply (compiler) {
     const self = this;
-    let isCompilationCached = false;
-    /** @type Promise<string> */
-    let compilationPromise;
 
     this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
+
+    // Inject child compiler plugin
+    const childCompilerPlugin = new CachedChildCompilation(compiler);
+    if (!this.options.templateContent) {
+      childCompilerPlugin.addEntry(this.options.template);
+    }
 
     // convert absolute filename into relative so that webpack can
     // generate it at correct location
@@ -128,74 +127,41 @@ class HtmlWebpackPlugin {
       };
     }
 
-    // Clear the cache once a new HtmlWebpackPlugin is added
-    childCompiler.clearCache(compiler);
-
-    // Register all HtmlWebpackPlugins instances at the child compiler
-    compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin', (compilation) => {
-      // Clear the cache if the child compiler is outdated
-      if (childCompiler.hasOutDatedTemplateCache(compilation)) {
-        childCompiler.clearCache(compiler);
-      }
-      // Add this instances template to the child compiler
-      childCompiler.addTemplateToCompiler(compiler, this.options.template);
-      // Add file dependencies of child compiler to parent compiler
-      // to keep them watched even if we get the result from the cache
-      compilation.hooks.additionalChunkAssets.tap('HtmlWebpackPlugin', () => {
-        const childCompilerDependencies = childCompiler.getFileDependencies(compiler);
-        childCompilerDependencies.forEach(fileDependency => {
-          compilation.compilationDependencies.add(fileDependency);
-        });
-      });
-    });
-
-    compiler.hooks.make.tapAsync('HtmlWebpackPlugin', (compilation, callback) => {
-      // Compile the template (queued)
-      compilationPromise = childCompiler.compileTemplate(self.options.template, self.options.filename, compilation)
-        .catch(err => {
-          compilation.errors.push(prettyError(err, compiler.context).toString());
-          return {
-            content: self.options.showErrors ? prettyError(err, compiler.context).toJsonHtml() : 'ERROR',
-            outputName: self.options.filename,
-            hash: ''
-          };
-        })
-        .then(compilationResult => {
-          // If the compilation change didnt change the cache is valid
-          isCompilationCached = Boolean(compilationResult.hash) && self.childCompilerHash === compilationResult.hash;
-          self.childCompilerHash = compilationResult.hash;
-          self.childCompilationOutputName = compilationResult.outputName;
-          callback();
-          return compilationResult.content;
-        });
-    });
-
     compiler.hooks.emit.tapAsync('HtmlWebpackPlugin',
       /**
        * Hook into the webpack emit phase
        * @param {WebpackCompilation} compilation
-       * @param {() => void} callback
+       * @param {(err?: Error) => void} callback
       */
       (compilation, callback) => {
         // Get all entry point names for this html file
         const entryNames = Array.from(compilation.entrypoints.keys());
         const filteredEntryNames = self.filterChunks(entryNames, self.options.chunks, self.options.excludeChunks);
         const sortedEntryNames = self.sortEntryChunks(filteredEntryNames, this.options.chunksSortMode, compilation);
-        const childCompilationOutputName = self.childCompilationOutputName;
 
-        if (childCompilationOutputName === undefined) {
-          throw new Error('Did not receive child compilation result');
+        const templateResult = this.options.templateContent
+          ? { mainCompilationHash: compilation.hash }
+          : childCompilerPlugin.getCompilationEntryResult(this.options.template);
+
+        this.childCompilerHash = templateResult.mainCompilationHash;
+
+        if ('error' in templateResult) {
+          compilation.errors.push(prettyError(templateResult.error, compiler.context).toString());
         }
+
+        const childCompilationOutputName = compilation.mainTemplate.getAssetPath(this.options.filename, 'compiledEntry' in templateResult ? {
+          hash: templateResult.compiledEntry.hash,
+          chunk: templateResult.compiledEntry.entry
+        } : {
+          hash: templateResult.mainCompilationHash
+        });
+
+        // If the child compilation was not executed during a previous main compile run
+        // it is a cached result
+        const isCompilationCached = templateResult.mainCompilationHash !== compilation.hash;
 
         // Turn the entry point names into file paths
         const assets = self.htmlWebpackPluginAssets(compilation, childCompilationOutputName, sortedEntryNames);
-
-        // If this is a hot update compilation, move on!
-        // This solves a problem where an `index.html` file is generated for hot-update js files
-        // It only happens in Webpack 2, where hot updates are emitted separately before the full bundle
-        if (self.isHotUpdateCompilation(assets)) {
-          return callback();
-        }
 
         // If the template and the assets did not change we don't have to emit the html
         const assetJson = JSON.stringify(self.getAssetFiles(assets));
@@ -249,15 +215,20 @@ class HtmlWebpackPlugin {
           });
 
         // Turn the compiled tempalte into a nodejs function or into a nodejs string
-        const templateEvaluationPromise = compilationPromise
-          .then(compiledTemplate => {
+        const templateEvaluationPromise = Promise.resolve()
+          .then(() => {
+            if ('error' in templateResult) {
+              return self.options.showErrors ? prettyError(templateResult.error, compiler.context).toHtml() : 'ERROR';
+            }
             // Allow to use a custom function / string instead
             if (self.options.templateContent !== false) {
               return self.options.templateContent;
             }
             // Once everything is compiled evaluate the html factory
             // and replace it with its content
-            return self.evaluateCompilationResult(compilation, compiledTemplate);
+            return ('compiledEntry' in templateResult)
+              ? self.evaluateCompilationResult(compilation, templateResult.compiledEntry.content)
+              : Promise.reject(new Error('Child compilation contained no compiledEntry'));
           });
 
         const templateExectutionPromise = Promise.all([assetsPromise, assetTagGroupsPromise, templateEvaluationPromise])

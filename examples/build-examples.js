@@ -20,7 +20,7 @@ examples.forEach(function (exampleName) {
   var configFile = path.join(examplePath, 'webpack.config.js');
 
   var config = require(configFile);
-  if (webpackMajorVersion === '4') {
+  if (Number(webpackMajorVersion) >= 4) {
     config.plugins.unshift(new webpack.LoaderOptionsPlugin({
       options: {
         context: process.cwd() // or the same value as `context`

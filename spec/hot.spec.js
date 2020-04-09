@@ -81,8 +81,8 @@ describe('HtmlWebpackPluginHMR', () => {
         const hotUpdateJsFileNames = Object.keys(stats.compilation.assets).filter((fileName) => /\.hot-update\.js$/.test(fileName));
         expect(hotUpdateJsFileNames).not.toEqual([]);
         expect(hotUpdateJsFileNames.length).toEqual(1);
-        const hotUpdateFileSource = stats.compilation.assets[hotUpdateJsFileNames[0]].source();
-        expect(hotUpdateFileSource).not.toEqual('');
+        const hotUpdateFileSize = stats.compilation.assets[hotUpdateJsFileNames[0]].size();
+        expect(hotUpdateFileSize).not.toEqual(0);
       })
       .then(() => compiler.stopWatching());
   });
