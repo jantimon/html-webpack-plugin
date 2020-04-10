@@ -289,7 +289,7 @@ The following variables are available in the template by default (you can extend
 
 
 The template can also be directly inlined directly into the options object.  
-⚠️ **`templateContent` does not allow to use weboack loaders for your template and will not watch for template file changes**
+⚠️ **`templateContent` does not allow to use webpack loaders for your template and will not watch for template file changes**
 
 **webpack.config.js**
 ```js
@@ -305,7 +305,7 @@ new HtmlWebpackPlugin({
 ```
 
 The `templateContent` can also access all `templateParameters` values.  
-⚠️ **`templateContent` does not allow to use weboack loaders for your template and will not watch for template file changes**
+⚠️ **`templateContent` does not allow to use webpack loaders for your template and will not watch for template file changes**
 
 **webpack.config.js**
 ```js
