@@ -310,7 +310,7 @@ The `templateContent` can also access all `templateParameters` values.
 **webpack.config.js**
 ```js
 new HtmlWebpackPlugin({
-  injext: false
+  inject: false
   templateContent: ({htmlWebpackPlugin}) => `
     <html>
       <head>
