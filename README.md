@@ -275,9 +275,6 @@ The following variables are available in the template by default (you can extend
     favicon?: string;
     ```
 
-  - `htmlWebpackPlugin.options`: the options hash that was passed to
-     the plugin. In addition to the options actually used by this plugin,
-     you can use this hash to pass arbitrary data through to your template.
 
 - `webpackConfig`: the webpack configuration that was used for this compilation. This
   can be used, for example, to get the `publicPath` (`webpackConfig.output.publicPath`).
