@@ -11,20 +11,24 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      // NOTE if you pass plain object it will be passed as is. no default values there, so be aware!
-      // for implementation detail, please see index.js and search for "userOptions" variable
-      templateParameters: (compilation, assets, assetTags, options) => {
-        return {
-          compilation,
-          webpackConfig: compilation.options,
-          htmlWebpackPlugin: {
-            tags: assetTags,
-            files: assets,
-            options
-          },
-          'foo': 'bar'
-        };
+      // If you pass a plain object, it will be merged with the default values
+      // (New in version 4)
+      templateParameters: {
+        'foo': 'bar'
       },
+      // Or if you want full control, pass a function
+      // templateParameters: (compilation, assets, assetTags, options) => {
+      //   return {
+      //     compilation,
+      //     webpackConfig: compilation.options,
+      //     htmlWebpackPlugin: {
+      //       tags: assetTags,
+      //       files: assets,
+      //       options
+      //     },
+      //     'foo': 'bar'
+      //   };
+      // },
       template: 'index.ejs'
     })
   ]
