@@ -574,7 +574,21 @@ class HtmlWebpackPlugin {
     const extensionRegexp = /\.(css|js|mjs)(\?|$)/;
     for (let i = 0; i < entryNames.length; i++) {
       const entryName = entryNames[i];
-      const entryPointFiles = compilation.entrypoints.get(entryName).getFiles();
+      /** entryPointUnfilteredFiles - also includes hot module update files */
+      const entryPointUnfilteredFiles = compilation.entrypoints.get(entryName).getFiles();
+
+      const entryPointFiles = entryPointUnfilteredFiles.filter((chunkFile) => {
+        // compilation.getAsset was introduced in webpack 4.4.0
+        // once the support pre webpack 4.4.0 is dropped please
+        // remove the following guard:
+        if (!compilation.getAsset) {
+          return true;
+        }
+        // Prevent hot-module files from beeing included:
+        const assetMetaInformation = compilation.getAsset(chunkFile).info || {};
+        return !(assetMetaInformation.hotModuleReplacement || assetMetaInformation.development);
+      });
+
       // Prepend the publicPath and append the hash depending on the
       // webpack.output.publicPath and hashOptions
       // E.g. bundle.js -> /bundle.js?hash
