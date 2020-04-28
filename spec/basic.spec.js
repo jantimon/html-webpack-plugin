@@ -1625,7 +1625,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+    }, [/<link rel="icon" href="[^"]+\.ico">/], null, done);
   });
 
   it('adds a base tag with attributes', done => {
@@ -1716,7 +1716,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="\/some\/+[^"]+\.ico">/], null, done);
+    }, [/<link rel="icon" href="\/some\/+[^"]+\.ico">/], null, done);
   });
 
   it('adds a favicon with publicPath set to /some', done => {
@@ -1733,7 +1733,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="\/some\/+[^"]+\.ico">/], null, done);
+    }, [/<link rel="icon" href="\/some\/+[^"]+\.ico">/], null, done);
   });
 
   it('adds a favicon with publicPath set to some/', done => {
@@ -1750,7 +1750,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="some\/+[^"]+\.ico">/], null, done);
+    }, [/<link rel="icon" href="some\/+[^"]+\.ico">/], null, done);
   });
 
   it('adds a favicon with publicPath undefined', done => {
@@ -1766,7 +1766,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+    }, [/<link rel="icon" href="[^"]+\.ico">/], null, done);
   });
 
   it('adds a favicon with publicPath undefined', done => {
@@ -1783,7 +1783,7 @@ describe('HtmlWebpackPlugin', () => {
           filename: path.resolve(OUTPUT_DIR, 'subfolder', 'test.html')
         })
       ]
-    }, [/<link rel="shortcut icon" href="\.\.\/[^"]+\.ico">/], path.join('subfolder', 'test.html'), done);
+    }, [/<link rel="icon" href="\.\.\/[^"]+\.ico">/], path.join('subfolder', 'test.html'), done);
   });
 
   it('adds a favicon with a publichPath set to /[hash]/ and replaces the hash', done => {
@@ -1800,7 +1800,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="\/[a-z0-9]{20}\/favicon\.ico">/], null, done);
+    }, [/<link rel="icon" href="\/[a-z0-9]{20}\/favicon\.ico">/], null, done);
   });
 
   it('adds a favicon with a publichPath set to [hash]/ and replaces the hash', done => {
@@ -1817,7 +1817,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="[a-z0-9]{20}\/favicon\.ico">/], null, done);
+    }, [/<link rel="icon" href="[a-z0-9]{20}\/favicon\.ico">/], null, done);
   });
 
   it('adds a favicon with inject enabled', done => {
@@ -1834,7 +1834,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+    }, [/<link rel="icon" href="[^"]+\.ico">/], null, done);
   });
 
   it('adds a favicon with xhtml enabled', done => {
@@ -1855,7 +1855,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="[^"]+\.ico"\/>/], null, done);
+    }, [/<link rel="icon" href="[^"]+\.ico"\/>/], null, done);
   });
 
   it('shows an error if the favicon could not be load', done => {
