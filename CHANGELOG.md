@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.1](https://github.com/jantimon/html-webpack-plugin/compare/v4.2.0...v4.2.1) (2020-04-28)
+
+
+### Bug Fixes
+
+* don't add dependencies twice to the webpack 5 watcher api ([ceafe14](https://github.com/jantimon/html-webpack-plugin/commit/ceafe143650749a5f53a14411dc1b762e252ec44))
+* prevent scripts marked as hotModuleReplacement from being added to the html file ([119252a](https://github.com/jantimon/html-webpack-plugin/commit/119252a381bf43dea37c1be64f90c10bebc21302))
+
+
+
 # [4.2.0](https://github.com/jantimon/html-webpack-plugin/compare/v4.1.0...v4.2.0) (2020-04-09)
 
 
