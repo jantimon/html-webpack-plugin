@@ -785,7 +785,7 @@ class HtmlWebpackPlugin {
       tagName: 'link',
       voidTag: true,
       attributes: {
-        rel: 'shortcut icon',
+        rel: 'icon',
         href: faviconPath
       }
     }];
