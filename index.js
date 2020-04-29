@@ -306,7 +306,7 @@ class HtmlWebpackPlugin {
     // To extract the result during the evaluation this part has to be removed.
     source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
     const template = this.options.template.replace(/^.+!/, '').replace(/\?.+$/, '');
-    const vmContext = vm.createContext(_.extend({ HTML_WEBPACK_PLUGIN: true, require: require }, global));
+    const vmContext = vm.createContext(_.extend({ HTML_WEBPACK_PLUGIN: true, require: require, console: console }, global));
     const vmScript = new vm.Script(source, { filename: template });
     // Evaluate code and cast to string
     let newSource;
