@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.2](https://github.com/jantimon/html-webpack-plugin/compare/v4.2.1...v4.2.2) (2020-04-30)
+
+
+### Bug Fixes
+
+* Prevent "cannot read property info of undefined" when reading meta information from assets ([253ce30](https://github.com/jantimon/html-webpack-plugin/commit/253ce30))
+* use modern icon tag rel attribute for favicons ([c40dd85](https://github.com/jantimon/html-webpack-plugin/commit/c40dd85))
+
+
+
 ## [4.2.1](https://github.com/jantimon/html-webpack-plugin/compare/v4.2.0...v4.2.1) (2020-04-28)
 
 
