@@ -581,11 +581,12 @@ class HtmlWebpackPlugin {
         // compilation.getAsset was introduced in webpack 4.4.0
         // once the support pre webpack 4.4.0 is dropped please
         // remove the following guard:
-        if (!compilation.getAsset) {
+        const asset = compilation.getAsset && compilation.getAsset(chunkFile);
+        if (!asset) {
           return true;
         }
         // Prevent hot-module files from beeing included:
-        const assetMetaInformation = compilation.getAsset(chunkFile).info || {};
+        const assetMetaInformation = asset.info || {};
         return !(assetMetaInformation.hotModuleReplacement || assetMetaInformation.development);
       });
 
