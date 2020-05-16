@@ -141,6 +141,7 @@ Allowed values are as follows
 |**`scriptLoading`**|`{'blocking'\|'defer'}`|`'blocking'`| Modern browsers support non blocking javascript loading (`'defer'`) to improve the page startup performance. |
 |**`favicon`**|`{String}`|``|Adds the given favicon path to the output HTML|
 |**`meta`**|`{Object}`|`{}`|Allows to inject `meta`-tags. E.g. `meta: {viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'}`|
+|**`openGraph`**|`{Object}`|`{}`|Inject Open Graph tags. e.g `openGraph:{"title": "Your open graph title", "description": "Your open graph description"}`
 |**`base`**|`{Object\|String\|false}`|`false`|Inject a [`base`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) tag. E.g. `base: "https://example.com/path/page.html`|
 |**`minify`**|`{Boolean\|Object}`|`true` if `mode` is `'production'`, otherwise `false`|Controls if and in what ways the output should be minified. See [minification](#minification) below for more details.|
 |**`hash`**|`{Boolean}`|`false`|If `true` then append a unique `webpack` compilation hash to all included scripts and CSS files. This is useful for cache busting|
@@ -413,6 +414,27 @@ plugins: [
       // Which equals to the following http header: `set-cookie: value; expires=date; path=url`
     }
   })
+]
+```
+
+### Open Graph Tags 
+
+If the `openGraph` option is set the html-webpack-plugin will inject open graph tags.
+See [Open Graph Standard](https://ogp.me/) for valid open graph tags.
+
+#### Example
+
+**webpack.config.js**
+```js
+plugins: [
+  new HtmlWebpackPlugin({
+    'openGraph': {
+      "title": "Your open graph title",
+      //Generates <meta property="og:title" content="Your open graph title">
+      "image": "https://mydomain.com/og.png"
+      //Generates <meta property="og:image" content="Your open graph image">
+      }
+    })
 ]
 ```
 
