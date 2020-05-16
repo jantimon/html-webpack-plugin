@@ -1544,7 +1544,7 @@ describe('HtmlWebpackPlugin', () => {
       'beforeEmit',
       'afterEmit'
     ];
-    let eventsFired = [];
+    const eventsFired = [];
     let hookLength = 0;
     const examplePlugin = {
       apply: function (compiler) {
@@ -1674,9 +1674,9 @@ describe('HtmlWebpackPlugin', () => {
       plugins: [
         new HtmlWebpackPlugin({
           meta: {
-            'viewport': {
-              'name': 'viewport',
-              'content': 'width=device-width, initial-scale=1, shrink-to-fit=no'
+            viewport: {
+              name: 'viewport',
+              content: 'width=device-width, initial-scale=1, shrink-to-fit=no'
             }
           }
         })
@@ -1695,11 +1695,29 @@ describe('HtmlWebpackPlugin', () => {
       plugins: [
         new HtmlWebpackPlugin({
           meta: {
-            'viewport': 'width=device-width, initial-scale=1, shrink-to-fit=no'
+            viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'
           }
         })
       ]
     }, [/<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">/], null, done);
+  });
+
+  it('adds a open graph tag', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          openGraph: {
+            'title': 'My open graph title tag'
+          }
+        })
+      ]
+    }, [/<meta property="og:title" content="My open graph title tag">/], null, done);
   });
 
   it('adds a favicon with publicPath set to /some/', done => {
@@ -2108,7 +2126,7 @@ describe('HtmlWebpackPlugin', () => {
           template: path.join(__dirname, 'fixtures/templateParam.js'),
           inject: false,
           templateParameters: function () {
-            return { 'foo': 'bar' };
+            return { foo: 'bar' };
           }
         })
       ]
@@ -2128,7 +2146,7 @@ describe('HtmlWebpackPlugin', () => {
           template: path.join(__dirname, 'fixtures/templateParam.js'),
           inject: false,
           templateParameters: function () {
-            return Promise.resolve({ 'foo': 'bar' });
+            return Promise.resolve({ foo: 'bar' });
           }
         })
       ]

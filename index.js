@@ -680,11 +680,12 @@ class HtmlWebpackPlugin {
       };
     });
   }
+
   /**
-   * Get open graph meta tags 
+   * Get open graph meta tags
    * @returns {HtmlTagObject[]}
    */
-  getOpenGraphTags() {
+  getOpenGraphTags () {
     const openGraphOptions = this.options.openGraph;
     if (openGraphOptions === {}) {
       return [];
@@ -693,18 +694,16 @@ class HtmlWebpackPlugin {
       return {
         property: `og:${tag}`,
         content: openGraphOptions[tag]
-      }
+      };
     });
     return openGraphTagObjects.map((openGraphTagObject) => {
       return {
         tagName: 'meta',
         voidTag: true,
         attributes: openGraphTagObject
-      }
-    })
-
+      };
+    });
   }
-
 
   /**
    * Generate all tags script for the given file paths
@@ -800,16 +799,16 @@ class HtmlWebpackPlugin {
     });
   }
 
-    /**
-   * Generate open graph meta tags 
+  /**
+   * Generate open graph meta tags
    * e.g {property: "og:title", content: "OG Title"}
    * @param {false | {
-   *         [name: string]: 
+   *         [name: string]:
    *         | string
    *         }} openGraphOptions
    * @returns {Array<HtmlTagObject>}
    */
-  generateOpenGraphTags(openGraphOptions) {
+  generateOpenGraphTags (openGraphOptions) {
     if (openGraphOptions === {}) {
       return [];
     }
@@ -817,16 +816,15 @@ class HtmlWebpackPlugin {
       return {
         property: `og:${tag}`,
         content: openGraphOptions[tag]
-      }
+      };
     });
     return openGraphTagObjects.map((openGraphTagObject) => {
       return {
         tagName: 'meta',
         voidTag: true,
         attributes: openGraphTagObject
-      }
-    })
-
+      };
+    });
   }
 
   /**

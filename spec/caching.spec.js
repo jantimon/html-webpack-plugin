@@ -213,8 +213,8 @@ describe('HtmlWebpackPluginCaching', () => {
     let multiPluginComileStart;
     let multiCompileRunDuration;
 
-    let singleCompiler = setUpCompiler(createHtmlWebpackPlugin());
-    let multiCompiler = setUpCompiler.apply(null, Array(10).fill(0).map(() => createHtmlWebpackPlugin()));
+    const singleCompiler = setUpCompiler(createHtmlWebpackPlugin());
+    const multiCompiler = setUpCompiler.apply(null, Array(10).fill(0).map(() => createHtmlWebpackPlugin()));
 
     Promise.resolve()
       .then(function singleCompileRun () {
