@@ -802,7 +802,7 @@ class HtmlWebpackPlugin {
 
     /**
    * Generate open graph meta tags 
-   * e.g {name: "title" property: "og:title", content: "OG Title"}
+   * e.g {property: "og:title", content: "OG Title"}
    * @param {false | {
    *         [name: string]: 
    *         | string
