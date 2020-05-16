@@ -10,6 +10,17 @@ declare class HtmlWebpackPlugin {
   apply(compiler: Compiler): void;
 
   static getHooks(compilation: compilation.Compilation): HtmlWebpackPlugin.Hooks;
+
+  /**
+   * Static helper to create a tag object to be get injected into the dom
+   */
+  static createHtmlTagObject(
+    tagName: string,
+    attributes?: { [attributeName: string]: string | boolean },
+    innerHTML?: string
+  ): HtmlTagObject;
+
+  static readonly version: number;
 }
 
 declare namespace HtmlWebpackPlugin {
@@ -23,7 +34,7 @@ declare namespace HtmlWebpackPlugin {
   interface ProcessedOptions {
     /**
      * Emit the file only if it was changed.
-     * Default: `true`.
+     * @default true
      */
     cache: boolean;
     /**
@@ -32,14 +43,14 @@ declare namespace HtmlWebpackPlugin {
     chunks: "all" | string[];
     /**
      * Allows to control how chunks should be sorted before they are included to the html.
-     * Default: `'auto'`.
+     * @default 'auto'
      */
     chunksSortMode:
       | "auto"
       | "manual"
       | (((entryNameA: string, entryNameB: string) => number));
     /**
-     * List all entries which should not be injeccted
+     * List all entries which should not be injected
      */
     excludeChunks: string[];
     /**
@@ -48,8 +59,8 @@ declare namespace HtmlWebpackPlugin {
     favicon: false | string;
     /**
      * The file to write the HTML to.
-     * Defaults to `index.html`.
      * Supports subdirectories eg: `assets/admin.html`
+     * @default 'index.html'
      */
     filename: string;
     /**
@@ -70,7 +81,7 @@ declare namespace HtmlWebpackPlugin {
      * blocking will result in <script src="..."></script>
      * defer will result in <script defer src="..."></script>
      *
-     * The default behaviour is blocking
+     * @default 'blocking'
      */
     scriptLoading:
       | "blocking"
@@ -87,11 +98,11 @@ declare namespace HtmlWebpackPlugin {
             | { [attributeName: string]: string | boolean }; // custom properties e.g. { name:"viewport" content:"width=500, initial-scale=1" }
         };
     /**
-     * HTML Minification options accepts the following valeus:
+     * HTML Minification options accepts the following values:
      * - Set to `false` to disable minifcation
      * - Set to `'auto'` to enable minifcation only for production mode
      * - Set to custom minification according to
-     * @https://github.com/kangax/html-minifier#options-quick-reference
+     * {@link https://github.com/kangax/html-minifier#options-quick-reference}
      */
     minify: 'auto' | boolean | MinifyOptions;
     /**
