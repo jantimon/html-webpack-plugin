@@ -54,6 +54,7 @@ class HtmlWebpackPlugin {
       excludeChunks: [],
       chunksSortMode: 'auto',
       meta: {},
+      openGraph: {},
       base: false,
       title: 'Webpack App',
       xhtml: false
@@ -194,7 +195,8 @@ class HtmlWebpackPlugin {
               meta: [
                 ...self.generateBaseTag(self.options.base),
                 ...self.generatedMetaTags(self.options.meta),
-                ...self.generateFaviconTags(assets.favicon)
+                ...self.generateFaviconTags(assets.favicon),
+                ...self.generateOpenGraphTags(self.options.openGraph)
               ]
             },
             outputName: childCompilationOutputName,
@@ -678,6 +680,31 @@ class HtmlWebpackPlugin {
       };
     });
   }
+  /**
+   * Get open graph meta tags 
+   * @returns {HtmlTagObject[]}
+   */
+  getOpenGraphTags() {
+    const openGraphOptions = this.options.openGraph;
+    if (openGraphOptions === {}) {
+      return [];
+    }
+    const openGraphTagObjects = Object.keys(openGraphOptions).map((tag) => {
+      return {
+        property: `og:${tag}`,
+        content: openGraphOptions[tag]
+      }
+    });
+    return openGraphTagObjects.map((openGraphTagObject) => {
+      return {
+        tagName: 'meta',
+        voidTag: true,
+        attributes: openGraphTagObject
+      }
+    })
+
+  }
+
 
   /**
    * Generate all tags script for the given file paths
@@ -771,6 +798,35 @@ class HtmlWebpackPlugin {
         attributes: metaTagAttributes
       };
     });
+  }
+
+    /**
+   * Generate open graph meta tags 
+   * e.g {name: "title" property: "og:title", content: "OG Title"}
+   * @param {false | {
+   *         [name: string]: 
+   *         | string
+   *         }} openGraphOptions
+   * @returns {Array<HtmlTagObject>}
+   */
+  generateOpenGraphTags(openGraphOptions) {
+    if (openGraphOptions === {}) {
+      return [];
+    }
+    const openGraphTagObjects = Object.keys(openGraphOptions).map((tag) => {
+      return {
+        property: `og:${tag}`,
+        content: openGraphOptions[tag]
+      }
+    });
+    return openGraphTagObjects.map((openGraphTagObject) => {
+      return {
+        tagName: 'meta',
+        voidTag: true,
+        attributes: openGraphTagObject
+      }
+    })
+
   }
 
   /**

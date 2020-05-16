@@ -87,6 +87,16 @@ declare namespace HtmlWebpackPlugin {
             | { [attributeName: string]: string | boolean }; // custom properties e.g. { name:"viewport" content:"width=500, initial-scale=1" }
         };
     /**
+     * Inject open graph tags
+     */
+    openGraph:
+       | false
+       | {
+           [name: string]:
+              | string
+       };
+
+    /**
      * HTML Minification options accepts the following valeus:
      * - Set to `false` to disable minifcation
      * - Set to `'auto'` to enable minifcation only for production mode
