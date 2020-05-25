@@ -79,6 +79,7 @@ The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webp
  * [csp-html-webpack-plugin](https://github.com/slackhq/csp-html-webpack-plugin) to add [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) meta tags to the HTML output
  * [webpack-nomodule-plugin](https://github.com/swimmadude66/webpack-nomodule-plugin) allows you to add a `nomodule` attribute to specific injected scripts, which prevents the scripts from being loaded by newer browsers. Good for limiting loads of polyfills.
   * [html-webpack-skip-assets-plugin](https://github.com/swimmadude66/html-webpack-skip-assets-plugin) Skip adding certain output files to the html file. Built as a drop-in replacement for [html-webpack-exclude-assets-plugin](https://www.npmjs.com/package/html-webpack-exclude-assets-plugin) and works with newer [html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin) versions
+  * [htmllinter-webpack-plugin](https://github.com/anikethsaha/htmllinter/tree/master/packages/htmllinter-webpack-plugin) Lint your html files just before emitting using [htmllinter](https://github.com/anikethsaha/htmllinter)
 
 
 <h2 align="center">Usage</h2>
