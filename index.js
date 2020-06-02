@@ -158,9 +158,9 @@ class HtmlWebpackPlugin {
           hash: templateResult.mainCompilationHash
         };
 
-        const childCompilationOutputName = webpackMajorVersion === 5
-          ? compilation.getAssetPath(this.options.filename, compiledEntries)
-          : compilation.mainTemplate.getAssetPath(this.options.filename, compiledEntries);
+        const childCompilationOutputName = webpackMajorVersion === 4
+          ? compilation.mainTemplate.getAssetPath(this.options.filename, compiledEntries)
+          : compilation.getAssetPath(this.options.filename, compiledEntries);
 
         // If the child compilation was not executed during a previous main compile run
         // it is a cached result
@@ -535,9 +535,9 @@ class HtmlWebpackPlugin {
      * if a path publicPath is set in the current webpack config use it otherwise
      * fallback to a realtive path
      */
-    const webpackPublicPath = webpackMajorVersion === 5
-      ? compilation.getAssetPath(compilation.outputOptions.publicPath, { hash: compilationHash })
-      : compilation.mainTemplate.getPublicPath({ hash: compilationHash });
+    const webpackPublicPath = webpackMajorVersion === 4
+      ? compilation.mainTemplate.getPublicPath({ hash: compilationHash })
+      : compilation.getAssetPath(compilation.outputOptions.publicPath, { hash: compilationHash });
 
     const isPublicPathDefined = webpackPublicPath.trim() !== '';
     let publicPath = isPublicPathDefined
