@@ -43,12 +43,12 @@ new HtmlWebpackPlugin({
 })
 ```
 
-## 3) Setting a loader using the `module.loaders` syntax
+## 3) Setting a loader using the `module.rules` syntax
 
 ```js
 {
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.hbs$/,
         loader: 'handlebars-loader'
@@ -69,7 +69,7 @@ This will **cause html minification** and it will also **disable the ejs/lodash 
 ```js
 {
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.html$/,
         loader: 'html-loader'
