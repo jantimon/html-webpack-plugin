@@ -32,7 +32,7 @@ Please note that this loader does not support the full ejs syntax as it is based
 }
 ```
 
-Be aware, using `.html` as your template extention may unexpectedly trigger another loader.
+Be aware, using `.html` as your template extension may unexpectedly trigger another loader.
 
 ## 2) Setting a loader directly for the template
 
