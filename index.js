@@ -123,7 +123,8 @@ class HtmlWebpackPlugin {
         removeRedundantAttributes: true,
         removeScriptTypeAttributes: true,
         removeStyleLinkTypeAttributes: true,
-        useShortDoctype: true
+        useShortDoctype: true,
+        minifyCSS: true
       };
     }
 
