@@ -1786,7 +1786,7 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<link rel="icon" href="\.\.\/[^"]+\.ico">/], path.join('subfolder', 'test.html'), done);
   });
 
-  it('adds a favicon with a publichPath set to /[hash]/ and replaces the hash', done => {
+  it('adds a favicon with a publicPath set to /[hash]/ and replaces the hash', done => {
     testHtmlPlugin({
       mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
@@ -1803,7 +1803,7 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<link rel="icon" href="\/[a-z0-9]{20}\/favicon\.ico">/], null, done);
   });
 
-  it('adds a favicon with a publichPath set to [hash]/ and replaces the hash', done => {
+  it('adds a favicon with a publicPath set to [hash]/ and replaces the hash', done => {
     testHtmlPlugin({
       mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
