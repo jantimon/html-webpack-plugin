@@ -116,6 +116,18 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<body>[\s]*<script src="foo\/very%20fancy%2Bname.js"><\/script>[\s]*<\/body>/], null, done);
   });
 
+  it('properly encodes file names in emitted URIs but keeps the querystring', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'fo:o/very fancy+file-name.js?path=/home?value=abc&value=def#zzz'
+      },
+      plugins: [new HtmlWebpackPlugin()]
+    }, ['<script src="fo%3Ao/very%20fancy%2Bfile-name.js?path=/home?value=abc&value=def#zzz">'], null, done);
+  });
+
   it('generates a default index.html file with multiple entry points', done => {
     testHtmlPlugin({
       mode: 'production',
@@ -473,7 +485,7 @@ describe('HtmlWebpackPlugin', () => {
   it('works with source maps', done => {
     testHtmlPlugin({
       mode: 'development',
-      devtool: 'sourcemap',
+      devtool: 'source-map',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
@@ -1112,7 +1124,7 @@ describe('HtmlWebpackPlugin', () => {
     let eventFired = false;
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             expect(Object.keys(object.assetTags)).toEqual(['scripts', 'styles', 'meta']);
             eventFired = true;
@@ -1146,7 +1158,7 @@ describe('HtmlWebpackPlugin', () => {
   it('allows events to add a no-value attribute', done => {
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('HtmlWebpackPluginTest', (pluginArgs, callback) => {
             pluginArgs.assetTags.scripts = pluginArgs.assetTags.scripts.map(tag => {
               if (tag.tagName === 'script') {
@@ -1180,7 +1192,7 @@ describe('HtmlWebpackPlugin', () => {
   it('allows events to remove an attribute by setting it to false', done => {
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('HtmlWebpackPluginTest', (pluginArgs, callback) => {
             pluginArgs.assetTags.scripts = pluginArgs.assetTags.scripts.map(tag => {
               if (tag.tagName === 'script') {
@@ -1215,7 +1227,7 @@ describe('HtmlWebpackPlugin', () => {
     let eventFired = false;
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).afterTemplateExecution.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             callback();
@@ -1249,7 +1261,7 @@ describe('HtmlWebpackPlugin', () => {
     let eventFired = false;
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             callback();
@@ -1282,7 +1294,7 @@ describe('HtmlWebpackPlugin', () => {
     let eventFired = false;
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).afterEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             callback();
@@ -1313,7 +1325,7 @@ describe('HtmlWebpackPlugin', () => {
     let eventFired = false;
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             object.html += 'Injected by plugin';
@@ -1348,7 +1360,7 @@ describe('HtmlWebpackPlugin', () => {
     let hookNames;
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           hookNames = Object.keys(HtmlWebpackPlugin.getHooks(compilation)).sort();
         });
       }
@@ -1386,7 +1398,7 @@ describe('HtmlWebpackPlugin', () => {
     let eventFiredForSecondPlugin = false;
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForFirstPlugin = true;
             object.html += 'Injected by first plugin';
@@ -1397,7 +1409,7 @@ describe('HtmlWebpackPlugin', () => {
     };
     const secondExamplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForSecondPlugin = true;
             object.html += ' Injected by second plugin';
@@ -1435,7 +1447,7 @@ describe('HtmlWebpackPlugin', () => {
     let eventFiredForSecondPlugin = false;
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForFirstPlugin = true;
             const result = _.extend(object, {
@@ -1448,7 +1460,7 @@ describe('HtmlWebpackPlugin', () => {
     };
     const secondExamplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForSecondPlugin = true;
             object.html += ' Injected by second plugin';
@@ -1486,7 +1498,7 @@ describe('HtmlWebpackPlugin', () => {
     let eventFiredForSecondPlugin = false;
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForFirstPlugin = true;
             const result = _.extend(object, {
@@ -1499,7 +1511,7 @@ describe('HtmlWebpackPlugin', () => {
     };
     const secondExamplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFiredForSecondPlugin = true;
             const result = _.extend(object, {
@@ -1536,7 +1548,7 @@ describe('HtmlWebpackPlugin', () => {
     let eventFired = false;
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).afterTemplateExecution.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             object.bodyTags.push(HtmlWebpackPlugin.createHtmlTagObject('script', { src: 'funky-script.js' }));
@@ -1572,7 +1584,7 @@ describe('HtmlWebpackPlugin', () => {
     let eventFired = false;
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           HtmlWebpackPlugin.getHooks(compilation).beforeAssetTagGeneration.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
             eventFired = true;
             object.assets.js.push('funky-script.js');
@@ -1616,7 +1628,7 @@ describe('HtmlWebpackPlugin', () => {
     let hookLength = 0;
     const examplePlugin = {
       apply: function (compiler) {
-        compiler.plugin('compilation', compilation => {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
           const hooks = HtmlWebpackPlugin.getHooks(compilation);
           hookLength = hooks.length;
           // Hook into all hooks
@@ -1693,7 +1705,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+    }, [/<link rel="icon" href="[^"]+\.ico">/], null, done);
   });
 
   it('adds a base tag with attributes', done => {
@@ -1784,7 +1796,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="\/some\/+[^"]+\.ico">/], null, done);
+    }, [/<link rel="icon" href="\/some\/+[^"]+\.ico">/], null, done);
   });
 
   it('adds a favicon with publicPath set to /some', done => {
@@ -1801,7 +1813,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="\/some\/+[^"]+\.ico">/], null, done);
+    }, [/<link rel="icon" href="\/some\/+[^"]+\.ico">/], null, done);
   });
 
   it('adds a favicon with publicPath set to some/', done => {
@@ -1818,7 +1830,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="some\/+[^"]+\.ico">/], null, done);
+    }, [/<link rel="icon" href="some\/+[^"]+\.ico">/], null, done);
   });
 
   it('adds a favicon with publicPath undefined', done => {
@@ -1834,7 +1846,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+    }, [/<link rel="icon" href="[^"]+\.ico">/], null, done);
   });
 
   it('adds a favicon with publicPath undefined', done => {
@@ -1851,7 +1863,7 @@ describe('HtmlWebpackPlugin', () => {
           filename: path.resolve(OUTPUT_DIR, 'subfolder', 'test.html')
         })
       ]
-    }, [/<link rel="shortcut icon" href="\.\.\/[^"]+\.ico">/], path.join('subfolder', 'test.html'), done);
+    }, [/<link rel="icon" href="\.\.\/[^"]+\.ico">/], path.join('subfolder', 'test.html'), done);
   });
 
   it('adds a favicon with a publichPath set to /[hash]/ and replaces the hash', done => {
@@ -1868,7 +1880,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="\/[a-z0-9]{20}\/favicon\.ico">/], null, done);
+    }, [/<link rel="icon" href="\/[a-z0-9]{20}\/favicon\.ico">/], null, done);
   });
 
   it('adds a favicon with a publichPath set to [hash]/ and replaces the hash', done => {
@@ -1885,7 +1897,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="[a-z0-9]{20}\/favicon\.ico">/], null, done);
+    }, [/<link rel="icon" href="[a-z0-9]{20}\/favicon\.ico">/], null, done);
   });
 
   it('adds a favicon with inject enabled', done => {
@@ -1902,7 +1914,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="[^"]+\.ico">/], null, done);
+    }, [/<link rel="icon" href="[^"]+\.ico">/], null, done);
   });
 
   it('adds a favicon with xhtml enabled', done => {
@@ -1923,7 +1935,7 @@ describe('HtmlWebpackPlugin', () => {
           favicon: path.join(__dirname, 'fixtures/favicon.ico')
         })
       ]
-    }, [/<link rel="shortcut icon" href="[^"]+\.ico"\/>/], null, done);
+    }, [/<link rel="icon" href="[^"]+\.ico"\/>/], null, done);
   });
 
   it('shows an error if the favicon could not be load', done => {
@@ -2005,7 +2017,10 @@ describe('HtmlWebpackPlugin', () => {
           template: path.join(__dirname, 'fixtures/non-existing-template.html')
         })
       ]
-    }, ['Child compilation failed:\n  Entry module not found:'], null, done, true);
+    }, [Number(webpackMajorVersion) >= 5
+      ? 'Child compilation failed:\n  Module not found:'
+      : 'Child compilation failed:\n  Entry module not found:'
+    ], null, done, true);
   });
 
   it('should sort the chunks in auto mode', done => {
@@ -2157,7 +2172,7 @@ describe('HtmlWebpackPlugin', () => {
           templateParameters: { foo: 'bar' }
         })
       ]
-    }, ['templateParams keys: "foo"'], null, done);
+    }, ['templateParams keys: "compilation,webpackConfig,htmlWebpackPlugin,foo"'], null, done);
   });
 
   it('should allow to set specific template parameters using a function', done => {
@@ -2331,5 +2346,108 @@ describe('HtmlWebpackPlugin', () => {
         }
       })]
     }, [/<!doctype html>\s+<html>\s+<head>\s+<meta charset="utf-8">/], null, done);
+  });
+
+  it('should allow to inject scripts with a defer attribute', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        scriptLoading: 'defer'
+
+      })]
+    }, [/<script defer="defer" .+<body>/], null, done);
+  });
+
+  it('should allow to inject scripts with a defer attribute to the body', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        scriptLoading: 'defer',
+        inject: 'body'
+      })]
+    }, [/<body>.*<script defer="defer"/], null, done);
+  });
+
+  it('should allow to inject scripts with a defer in front of styles', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        rules: [
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          scriptLoading: 'defer'
+        }),
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
+      ]
+    }, [/<script defer="defer".+<link href="styles.css"/], null, done);
+  });
+
+  it('should keep closing slashes from the template', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        rules: [
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          scriptLoading: 'defer',
+          templateContent: '<html><body> <selfclosed /> </body></html>'
+        }),
+        new MiniCssExtractPlugin({ filename: 'styles.css' })
+      ]
+    }, [/<selfclosed\/>/], null, done);
+  });
+
+  it('should allow to use headTags and bodyTags directly in string literals', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        rules: [
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
+        ]
+      },
+      plugins: [
+        new MiniCssExtractPlugin({ filename: 'styles.css' }),
+        new HtmlWebpackPlugin({
+          inject: false,
+          templateContent: ({ htmlWebpackPlugin }) => `
+            <html>
+              <head>${htmlWebpackPlugin.tags.headTags}</head>
+              <body>${htmlWebpackPlugin.tags.bodyTags}</body>
+            </html>
+            `
+        })
+      ]
+    }, ['<head><link href="styles.css" rel="stylesheet"></head>', '<script src="index_bundle.js"></script></body>'], null, done);
   });
 });

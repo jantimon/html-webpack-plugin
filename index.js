@@ -16,10 +16,10 @@ const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
 const loaderUtils = require('loader-utils');
+const { CachedChildCompilation } = require('./lib/cached-child-compiler');
 
-const { createHtmlTagObject, htmlTagObjectToString } = require('./lib/html-tags');
+const { createHtmlTagObject, htmlTagObjectToString, HtmlTagArray } = require('./lib/html-tags');
 
-const childCompiler = require('./lib/compiler.js');
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
 const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
@@ -43,7 +43,8 @@ class HtmlWebpackPlugin {
       templateParameters: templateParametersGenerator,
       filename: 'index.html',
       hash: false,
-      inject: true,
+      inject: userOptions.scriptLoading !== 'defer' ? 'body' : 'head',
+      scriptLoading: 'blocking',
       compile: true,
       favicon: false,
       minify: 'auto',
@@ -73,10 +74,6 @@ class HtmlWebpackPlugin {
     // Instance variables to keep caching information
     // for multiple builds
     this.childCompilerHash = undefined;
-    /**
-     * @type {string | undefined}
-     */
-    this.childCompilationOutputName = undefined;
     this.assetJson = undefined;
     this.hash = undefined;
     this.version = HtmlWebpackPlugin.version;
@@ -88,11 +85,14 @@ class HtmlWebpackPlugin {
    */
   apply (compiler) {
     const self = this;
-    let isCompilationCached = false;
-    /** @type Promise<string> */
-    let compilationPromise;
 
     this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
+
+    // Inject child compiler plugin
+    const childCompilerPlugin = new CachedChildCompilation(compiler);
+    if (!this.options.templateContent) {
+      childCompilerPlugin.addEntry(this.options.template);
+    }
 
     // convert absolute filename into relative so that webpack can
     // generate it at correct location
@@ -114,10 +114,11 @@ class HtmlWebpackPlugin {
 
     const minify = this.options.minify;
     if (minify === true || (minify === 'auto' && isProductionLikeMode)) {
-      /** @type { import('html-minifier').Options } */
+      /** @type { import('html-minifier-terser').Options } */
       this.options.minify = {
-        // https://github.com/kangax/html-minifier#options-quick-reference
+        // https://www.npmjs.com/package/html-minifier-terser#options-quick-reference
         collapseWhitespace: true,
+        keepClosingSlash: true,
         removeComments: true,
         removeRedundantAttributes: true,
         removeScriptTypeAttributes: true,
@@ -126,74 +127,41 @@ class HtmlWebpackPlugin {
       };
     }
 
-    // Clear the cache once a new HtmlWebpackPlugin is added
-    childCompiler.clearCache(compiler);
-
-    // Register all HtmlWebpackPlugins instances at the child compiler
-    compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin', (compilation) => {
-      // Clear the cache if the child compiler is outdated
-      if (childCompiler.hasOutDatedTemplateCache(compilation)) {
-        childCompiler.clearCache(compiler);
-      }
-      // Add this instances template to the child compiler
-      childCompiler.addTemplateToCompiler(compiler, this.options.template);
-      // Add file dependencies of child compiler to parent compiler
-      // to keep them watched even if we get the result from the cache
-      compilation.hooks.additionalChunkAssets.tap('HtmlWebpackPlugin', () => {
-        const childCompilerDependencies = childCompiler.getFileDependencies(compiler);
-        childCompilerDependencies.forEach(fileDependency => {
-          compilation.compilationDependencies.add(fileDependency);
-        });
-      });
-    });
-
-    compiler.hooks.make.tapAsync('HtmlWebpackPlugin', (compilation, callback) => {
-      // Compile the template (queued)
-      compilationPromise = childCompiler.compileTemplate(self.options.template, self.options.filename, compilation)
-        .catch(err => {
-          compilation.errors.push(prettyError(err, compiler.context).toString());
-          return {
-            content: self.options.showErrors ? prettyError(err, compiler.context).toJsonHtml() : 'ERROR',
-            outputName: self.options.filename,
-            hash: ''
-          };
-        })
-        .then(compilationResult => {
-          // If the compilation change didnt change the cache is valid
-          isCompilationCached = Boolean(compilationResult.hash) && self.childCompilerHash === compilationResult.hash;
-          self.childCompilerHash = compilationResult.hash;
-          self.childCompilationOutputName = compilationResult.outputName;
-          callback();
-          return compilationResult.content;
-        });
-    });
-
     compiler.hooks.emit.tapAsync('HtmlWebpackPlugin',
       /**
        * Hook into the webpack emit phase
        * @param {WebpackCompilation} compilation
-       * @param {() => void} callback
+       * @param {(err?: Error) => void} callback
       */
       (compilation, callback) => {
         // Get all entry point names for this html file
         const entryNames = Array.from(compilation.entrypoints.keys());
         const filteredEntryNames = self.filterChunks(entryNames, self.options.chunks, self.options.excludeChunks);
         const sortedEntryNames = self.sortEntryChunks(filteredEntryNames, this.options.chunksSortMode, compilation);
-        const childCompilationOutputName = self.childCompilationOutputName;
 
-        if (childCompilationOutputName === undefined) {
-          throw new Error('Did not receive child compilation result');
+        const templateResult = this.options.templateContent
+          ? { mainCompilationHash: compilation.hash }
+          : childCompilerPlugin.getCompilationEntryResult(this.options.template);
+
+        this.childCompilerHash = templateResult.mainCompilationHash;
+
+        if ('error' in templateResult) {
+          compilation.errors.push(prettyError(templateResult.error, compiler.context).toString());
         }
+
+        const childCompilationOutputName = compilation.mainTemplate.getAssetPath(this.options.filename, 'compiledEntry' in templateResult ? {
+          hash: templateResult.compiledEntry.hash,
+          chunk: templateResult.compiledEntry.entry
+        } : {
+          hash: templateResult.mainCompilationHash
+        });
+
+        // If the child compilation was not executed during a previous main compile run
+        // it is a cached result
+        const isCompilationCached = templateResult.mainCompilationHash !== compilation.hash;
 
         // Turn the entry point names into file paths
         const assets = self.htmlWebpackPluginAssets(compilation, childCompilationOutputName, sortedEntryNames);
-
-        // If this is a hot update compilation, move on!
-        // This solves a problem where an `index.html` file is generated for hot-update js files
-        // It only happens in Webpack 2, where hot updates are emitted separately before the full bundle
-        if (self.isHotUpdateCompilation(assets)) {
-          return callback();
-        }
 
         // If the template and the assets did not change we don't have to emit the html
         const assetJson = JSON.stringify(self.getAssetFiles(assets));
@@ -247,15 +215,20 @@ class HtmlWebpackPlugin {
           });
 
         // Turn the compiled tempalte into a nodejs function or into a nodejs string
-        const templateEvaluationPromise = compilationPromise
-          .then(compiledTemplate => {
+        const templateEvaluationPromise = Promise.resolve()
+          .then(() => {
+            if ('error' in templateResult) {
+              return self.options.showErrors ? prettyError(templateResult.error, compiler.context).toHtml() : 'ERROR';
+            }
             // Allow to use a custom function / string instead
             if (self.options.templateContent !== false) {
               return self.options.templateContent;
             }
             // Once everything is compiled evaluate the html factory
             // and replace it with its content
-            return self.evaluateCompilationResult(compilation, compiledTemplate);
+            return ('compiledEntry' in templateResult)
+              ? self.evaluateCompilationResult(compilation, templateResult.compiledEntry.content)
+              : Promise.reject(new Error('Child compilation contained no compiledEntry'));
           });
 
         const templateExectutionPromise = Promise.all([assetsPromise, assetTagGroupsPromise, templateEvaluationPromise])
@@ -333,7 +306,7 @@ class HtmlWebpackPlugin {
     // To extract the result during the evaluation this part has to be removed.
     source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
     const template = this.options.template.replace(/^.+!/, '').replace(/\?.+$/, '');
-    const vmContext = vm.createContext(_.extend({ HTML_WEBPACK_PLUGIN: true, require: require }, global));
+    const vmContext = vm.createContext(_.extend({ HTML_WEBPACK_PLUGIN: true, require: require, console: console }, global));
     const vmScript = new vm.Script(source, { filename: template });
     // Evaluate code and cast to string
     let newSource;
@@ -371,19 +344,24 @@ class HtmlWebpackPlugin {
     if (templateParameters === false) {
       return Promise.resolve({});
     }
-    if (typeof templateParameters === 'function') {
-      const preparedAssetTags = {
-        headTags: this.prepareAssetTagGroupForRendering(assetTags.headTags),
-        bodyTags: this.prepareAssetTagGroupForRendering(assetTags.bodyTags)
-      };
-      return Promise
-        .resolve()
-        .then(() => templateParameters(compilation, assets, preparedAssetTags, this.options));
+    if (typeof templateParameters !== 'function' && typeof templateParameters !== 'object') {
+      throw new Error('templateParameters has to be either a function or an object');
     }
-    if (typeof templateParameters === 'object') {
-      return Promise.resolve(templateParameters);
-    }
-    throw new Error('templateParameters has to be either a function or an object');
+    const templateParameterFunction = typeof templateParameters === 'function'
+      // A custom function can overwrite the entire template parameter preparation
+      ? templateParameters
+      // If the template parameters is an object merge it with the default values
+      : (compilation, assets, assetTags, options) => Object.assign({},
+        templateParametersGenerator(compilation, assets, assetTags, options),
+        templateParameters
+      );
+    const preparedAssetTags = {
+      headTags: this.prepareAssetTagGroupForRendering(assetTags.headTags),
+      bodyTags: this.prepareAssetTagGroupForRendering(assetTags.bodyTags)
+    };
+    return Promise
+      .resolve()
+      .then(() => templateParameterFunction(compilation, assets, preparedAssetTags, this.options));
   }
 
   /**
@@ -441,9 +419,7 @@ class HtmlWebpackPlugin {
     const htmlAfterInjection = this.options.inject
       ? this.injectAssetsIntoHtml(html, assets, assetTags)
       : html;
-    const htmlAfterMinification = typeof this.options.minify === 'object'
-      ? require('html-minifier-terser').minify(htmlAfterInjection, this.options.minify)
-      : htmlAfterInjection;
+    const htmlAfterMinification = this.minifyHtml(htmlAfterInjection);
     return Promise.resolve(htmlAfterMinification);
   }
 
@@ -613,7 +589,22 @@ class HtmlWebpackPlugin {
     const extensionRegexp = /\.(css|js|mjs)(\?|$)/;
     for (let i = 0; i < entryNames.length; i++) {
       const entryName = entryNames[i];
-      const entryPointFiles = compilation.entrypoints.get(entryName).getFiles();
+      /** entryPointUnfilteredFiles - also includes hot module update files */
+      const entryPointUnfilteredFiles = compilation.entrypoints.get(entryName).getFiles();
+
+      const entryPointFiles = entryPointUnfilteredFiles.filter((chunkFile) => {
+        // compilation.getAsset was introduced in webpack 4.4.0
+        // once the support pre webpack 4.4.0 is dropped please
+        // remove the following guard:
+        const asset = compilation.getAsset && compilation.getAsset(chunkFile);
+        if (!asset) {
+          return true;
+        }
+        // Prevent hot-module files from beeing included:
+        const assetMetaInformation = asset.info || {};
+        return !(assetMetaInformation.hotModuleReplacement || assetMetaInformation.development);
+      });
+
       // Prepend the publicPath and append the hash depending on the
       // webpack.output.publicPath and hashOptions
       // E.g. bundle.js -> /bundle.js?hash
@@ -713,6 +704,7 @@ class HtmlWebpackPlugin {
       tagName: 'script',
       voidTag: false,
       attributes: {
+        defer: this.options.scriptLoading !== 'blocking',
         src: scriptAsset
       }
     }));
@@ -809,7 +801,7 @@ class HtmlWebpackPlugin {
       tagName: 'link',
       voidTag: true,
       attributes: {
-        rel: 'shortcut icon',
+        rel: 'icon',
         href: faviconPath
       }
     }];
@@ -843,7 +835,10 @@ class HtmlWebpackPlugin {
     if (scriptTarget === 'body') {
       result.bodyTags.push(...assetTags.scripts);
     } else {
-      result.headTags.push(...assetTags.scripts);
+      // If script loading is blocking add the scripts to the end of the head
+      // If script loading is non-blocking add the scripts infront of the css files
+      const insertPosition = this.options.scriptLoading === 'blocking' ? result.headTags.length : assetTags.meta.length;
+      result.headTags.splice(insertPosition, 0, ...assetTags.scripts);
     }
     return result;
   }
@@ -857,17 +852,13 @@ class HtmlWebpackPlugin {
    */
   prepareAssetTagGroupForRendering (assetTagGroup) {
     const xhtml = this.options.xhtml;
-    const preparedTags = assetTagGroup.map((assetTag) => {
+    return HtmlTagArray.from(assetTagGroup.map((assetTag) => {
       const copiedAssetTag = Object.assign({}, assetTag);
       copiedAssetTag.toString = function () {
         return htmlTagObjectToString(this, xhtml);
       };
       return copiedAssetTag;
-    });
-    preparedTags.toString = function () {
-      return this.join('');
-    };
-    return preparedTags;
+    }));
   }
 
   /**
@@ -945,10 +936,35 @@ class HtmlWebpackPlugin {
    * Encode each path component using `encodeURIComponent` as files can contain characters
    * which needs special encoding in URLs like `+ `.
    *
+   * Valid filesystem characters which need to be encoded for urls:
+   *
+   * # pound, % percent, & ampersand, { left curly bracket, } right curly bracket,
+   * \ back slash, < left angle bracket, > right angle bracket, * asterisk, ? question mark,
+   * blank spaces, $ dollar sign, ! exclamation point, ' single quotes, " double quotes,
+   * : colon, @ at sign, + plus sign, ` backtick, | pipe, = equal sign
+   *
+   * However the query string must not be encoded:
+   *
+   *  fo:demonstration-path/very fancy+name.js?path=/home?value=abc&value=def#zzz
+   *    ^             ^    ^    ^     ^    ^  ^    ^^    ^     ^   ^     ^   ^
+   *    |             |    |    |     |    |  |    ||    |     |   |     |   |
+   *    encoded       |    |    encoded    |  |    ||    |     |   |     |   |
+   *                 ignored              ignored  ignored     ignored   ignored
+   *
    * @param {string} filePath
    */
   urlencodePath (filePath) {
-    return filePath.split('/').map(encodeURIComponent).join('/');
+    // People use the filepath in quite unexpected ways.
+    // Try to extract the first querystring of the url:
+    //
+    // some+path/demo.html?value=abc?def
+    //
+    const queryStringStart = filePath.indexOf('?');
+    const urlPath = queryStringStart === -1 ? filePath : filePath.substr(0, queryStringStart);
+    const queryString = filePath.substr(urlPath.length);
+    // Encode all parts except '/' which are not part of the querystring:
+    const encodedUrlPath = urlPath.split('/').map(encodeURIComponent).join('/');
+    return encodedUrlPath + queryString;
   }
 
   /**
@@ -973,6 +989,38 @@ class HtmlWebpackPlugin {
     return template.replace(
       /([!])([^/\\][^!?]+|[^/\\!?])($|\?[^!?\n]+$)/,
       (match, prefix, filepath, postfix) => prefix + path.resolve(filepath) + postfix);
+  }
+
+  /**
+   * Minify the given string using html-minifier-terser
+   *
+   * As this is a breaking change to html-webpack-plugin 3.x
+   * provide an extended error message to explain how to get back
+   * to the old behaviour
+   *
+   * @param {string} html
+   */
+  minifyHtml (html) {
+    if (typeof this.options.minify !== 'object') {
+      return html;
+    }
+    try {
+      return require('html-minifier-terser').minify(html, this.options.minify);
+    } catch (e) {
+      const isParseError = String(e.message).indexOf('Parse Error') === 0;
+      if (isParseError) {
+        e.message = 'html-webpack-plugin could not minify the generated output.\n' +
+            'In production mode the html minifcation is enabled by default.\n' +
+            'If you are not generating a valid html output please disable it manually.\n' +
+            'You can do so by adding the following setting to your HtmlWebpackPlugin config:\n|\n|' +
+            '    minify: false\n|\n' +
+            'See https://github.com/jantimon/html-webpack-plugin#options for details.\n\n' +
+            'For parser dedicated bugs please create an issue here:\n' +
+            'https://danielruf.github.io/html-minifier-terser/' +
+          '\n' + e.message;
+      }
+      throw e;
+    }
   }
 
   /**

@@ -1,6 +1,6 @@
 import { AsyncSeriesWaterfallHook } from "tapable";
-import { Compiler } from 'webpack';
-import { Options as HtmlMinifierOptions } from "html-minifier";
+import { Compiler, compilation } from 'webpack';
+import { Options as HtmlMinifierOptions } from "html-minifier-terser";
 
 export = HtmlWebpackPlugin;
 
@@ -8,6 +8,19 @@ declare class HtmlWebpackPlugin {
   constructor(options?: HtmlWebpackPlugin.Options);
 
   apply(compiler: Compiler): void;
+
+  static getHooks(compilation: compilation.Compilation): HtmlWebpackPlugin.Hooks;
+
+  /**
+   * Static helper to create a tag object to be get injected into the dom
+   */
+  static createHtmlTagObject(
+    tagName: string,
+    attributes?: { [attributeName: string]: string | boolean },
+    innerHTML?: string
+  ): HtmlTagObject;
+
+  static readonly version: number;
 }
 
 declare namespace HtmlWebpackPlugin {
@@ -21,7 +34,7 @@ declare namespace HtmlWebpackPlugin {
   interface ProcessedOptions {
     /**
      * Emit the file only if it was changed.
-     * Default: `true`.
+     * @default true
      */
     cache: boolean;
     /**
@@ -30,14 +43,14 @@ declare namespace HtmlWebpackPlugin {
     chunks: "all" | string[] | RegExp | (((chunkName: string) => boolean));
     /**
      * Allows to control how chunks should be sorted before they are included to the html.
-     * Default: `'auto'`.
+     * @default 'auto'
      */
     chunksSortMode:
       | "auto"
       | "manual"
       | (((entryNameA: string, entryNameB: string) => number));
     /**
-     * List all entries which should not be injeccted
+     * List all entries which should not be injected
      */
     excludeChunks: string[] | RegExp | (((chunkName: string) => boolean));
     /**
@@ -46,8 +59,8 @@ declare namespace HtmlWebpackPlugin {
     favicon: false | string;
     /**
      * The file to write the HTML to.
-     * Defaults to `index.html`.
      * Supports subdirectories eg: `assets/admin.html`
+     * @default 'index.html'
      */
     filename: string;
     /**
@@ -62,7 +75,17 @@ declare namespace HtmlWebpackPlugin {
       | false // Don't inject scripts
       | true // Inject scripts into body
       | "body" // Inject scripts into body
-      | "head"; // Inject scripts into head
+      | "head" // Inject scripts into head
+    /**
+     * Set up script loading
+     * blocking will result in <script src="..."></script>
+     * defer will result in <script defer src="..."></script>
+     *
+     * @default 'blocking'
+     */
+    scriptLoading:
+      | "blocking"
+      | "defer"
     /**
      * Inject meta tags
      */
@@ -75,11 +98,11 @@ declare namespace HtmlWebpackPlugin {
             | { [attributeName: string]: string | boolean }; // custom properties e.g. { name:"viewport" content:"width=500, initial-scale=1" }
         };
     /**
-     * HTML Minification options accepts the following valeus:
+     * HTML Minification options accepts the following values:
      * - Set to `false` to disable minifcation
      * - Set to `'auto'` to enable minifcation only for production mode
      * - Set to custom minification according to
-     * @https://github.com/kangax/html-minifier#options-quick-reference
+     * {@link https://github.com/kangax/html-minifier#options-quick-reference}
      */
     minify: 'auto' | boolean | MinifyOptions;
     /**
@@ -97,6 +120,7 @@ declare namespace HtmlWebpackPlugin {
     templateContent:
       | false // Use the template option instead to load a file
       | string
+      | ((templateParameters: { [option: string]: any }) => (string | Promise<string>))
       | Promise<string>;
     /**
      * Allows to overwrite the parameters used in the template
