@@ -201,7 +201,7 @@ class HtmlWebpackPlugin {
             plugin: self
           }))
           .then(({ assetTags }) => {
-            // Inject scripts to body unless it set explictly to head
+            // Inject scripts to body unless it set explicitly to head
             const scriptTarget = self.options.inject === 'head' ? 'head' : 'body';
             // Group assets to `head` and `body` tag arrays
             const assetGroups = this.generateAssetGroups(assetTags, scriptTarget);
@@ -214,7 +214,7 @@ class HtmlWebpackPlugin {
             });
           });
 
-        // Turn the compiled tempalte into a nodejs function or into a nodejs string
+        // Turn the compiled template into a nodejs function or into a nodejs string
         const templateEvaluationPromise = Promise.resolve()
           .then(() => {
             if ('error' in templateResult) {
@@ -527,7 +527,7 @@ class HtmlWebpackPlugin {
     /**
      * @type {string} the configured public path to the asset root
      * if a path publicPath is set in the current webpack config use it otherwise
-     * fallback to a realtive path
+     * fallback to a relative path
      */
     const webpackPublicPath = compilation.mainTemplate.getPublicPath({ hash: compilationHash });
     const isPublicPathDefined = webpackPublicPath.trim() !== '';
@@ -585,7 +585,7 @@ class HtmlWebpackPlugin {
         if (!asset) {
           return true;
         }
-        // Prevent hot-module files from beeing included:
+        // Prevent hot-module files from being included:
         const assetMetaInformation = asset.info || {};
         return !(assetMetaInformation.hotModuleReplacement || assetMetaInformation.development);
       });
@@ -622,8 +622,8 @@ class HtmlWebpackPlugin {
   }
 
   /**
-   * Converts a favicon file from disk to a webpack ressource
-   * and returns the url to the ressource
+   * Converts a favicon file from disk to a webpack resource
+   * and returns the url to the resource
    *
    * @param {string|false} faviconFilePath
    * @param {WebpackCompilation} compilation

@@ -103,7 +103,7 @@ describe('HtmlWebpackPluginCaching', () => {
         // Verify that no file was built
         expect(getCompiledModules(stats.toJson()))
           .toEqual([]);
-        // Verify that the html was processed only during the inital build
+        // Verify that the html was processed only during the initial build
         expect(htmlWebpackPlugin.evaluateCompilationResult.mock.calls.length)
           .toBe(1);
         // Verify that the child compilation was executed twice
@@ -131,7 +131,7 @@ describe('HtmlWebpackPluginCaching', () => {
         // Verify that only one file was built
         expect(getCompiledModuleCount(stats.toJson()))
           .toBe(1);
-        // Verify that the html was processed only during the inital build
+        // Verify that the html was processed only during the initial build
         expect(htmlWebpackPlugin.evaluateCompilationResult.mock.calls.length)
           .toBe(1);
         // Verify that the child compilation was executed only once
