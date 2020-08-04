@@ -705,7 +705,7 @@ class HtmlWebpackPlugin {
       tagName: 'link',
       voidTag: true,
       attributes: {
-        href: styleAsset,
+        href: "/" + styleAsset,
         rel: 'stylesheet'
       }
     }));
