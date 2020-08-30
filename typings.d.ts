@@ -18,7 +18,7 @@ declare class HtmlWebpackPlugin {
     tagName: string,
     attributes?: { [attributeName: string]: string | boolean },
     innerHTML?: string
-  ): HtmlTagObject;
+  ): HtmlWebpackPlugin.HtmlTagObject;
 
   static readonly version: number;
 }
