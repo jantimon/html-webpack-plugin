@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.4.1](https://github.com/jantimon/html-webpack-plugin/compare/v4.4.0...v4.4.1) (2020-08-30)
+
+
+### Bug Fixes
+
+* broken typings.d.ts in v4.4.0 ([#1503](https://github.com/jantimon/html-webpack-plugin/issues/1503)) ([98ad756](https://github.com/jantimon/html-webpack-plugin/commit/98ad756))
+
+
+
 # [4.4.0](https://github.com/jantimon/html-webpack-plugin/compare/v4.3.0...v4.4.0) (2020-08-30)
 
 
