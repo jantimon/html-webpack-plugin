@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [4.4.0](https://github.com/jantimon/html-webpack-plugin/compare/v4.3.0...v4.4.0) (2020-08-30)
+
+
+### Bug Fixes
+
+* fix typos in comments ([#1484](https://github.com/jantimon/html-webpack-plugin/issues/1484)) ([6b0711e](https://github.com/jantimon/html-webpack-plugin/commit/6b0711e))
+
+
+### Features
+
+* added v5 compilation support and deleted depreciation warnings ([4ae7be8](https://github.com/jantimon/html-webpack-plugin/commit/4ae7be8)), closes [#1454](https://github.com/jantimon/html-webpack-plugin/issues/1454)
+
+
+
 # [4.3.0](https://github.com/jantimon/html-webpack-plugin/compare/v4.2.2...v4.3.0) (2020-04-30)
 
 
