@@ -27,6 +27,8 @@ const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPlugin
 const fsStatAsync = promisify(fs.stat);
 const fsReadFileAsync = promisify(fs.readFile);
 
+const webpackMajorVersion = Number(require('webpack/package.json').version.split('.')[0]);
+
 class HtmlWebpackPlugin {
   /**
    * @param {HtmlWebpackOptions} [options]
@@ -149,12 +151,16 @@ class HtmlWebpackPlugin {
           compilation.errors.push(prettyError(templateResult.error, compiler.context).toString());
         }
 
-        const childCompilationOutputName = compilation.mainTemplate.getAssetPath(this.options.filename, 'compiledEntry' in templateResult ? {
+        const compiledEntries = 'compiledEntry' in templateResult ? {
           hash: templateResult.compiledEntry.hash,
           chunk: templateResult.compiledEntry.entry
         } : {
           hash: templateResult.mainCompilationHash
-        });
+        };
+
+        const childCompilationOutputName = webpackMajorVersion === 4
+          ? compilation.mainTemplate.getAssetPath(this.options.filename, compiledEntries)
+          : compilation.getAssetPath(this.options.filename, compiledEntries);
 
         // If the child compilation was not executed during a previous main compile run
         // it is a cached result
@@ -529,7 +535,10 @@ class HtmlWebpackPlugin {
      * if a path publicPath is set in the current webpack config use it otherwise
      * fallback to a relative path
      */
-    const webpackPublicPath = compilation.mainTemplate.getPublicPath({ hash: compilationHash });
+    const webpackPublicPath = webpackMajorVersion === 4
+      ? compilation.mainTemplate.getPublicPath({ hash: compilationHash })
+      : compilation.getAssetPath(compilation.outputOptions.publicPath, { hash: compilationHash });
+
     const isPublicPathDefined = webpackPublicPath.trim() !== '';
     let publicPath = isPublicPathDefined
       // If a hard coded public path exists use it
