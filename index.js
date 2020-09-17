@@ -16,6 +16,7 @@ const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
 const loaderUtils = require('loader-utils');
+const prettyHtml = require('pretty');
 const { CachedChildCompilation } = require('./lib/cached-child-compiler');
 
 const { createHtmlTagObject, htmlTagObjectToString, HtmlTagArray } = require('./lib/html-tags');
@@ -28,7 +29,7 @@ const fsStatAsync = promisify(fs.stat);
 const fsReadFileAsync = promisify(fs.readFile);
 
 const webpackMajorVersion = Number(require('webpack/package.json').version.split('.')[0]);
-
+const eexDefaultFilename = 'eex_template.html'
 class HtmlWebpackPlugin {
   /**
    * @param {HtmlWebpackOptions} [options]
@@ -58,7 +59,8 @@ class HtmlWebpackPlugin {
       meta: {},
       base: false,
       title: 'Webpack App',
-      xhtml: false
+      xhtml: false,
+      removeReplaceEEx: false,
     };
 
     /** @type {ProcessedHtmlWebpackOptions} */
@@ -87,6 +89,12 @@ class HtmlWebpackPlugin {
    */
   apply (compiler) {
     const self = this;
+
+    let theEExMatches
+    if (this.options.template && this.options.removeReplaceEEx) {
+      theEExMatches = this.removeEEx(compiler, eexDefaultFilename)
+      this.options.template = eexDefaultFilename
+    }
 
     this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
 
@@ -269,6 +277,11 @@ class HtmlWebpackPlugin {
             return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
           })
           .then(html => {
+            if (this.options.template && this.options.removeReplaceEEx && theEExMatches && theEExMatches.length) {
+              html = this.replaceEEx(prettyHtml(html), theEExMatches)
+              fs.unlinkSync(path.resolve(compiler.context, eexDefaultFilename))
+            }
+
             // Allow to use [templatehash] as placeholder for the html-webpack-plugin name
             // See also https://survivejs.com/webpack/optimizing/adding-hashes-to-filenames/
             // From https://github.com/webpack-contrib/extract-text-webpack-plugin/blob/8de6558e33487e7606e7cd7cb2adc2cccafef272/src/index.js#L212-L214
@@ -296,6 +309,35 @@ class HtmlWebpackPlugin {
           callback();
         });
       });
+  }
+
+  removeEEx (compiler, filename) {
+    let actualPath = path.resolve(compiler.context, this.options.template)
+    let matches = []
+      let fileString = fs.readFileSync(actualPath, "utf8") 
+      let newFileString = fileString
+      let index = 0
+      const regex = /(<%=?[\s\S]+?%>)/g
+      newFileString = newFileString.replace(regex, (match, p, offset, string, groups) => {
+        const replacement = `__EEx_REPLACER_${index}`
+        matches.push({offset, match, index, replacement})
+        index++
+        return replacement
+      })
+      fs.writeFileSync(path.resolve(compiler.context, filename), newFileString, 'utf8')
+      return matches
+
+  }
+
+  replaceEEx(html, matches) {
+    let newhtml = html
+
+      matches.forEach(({replacement, match}) => {
+        newhtml = newhtml.replace(replacement, match)
+      })
+
+      return newhtml
+
   }
 
   /**

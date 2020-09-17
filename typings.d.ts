@@ -152,8 +152,11 @@ declare namespace HtmlWebpackPlugin {
      */
     xhtml: boolean;
     /**
-     * In addition to the options actually used by this plugin, you can use this hash to pass arbitrary data through
-     * to your template.
+     * Enforce self closing tags e.g. <link />
+     */
+    removeReplaceEEx
+    /**
+     * Remove Elixir/Phoenix EEx tags during compilation and replace just before emission
      */
     [option: string]: any;
   }

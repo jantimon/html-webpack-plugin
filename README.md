@@ -150,6 +150,7 @@ Allowed values are as follows
 |**`chunksSortMode`**|`{String\|Function}`|`auto`|Allows to control how chunks should be sorted before they are included to the HTML. Allowed values are `'none' \| 'auto' \| 'manual' \| {Function}`|
 |**`excludeChunks`**|`{Array.<string>}`|``|Allows you to skip some chunks (e.g don't add the unit-test chunk)|
 |**`xhtml`**|`{Boolean}`|`false`|If `true` render the `link` tags as self-closing (XHTML compliant)|
+|**`removeReplaceEex`**|`{Boolean}`|`false`|If `true` remove Elixir/Phoenix EEx tags during compilation and replace just before emission|
 
 Here's an example webpack config illustrating how to use these options
 
