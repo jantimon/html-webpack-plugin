@@ -152,6 +152,16 @@ declare namespace HtmlWebpackPlugin {
      */
     xhtml: boolean;
     /**
+     * Preserve templating strings by substituting a filler string for them before compilation 
+     * and replacing the strings just before emission. Must be used in conjunction with "filename"
+     * property. When not provided: "preserve" defaults to /(<%=?[\s\S]+?%>)/g, 
+     * "proxyFilename" defaults to "__html_eex_template.html", "replaceWith" defaults to "_TEMPLATE_REPLACEMENT_"
+     */
+    preserveStrings: 
+      | true // preserve strings, use default properties
+      | false // don't do strings preservation, use default html-webpack-plugin behavior
+      | { preserve: ?(RegExp | [RegExp]), proxyFilename: ?string, replaceWith: ?string} ; // preserve template override defaults
+    /**
      * In addition to the options actually used by this plugin, you can use this hash to pass arbitrary data through
      * to your template.
      */

@@ -150,6 +150,7 @@ Allowed values are as follows
 |**`chunksSortMode`**|`{String\|Function}`|`auto`|Allows to control how chunks should be sorted before they are included to the HTML. Allowed values are `'none' \| 'auto' \| 'manual' \| {Function}`|
 |**`excludeChunks`**|`{Array.<string>}`|``|Allows you to skip some chunks (e.g don't add the unit-test chunk)|
 |**`xhtml`**|`{Boolean}`|`false`|If `true` render the `link` tags as self-closing (XHTML compliant)|
+|**`preserveStrings`**|`{Boolean\|Object}`|`false`|If `true` or `{Object}` For use with frameworks like Elixir/Phoenix which have their own templating language (like EEx/ERB). This option enables preserving those templating strings while enabling html-webpack-plugin asset injection. It works by substituting a filler ("replaceWith") string for matched "preserve" regular-expressions before compilation and replacing the strings just before emission. A proxy file is generated to assist. Must be used in conjunction with "template" property.
 
 Here's an example webpack config illustrating how to use these options
 

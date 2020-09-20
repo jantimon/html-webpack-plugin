@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-nocheck
 // Import types
 /** @typedef {import("./typings").HtmlTagObject} HtmlTagObject */
 /** @typedef {import("./typings").Options} HtmlWebpackOptions */
@@ -58,7 +58,8 @@ class HtmlWebpackPlugin {
       meta: {},
       base: false,
       title: 'Webpack App',
-      xhtml: false
+      xhtml: false,
+      preserveStrings: false
     };
 
     /** @type {ProcessedHtmlWebpackOptions} */
@@ -87,6 +88,33 @@ class HtmlWebpackPlugin {
    */
   apply (compiler) {
     const self = this;
+
+    const shouldPreserveTemplate = this.options.template && !!this.options.preserveStrings;
+    const preserveStringsConfig = {
+      preserve: [/(<%=?[\s\S]+?%>)/g],
+      proxyFilename: '__html_eex_template.html',
+      replaceWith: '_TEMPLATE_REPLACEMENT_',
+      originalFilename: this.options.template,
+      matches: []
+    };
+
+    if (shouldPreserveTemplate) {
+      if (this.options.preserveStrings.preserve) {
+        preserveStringsConfig.preserve = this.options.preserveStrings.preserve;
+      }
+      if (this.options.preserveStrings.proxyFilename) {
+        preserveStringsConfig.proxyFilename = this.options.preserveStrings.proxyFilename;
+      }
+      if (this.options.preserveStrings.replaceWith) {
+        preserveStringsConfig.replaceWith = this.options.preserveStrings.replaceWith;
+      }
+    }
+
+    const preserveTemplateProcessor = () => this.preserveTemplating(compiler, preserveStringsConfig);
+    if (shouldPreserveTemplate) {
+      preserveTemplateProcessor();
+      this.options.template = preserveStringsConfig.proxyFilename;
+    }
 
     this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
 
@@ -269,6 +297,12 @@ class HtmlWebpackPlugin {
             return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
           })
           .then(html => {
+            if (shouldPreserveTemplate) {
+              if (preserveStringsConfig.matches.length) {
+                html = this.replaceTemplating(html, preserveStringsConfig.matches);
+              }
+            }
+
             // Allow to use [templatehash] as placeholder for the html-webpack-plugin name
             // See also https://survivejs.com/webpack/optimizing/adding-hashes-to-filenames/
             // From https://github.com/webpack-contrib/extract-text-webpack-plugin/blob/8de6558e33487e7606e7cd7cb2adc2cccafef272/src/index.js#L212-L214
@@ -296,6 +330,35 @@ class HtmlWebpackPlugin {
           callback();
         });
       });
+  }
+
+  preserveTemplating (compiler, preserveStringsConfig) {
+    let actualPath = path.resolve(compiler.context, preserveStringsConfig.originalFilename);
+    let matches = [];
+    let fileString = fs.readFileSync(actualPath, 'utf8');
+    let newFileString = fileString;
+    let index = 0;
+    const preserve = Array.isArray(preserveStringsConfig.preserve)
+      ? preserveStringsConfig.preserve
+      : [preserveStringsConfig.preserve];
+    newFileString = preserve.reduce((acc, regex) => acc.replace(regex, (match, _p, offset, _string, _groups) => {
+      const replacement = `${preserveStringsConfig.replaceWith}${index}`;
+      matches.push({ offset, match, index, replacement });
+      index++;
+      return replacement;
+    }), newFileString);
+    fs.writeFileSync(path.resolve(compiler.context, preserveStringsConfig.proxyFilename), newFileString, 'utf8');
+    preserveStringsConfig.matches = matches;
+  }
+
+  replaceTemplating (html, matches) {
+    let newhtml = html;
+
+    matches.forEach(({ replacement, match }) => {
+      newhtml = newhtml.replace(replacement, match);
+    });
+
+    return newhtml;
   }
 
   /**

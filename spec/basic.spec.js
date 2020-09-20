@@ -238,6 +238,25 @@ describe('HtmlWebpackPlugin', () => {
     ['<script src="app_bundle.js', 'Some unique text'], null, done);
   });
 
+  it('allows you to preserve an external template file', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        template: path.join(__dirname, 'fixtures/test.html'),
+        preserveStrings: true,
+        inject: false
+      })]
+    },
+    ['<!doctype html><html><head><meta charset="utf-8"/><title>Test</title></head><body><p>Some unique text</p><script src="<%=htmlWebpackPlugin.files.js[0]%>"></script></body></html>'], null, done);
+  });
+
   it('picks up src/index.ejs by default', done => {
     testHtmlPlugin({
       mode: 'production',
