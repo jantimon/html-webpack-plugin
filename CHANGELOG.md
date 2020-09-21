@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [4.5.0](https://github.com/jantimon/html-webpack-plugin/compare/v4.4.1...v4.5.0) (2020-09-21)
+
+
+### Features
+
+* Add publicPath option to overrule the default path generation ([#1516](https://github.com/jantimon/html-webpack-plugin/issues/1516)) ([19b5122](https://github.com/jantimon/html-webpack-plugin/commit/19b5122))
+* update webpack dependency range to allow installing webpack 5 beta  ([f3ccdd5](https://github.com/jantimon/html-webpack-plugin/commit/f3ccdd5)), closes [#1504](https://github.com/jantimon/html-webpack-plugin/issues/1504)
+
+
+
 ## [4.4.1](https://github.com/jantimon/html-webpack-plugin/compare/v4.4.0...v4.4.1) (2020-08-30)
 
 
