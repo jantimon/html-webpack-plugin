@@ -44,6 +44,7 @@ class HtmlWebpackPlugin {
       templateContent: false,
       templateParameters: templateParametersGenerator,
       filename: 'index.html',
+      publicPath: userOptions.publicPath === undefined ? 'auto' : userOptions.publicPath,
       hash: false,
       inject: userOptions.scriptLoading !== 'defer' ? 'body' : 'head',
       scriptLoading: 'blocking',
@@ -167,7 +168,7 @@ class HtmlWebpackPlugin {
         const isCompilationCached = templateResult.mainCompilationHash !== compilation.hash;
 
         // Turn the entry point names into file paths
-        const assets = self.htmlWebpackPluginAssets(compilation, childCompilationOutputName, sortedEntryNames);
+        const assets = self.htmlWebpackPluginAssets(compilation, childCompilationOutputName, sortedEntryNames, this.options.publicPath);
 
         // If the template and the assets did not change we don't have to emit the html
         const assetJson = JSON.stringify(self.getAssetFiles(assets));
@@ -519,6 +520,7 @@ class HtmlWebpackPlugin {
    * for all given entry names
    * @param {WebpackCompilation} compilation
    * @param {string[]} entryNames
+   * @param {string | 'auto'} customPublicPath
    * @returns {{
       publicPath: string,
       js: Array<string>,
@@ -527,7 +529,7 @@ class HtmlWebpackPlugin {
       favicon?: string
     }}
    */
-  htmlWebpackPluginAssets (compilation, childCompilationOutputName, entryNames) {
+  htmlWebpackPluginAssets (compilation, childCompilationOutputName, entryNames, customPublicPath) {
     const compilationHash = compilation.hash;
 
     /**
@@ -539,13 +541,22 @@ class HtmlWebpackPlugin {
       ? compilation.mainTemplate.getPublicPath({ hash: compilationHash })
       : compilation.getAssetPath(compilation.outputOptions.publicPath, { hash: compilationHash });
 
-    const isPublicPathDefined = webpackPublicPath.trim() !== '';
-    let publicPath = isPublicPathDefined
-      // If a hard coded public path exists use it
-      ? webpackPublicPath
-      // If no public path was set get a relative url path
-      : path.relative(path.resolve(compilation.options.output.path, path.dirname(childCompilationOutputName)), compilation.options.output.path)
-        .split(path.sep).join('/');
+    const isPublicPathDefined = webpackMajorVersion === 4
+      ? webpackPublicPath.trim() !== ''
+      // Webpack 5 introduced "auto" - however it can not be retrieved at runtime
+      : webpackPublicPath.trim() !== '' && webpackPublicPath !== 'auto';
+
+    let publicPath =
+      // If the html-webpack-plugin options contain a custom public path uset it
+      customPublicPath !== 'auto'
+        ? customPublicPath
+        : (isPublicPathDefined
+          // If a hard coded public path exists use it
+          ? webpackPublicPath
+          // If no public path was set get a relative url path
+          : path.relative(path.resolve(compilation.options.output.path, path.dirname(childCompilationOutputName)), compilation.options.output.path)
+            .split(path.sep).join('/')
+        );
 
     if (publicPath.length && publicPath.substr(-1, 1) !== '/') {
       publicPath += '/';
