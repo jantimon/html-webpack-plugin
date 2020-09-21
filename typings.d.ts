@@ -64,6 +64,11 @@ declare namespace HtmlWebpackPlugin {
      */
     filename: string;
     /**
+     * By default the public path is set to `auto` - that way the html-webpack-plugin will try
+     * to set the publicPath according to the current filename and the webpack publicPath setting
+     */
+    publicPath: string | 'auto';
+    /**
      * If `true` then append a unique `webpack` compilation hash to all included scripts and CSS files.
      * This is useful for cache busting
      */
