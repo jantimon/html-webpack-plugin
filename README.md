@@ -123,12 +123,12 @@ If you have multiple `webpack` entry points, they will all be included with `scr
 If you have any CSS assets in webpack's output (for example, CSS extracted with the [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin))
 then these will be included with `<link>` tags in the HTML head.
 
-If you have plugins that make use of it, `html-webpack-plugin` should be ordered first before any of the integrated plugins.
+If you have plugins that make use of it, `html-webpack-plugin` should be ordered first before any of the integrated Plugins.
 
 <h2 align="center">Options</h2>
 
 You can pass a hash of configuration options to `html-webpack-plugin`.
-Allowed values are as follows
+Allowed values are as follows:
 
 |Name|Type|Default|Description|
 |:--:|:--:|:-----:|:----------|
