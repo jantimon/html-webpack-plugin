@@ -2,13 +2,12 @@ language: node_js
 node_js:
   - stable
   - lts/*
-  - 6.9
+  - 10.13.0
 env:
-  - WEBPACK_CORE=4
-  - WEBPACK_CORE=next
+  - WEBPACK_CORE=5
 jobs:
   exclude:
-  - node_js: 6.9
+  - node_js: 10.13.0
     env: WEBPACK_CORE=next
 before_install:
   - stty columns 120
