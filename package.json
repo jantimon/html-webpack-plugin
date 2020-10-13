@@ -84,5 +84,9 @@
       "<rootDir>/dist"
     ],
     "testEnvironment": "node"
+  },
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/html-webpack-plugin"
   }
 }
