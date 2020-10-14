@@ -70,246 +70,34 @@ class HtmlWebpackPlugin {
       };
       this.options.meta = Object.assign({}, this.options.meta, defaultMeta, userOptions.meta);
     }
-
-    // Instance variables to keep caching information
-    // for multiple builds
-    this.childCompilerHash = undefined;
-    this.assetJson = undefined;
-    this.hash = undefined;
     this.version = HtmlWebpackPlugin.version;
   }
 
-  /**
-   * apply is called by the webpack main compiler during the start phase
-   * @param {WebpackCompiler} compiler
-   */
   apply (compiler) {
-    const self = this;
-
-    this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
-
-    // Inject child compiler plugin
-    const childCompilerPlugin = new CachedChildCompilation(compiler);
-    if (!this.options.templateContent) {
-      childCompilerPlugin.addEntry(this.options.template);
-    }
-
-    // convert absolute filename into relative so that webpack can
-    // generate it at correct location
-    const filename = this.options.filename;
-    if (path.resolve(filename) === path.normalize(filename)) {
-      this.options.filename = path.relative(compiler.options.output.path, filename);
-    }
-
-    // `contenthash` is introduced in webpack v4.3
-    // which conflicts with the plugin's existing `contenthash` method,
-    // hence it is renamed to `templatehash` to avoid conflicts
-    this.options.filename = this.options.filename.replace(/\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, (match) => {
-      return match.replace('contenthash', 'templatehash');
-    });
-
-    // Check if webpack is running in production mode
-    // @see https://github.com/webpack/webpack/blob/3366421f1784c449f415cda5930a8e445086f688/lib/WebpackOptionsDefaulter.js#L12-L14
-    const isProductionLikeMode = compiler.options.mode === 'production' || !compiler.options.mode;
-
-    const minify = this.options.minify;
-    if (minify === true || (minify === 'auto' && isProductionLikeMode)) {
-      /** @type { import('html-minifier-terser').Options } */
-      this.options.minify = {
-        // https://www.npmjs.com/package/html-minifier-terser#options-quick-reference
-        collapseWhitespace: true,
-        keepClosingSlash: true,
-        removeComments: true,
-        removeRedundantAttributes: true,
-        removeScriptTypeAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        useShortDoctype: true
-      };
-    }
-
-    compiler.hooks.emit.tapAsync('HtmlWebpackPlugin',
-      /**
-       * Hook into the webpack emit phase
-       * @param {WebpackCompilation} compilation
-       * @param {(err?: Error) => void} callback
-      */
-      (compilation, callback) => {
-        // Get all entry point names for this html file
-        const entryNames = Array.from(compilation.entrypoints.keys());
-        const filteredEntryNames = self.filterChunks(entryNames, self.options.chunks, self.options.excludeChunks);
-        const sortedEntryNames = self.sortEntryChunks(filteredEntryNames, this.options.chunksSortMode, compilation);
-
-        const templateResult = this.options.templateContent
-          ? { mainCompilationHash: compilation.hash }
-          : childCompilerPlugin.getCompilationEntryResult(this.options.template);
-
-        this.childCompilerHash = templateResult.mainCompilationHash;
-
-        if ('error' in templateResult) {
-          compilation.errors.push(prettyError(templateResult.error, compiler.context).toString());
-        }
-
-        const compiledEntries = 'compiledEntry' in templateResult ? {
-          hash: templateResult.compiledEntry.hash,
-          chunk: templateResult.compiledEntry.entry
-        } : {
-          hash: templateResult.mainCompilationHash
-        };
-
-        const childCompilationOutputName = compilation.getAssetPath(this.options.filename, compiledEntries);
-
-        // If the child compilation was not executed during a previous main compile run
-        // it is a cached result
-        const isCompilationCached = templateResult.mainCompilationHash !== compilation.hash;
-
-        // Turn the entry point names into file paths
-        const assets = self.htmlWebpackPluginAssets(compilation, childCompilationOutputName, sortedEntryNames, this.options.publicPath);
-
-        // If the template and the assets did not change we don't have to emit the html
-        const assetJson = JSON.stringify(self.getAssetFiles(assets));
-        if (isCompilationCached && self.options.cache && assetJson === self.assetJson) {
-          return callback();
-        } else {
-          self.assetJson = assetJson;
-        }
-
-        // The html-webpack plugin uses a object representation for the html-tags which will be injected
-        // to allow altering them more easily
-        // Just before they are converted a third-party-plugin author might change the order and content
-        const assetsPromise = this.getFaviconPublicPath(this.options.favicon, compilation, assets.publicPath)
-          .then((faviconPath) => {
-            assets.favicon = faviconPath;
-            return getHtmlWebpackPluginHooks(compilation).beforeAssetTagGeneration.promise({
-              assets: assets,
-              outputName: childCompilationOutputName,
-              plugin: self
-            });
-          });
-
-        // Turn the js and css paths into grouped HtmlTagObjects
-        const assetTagGroupsPromise = assetsPromise
-          // And allow third-party-plugin authors to reorder and change the assetTags before they are grouped
-          .then(({ assets }) => getHtmlWebpackPluginHooks(compilation).alterAssetTags.promise({
-            assetTags: {
-              scripts: self.generatedScriptTags(assets.js),
-              styles: self.generateStyleTags(assets.css),
-              meta: [
-                ...self.generateBaseTag(self.options.base),
-                ...self.generatedMetaTags(self.options.meta),
-                ...self.generateFaviconTags(assets.favicon)
-              ]
-            },
-            outputName: childCompilationOutputName,
-            plugin: self
-          }))
-          .then(({ assetTags }) => {
-            // Inject scripts to body unless it set explicitly to head
-            const scriptTarget = self.options.inject === 'head' ? 'head' : 'body';
-            // Group assets to `head` and `body` tag arrays
-            const assetGroups = this.generateAssetGroups(assetTags, scriptTarget);
-            // Allow third-party-plugin authors to reorder and change the assetTags once they are grouped
-            return getHtmlWebpackPluginHooks(compilation).alterAssetTagGroups.promise({
-              headTags: assetGroups.headTags,
-              bodyTags: assetGroups.bodyTags,
-              outputName: childCompilationOutputName,
-              plugin: self
-            });
-          });
-
-        // Turn the compiled template into a nodejs function or into a nodejs string
-        const templateEvaluationPromise = Promise.resolve()
-          .then(() => {
-            if ('error' in templateResult) {
-              return self.options.showErrors ? prettyError(templateResult.error, compiler.context).toHtml() : 'ERROR';
-            }
-            // Allow to use a custom function / string instead
-            if (self.options.templateContent !== false) {
-              return self.options.templateContent;
-            }
-            // Once everything is compiled evaluate the html factory
-            // and replace it with its content
-            return ('compiledEntry' in templateResult)
-              ? self.evaluateCompilationResult(compilation, templateResult.compiledEntry.content)
-              : Promise.reject(new Error('Child compilation contained no compiledEntry'));
-          });
-
-        const templateExectutionPromise = Promise.all([assetsPromise, assetTagGroupsPromise, templateEvaluationPromise])
-          // Execute the template
-          .then(([assetsHookResult, assetTags, compilationResult]) => typeof compilationResult !== 'function'
-            ? compilationResult
-            : self.executeTemplate(compilationResult, assetsHookResult.assets, { headTags: assetTags.headTags, bodyTags: assetTags.bodyTags }, compilation));
-
-        const injectedHtmlPromise = Promise.all([assetTagGroupsPromise, templateExectutionPromise])
-          // Allow plugins to change the html before assets are injected
-          .then(([assetTags, html]) => {
-            const pluginArgs = { html, headTags: assetTags.headTags, bodyTags: assetTags.bodyTags, plugin: self, outputName: childCompilationOutputName };
-            return getHtmlWebpackPluginHooks(compilation).afterTemplateExecution.promise(pluginArgs);
-          })
-          .then(({ html, headTags, bodyTags }) => {
-            return self.postProcessHtml(html, assets, { headTags, bodyTags });
-          });
-
-        const emitHtmlPromise = injectedHtmlPromise
-          // Allow plugins to change the html after assets are injected
-          .then((html) => {
-            const pluginArgs = { html, plugin: self, outputName: childCompilationOutputName };
-            return getHtmlWebpackPluginHooks(compilation).beforeEmit.promise(pluginArgs)
-              .then(result => result.html);
-          })
-          .catch(err => {
-            // In case anything went wrong the promise is resolved
-            // with the error message and an error is logged
-            compilation.errors.push(prettyError(err, compiler.context).toString());
-            // Prevent caching
-            self.hash = null;
-            return self.options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
-          })
-          .then(html => {
-            // Allow to use [templatehash] as placeholder for the html-webpack-plugin name
-            // See also https://survivejs.com/webpack/optimizing/adding-hashes-to-filenames/
-            // From https://github.com/webpack-contrib/extract-text-webpack-plugin/blob/8de6558e33487e7606e7cd7cb2adc2cccafef272/src/index.js#L212-L214
-            const finalOutputName = childCompilationOutputName.replace(/\[(?:(\w+):)?templatehash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, (_, hashType, digestType, maxLength) => {
-              return loaderUtils.getHashDigest(Buffer.from(html, 'utf8'), hashType, digestType, parseInt(maxLength, 10));
-            });
-              // Add the evaluated html code to the webpack assets
-            compilation.assets[finalOutputName] = {
-              source: () => html,
-              size: () => html.length
-            };
-            return finalOutputName;
-          })
-          .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
-            outputName: finalOutputName,
-            plugin: self
-          }).catch(err => {
-            console.error(err);
-            return null;
-          }).then(() => null));
-
-        // Once all files are added to the webpack compilation
-        // let the webpack compiler continue
-        emitHtmlPromise.then(() => {
-          callback();
-        });
-      });
+    hookIntoCompiler(compiler, this.options, this);
   }
 
   /**
-   * Evaluates the child compilation result
-   * @param {WebpackCompilation} compilation
+   * Once webpack is done with compiling the template into a NodeJS code this function
+   * evaluates it to generate the html result
+   *
+   * The evaluateCompilationResult is only a class function to allow spying during testing.
+   * Please change that in a further refactoring
+   *
    * @param {string} source
+   * @param {string} templateFilename
    * @returns {Promise<string | (() => string | Promise<string>)>}
    */
-  evaluateCompilationResult (compilation, source) {
+  evaluateCompilationResult (source, templateFilename) {
     if (!source) {
       return Promise.reject(new Error('The child compilation didn\'t provide a result'));
     }
     // The LibraryTemplatePlugin stores the template result in a local variable.
     // To extract the result during the evaluation this part has to be removed.
     source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
-    const template = this.options.template.replace(/^.+!/, '').replace(/\?.+$/, '');
-    const vmContext = vm.createContext(_.extend({ HTML_WEBPACK_PLUGIN: true, require: require, console: console }, global));
-    const vmScript = new vm.Script(source, { filename: template });
+    const templateWithoutLoaders = templateFilename.replace(/^.+!/, '').replace(/\?.+$/, '');
+    const vmContext = vm.createContext({ HTML_WEBPACK_PLUGIN: true, require: require, ...global });
+    const vmScript = new vm.Script(source, { filename: templateWithoutLoaders });
     // Evaluate code and cast to string
     let newSource;
     try {
@@ -322,8 +110,229 @@ class HtmlWebpackPlugin {
     }
     return typeof newSource === 'string' || typeof newSource === 'function'
       ? Promise.resolve(newSource)
-      : Promise.reject(new Error('The loader "' + this.options.template + '" didn\'t return html.'));
+      : Promise.reject(new Error('The loader "' + templateWithoutLoaders + '" didn\'t return html.'));
   }
+}
+
+/**
+ * apply is called by the webpack main compiler during the start phase
+ * @param {WebpackCompiler} compiler
+ * @param {ProcessedHtmlWebpackOptions} options
+ * @param {HtmlWebpackPlugin} plugin
+ */
+function hookIntoCompiler (compiler, options, plugin) {
+  // Instance variables to keep caching information
+  // for multiple builds
+  let childCompilerHash;
+  let assetJson;
+  let hash;
+
+  options.template = getFullTemplatePath(options.template, compiler.context);
+
+  // Inject child compiler plugin
+  const childCompilerPlugin = new CachedChildCompilation(compiler);
+  if (!options.templateContent) {
+    childCompilerPlugin.addEntry(options.template);
+  }
+
+  // convert absolute filename into relative so that webpack can
+  // generate it at correct location
+  const filename = options.filename;
+  if (path.resolve(filename) === path.normalize(filename)) {
+    options.filename = path.relative(compiler.options.output.path, filename);
+  }
+
+  // `contenthash` is introduced in webpack v4.3
+  // which conflicts with the plugin's existing `contenthash` method,
+  // hence it is renamed to `templatehash` to avoid conflicts
+  options.filename = options.filename.replace(/\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, (match) => {
+    return match.replace('contenthash', 'templatehash');
+  });
+
+  // Check if webpack is running in production mode
+  // @see https://github.com/webpack/webpack/blob/3366421f1784c449f415cda5930a8e445086f688/lib/WebpackOptionsDefaulter.js#L12-L14
+  const isProductionLikeMode = compiler.options.mode === 'production' || !compiler.options.mode;
+
+  const minify = options.minify;
+  if (minify === true || (minify === 'auto' && isProductionLikeMode)) {
+    /** @type { import('html-minifier-terser').Options } */
+    options.minify = {
+      // https://www.npmjs.com/package/html-minifier-terser#options-quick-reference
+      collapseWhitespace: true,
+      keepClosingSlash: true,
+      removeComments: true,
+      removeRedundantAttributes: true,
+      removeScriptTypeAttributes: true,
+      removeStyleLinkTypeAttributes: true,
+      useShortDoctype: true
+    };
+  }
+
+  compiler.hooks.emit.tapAsync('HtmlWebpackPlugin',
+    /**
+       * Hook into the webpack emit phase
+       * @param {WebpackCompilation} compilation
+       * @param {(err?: Error) => void} callback
+      */
+    (compilation, callback) => {
+      // Get all entry point names for this html file
+      const entryNames = Array.from(compilation.entrypoints.keys());
+      const filteredEntryNames = filterChunks(entryNames, options.chunks, options.excludeChunks);
+      const sortedEntryNames = sortEntryChunks(filteredEntryNames, options.chunksSortMode, compilation);
+
+      const templateResult = options.templateContent
+        ? { mainCompilationHash: compilation.hash }
+        : childCompilerPlugin.getCompilationEntryResult(options.template);
+
+      childCompilerHash = templateResult.mainCompilationHash;
+
+      if ('error' in templateResult) {
+        compilation.errors.push(prettyError(templateResult.error, compiler.context).toString());
+      }
+
+      const compiledEntries = 'compiledEntry' in templateResult ? {
+        hash: templateResult.compiledEntry.hash,
+        chunk: templateResult.compiledEntry.entry
+      } : {
+        hash: templateResult.mainCompilationHash
+      };
+
+      const childCompilationOutputName = compilation.getAssetPath(options.filename, compiledEntries);
+
+      // If the child compilation was not executed during a previous main compile run
+      // it is a cached result
+      const isCompilationCached = templateResult.mainCompilationHash !== compilation.hash;
+
+      // Turn the entry point names into file paths
+      const assets = htmlWebpackPluginAssets(compilation, childCompilationOutputName, sortedEntryNames, options.publicPath);
+
+      // If the template and the assets did not change we don't have to emit the html
+      const newAssetJson = JSON.stringify(getAssetFiles(assets));
+      if (isCompilationCached && options.cache && assetJson === newAssetJson) {
+        return callback();
+      } else {
+        assetJson = newAssetJson;
+      }
+
+      // The html-webpack plugin uses a object representation for the html-tags which will be injected
+      // to allow altering them more easily
+      // Just before they are converted a third-party-plugin author might change the order and content
+      const assetsPromise = getFaviconPublicPath(options.favicon, compilation, assets.publicPath)
+        .then((faviconPath) => {
+          assets.favicon = faviconPath;
+          return getHtmlWebpackPluginHooks(compilation).beforeAssetTagGeneration.promise({
+            assets: assets,
+            outputName: childCompilationOutputName,
+            plugin: plugin
+          });
+        });
+
+      // Turn the js and css paths into grouped HtmlTagObjects
+      const assetTagGroupsPromise = assetsPromise
+      // And allow third-party-plugin authors to reorder and change the assetTags before they are grouped
+        .then(({ assets }) => getHtmlWebpackPluginHooks(compilation).alterAssetTags.promise({
+          assetTags: {
+            scripts: generatedScriptTags(assets.js),
+            styles: generateStyleTags(assets.css),
+            meta: [
+              ...generateBaseTag(options.base),
+              ...generatedMetaTags(options.meta),
+              ...generateFaviconTags(assets.favicon)
+            ]
+          },
+          outputName: childCompilationOutputName,
+          plugin: plugin
+        }))
+        .then(({ assetTags }) => {
+          // Inject scripts to body unless it set explicitly to head
+          const scriptTarget = options.inject === 'head' ? 'head' : 'body';
+          // Group assets to `head` and `body` tag arrays
+          const assetGroups = generateAssetGroups(assetTags, scriptTarget);
+          // Allow third-party-plugin authors to reorder and change the assetTags once they are grouped
+          return getHtmlWebpackPluginHooks(compilation).alterAssetTagGroups.promise({
+            headTags: assetGroups.headTags,
+            bodyTags: assetGroups.bodyTags,
+            outputName: childCompilationOutputName,
+            plugin: plugin
+          });
+        });
+
+      // Turn the compiled template into a nodejs function or into a nodejs string
+      const templateEvaluationPromise = Promise.resolve()
+        .then(() => {
+          if ('error' in templateResult) {
+            return options.showErrors ? prettyError(templateResult.error, compiler.context).toHtml() : 'ERROR';
+          }
+          // Allow to use a custom function / string instead
+          if (options.templateContent !== false) {
+            return options.templateContent;
+          }
+          // Once everything is compiled evaluate the html factory
+          // and replace it with its content
+          return ('compiledEntry' in templateResult)
+            ? plugin.evaluateCompilationResult(templateResult.compiledEntry.content, options.template)
+            : Promise.reject(new Error('Child compilation contained no compiledEntry'));
+        });
+
+      const templateExectutionPromise = Promise.all([assetsPromise, assetTagGroupsPromise, templateEvaluationPromise])
+      // Execute the template
+        .then(([assetsHookResult, assetTags, compilationResult]) => typeof compilationResult !== 'function'
+          ? compilationResult
+          : executeTemplate(compilationResult, assetsHookResult.assets, { headTags: assetTags.headTags, bodyTags: assetTags.bodyTags }, compilation));
+
+      const injectedHtmlPromise = Promise.all([assetTagGroupsPromise, templateExectutionPromise])
+      // Allow plugins to change the html before assets are injected
+        .then(([assetTags, html]) => {
+          const pluginArgs = { html, headTags: assetTags.headTags, bodyTags: assetTags.bodyTags, plugin: plugin, outputName: childCompilationOutputName };
+          return getHtmlWebpackPluginHooks(compilation).afterTemplateExecution.promise(pluginArgs);
+        })
+        .then(({ html, headTags, bodyTags }) => {
+          return postProcessHtml(html, assets, { headTags, bodyTags });
+        });
+
+      const emitHtmlPromise = injectedHtmlPromise
+      // Allow plugins to change the html after assets are injected
+        .then((html) => {
+          const pluginArgs = { html, plugin: plugin, outputName: childCompilationOutputName };
+          return getHtmlWebpackPluginHooks(compilation).beforeEmit.promise(pluginArgs)
+            .then(result => result.html);
+        })
+        .catch(err => {
+          // In case anything went wrong the promise is resolved
+          // with the error message and an error is logged
+          compilation.errors.push(prettyError(err, compiler.context).toString());
+          // Prevent caching
+          hash = null;
+          return options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
+        })
+        .then(html => {
+          // Allow to use [templatehash] as placeholder for the html-webpack-plugin name
+          // See also https://survivejs.com/webpack/optimizing/adding-hashes-to-filenames/
+          // From https://github.com/webpack-contrib/extract-text-webpack-plugin/blob/8de6558e33487e7606e7cd7cb2adc2cccafef272/src/index.js#L212-L214
+          const finalOutputName = childCompilationOutputName.replace(/\[(?:(\w+):)?templatehash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, (_, hashType, digestType, maxLength) => {
+            return loaderUtils.getHashDigest(Buffer.from(html, 'utf8'), hashType, digestType, parseInt(maxLength, 10));
+          });
+          // Add the evaluated html code to the webpack assets
+          compilation.assets[finalOutputName] = {
+            source: () => html,
+            size: () => html.length
+          };
+          return finalOutputName;
+        })
+        .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
+          outputName: finalOutputName,
+          plugin: plugin
+        }).catch(err => {
+          console.error(err);
+          return null;
+        }).then(() => null));
+
+      // Once all files are added to the webpack compilation
+      // let the webpack compiler continue
+      emitHtmlPromise.then(() => {
+        callback();
+      });
+    });
 
   /**
    * Generate the template parameters for the template function
@@ -341,8 +350,8 @@ class HtmlWebpackPlugin {
      }} assetTags
    * @returns {Promise<{[key: any]: any}>}
    */
-  getTemplateParameters (compilation, assets, assetTags) {
-    const templateParameters = this.options.templateParameters;
+  function getTemplateParameters (compilation, assets, assetTags) {
+    const templateParameters = options.templateParameters;
     if (templateParameters === false) {
       return Promise.resolve({});
     }
@@ -358,12 +367,12 @@ class HtmlWebpackPlugin {
         templateParameters
       );
     const preparedAssetTags = {
-      headTags: this.prepareAssetTagGroupForRendering(assetTags.headTags),
-      bodyTags: this.prepareAssetTagGroupForRendering(assetTags.bodyTags)
+      headTags: prepareAssetTagGroupForRendering(assetTags.headTags),
+      bodyTags: prepareAssetTagGroupForRendering(assetTags.bodyTags)
     };
     return Promise
       .resolve()
-      .then(() => templateParameterFunction(compilation, assets, preparedAssetTags, this.options));
+      .then(() => templateParameterFunction(compilation, assets, preparedAssetTags, options));
   }
 
   /**
@@ -385,9 +394,9 @@ class HtmlWebpackPlugin {
    *
    * @returns Promise<string>
    */
-  executeTemplate (templateFunction, assets, assetTags, compilation) {
+  function executeTemplate (templateFunction, assets, assetTags, compilation) {
     // Template processing
-    const templateParamsPromise = this.getTemplateParameters(compilation, assets, assetTags);
+    const templateParamsPromise = getTemplateParameters(compilation, assets, assetTags);
     return templateParamsPromise.then((templateParams) => {
       try {
         // If html is a promise return the promise
@@ -414,14 +423,14 @@ class HtmlWebpackPlugin {
    *
    * @returns {Promise<string>}
    */
-  postProcessHtml (html, assets, assetTags) {
+  function postProcessHtml (html, assets, assetTags) {
     if (typeof html !== 'string') {
       return Promise.reject(new Error('Expected html to be a string but got ' + JSON.stringify(html)));
     }
-    const htmlAfterInjection = this.options.inject
-      ? this.injectAssetsIntoHtml(html, assets, assetTags)
+    const htmlAfterInjection = options.inject
+      ? injectAssetsIntoHtml(html, assets, assetTags)
       : html;
-    const htmlAfterMinification = this.minifyHtml(htmlAfterInjection);
+    const htmlAfterMinification = minifyHtml(htmlAfterInjection);
     return Promise.resolve(htmlAfterMinification);
   }
 
@@ -432,7 +441,7 @@ class HtmlWebpackPlugin {
    *
    * @returns {string} file basename
    */
-  addFileToAssets (filename, compilation) {
+  function addFileToAssets (filename, compilation) {
     filename = path.resolve(compilation.compiler.context, filename);
     return Promise.all([
       fsStatAsync(filename),
@@ -462,14 +471,14 @@ class HtmlWebpackPlugin {
    * @param {string|((entryNameA: string, entryNameB: string) => number)} sortMode
    * @param {WebpackCompilation} compilation
    */
-  sortEntryChunks (entryNames, sortMode, compilation) {
+  function sortEntryChunks (entryNames, sortMode, compilation) {
     // Custom function
     if (typeof sortMode === 'function') {
       return entryNames.sort(sortMode);
     }
     // Check if the given sort mode is a valid chunkSorter sort mode
     if (typeof chunkSorter[sortMode] !== 'undefined') {
-      return chunkSorter[sortMode](entryNames, compilation, this.options);
+      return chunkSorter[sortMode](entryNames, compilation, options);
     }
     throw new Error('"' + sortMode + '" is not a valid chunk sort mode');
   }
@@ -480,7 +489,7 @@ class HtmlWebpackPlugin {
    * @param {string[]|'all'} includedChunks
    * @param {string[]} excludedChunks
    */
-  filterChunks (chunks, includedChunks, excludedChunks) {
+  function filterChunks (chunks, includedChunks, excludedChunks) {
     return chunks.filter(chunkName => {
       // Skip if the chunks should be filtered and the given chunk was not added explicity
       if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
@@ -506,7 +515,7 @@ class HtmlWebpackPlugin {
       favicon?: string
     }} assets
    */
-  isHotUpdateCompilation (assets) {
+  function isHotUpdateCompilation (assets) {
     return assets.js.length && assets.js.every((assetPath) => /\.hot-update\.js$/.test(assetPath));
   }
 
@@ -524,7 +533,7 @@ class HtmlWebpackPlugin {
       favicon?: string
     }}
    */
-  htmlWebpackPluginAssets (compilation, childCompilationOutputName, entryNames, customPublicPath) {
+  function htmlWebpackPluginAssets (compilation, childCompilationOutputName, entryNames, customPublicPath) {
     const compilationHash = compilation.hash;
 
     /**
@@ -576,8 +585,8 @@ class HtmlWebpackPlugin {
     };
 
     // Append a hash for cache busting
-    if (this.options.hash && assets.manifest) {
-      assets.manifest = this.appendHash(assets.manifest, compilationHash);
+    if (options.hash && assets.manifest) {
+      assets.manifest = appendHash(assets.manifest, compilationHash);
     }
 
     // Extract paths to .js, .mjs and .css files from the current compilation
@@ -606,9 +615,9 @@ class HtmlWebpackPlugin {
       // E.g. bundle.js -> /bundle.js?hash
       const entryPointPublicPaths = entryPointFiles
         .map(chunkFile => {
-          const entryPointPublicPath = publicPath + this.urlencodePath(chunkFile);
-          return this.options.hash
-            ? this.appendHash(entryPointPublicPath, compilationHash)
+          const entryPointPublicPath = publicPath + urlencodePath(chunkFile);
+          return options.hash
+            ? appendHash(entryPointPublicPath, compilationHash)
             : entryPointPublicPath;
         });
 
@@ -641,15 +650,15 @@ class HtmlWebpackPlugin {
    * @param {string} publicPath
    * @returns {Promise<string|undefined>}
    */
-  getFaviconPublicPath (faviconFilePath, compilation, publicPath) {
+  function getFaviconPublicPath (faviconFilePath, compilation, publicPath) {
     if (!faviconFilePath) {
       return Promise.resolve(undefined);
     }
-    return this.addFileToAssets(faviconFilePath, compilation)
+    return addFileToAssets(faviconFilePath, compilation)
       .then((faviconName) => {
         const faviconPath = publicPath + faviconName;
-        if (this.options.hash) {
-          return this.appendHash(faviconPath, compilation.hash);
+        if (options.hash) {
+          return appendHash(faviconPath, compilation.hash);
         }
         return faviconPath;
       });
@@ -659,8 +668,8 @@ class HtmlWebpackPlugin {
    * Generate meta tags
    * @returns {HtmlTagObject[]}
    */
-  getMetaTags () {
-    const metaOptions = this.options.meta;
+  function getMetaTags () {
+    const metaOptions = options.meta;
     if (metaOptions === false) {
       return [];
     }
@@ -695,12 +704,12 @@ class HtmlWebpackPlugin {
    * @param {Array<string>} jsAssets
    * @returns {Array<HtmlTagObject>}
    */
-  generatedScriptTags (jsAssets) {
+  function generatedScriptTags (jsAssets) {
     return jsAssets.map(scriptAsset => ({
       tagName: 'script',
       voidTag: false,
       attributes: {
-        defer: this.options.scriptLoading !== 'blocking',
+        defer: options.scriptLoading !== 'blocking',
         src: scriptAsset
       }
     }));
@@ -711,7 +720,7 @@ class HtmlWebpackPlugin {
    * @param {Array<string>} cssAssets
    * @returns {Array<HtmlTagObject>}
    */
-  generateStyleTags (cssAssets) {
+  function generateStyleTags (cssAssets) {
     return cssAssets.map(styleAsset => ({
       tagName: 'link',
       voidTag: true,
@@ -730,7 +739,7 @@ class HtmlWebpackPlugin {
             } baseOption
   * @returns {Array<HtmlTagObject>}
   */
-  generateBaseTag (baseOption) {
+  function generateBaseTag (baseOption) {
     if (baseOption === false) {
       return [];
     } else {
@@ -754,7 +763,7 @@ class HtmlWebpackPlugin {
         }} metaOptions
   * @returns {Array<HtmlTagObject>}
   */
-  generatedMetaTags (metaOptions) {
+  function generatedMetaTags (metaOptions) {
     if (metaOptions === false) {
       return [];
     }
@@ -789,7 +798,7 @@ class HtmlWebpackPlugin {
    * @param {string| undefined} faviconPath
    * @returns {Array<HtmlTagObject>}
    */
-  generateFaviconTags (faviconPath) {
+  function generateFaviconTags (faviconPath) {
     if (!faviconPath) {
       return [];
     }
@@ -817,7 +826,7 @@ class HtmlWebpackPlugin {
       bodyTags: Array<HtmlTagObject>;
     }}
   */
-  generateAssetGroups (assetTags, scriptTarget) {
+  function generateAssetGroups (assetTags, scriptTarget) {
     /** @type {{ headTags: Array<HtmlTagObject>; bodyTags: Array<HtmlTagObject>; }} */
     const result = {
       headTags: [
@@ -833,7 +842,7 @@ class HtmlWebpackPlugin {
     } else {
       // If script loading is blocking add the scripts to the end of the head
       // If script loading is non-blocking add the scripts infront of the css files
-      const insertPosition = this.options.scriptLoading === 'blocking' ? result.headTags.length : assetTags.meta.length;
+      const insertPosition = options.scriptLoading === 'blocking' ? result.headTags.length : assetTags.meta.length;
       result.headTags.splice(insertPosition, 0, ...assetTags.scripts);
     }
     return result;
@@ -846,8 +855,8 @@ class HtmlWebpackPlugin {
    * @param {Array<HtmlTagObject>} assetTagGroup
    * @returns {Array<HtmlTagObject>}
    */
-  prepareAssetTagGroupForRendering (assetTagGroup) {
-    const xhtml = this.options.xhtml;
+  function prepareAssetTagGroupForRendering (assetTagGroup) {
+    const xhtml = options.xhtml;
     return HtmlTagArray.from(assetTagGroup.map((assetTag) => {
       const copiedAssetTag = Object.assign({}, assetTag);
       copiedAssetTag.toString = function () {
@@ -871,12 +880,12 @@ class HtmlWebpackPlugin {
    *
    * @returns {string}
    */
-  injectAssetsIntoHtml (html, assets, assetTags) {
+  function injectAssetsIntoHtml (html, assets, assetTags) {
     const htmlRegExp = /(<html[^>]*>)/i;
     const headRegExp = /(<\/head\s*>)/i;
     const bodyRegExp = /(<\/body\s*>)/i;
-    const body = assetTags.bodyTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
-    const head = assetTags.headTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
+    const body = assetTags.bodyTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, options.xhtml));
+    const head = assetTags.headTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, options.xhtml));
 
     if (body.length) {
       if (bodyRegExp.test(html)) {
@@ -921,7 +930,7 @@ class HtmlWebpackPlugin {
    * @param {string} url
    * @param {string} hash
    */
-  appendHash (url, hash) {
+  function appendHash (url, hash) {
     if (!url) {
       return url;
     }
@@ -949,7 +958,7 @@ class HtmlWebpackPlugin {
    *
    * @param {string} filePath
    */
-  urlencodePath (filePath) {
+  function urlencodePath (filePath) {
     // People use the filepath in quite unexpected ways.
     // Try to extract the first querystring of the url:
     //
@@ -970,7 +979,7 @@ class HtmlWebpackPlugin {
    * @param {string} context
    * The webpack base resolution path for relative paths e.g. process.cwd()
    */
-  getFullTemplatePath (template, context) {
+  function getFullTemplatePath (template, context) {
     if (template === 'auto') {
       template = path.resolve(context, 'src/index.ejs');
       if (!fs.existsSync(template)) {
@@ -996,12 +1005,12 @@ class HtmlWebpackPlugin {
    *
    * @param {string} html
    */
-  minifyHtml (html) {
-    if (typeof this.options.minify !== 'object') {
+  function minifyHtml (html) {
+    if (typeof options.minify !== 'object') {
       return html;
     }
     try {
-      return require('html-minifier-terser').minify(html, this.options.minify);
+      return require('html-minifier-terser').minify(html, options.minify);
     } catch (e) {
       const isParseError = String(e.message).indexOf('Parse Error') === 0;
       if (isParseError) {
@@ -1023,7 +1032,7 @@ class HtmlWebpackPlugin {
    * Helper to return a sorted unique array of all asset files out of the
    * asset object
    */
-  getAssetFiles (assets) {
+  function getAssetFiles (assets) {
     const files = _.uniq(Object.keys(assets).filter(assetType => assetType !== 'chunks' && assets[assetType]).reduce((files, assetType) => files.concat(assets[assetType]), []));
     files.sort();
     return files;
