@@ -176,13 +176,11 @@ describe('HtmlWebpackPluginCaching', () => {
     const htmlWebpackPlugin = new HtmlWebpackPlugin({
       template: template
     });
-    let childCompilerHash;
     const compiler = setUpCompiler(htmlWebpackPlugin);
     compiler.addTestFile(template);
     compiler.run()
       // Change the template file and compile again
       .then(() => {
-        childCompilerHash = htmlWebpackPlugin.childCompilerHash;
         compiler.simulateFileChange(template, { footer: '<!-- 1 -->' });
         return compiler.run();
       })
@@ -195,9 +193,14 @@ describe('HtmlWebpackPluginCaching', () => {
         // Verify that the html was processed twice
         expect(htmlWebpackPlugin.evaluateCompilationResult.mock.calls.length)
           .toBe(2);
+
+        const [evaluateCompilationResultArgs1, evaluateCompilationResultArgs2] = htmlWebpackPlugin.evaluateCompilationResult.mock.calls;
+        const compiledSource = evaluateCompilationResultArgs1[0];
+        const compiledSourceSecondRun = evaluateCompilationResultArgs2[0];
+
         // Verify that the child compilation was executed twice
-        expect(htmlWebpackPlugin.childCompilerHash)
-          .not.toBe(childCompilerHash);
+        expect(compiledSource)
+          .not.toBe(compiledSourceSecondRun);
       })
       .then(done);
   });
