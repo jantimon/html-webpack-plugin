@@ -101,7 +101,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, [/<body>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/body>/], null, done);
+    }, [/<script defer="defer" src="index_bundle.js"><\/script>[\s]*<\/head>/], null, done);
   });
 
   it('properly encodes file names in emitted URIs', done => {
@@ -113,7 +113,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'foo/very fancy+name.js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, [/<body>[\s]*<script src="foo\/very%20fancy%2Bname.js"><\/script>[\s]*<\/body>/], null, done);
+    }, [/<script defer="defer" src="foo\/very%20fancy%2Bname.js"><\/script>[\s]*<\/head>/], null, done);
   });
 
   it('properly encodes file names in emitted URIs but keeps the querystring', done => {
@@ -125,7 +125,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'fo:o/very fancy+file-name.js?path=/home?value=abc&value=def#zzz'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="fo%3Ao/very%20fancy%2Bfile-name.js?path=/home?value=abc&value=def#zzz">'], null, done);
+    }, ['<script defer="defer" src="fo%3Ao/very%20fancy%2Bfile-name.js?path=/home?value=abc&value=def#zzz">'], null, done);
   });
 
   it('generates a default index.html file with multiple entry points', done => {
@@ -140,7 +140,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: '[name]_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="util_bundle.js"', '<script defer="defer" src="app_bundle.js"'], null, done);
   });
 
   it('allows you to specify a custom loader without injection', done => {
@@ -217,7 +217,7 @@ describe('HtmlWebpackPlugin', () => {
         template: 'html-loader!' + path.join(__dirname, 'fixtures/plain.html')
       })]
     },
-    ['<script src="app_bundle.js"'], null, done);
+    ['<script defer="defer" src="app_bundle.js"'], null, done);
   });
 
   it('allows you to specify your own HTML template file', done => {
@@ -251,7 +251,7 @@ describe('HtmlWebpackPlugin', () => {
       },
       plugins: [new HtmlWebpackPlugin()]
     },
-    ['<script src="app_bundle.js', 'src/index.ejs'], null, done);
+    ['<script defer="defer" src="app_bundle.js', 'src/index.ejs'], null, done);
   });
 
   it('allows you to inject the assets into a given html file', done => {
@@ -269,7 +269,7 @@ describe('HtmlWebpackPlugin', () => {
         inject: true,
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
-    }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="util_bundle.js"', '<script defer="defer" src="app_bundle.js"'], null, done);
   });
 
   it('allows you to inject the assets into the body of the given template', done => {
@@ -287,7 +287,7 @@ describe('HtmlWebpackPlugin', () => {
         inject: 'body',
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
-    }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="util_bundle.js"', '<script defer="defer" src="app_bundle.js"'], null, done);
   });
 
   it('allows you to inject the assets into the head of the given template', done => {
@@ -305,7 +305,7 @@ describe('HtmlWebpackPlugin', () => {
         inject: 'head',
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
-    }, ['<script src="util_bundle.js"', '<script src="app_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="util_bundle.js"', '<script defer="defer" src="app_bundle.js"'], null, done);
   });
 
   it('allows you to inject a specified asset into a given html file', done => {
@@ -324,7 +324,7 @@ describe('HtmlWebpackPlugin', () => {
         chunks: ['app'],
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
-    }, ['<script src="app_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="app_bundle.js"'], null, done);
   });
 
   it('allows you to inject a specified asset into a given html file', done => {
@@ -343,7 +343,7 @@ describe('HtmlWebpackPlugin', () => {
         excludeChunks: ['util'],
         template: path.join(__dirname, 'fixtures/plain.html')
       })]
-    }, ['<script src="app_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="app_bundle.js"'], null, done);
   });
 
   it('allows you to use chunkhash with asset into a given html file', done => {
@@ -399,7 +399,7 @@ describe('HtmlWebpackPlugin', () => {
         }
       })]
     },
-    ['<script src="app_bundle.js"'], null, done);
+    ['<script defer="defer" src="app_bundle.js"'], null, done);
   });
 
   it('works with source maps', done => {
@@ -412,7 +412,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="index_bundle.js"'], null, done);
+    }, ['<script defer src="index_bundle.js"'], null, done);
   });
 
   it('handles hashes in bundle filenames', done => {
@@ -424,7 +424,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'index_bundle_[hash].js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, [/<script src="index_bundle_[0-9a-f]+\.js"*/], null, done);
+    }, [/<script defer="defer" src="index_bundle_[0-9a-f]+\.js"*/], null, done);
   });
 
   it('handles hashes in the directory which has the bundle file', done => {
@@ -437,7 +437,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'index_bundle_[hash].js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, [/<script src="\/dist\/[0-9a-f]+\/index_bundle_[0-9a-f]+\.js"*/], null, done);
+    }, [/<script defer="defer" src="\/dist\/[0-9a-f]+\/index_bundle_[0-9a-f]+\.js"*/], null, done);
   });
 
   it('allows to append hashes to the assets', done => {
@@ -449,7 +449,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({ hash: true })]
-    }, ['<script src="index_bundle.js?%hash%"'], null, done);
+    }, ['<script defer="defer" src="index_bundle.js?%hash%"'], null, done);
   });
 
   it('allows to append hashes to the assets', done => {
@@ -461,7 +461,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({ hash: true, inject: true })]
-    }, ['<script src="index_bundle.js?%hash%"'], null, done);
+    }, ['<script defer="defer" src="index_bundle.js?%hash%"'], null, done);
   });
 
   it('should work with the css extract plugin', done => {
@@ -691,7 +691,7 @@ describe('HtmlWebpackPlugin', () => {
         }
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="/index_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="/index_bundle.js"'], null, done);
   });
 
   it('prepends the publicPath to /some/', done => {
@@ -704,7 +704,7 @@ describe('HtmlWebpackPlugin', () => {
         publicPath: '/some/'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="/some/index_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="/some/index_bundle.js"'], null, done);
   });
 
   it('prepends the publicPath to /some', done => {
@@ -717,7 +717,7 @@ describe('HtmlWebpackPlugin', () => {
         publicPath: '/some'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="/some/index_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="/some/index_bundle.js"'], null, done);
   });
 
   it('prepends the publicPath to /some', done => {
@@ -730,7 +730,7 @@ describe('HtmlWebpackPlugin', () => {
         publicPath: 'some/'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="some/index_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="some/index_bundle.js"'], null, done);
   });
 
   it('prepends the publicPath to undefined', done => {
@@ -742,7 +742,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="index_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="index_bundle.js"'], null, done);
   });
 
   it('prepends the publicPath to undefined', done => {
@@ -756,10 +756,10 @@ describe('HtmlWebpackPlugin', () => {
       plugins: [new HtmlWebpackPlugin({
         filename: path.resolve(OUTPUT_DIR, 'subfolder', 'test.html')
       })]
-    }, ['<script src="../index_bundle.js"'], path.join('subfolder', 'test.html'), done);
+    }, ['<script defer="defer" src="../index_bundle.js"'], path.join('subfolder', 'test.html'), done);
   });
 
-  it('prepends the publicPath to script src', done => {
+  it('prepends the publicPath to script defer="defer" src', done => {
     testHtmlPlugin({
       mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
@@ -769,7 +769,7 @@ describe('HtmlWebpackPlugin', () => {
         publicPath: 'http://cdn.example.com/assets/'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="http://cdn.example.com/assets/index_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="http://cdn.example.com/assets/index_bundle.js"'], null, done);
   });
 
   it('handles subdirectories in the webpack output bundles', done => {
@@ -782,7 +782,7 @@ describe('HtmlWebpackPlugin', () => {
         publicPath: '/'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="/assets/index_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="/assets/index_bundle.js"'], null, done);
   });
 
   it('handles subdirectories in the webpack output bundles along with a relative path', done => {
@@ -794,7 +794,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'assets/index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="assets/index_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="assets/index_bundle.js"'], null, done);
   });
 
   it('handles subdirectories in the webpack output bundles along with a relative path', done => {
@@ -808,7 +808,7 @@ describe('HtmlWebpackPlugin', () => {
       plugins: [new HtmlWebpackPlugin({
         filename: path.resolve(OUTPUT_DIR, 'subfolder', 'test.html')
       })]
-    }, ['<script src="../assets/index_bundle.js"'], path.join('subfolder', 'test.html'), done);
+    }, ['<script defer="defer" src="../assets/index_bundle.js"'], path.join('subfolder', 'test.html'), done);
   });
 
   it('handles subdirectories in the webpack output bundles along with a absolute path', done => {
@@ -821,7 +821,7 @@ describe('HtmlWebpackPlugin', () => {
         publicPath: 'http://cdn.example.com/'
       },
       plugins: [new HtmlWebpackPlugin()]
-    }, ['<script src="http://cdn.example.com/assets/index_bundle.js"'], null, done);
+    }, ['<script defer="defer" src="http://cdn.example.com/assets/index_bundle.js"'], null, done);
   });
 
   it('allows you to configure the title of the generated HTML page', done => {
@@ -845,7 +845,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({ filename: 'test.html' })]
-    }, ['<script src="index_bundle.js"'], 'test.html', done);
+    }, ['<script defer="defer" src="index_bundle.js"'], 'test.html', done);
   });
 
   it('will replace [hash] in the filename with the child compilation hash', done => {
@@ -859,7 +859,7 @@ describe('HtmlWebpackPlugin', () => {
       plugins: [new HtmlWebpackPlugin({
         filename: 'test-[hash].html'
       })]
-    }, ['<script src="index_bundle.js"'], /test-\S+\.html$/, done);
+    }, ['<script defer="defer" src="index_bundle.js"'], /test-\S+\.html$/, done);
   });
 
   it('should allow filename in the format of [<hashType>:contenthash:<digestType>:<length>]', done => {
@@ -921,7 +921,7 @@ describe('HtmlWebpackPlugin', () => {
       plugins: [new HtmlWebpackPlugin({
         filename: path.resolve(OUTPUT_DIR, 'subfolder', 'test.html')
       })]
-    }, ['<script src="../index_bundle.js"'], path.join('subfolder', 'test.html'), done);
+    }, ['<script defer="defer" src="../index_bundle.js"'], path.join('subfolder', 'test.html'), done);
   });
 
   it('allows you to use an absolute output filename outside the output path', done => {
@@ -935,7 +935,7 @@ describe('HtmlWebpackPlugin', () => {
       plugins: [new HtmlWebpackPlugin({
         filename: path.resolve(OUTPUT_DIR, 'test.html')
       })]
-    }, ['<script src="app/index_bundle.js"'], 'test.html', done);
+    }, ['<script defer="defer" src="app/index_bundle.js"'], 'test.html', done);
   });
 
   it('allows you to use an relative output filename outside the output path', done => {
@@ -949,7 +949,7 @@ describe('HtmlWebpackPlugin', () => {
       plugins: [new HtmlWebpackPlugin({
         filename: '../test.html'
       })]
-    }, ['<script src="app/index_bundle.js"'], 'test.html', done);
+    }, ['<script defer="defer" src="app/index_bundle.js"'], 'test.html', done);
   });
 
   it('will try to use a relative name if the filename is in a subdirectory', done => {
@@ -961,10 +961,10 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({ filename: 'assets/test.html' })]
-    }, ['<script src="../index_bundle.js"'], 'assets/test.html', done);
+    }, ['<script defer="defer" src="../index_bundle.js"'], 'assets/test.html', done);
   });
 
-  it('will try to use a relative name if the filename and the script are in a subdirectory', done => {
+  it('will try to use a relative name if the filename and the script defer="defer" are in a subdirectory', done => {
     testHtmlPlugin({
       mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
@@ -973,7 +973,7 @@ describe('HtmlWebpackPlugin', () => {
         filename: 'assets/index_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({ filename: 'assets/demo/test.html' })]
-    }, ['<script src="../../assets/index_bundle.js"'], 'assets/demo/test.html', done);
+    }, ['<script defer="defer" src="../../assets/index_bundle.js"'], 'assets/demo/test.html', done);
   });
 
   it('allows you write multiple HTML files', done => {
@@ -997,7 +997,7 @@ describe('HtmlWebpackPlugin', () => {
           template: path.join(__dirname, 'fixtures/test.html')
         })
       ]
-    }, ['<script src="index_bundle.js"'], null, () => {
+    }, ['<script defer="defer" src="index_bundle.js"'], null, () => {
       expect(fs.existsSync(path.join(OUTPUT_DIR, 'second-file.html'))).toBe(true);
       expect(fs.existsSync(path.join(OUTPUT_DIR, 'third-file.html'))).toBe(true);
       done();
@@ -1021,7 +1021,7 @@ describe('HtmlWebpackPlugin', () => {
         new HtmlWebpackPlugin({ template: path.join(__dirname, 'fixtures/empty_html.html') }),
         new MiniCssExtractPlugin({ filename: 'styles.css' })
       ]
-    }, ['<link href="styles.css"', '<script src="index_bundle.js"'], null, done);
+    }, ['<link href="styles.css"', '<script defer="defer" src="index_bundle.js"'], null, done);
   });
 
   it('exposes the webpack configuration to templates', done => {
@@ -1105,7 +1105,7 @@ describe('HtmlWebpackPlugin', () => {
         examplePlugin
       ]
     },
-    [/<body>[\s]*<script src="app_bundle.js" specialattribute><\/script>[\s]*<\/body>/],
+    [/[\s]*<script defer="defer" src="app_bundle.js" specialattribute><\/script>[\s]*<\/head>/],
     null, done, false, false);
   });
 
@@ -1139,7 +1139,7 @@ describe('HtmlWebpackPlugin', () => {
         examplePlugin
       ]
     },
-    [/<body>[\s]*<script src="app_bundle.js"><\/script>[\s]*<\/body>/],
+    [/<script defer="defer" src="app_bundle.js"><\/script>[\s]*<\/head>/],
     null, done, false, false);
   });
 
@@ -1535,6 +1535,38 @@ describe('HtmlWebpackPlugin', () => {
     });
   });
 
+  it('allows to inject files during html-webpack-plugin-before-asset-tag-generation event', done => {
+    let eventFired = false;
+    const examplePlugin = {
+      apply: function (compiler) {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
+          HtmlWebpackPlugin.getHooks(compilation).beforeAssetTagGeneration.tapAsync('HtmlWebpackPluginTest', (object, callback) => {
+            eventFired = true;
+            object.assets.js.push('funky-script.js');
+            callback();
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    }, ['<script defer="defer" src="funky-script.js"'], null, () => {
+      expect(eventFired).toBe(true);
+      done();
+    });
+  });
+
   it('fires the events in the correct order', done => {
     const hookCallOrder = [
       'beforeAssetTagGeneration',
@@ -1608,8 +1640,8 @@ describe('HtmlWebpackPlugin', () => {
         new HtmlWebpackPlugin()
       ]
     }, [
-      /<script src="common_bundle.js">[\s\S]*<script src="util_bundle.js">/,
-      /<script src="common_bundle.js"[\s\S]*<script src="index_bundle.js">/], null, done);
+      /<script defer="defer" src="common_bundle.js">[\s\S]*<script defer="defer" src="util_bundle.js">/,
+      /<script defer="defer" src="common_bundle.js"[\s\S]*<script defer="defer" src="index_bundle.js">/], null, done);
   });
 
   it('adds a favicon', done => {
@@ -1971,7 +2003,7 @@ describe('HtmlWebpackPlugin', () => {
         })
       ]
     }, [
-      /(<script src="common_bundle.js">.+<script src="util_bundle.js">.+<script src="index_bundle.js">)|(<script src="common_bundle.js">.+<script src="index_bundle.js">.+<script src="util_bundle.js">)/
+      /(<script defer="defer" src="common_bundle.js">.+<script defer="defer" src="util_bundle.js">.+<script defer="defer" src="index_bundle.js">)|(<script defer="defer" src="common_bundle.js">.+<script defer="defer" src="index_bundle.js">.+<script defer="defer" src="util_bundle.js">)/
     ], null, done);
   });
 
@@ -2000,7 +2032,7 @@ describe('HtmlWebpackPlugin', () => {
           }
         })
       ]
-    }, [/<script src="c_bundle.js">.+<script src="b_bundle.js">.+<script src="a_bundle.js">/], null, done);
+    }, [/<script defer="defer" src="c_bundle.js">.+<script defer="defer" src="b_bundle.js">.+<script defer="defer" src="a_bundle.js">/], null, done);
   });
 
   it('should sort manually by the chunks', done => {
@@ -2039,7 +2071,7 @@ describe('HtmlWebpackPlugin', () => {
         })
       ]
     }, [
-      /<script src="common_bundle.js">.+<script src="a_bundle.js">.+<script src="b_bundle.js">.+<script src="c_bundle.js">/], null, done);
+      /<script defer="defer" src="common_bundle.js">.+<script defer="defer" src="a_bundle.js">.+<script defer="defer" src="b_bundle.js">.+<script defer="defer" src="c_bundle.js">/], null, done);
   });
 
   it('should add the webpack compilation object as a property of the templateParam object', done => {
@@ -2147,7 +2179,7 @@ describe('HtmlWebpackPlugin', () => {
         templateContent: ''
       })]
     },
-    [/^<script src="app_bundle\.js"><\/script>$/], null, done);
+    [/^<head><script defer="defer" src="app_bundle\.js"><\/script><\/head>$/], null, done);
   });
 
   it('allows you to inject the assets into the body of the given spaced closing tag template', done => {
@@ -2162,7 +2194,7 @@ describe('HtmlWebpackPlugin', () => {
         inject: 'body',
         template: path.join(__dirname, 'fixtures/spaced_plain.html')
       })]
-    }, [/<body>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/body>/], null, done);
+    }, [/<body>[\s]*<script defer="defer" src="index_bundle.js"><\/script>[\s]*<\/body>/], null, done);
   });
 
   it('allows you to inject the assets into the head of the given spaced closing tag template', done => {
@@ -2177,7 +2209,7 @@ describe('HtmlWebpackPlugin', () => {
         inject: 'head',
         template: path.join(__dirname, 'fixtures/spaced_plain.html')
       })]
-    }, [/<head>[\s]*<script src="index_bundle.js"><\/script>[\s]*<\/head>/], null, done);
+    }, [/<script defer="defer" src="index_bundle.js"><\/script>[\s]*<\/head>/], null, done);
   });
 
   it('should minify by default when mode is production', done => {
@@ -2268,7 +2300,7 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<!doctype html>\s+<html>\s+<head>\s+<meta charset="utf-8">/], null, done);
   });
 
-  it('should allow to inject scripts with a defer attribute', done => {
+  it('should allow to inject scripts with a defer="defer" attribute', done => {
     testHtmlPlugin({
       mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
@@ -2283,7 +2315,7 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<script defer="defer" .+<body>/], null, done);
   });
 
-  it('should allow to inject scripts with a defer attribute to the body', done => {
+  it('should allow to inject scripts with a defer="defer" attribute to the body', done => {
     testHtmlPlugin({
       mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),
@@ -2298,7 +2330,7 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<body>.*<script defer="defer"/], null, done);
   });
 
-  it('should allow to inject scripts with a defer in front of styles', done => {
+  it('should allow to inject scripts with a defer="defer" in front of styles', done => {
     testHtmlPlugin({
       mode: 'production',
       entry: path.join(__dirname, 'fixtures/theme.js'),
@@ -2343,6 +2375,35 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<selfclosed\/>/], null, done);
   });
 
+  it('should allow to use headTags and bodyTags directly in string literals with blocking script loading', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        rules: [
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
+        ]
+      },
+      plugins: [
+        new MiniCssExtractPlugin({ filename: 'styles.css' }),
+        new HtmlWebpackPlugin({
+          scriptLoading: 'blocking',
+          inject: false,
+          templateContent: ({ htmlWebpackPlugin }) => `
+            <html>
+              <head>${htmlWebpackPlugin.tags.headTags}</head>
+              <body>${htmlWebpackPlugin.tags.bodyTags}</body>
+            </html>
+            `
+        })
+      ]
+    }, ['<head><link href="styles.css" rel="stylesheet"></head>', '<script src="index_bundle.js"></script></body>'], null, done);
+  });
+
   it('should allow to use headTags and bodyTags directly in string literals', done => {
     testHtmlPlugin({
       mode: 'production',
@@ -2368,6 +2429,6 @@ describe('HtmlWebpackPlugin', () => {
             `
         })
       ]
-    }, ['<head><link href="styles.css" rel="stylesheet"></head>', '<script src="index_bundle.js"></script></body>'], null, done);
+    }, ['<head><script defer="defer" src="index_bundle.js"></script><link href="styles.css" rel="stylesheet"></head>'], null, done);
   });
 });
