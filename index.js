@@ -128,9 +128,7 @@ class HtmlWebpackPlugin {
 function hookIntoCompiler (compiler, options, plugin) {
   // Instance variables to keep caching information
   // for multiple builds
-  let childCompilerHash;
   let assetJson;
-  let hash;
 
   options.template = getFullTemplatePath(options.template, compiler.context);
 
@@ -188,8 +186,6 @@ function hookIntoCompiler (compiler, options, plugin) {
       const templateResult = options.templateContent
         ? { mainCompilationHash: compilation.hash }
         : childCompilerPlugin.getCompilationEntryResult(options.template);
-
-      childCompilerHash = templateResult.mainCompilationHash;
 
       if ('error' in templateResult) {
         compilation.errors.push(prettyError(templateResult.error, compiler.context).toString());
@@ -306,8 +302,6 @@ function hookIntoCompiler (compiler, options, plugin) {
           // In case anything went wrong the promise is resolved
           // with the error message and an error is logged
           compilation.errors.push(prettyError(err, compiler.context).toString());
-          // Prevent caching
-          hash = null;
           return options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
         })
         .then(html => {
@@ -510,21 +504,6 @@ function hookIntoCompiler (compiler, options, plugin) {
   }
 
   /**
-   * Check if the given asset object consists only of hot-update.js files
-   *
-   * @param {{
-      publicPath: string,
-      js: Array<string>,
-      css: Array<string>,
-      manifest?: string,
-      favicon?: string
-    }} assets
-   */
-  function isHotUpdateCompilation (assets) {
-    return assets.js.length && assets.js.every((assetPath) => /\.hot-update\.js$/.test(assetPath));
-  }
-
-  /**
    * The htmlWebpackPluginAssets extracts the asset information of a webpack compilation
    * for all given entry names
    * @param {WebpackCompilation} compilation
@@ -667,41 +646,6 @@ function hookIntoCompiler (compiler, options, plugin) {
         }
         return faviconPath;
       });
-  }
-
-  /**
-   * Generate meta tags
-   * @returns {HtmlTagObject[]}
-   */
-  function getMetaTags () {
-    const metaOptions = options.meta;
-    if (metaOptions === false) {
-      return [];
-    }
-    // Make tags self-closing in case of xhtml
-    // Turn { "viewport" : "width=500, initial-scale=1" } into
-    // [{ name:"viewport" content:"width=500, initial-scale=1" }]
-    const metaTagAttributeObjects = Object.keys(metaOptions)
-      .map((metaName) => {
-        const metaTagContent = metaOptions[metaName];
-        return (typeof metaTagContent === 'string') ? {
-          name: metaName,
-          content: metaTagContent
-        } : metaTagContent;
-      })
-      .filter((attribute) => attribute !== false);
-    // Turn [{ name:"viewport" content:"width=500, initial-scale=1" }] into
-    // the html-webpack-plugin tag structure
-    return metaTagAttributeObjects.map((metaTagAttributes) => {
-      if (metaTagAttributes === false) {
-        throw new Error('Invalid meta tag');
-      }
-      return {
-        tagName: 'meta',
-        voidTag: true,
-        attributes: metaTagAttributes
-      };
-    });
   }
 
   /**
