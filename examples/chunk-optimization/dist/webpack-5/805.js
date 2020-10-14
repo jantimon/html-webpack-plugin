@@ -1,4 +1,4 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[805],{
+(self["webpackChunk"] = self["webpackChunk"] || []).push([[805],{
 
 /***/ 609:
 /***/ ((module) => {
