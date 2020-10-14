@@ -32,51 +32,53 @@ class HtmlWebpackPlugin {
    */
   constructor (options) {
     /** @type {HtmlWebpackOptions} */
-    const userOptions = options || {};
-
-    // Default options
-    /** @type {ProcessedHtmlWebpackOptions} */
-    const defaultOptions = {
-      template: 'auto',
-      templateContent: false,
-      templateParameters: templateParametersGenerator,
-      filename: 'index.html',
-      publicPath: userOptions.publicPath === undefined ? 'auto' : userOptions.publicPath,
-      hash: false,
-      inject: userOptions.scriptLoading !== 'defer' ? 'body' : 'head',
-      scriptLoading: 'blocking',
-      compile: true,
-      favicon: false,
-      minify: 'auto',
-      cache: true,
-      showErrors: true,
-      chunks: 'all',
-      excludeChunks: [],
-      chunksSortMode: 'auto',
-      meta: {},
-      base: false,
-      title: 'Webpack App',
-      xhtml: false
-    };
-
-    /** @type {ProcessedHtmlWebpackOptions} */
-    this.options = Object.assign(defaultOptions, userOptions);
-
-    // Default metaOptions if no template is provided
-    if (!userOptions.template && this.options.templateContent === false && this.options.meta) {
-      const defaultMeta = {
-        // From https://developer.mozilla.org/en-US/docs/Mozilla/Mobile/Viewport_meta_tag
-        viewport: 'width=device-width, initial-scale=1'
-      };
-      this.options.meta = Object.assign({}, this.options.meta, defaultMeta, userOptions.meta);
-    }
+    this.userOptions = options || {};
     this.version = HtmlWebpackPlugin.version;
   }
 
   apply (compiler) {
     // Wait for configuration preset plugions to apply all configure webpack defaults
     compiler.hooks.initialize.tap('HtmlWebpackPlugin', () => {
-      hookIntoCompiler(compiler, this.options, this);
+      const userOptions = this.userOptions;
+
+      // Default options
+      /** @type {ProcessedHtmlWebpackOptions} */
+      const defaultOptions = {
+        template: 'auto',
+        templateContent: false,
+        templateParameters: templateParametersGenerator,
+        filename: 'index.html',
+        publicPath: userOptions.publicPath === undefined ? 'auto' : userOptions.publicPath,
+        hash: false,
+        inject: userOptions.scriptLoading !== 'defer' ? 'body' : 'head',
+        scriptLoading: 'blocking',
+        compile: true,
+        favicon: false,
+        minify: 'auto',
+        cache: true,
+        showErrors: true,
+        chunks: 'all',
+        excludeChunks: [],
+        chunksSortMode: 'auto',
+        meta: {},
+        base: false,
+        title: 'Webpack App',
+        xhtml: false
+      };
+
+      /** @type {ProcessedHtmlWebpackOptions} */
+      const options = Object.assign(defaultOptions, userOptions);
+
+      // Default metaOptions if no template is provided
+      if (!userOptions.template && options.templateContent === false && options.meta) {
+        const defaultMeta = {
+        // From https://developer.mozilla.org/en-US/docs/Mozilla/Mobile/Viewport_meta_tag
+          viewport: 'width=device-width, initial-scale=1'
+        };
+        options.meta = Object.assign({}, options.meta, defaultMeta, userOptions.meta);
+      }
+
+      hookIntoCompiler(compiler, options, this);
     });
   }
 
