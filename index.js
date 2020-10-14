@@ -74,7 +74,10 @@ class HtmlWebpackPlugin {
   }
 
   apply (compiler) {
-    hookIntoCompiler(compiler, this.options, this);
+    // Wait for configuration preset plugions to apply all configure webpack defaults
+    compiler.hooks.initialize.tap('HtmlWebpackPlugin', () => {
+      hookIntoCompiler(compiler, this.options, this);
+    });
   }
 
   /**
