@@ -100,6 +100,10 @@ describe('HtmlWebpackPlugin Examples', () => {
     runExample('sort-manually', done);
   });
 
+  it('multi-page example', done => {
+    runExample('multi-page', done);
+  });
+
   it('template-parameters example', done => {
     runExample('template-parameters', done);
   });
