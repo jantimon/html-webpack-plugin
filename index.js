@@ -15,6 +15,7 @@ const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
 const loaderUtils = require('loader-utils');
+const webpack = require('webpack');
 const { CachedChildCompilation } = require('./lib/cached-child-compiler');
 
 const { createHtmlTagObject, htmlTagObjectToString, HtmlTagArray } = require('./lib/html-tags');
@@ -324,10 +325,7 @@ function hookIntoCompiler (compiler, options, plugin) {
             return loaderUtils.getHashDigest(Buffer.from(html, 'utf8'), hashType, digestType, parseInt(maxLength, 10));
           });
           // Add the evaluated html code to the webpack assets
-          compilation.assets[finalOutputName] = {
-            source: () => html,
-            size: () => html.length
-          };
+          compilation.emitAsset(finalOutputName, new webpack.sources.RawSource(html, false));
           return finalOutputName;
         })
         .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
