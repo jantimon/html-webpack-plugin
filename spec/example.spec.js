@@ -60,10 +60,6 @@ function runExample (exampleName, done) {
 }
 
 describe('HtmlWebpackPlugin Examples', () => {
-  it('appcache example', done => {
-    runExample('appcache', done);
-  });
-
   it('custom-template example', done => {
     runExample('custom-template', done);
   });
