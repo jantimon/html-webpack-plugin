@@ -69,6 +69,7 @@ class HtmlWebpackPlugin {
 
       /** @type {ProcessedHtmlWebpackOptions} */
       const options = Object.assign(defaultOptions, userOptions);
+      this.options = options;
 
       // Default metaOptions if no template is provided
       if (!userOptions.template && options.templateContent === false && options.meta) {

@@ -1143,6 +1143,74 @@ describe('HtmlWebpackPlugin', () => {
     null, done, false, false);
   });
 
+  it('provides the options to the afterEmit event', done => {
+    let eventArgs;
+    const examplePlugin = {
+      apply: function (compiler) {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
+          HtmlWebpackPlugin.getHooks(compilation).afterEmit.tapAsync('HtmlWebpackPluginTest', (pluginArgs, callback) => {
+            eventArgs = pluginArgs;
+            callback(null, pluginArgs);
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          foo: 'bar'
+        }),
+        examplePlugin
+      ]
+    },
+    [/<script defer="defer" src="app_bundle.js"><\/script>[\s]*<\/head>/],
+    null, () => {
+      expect(eventArgs.plugin.options.foo).toBe('bar');
+      done();
+    }, false, false);
+  });
+
+  it('provides the outputName to the afterEmit event', done => {
+    let eventArgs;
+    const examplePlugin = {
+      apply: function (compiler) {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
+          HtmlWebpackPlugin.getHooks(compilation).afterEmit.tapAsync('HtmlWebpackPluginTest', (pluginArgs, callback) => {
+            eventArgs = pluginArgs;
+            callback(null, pluginArgs);
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    },
+    [/<script defer="defer" src="app_bundle.js"><\/script>[\s]*<\/head>/],
+    null, () => {
+      expect(eventArgs.outputName).toBe('index.html');
+      done();
+    }, false, false);
+  });
+
   it('fires the html-webpack-plugin-after-template-execution event', done => {
     let eventFired = false;
     const examplePlugin = {
