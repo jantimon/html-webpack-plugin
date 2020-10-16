@@ -21,6 +21,19 @@
 
 <h2 align="center">Install</h2>
 
+<h3>Webpack 5</h3>
+
+```bash
+  npm i --save-dev html-webpack-plugin@next
+```
+
+```bash
+  yarn add --dev html-webpack-plugin@next
+```
+
+
+<h3>Webpack 4</h3>
+
 ```bash
   npm i --save-dev html-webpack-plugin
 ```
