@@ -38,7 +38,7 @@
     "file-loader": "3.0.1",
     "html-loader": "0.5.5",
     "jest": "26.5.3",
-    "mini-css-extract-plugin": "0.6.0",
+    "mini-css-extract-plugin": "1.0.0",
     "pug": "2.0.3",
     "pug-loader": "2.4.0",
     "rimraf": "2.6.3",
