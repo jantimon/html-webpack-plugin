@@ -2,9 +2,12 @@
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 636:
-/***/ (() => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
 // extracted by mini-css-extract-plugin
+
 
 /***/ }),
 
@@ -313,7 +316,18 @@ function pug_rethrow(err, filename, lineno, str){
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
 (() => {
 "use strict";
 
