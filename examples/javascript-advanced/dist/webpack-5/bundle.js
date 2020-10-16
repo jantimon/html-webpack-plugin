@@ -18,9 +18,10 @@ eval("// This file is used for frontend and backend\n\n\n// If compiled by the h
 /***/ }),
 
 /***/ 636:
-/***/ (() => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("// extracted by mini-css-extract-plugin\n\n//# sourceURL=webpack:///./main.css?");
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n// extracted by mini-css-extract-plugin\n\n\n//# sourceURL=webpack:///./main.css?");
 
 /***/ })
 
@@ -50,7 +51,18 @@ eval("// extracted by mini-css-extract-plugin\n\n//# sourceURL=webpack:///./main
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
 (() => {
 eval("__webpack_require__(636);\n\nvar universal = __webpack_require__(184);\nvar h1 = document.createElement('h1');\nh1.innerHTML = universal();\n\ndocument.body.appendChild(h1);\n\n\n//# sourceURL=webpack:///./example.js?");
 })();
