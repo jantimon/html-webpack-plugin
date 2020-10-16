@@ -70,6 +70,7 @@ class HtmlWebpackPlugin {
 
       /** @type {ProcessedHtmlWebpackOptions} */
       const options = Object.assign(defaultOptions, userOptions);
+      this.options = options;
 
       // Assert correct option spelling
       assert(options.scriptLoading === 'defer' || options.scriptLoading === 'blocking', 'scriptLoading needs to be set to "defer" or "blocking');
