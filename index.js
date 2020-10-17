@@ -24,7 +24,6 @@ const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
 const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
 
-const fsStatAsync = promisify(fs.stat);
 const fsReadFileAsync = promisify(fs.readFile);
 
 class HtmlWebpackPlugin {
@@ -464,24 +463,13 @@ function hookIntoCompiler (compiler, options, plugin) {
    */
   function addFileToAssets (filename, compilation) {
     filename = path.resolve(compilation.compiler.context, filename);
-    return Promise.all([
-      fsStatAsync(filename),
-      fsReadFileAsync(filename)
-    ])
-      .then(([size, source]) => {
-        return {
-          size,
-          source
-        };
-      })
+    return fsReadFileAsync(filename)
+      .then(source => new webpack.sources.RawSource(source, true))
       .catch(() => Promise.reject(new Error('HtmlWebpackPlugin: could not load file ' + filename)))
-      .then(results => {
+      .then(rawSource => {
         const basename = path.basename(filename);
         compilation.fileDependencies.add(filename);
-        compilation.assets[basename] = {
-          source: () => results.source,
-          size: () => results.size.size
-        };
+        compilation.emitAsset(basename, rawSource);
         return basename;
       });
   }
