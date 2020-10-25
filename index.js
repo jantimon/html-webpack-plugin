@@ -469,7 +469,7 @@ function hookIntoCompiler (compiler, options, plugin) {
   function addFileToAssets (filename, compilation) {
     filename = path.resolve(compilation.compiler.context, filename);
     return fsReadFileAsync(filename)
-      .then(source => new webpack.sources.RawSource(source, true))
+      .then(source => new webpack.sources.RawSource(source, false))
       .catch(() => Promise.reject(new Error('HtmlWebpackPlugin: could not load file ' + filename)))
       .then(rawSource => {
         const basename = path.basename(filename);
