@@ -84,16 +84,23 @@ class HtmlWebpackPlugin {
         options.meta = Object.assign({}, options.meta, defaultMeta, userOptions.meta);
       }
 
-      // Get all filenNames to support [name]
-      const multipleOptions = options.filename.includes('[name]')
-        ? Object.keys(compiler.options.entry).map((entryName) => ({
-          ...options,
-          filename: options.filename.replace(/\[name\]/g, entryName)
-        }))
-        : [options];
+      // entryName to fileName conversion
+      const filenameFunction = typeof options.filename === 'function'
+        ? options.filename
+        // Replace '[name]' with entry name
+        : (entryName) => options.filename.replace(/\[name\]/g, entryName);
+
+      /** output filenames for the given entry names */
+      const outputFileNames = new Set(Object.keys(compiler.options.entry).map(filenameFunction));
+
+      /** Option for every entry point */
+      const entryOptions = Array.from(outputFileNames).map((filename) => ({
+        ...options,
+        filename
+      }));
 
       // Hook all options into the webpack compiler
-      multipleOptions.forEach((instanceOptions) => {
+      entryOptions.forEach((instanceOptions) => {
         hookIntoCompiler(compiler, instanceOptions, this);
       });
     });
