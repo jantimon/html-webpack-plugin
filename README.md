@@ -133,7 +133,7 @@ Allowed values are as follows:
 |Name|Type|Default|Description|
 |:--:|:--:|:-----:|:----------|
 |**`title`**|`{String}`|`Webpack App`|The title to use for the generated HTML document|
-|**`filename`**|`{String}`|`'index.html'`|The file to write the HTML to. Defaults to `index.html`. You can specify a subdirectory here too (eg: `assets/admin.html`)|
+|**`filename`**|`{String\|Function}`|`'index.html'`|The file to write the HTML to. Defaults to `index.html`. You can specify a subdirectory here too (eg: `assets/admin.html`). The `[name]` placeholder will be replaced with the entry name. Can also be a function e.g. `(entryName) => entryName + '.html'`. |
 |**`template`**|`{String}`|``|`webpack` relative or absolute path to the template. By default it will use `src/index.ejs` if it exists. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details|
 |**`templateContent`**|`{string\|Function\|false}`|false| Can be used instead of `template` to provide an inline template - please read the [Writing Your Own Templates](https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates) section |
 |**`templateParameters`**|`{Boolean\|Object\|Function}`| `false`| Allows to overwrite the parameters used in the template - see [example](https://github.com/jantimon/html-webpack-plugin/tree/master/examples/template-parameters) |

@@ -238,6 +238,40 @@ describe('HtmlWebpackPlugin', () => {
     ['<script src="app_bundle.js', 'Some unique text'], null, done);
   });
 
+  it('allows to use a function to map entry names to filenames', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        filename: (entry) => `${entry}.html`
+      })]
+    },
+    ['<script defer="defer" src="app_bundle.js'], 'app.html', done);
+  });
+
+  it('allows to use [name] for file names', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        filename: '[name].html'
+      })]
+    },
+    ['<script defer="defer" src="app_bundle.js'], 'app.html', done);
+  });
+
   it('picks up src/index.ejs by default', done => {
     testHtmlPlugin({
       mode: 'production',
