@@ -22,6 +22,7 @@ const { createHtmlTagObject, htmlTagObjectToString, HtmlTagArray } = require('./
 
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
+const { lookForWebpackDuplicates } = require('./lib/lookForWebpackDuplicates');
 const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
 
 const fsReadFileAsync = promisify(fs.readFile);
@@ -37,6 +38,8 @@ class HtmlWebpackPlugin {
   }
 
   apply (compiler) {
+    lookForWebpackDuplicates(compiler);
+
     // Wait for configuration preset plugions to apply all configure webpack defaults
     compiler.hooks.initialize.tap('HtmlWebpackPlugin', () => {
       const userOptions = this.userOptions;
