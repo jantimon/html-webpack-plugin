@@ -25,8 +25,17 @@ declare class HtmlWebpackPlugin {
 
 declare namespace HtmlWebpackPlugin {
   type MinifyOptions = HtmlMinifierOptions;
-
-  interface Options extends Partial<ProcessedOptions> {}
+  /**
+   * The file to write the HTML to.
+   * Supports subdirectories eg: `assets/admin.html`
+   * [name] will be replaced by the entry name
+   * Supports a function to generate the name
+   *
+   * @default 'index.html'
+   */
+  interface Options extends Partial<ProcessedOptions> {
+    filename: string | ((entryName: string) => string);
+  }
 
   /**
    * The plugin options after adding default values
@@ -65,7 +74,7 @@ declare namespace HtmlWebpackPlugin {
      *
      * @default 'index.html'
      */
-    filename: string | ((entryName: string) => string);
+    filename: string
     /**
      * By default the public path is set to `auto` - that way the html-webpack-plugin will try
      * to set the publicPath according to the current filename and the webpack publicPath setting
