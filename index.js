@@ -15,7 +15,6 @@ const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
 const loaderUtils = require('loader-utils');
-const webpack = require('webpack');
 const { CachedChildCompilation } = require('./lib/cached-child-compiler');
 
 const { createHtmlTagObject, htmlTagObjectToString, HtmlTagArray } = require('./lib/html-tags');
@@ -140,11 +139,12 @@ class HtmlWebpackPlugin {
 
 /**
  * apply is called by the webpack main compiler during the start phase
- * @param {WebpackCompiler} compiler
+ * @param {import('webpack').Compiler} compiler
  * @param {ProcessedHtmlWebpackOptions} options
  * @param {HtmlWebpackPlugin} plugin
  */
 function hookIntoCompiler (compiler, options, plugin) {
+  const webpack = compiler.webpack;
   // Instance variables to keep caching information
   // for multiple builds
   let assetJson;
@@ -161,7 +161,8 @@ function hookIntoCompiler (compiler, options, plugin) {
   // generate it at correct location
   const filename = options.filename;
   if (path.resolve(filename) === path.normalize(filename)) {
-    options.filename = path.relative(compiler.options.output.path, filename);
+    const outputPath = /** @type {string} - Once initialized the path is always a string */(compiler.options.output.path);
+    options.filename = path.relative(outputPath, filename);
   }
 
   // `contenthash` is introduced in webpack v4.3
