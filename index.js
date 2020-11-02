@@ -83,11 +83,12 @@ class HtmlWebpackPlugin {
         options.meta = Object.assign({}, options.meta, defaultMeta, userOptions.meta);
       }
 
-      // entryName to fileName conversion
-      const filenameFunction = typeof options.filename === 'function'
-        ? options.filename
+      // entryName to fileName conversion function
+      const userOptionFilename = userOptions.filename || defaultOptions.filename;
+      const filenameFunction = typeof userOptionFilename === 'function'
+        ? userOptionFilename
         // Replace '[name]' with entry name
-        : (entryName) => options.filename.replace(/\[name\]/g, entryName);
+        : (entryName) => userOptionFilename.replace(/\[name\]/g, entryName);
 
       /** output filenames for the given entry names */
       const outputFileNames = new Set(Object.keys(compiler.options.entry).map(filenameFunction));
@@ -153,6 +154,12 @@ function hookIntoCompiler (compiler, options, plugin) {
   // Instance variables to keep caching information
   // for multiple builds
   let assetJson;
+  /**
+   * store the previous generated asset to emit them even if the content did not change
+   * to support watch mode for third party plugins like the clean-webpack-plugin or the compression plugin
+   * @type {Array<{html: string, name: string}>}
+   */
+  let previousEmittedAssets = [];
 
   options.template = getFullTemplatePath(options.template, compiler.context);
 
@@ -245,8 +252,12 @@ function hookIntoCompiler (compiler, options, plugin) {
           // If the template and the assets did not change we don't have to emit the html
           const newAssetJson = JSON.stringify(getAssetFiles(assets));
           if (isCompilationCached && options.cache && assetJson === newAssetJson) {
+            previousEmittedAssets.forEach(({ name, html }) => {
+              compilation.emitAsset(name, new webpack.sources.RawSource(html, false));
+            });
             return callback();
           } else {
+            previousEmittedAssets = [];
             assetJson = newAssetJson;
           }
 
@@ -349,6 +360,7 @@ function hookIntoCompiler (compiler, options, plugin) {
               });
               // Add the evaluated html code to the webpack assets
               compilation.emitAsset(finalOutputName, new webpack.sources.RawSource(html, false));
+              previousEmittedAssets.push({ name: finalOutputName, html });
               return finalOutputName;
             })
             .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
