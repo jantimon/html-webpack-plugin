@@ -1,5 +1,7 @@
 # custom insertion example
 
+**Note**: this example uses [ejs](https://ejs.co/), please substitute `<%=` & `%>` for your engine's (non-escaping) tags
+
 This example shows how you can define the position where the scripts are injected
 by setting `inject:false` and using the template parameters inside the `index.ejs`
 
