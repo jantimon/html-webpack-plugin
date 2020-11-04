@@ -23,11 +23,14 @@ const { createHtmlTagObject, htmlTagObjectToString, HtmlTagArray } = require('./
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
 const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
+const {
+  getAssetPath,
+  getPublicPath,
+  isWebpack4
+} = require('./lib/webpack-polyfill');
 
 const fsStatAsync = promisify(fs.stat);
 const fsReadFileAsync = promisify(fs.readFile);
-
-const webpackMajorVersion = Number(require('webpack/package.json').version.split('.')[0]);
 
 class HtmlWebpackPlugin {
   /**
@@ -159,9 +162,7 @@ class HtmlWebpackPlugin {
           hash: templateResult.mainCompilationHash
         };
 
-        const childCompilationOutputName = webpackMajorVersion === 4
-          ? compilation.mainTemplate.getAssetPath(this.options.filename, compiledEntries)
-          : compilation.getAssetPath(this.options.filename, compiledEntries);
+        const childCompilationOutputName = getAssetPath(compilation, this.options.filename, compiledEntries);
 
         // If the child compilation was not executed during a previous main compile run
         // it is a cached result
@@ -537,11 +538,9 @@ class HtmlWebpackPlugin {
      * if a path publicPath is set in the current webpack config use it otherwise
      * fallback to a relative path
      */
-    const webpackPublicPath = webpackMajorVersion === 4
-      ? compilation.mainTemplate.getPublicPath({ hash: compilationHash })
-      : compilation.getAssetPath(compilation.outputOptions.publicPath, { hash: compilationHash });
+    const webpackPublicPath = getPublicPath(compilation, { hash: compilationHash });
 
-    const isPublicPathDefined = webpackMajorVersion === 4
+    const isPublicPathDefined = isWebpack4()
       ? webpackPublicPath.trim() !== ''
       // Webpack 5 introduced "auto" - however it can not be retrieved at runtime
       : webpackPublicPath.trim() !== '' && webpackPublicPath !== 'auto';
