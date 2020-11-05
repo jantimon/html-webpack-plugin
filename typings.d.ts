@@ -34,7 +34,7 @@ declare namespace HtmlWebpackPlugin {
    * @default 'index.html'
    */
   interface Options extends Partial<ProcessedOptions> {
-    filename: string | ((entryName: string) => string);
+    filename?: string | ((entryName: string) => string);
   }
 
   /**
