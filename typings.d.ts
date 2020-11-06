@@ -74,7 +74,7 @@ declare namespace HtmlWebpackPlugin {
      *
      * @default 'index.html'
      */
-    filename: string
+    filename?: string | ((entryName: string) => string);
     /**
      * By default the public path is set to `auto` - that way the html-webpack-plugin will try
      * to set the publicPath according to the current filename and the webpack publicPath setting
