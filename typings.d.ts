@@ -1,5 +1,5 @@
 import { AsyncSeriesWaterfallHook } from "tapable";
-import { Compiler, Compilation } from 'webpack';
+import { Compiler, Compilation } from "webpack";
 import { Options as HtmlMinifierOptions } from "html-minifier-terser";
 
 export = HtmlWebpackPlugin;
@@ -25,47 +25,33 @@ declare class HtmlWebpackPlugin {
 
 declare namespace HtmlWebpackPlugin {
   type MinifyOptions = HtmlMinifierOptions;
-  /**
-   * The file to write the HTML to.
-   * Supports subdirectories eg: `assets/admin.html`
-   * [name] will be replaced by the entry name
-   * Supports a function to generate the name
-   *
-   * @default 'index.html'
-   */
-  interface Options extends Partial<ProcessedOptions> {
-    filename?: string | ((entryName: string) => string);
-  }
 
-  /**
-   * The plugin options after adding default values
-   */
-  interface ProcessedOptions {
+  interface Options {
     /**
      * Emit the file only if it was changed.
      * @default true
      */
-    cache: boolean;
+    cache?: boolean;
     /**
      * List all entries which should be injected
      */
-    chunks: "all" | string[];
+    chunks?: "all" | string[];
     /**
      * Allows to control how chunks should be sorted before they are included to the html.
      * @default 'auto'
      */
-    chunksSortMode:
+    chunksSortMode?:
       | "auto"
       | "manual"
-      | (((entryNameA: string, entryNameB: string) => number));
+      | ((entryNameA: string, entryNameB: string) => number);
     /**
      * List all entries which should not be injected
      */
-    excludeChunks: string[];
+    excludeChunks?: string[];
     /**
      * Path to the favicon icon
      */
-    favicon: false | string;
+    favicon?: false | string;
     /**
      * The file to write the HTML to.
      * Supports subdirectories eg: `assets/admin.html`
@@ -74,25 +60,25 @@ declare namespace HtmlWebpackPlugin {
      *
      * @default 'index.html'
      */
-    filename: string
+    filename?: string | ((entryName: string) => string);
     /**
      * By default the public path is set to `auto` - that way the html-webpack-plugin will try
      * to set the publicPath according to the current filename and the webpack publicPath setting
      */
-    publicPath: string | 'auto';
+    publicPath?: string | "auto";
     /**
      * If `true` then append a unique `webpack` compilation hash to all included scripts and CSS files.
      * This is useful for cache busting
      */
-    hash: boolean;
+    hash?: boolean;
     /**
      * Inject all assets into the given `template` or `templateContent`.
      */
-    inject:
+    inject?:
       | false // Don't inject scripts
       | true // Inject scripts into body
       | "body" // Inject scripts into body
-      | "head" // Inject scripts into head
+      | "head"; // Inject scripts into head
     /**
      * Set up script loading
      * blocking will result in <script src="..."></script>
@@ -100,13 +86,11 @@ declare namespace HtmlWebpackPlugin {
      *
      * @default 'blocking'
      */
-    scriptLoading:
-      | "blocking"
-      | "defer"
+    scriptLoading?: "blocking" | "defer";
     /**
      * Inject meta tags
      */
-    meta:
+    meta?:
       | false // Disable injection
       | {
           [name: string]:
@@ -121,28 +105,30 @@ declare namespace HtmlWebpackPlugin {
      * - Set to custom minification according to
      * {@link https://github.com/kangax/html-minifier#options-quick-reference}
      */
-    minify: 'auto' | boolean | MinifyOptions;
+    minify?: "auto" | boolean | MinifyOptions;
     /**
      * Render errors into the HTML page
      */
-    showErrors: boolean;
+    showErrors?: boolean;
     /**
      * The `webpack` require path to the template.
      * @see https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md
      */
-    template: string;
+    template?: string;
     /**
      * Allow to use a html string instead of reading from a file
      */
-    templateContent:
+    templateContent?:
       | false // Use the template option instead to load a file
       | string
-      | ((templateParameters: { [option: string]: any }) => (string | Promise<string>))
+      | ((templateParameters: {
+          [option: string]: any;
+        }) => string | Promise<string>)
       | Promise<string>;
     /**
      * Allows to overwrite the parameters used in the template
      */
-    templateParameters:
+    templateParameters?:
       | false // Pass an empty object to the template function
       | ((
           compilation: any,
@@ -163,16 +149,23 @@ declare namespace HtmlWebpackPlugin {
     /**
      * The title to use for the generated HTML document
      */
-    title: string;
+    title?: string;
     /**
      * Enforce self closing tags e.g. <link />
      */
-    xhtml: boolean;
+    xhtml?: boolean;
     /**
      * In addition to the options actually used by this plugin, you can use this hash to pass arbitrary data through
      * to your template.
      */
     [option: string]: any;
+  }
+
+  /**
+   * The plugin options after adding default values
+   */
+  interface ProcessedOptions extends Required<Options> {
+    filename: string;
   }
 
   /**
@@ -268,7 +261,7 @@ declare namespace HtmlWebpackPlugin {
      * The inner HTML
      */
     innerHTML?: string;
-        /**
+    /**
      * Whether this html must not contain innerHTML
      * @see https://www.w3.org/TR/html5/syntax.html#void-elements
      */
