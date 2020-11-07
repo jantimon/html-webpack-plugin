@@ -34,7 +34,6 @@
     "spec",
     "examples",
     "dist",
-    "coverage",
-    "lib/webpack5/*.js"
+    "coverage"
   ]
 }
