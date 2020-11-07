@@ -214,13 +214,17 @@ function hookIntoCompiler (compiler, options, plugin) {
       compilation.hooks.processAssets.tapAsync(
         {
           name: 'HtmlWebpackPlugin',
-          stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONS
+          stage:
+          /**
+           * Generate the html after minification and dev tooling is done
+           */
+          webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE
         },
         /**
-       * Hook into the PROCESS_ASSETS_STAGE_ADDITIONS hook
-       * @param {WebpackCompilation} compilationAssets
-       * @param {(err?: Error) => void} callback
-      */
+         * Hook into the process assets hook
+         * @param {WebpackCompilation} compilationAssets
+         * @param {(err?: Error) => void} callback
+         */
         (compilationAssets, callback) => {
           // Get all entry point names for this html file
           const entryNames = Array.from(compilation.entrypoints.keys());
