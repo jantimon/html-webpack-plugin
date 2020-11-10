@@ -15,7 +15,6 @@ const OUTPUT_DIR = path.join(__dirname, '../dist/caching-spec');
 
 jest.setTimeout(30000);
 process.on('unhandledRejection', r => console.log(r));
-process.traceDeprecation = true;
 
 function setUpCompiler (htmlWebpackPlugin) {
   jest.spyOn(htmlWebpackPlugin, 'evaluateCompilationResult');
