@@ -21,7 +21,6 @@ const DEFAULT_TEMPLATE = DEFAULT_LOADER + '!' + require.resolve('../default_inde
 
 jest.setTimeout(30000);
 process.on('unhandledRejection', r => console.log(r));
-process.traceDeprecation = true;
 
 describe('HtmlWebpackPluginHMR', () => {
   beforeEach(done => {

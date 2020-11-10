@@ -24,7 +24,6 @@ const OUTPUT_DIR = path.resolve(__dirname, '../dist/basic-spec');
 
 jest.setTimeout(30000);
 process.on('unhandledRejection', r => console.log(r));
-process.traceDeprecation = true;
 
 function testHtmlPlugin (webpackConfig, expectedResults, outputFile, done, expectErrors, expectWarnings) {
   outputFile = outputFile || 'index.html';

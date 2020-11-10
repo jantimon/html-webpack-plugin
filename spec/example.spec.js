@@ -15,7 +15,6 @@ const webpackMajorVersion = require('webpack/package.json').version.split('.')[0
 const OUTPUT_DIR = path.resolve(__dirname, '../dist');
 
 jest.setTimeout(30000);
-process.traceDeprecation = true;
 
 function runExample (exampleName, done) {
   const examplePath = path.resolve(__dirname, '..', 'examples', exampleName);
