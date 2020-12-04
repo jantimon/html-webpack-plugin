@@ -123,7 +123,9 @@ class HtmlWebpackPlugin {
     }
     // The LibraryTemplatePlugin stores the template result in a local variable.
     // To extract the result during the evaluation this part has to be removed.
-    source = source.replace('var HTML_WEBPACK_PLUGIN_RESULT =', '');
+    if (source && source.indexOf('HTML_WEBPACK_PLUGIN_RESULT') >= 0) {
+      source += ';\nHTML_WEBPACK_PLUGIN_RESULT';
+    }
     const templateWithoutLoaders = templateFilename.replace(/^.+!/, '').replace(/\?.+$/, '');
     const vmContext = vm.createContext({ HTML_WEBPACK_PLUGIN: true, require: require, ...global });
     const vmScript = new vm.Script(source, { filename: templateWithoutLoaders });

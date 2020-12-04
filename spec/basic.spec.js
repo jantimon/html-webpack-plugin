@@ -519,6 +519,26 @@ describe('HtmlWebpackPlugin', () => {
     }, ['<link href="styles.css" rel="stylesheet">'], null, done);
   });
 
+  it('works with a javascript returning loader like raw-loader', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      module: {
+        rules: [
+          { test: /\.html$/, use: ['raw-loader'] }
+        ]
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name].js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        inject: true,
+        template: path.join(__dirname, 'fixtures/plain.html')
+      })]
+    }, ['<script defer="defer" src="main.js"', '<title>Example Plain file</title>'], null, done);
+  });
+
   it('should work with the css extract plugin on windows and protocol relative urls support (#205)', done => {
     testHtmlPlugin({
       mode: 'production',
