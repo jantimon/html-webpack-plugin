@@ -7,17 +7,15 @@ module.exports = {
   entry: './example.js',
   output: {
     path: path.join(__dirname, 'dist/webpack-' + webpackMajorVersion),
-    publicPath: '',
     filename: 'bundle.js'
   },
   module: {
     rules: [
       { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] },
-      { test: /\.png$/, loader: 'file-loader' },
+      { test: /\.png$/, type: 'asset/resource' },
       { test: /\.html$/, loader: 'html-loader' }
     ]
   },
-  devtool: 'eval',
   plugins: [
     new HtmlWebpackPlugin({
       template: 'template.js'
