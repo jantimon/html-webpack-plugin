@@ -117,7 +117,7 @@ class HtmlWebpackPlugin {
    * @param {string} templateFilename
    * @returns {Promise<string | (() => string | Promise<string>)>}
    */
-  evaluateCompilationResult (source, templateFilename) {
+  evaluateCompilationResult (source, publicPath, templateFilename) {
     if (!source) {
       return Promise.reject(new Error('The child compilation didn\'t provide a result'));
     }
@@ -127,7 +127,7 @@ class HtmlWebpackPlugin {
       source += ';\nHTML_WEBPACK_PLUGIN_RESULT';
     }
     const templateWithoutLoaders = templateFilename.replace(/^.+!/, '').replace(/\?.+$/, '');
-    const vmContext = vm.createContext({ HTML_WEBPACK_PLUGIN: true, require: require, ...global });
+    const vmContext = vm.createContext({ HTML_WEBPACK_PLUGIN: true, require: require, htmlWebpackPluginPublicPath: publicPath, ...global });
     const vmScript = new vm.Script(source, { filename: templateWithoutLoaders });
     // Evaluate code and cast to string
     let newSource;
@@ -327,7 +327,7 @@ function hookIntoCompiler (compiler, options, plugin) {
               // Once everything is compiled evaluate the html factory
               // and replace it with its content
               return ('compiledEntry' in templateResult)
-                ? plugin.evaluateCompilationResult(templateResult.compiledEntry.content, options.template)
+                ? plugin.evaluateCompilationResult(templateResult.compiledEntry.content, htmlPublicPath, options.template)
                 : Promise.reject(new Error('Child compilation contained no compiledEntry'));
             });
           const templateExectutionPromise = Promise.all([assetsPromise, assetTagGroupsPromise, templateEvaluationPromise])
