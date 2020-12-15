@@ -2584,4 +2584,51 @@ describe('HtmlWebpackPlugin', () => {
       ]
     }, ['<script defer="defer" src="index_bundle.js"></script>'], null, done);
   });
+
+  it('generates relative path for asset/resource', done => {
+    testHtmlPlugin({
+      mode: 'development',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        assetModuleFilename: 'assets/demo[ext]'
+      },
+      module: {
+        rules: [
+          { test: /\.png$/, type: 'asset/resource' }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          template: 'html-loader!' + path.join(__dirname, 'fixtures/logo.html'),
+          filename: 'demo/index.js'
+        })
+      ]
+    }, ['<img src="../assets/demo.png'], 'demo/index.js', done);
+  });
+
+  it('uses the absolute path for asset/resource', done => {
+    testHtmlPlugin({
+      mode: 'development',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        assetModuleFilename: 'assets/demo[ext]'
+      },
+      module: {
+        rules: [
+          { test: /\.png$/, type: 'asset/resource' }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          template: 'html-loader!' + path.join(__dirname, 'fixtures/logo.html'),
+          filename: 'demo/index.js',
+          publicPath: '/foo/'
+        })
+      ]
+    }, ['<img src="/foo/assets/demo.png'], 'demo/index.js', done);
+  });
 });
