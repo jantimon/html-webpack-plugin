@@ -252,8 +252,11 @@ function hookIntoCompiler (compiler, options, plugin) {
           // it is a cached result
           const isCompilationCached = templateResult.mainCompilationHash !== compilation.hash;
 
-          // Turn the entry point names into file paths
-          const assets = htmlWebpackPluginAssets(compilation, childCompilationOutputName, sortedEntryNames, options.publicPath);
+          /** The public path used inside the html file */
+          const htmlPublicPath = getPublicPath(compilation, childCompilationOutputName, options.publicPath);
+
+          /** Generated file paths from the entry point names */
+          const assets = htmlWebpackPluginAssets(compilation, sortedEntryNames, htmlPublicPath);
 
           // If the template and the assets did not change we don't have to emit the html
           const newAssetJson = JSON.stringify(getAssetFiles(assets));
@@ -327,7 +330,6 @@ function hookIntoCompiler (compiler, options, plugin) {
                 ? plugin.evaluateCompilationResult(templateResult.compiledEntry.content, options.template)
                 : Promise.reject(new Error('Child compilation contained no compiledEntry'));
             });
-
           const templateExectutionPromise = Promise.all([assetsPromise, assetTagGroupsPromise, templateEvaluationPromise])
           // Execute the template
             .then(([assetsHookResult, assetTags, compilationResult]) => typeof compilationResult !== 'function'
@@ -545,20 +547,15 @@ function hookIntoCompiler (compiler, options, plugin) {
   }
 
   /**
-   * The htmlWebpackPluginAssets extracts the asset information of a webpack compilation
-   * for all given entry names
+   * Generate the relative or absolute base url to reference images, css, and javascript files
+   * from within the html file - the publicPath
+   *
    * @param {WebpackCompilation} compilation
-   * @param {string[]} entryNames
+   * @param {string} childCompilationOutputName
    * @param {string | 'auto'} customPublicPath
-   * @returns {{
-      publicPath: string,
-      js: Array<string>,
-      css: Array<string>,
-      manifest?: string,
-      favicon?: string
-    }}
+   * @returns {string}
    */
-  function htmlWebpackPluginAssets (compilation, childCompilationOutputName, entryNames, customPublicPath) {
+  function getPublicPath (compilation, childCompilationOutputName, customPublicPath) {
     const compilationHash = compilation.hash;
 
     /**
@@ -587,6 +584,25 @@ function hookIntoCompiler (compiler, options, plugin) {
       publicPath += '/';
     }
 
+    return publicPath;
+  }
+
+  /**
+   * The htmlWebpackPluginAssets extracts the asset information of a webpack compilation
+   * for all given entry names
+   * @param {WebpackCompilation} compilation
+   * @param {string[]} entryNames
+   * @param {string | 'auto'} publicPath
+   * @returns {{
+      publicPath: string,
+      js: Array<string>,
+      css: Array<string>,
+      manifest?: string,
+      favicon?: string
+    }}
+   */
+  function htmlWebpackPluginAssets (compilation, entryNames, publicPath) {
+    const compilationHash = compilation.hash;
     /**
      * @type {{
         publicPath: string,
@@ -598,7 +614,7 @@ function hookIntoCompiler (compiler, options, plugin) {
      */
     const assets = {
       // The public path
-      publicPath: publicPath,
+      publicPath,
       // Will contain all js and mjs files
       js: [],
       // Will contain all css files
