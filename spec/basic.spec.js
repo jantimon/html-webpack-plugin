@@ -2567,4 +2567,21 @@ describe('HtmlWebpackPlugin', () => {
       ]
     }, ['<head><script defer="defer" src="index_bundle.js"></script><link href="styles.css" rel="stylesheet"></head>'], null, done);
   });
+
+  it('should allow to use experiments:{outputModule:true}', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        module: true
+      },
+      experiments: { outputModule: true },
+      plugins: [
+        new HtmlWebpackPlugin({
+        })
+      ]
+    }, ['<script defer="defer" src="index_bundle.js"></script>'], null, done);
+  });
 });
