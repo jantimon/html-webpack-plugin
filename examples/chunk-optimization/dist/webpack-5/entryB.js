@@ -4,7 +4,7 @@
 /***/ 282:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-__webpack_require__(73);
+__webpack_require__(965);
 var multiply = __webpack_require__(179);
 var h1 = document.createElement('h1');
 h1.innerHTML = 'Hello world from Entry ' + multiply(1, 2);
@@ -94,7 +94,7 @@ document.body.appendChild(h1);
 /******/ 		};
 /******/ 		
 /******/ 		var deferredModules = [
-/******/ 			[282,494,805,73]
+/******/ 			[282,494,219,965]
 /******/ 		];
 /******/ 		// no chunk on demand loading
 /******/ 		
