@@ -24,22 +24,22 @@
 <h3>Webpack 5</h3>
 
 ```bash
-  npm i --save-dev html-webpack-plugin@next
+  npm i --save-dev html-webpack-plugin
 ```
 
 ```bash
-  yarn add --dev html-webpack-plugin@next
+  yarn add --dev html-webpack-plugin
 ```
 
 
 <h3>Webpack 4</h3>
 
 ```bash
-  npm i --save-dev html-webpack-plugin
+  npm i --save-dev html-webpack-plugin@4
 ```
 
 ```bash
-  yarn add --dev html-webpack-plugin
+  yarn add --dev html-webpack-plugin@4
 ```
 
 
