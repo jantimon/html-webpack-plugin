@@ -1,6 +1,13 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [4.5.1](https://github.com/jantimon/html-webpack-plugin/compare/v4.5.0...v4.5.1) (2021-01-03)
+
+
+### Bug Fixes
+
+* inject javascripts in the <head> tag for inject:true and scriptLoading:'defer' ([4f7064e](https://github.com/jantimon/html-webpack-plugin/commit/4f7064ee56fe710e8f416018956647a72c270fb1))
 
 # [4.5.0](https://github.com/jantimon/html-webpack-plugin/compare/v4.4.1...v4.5.0) (2020-09-21)
 
