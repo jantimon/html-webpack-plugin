@@ -2343,6 +2343,29 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<selfclosed\/>/], null, done);
   });
 
+  it('should add the javascript assets to the head for inject:true with scriptLoading:defer', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/theme.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      module: {
+        rules: [
+          { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }
+        ]
+      },
+      plugins: [
+        new MiniCssExtractPlugin({ filename: 'styles.css' }),
+        new HtmlWebpackPlugin({
+          scriptLoading: 'defer',
+          inject: true
+        })
+      ]
+    }, ['<script defer="defer" src="index_bundle.js"></script><link href="styles.css" rel="stylesheet"></head>'], null, done);
+  });
+
   it('should allow to use headTags and bodyTags directly in string literals', done => {
     testHtmlPlugin({
       mode: 'production',
