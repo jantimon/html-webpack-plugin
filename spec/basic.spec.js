@@ -2067,24 +2067,6 @@ describe('HtmlWebpackPlugin', () => {
     }, ['Error: HtmlWebpackPlugin: could not load file'], null, done, true);
   });
 
-  it('does not add a manifest if already present', done => {
-    const AppCachePlugin = require('appcache-webpack-plugin');
-    testHtmlPlugin({
-      mode: 'production',
-      entry: path.join(__dirname, 'fixtures/index.js'),
-      output: {
-        path: OUTPUT_DIR,
-        filename: 'index_bundle.js'
-      },
-      plugins: [
-        new AppCachePlugin({ settings: ['prefer-online'] }),
-        new HtmlWebpackPlugin({
-          template: path.join(__dirname, 'fixtures/plain.html')
-        })
-      ]
-    }, ['<html lang="en" manifest="foo.appcache">'], null, done);
-  });
-
   it('works with webpack bannerplugin', done => {
     testHtmlPlugin({
       mode: 'production',
