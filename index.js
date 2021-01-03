@@ -23,6 +23,7 @@ const { createHtmlTagObject, htmlTagObjectToString, HtmlTagArray } = require('./
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
 const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
+const { assert } = require('console');
 
 const fsStatAsync = promisify(fs.stat);
 const fsReadFileAsync = promisify(fs.readFile);
@@ -64,6 +65,10 @@ class HtmlWebpackPlugin {
 
     /** @type {ProcessedHtmlWebpackOptions} */
     this.options = Object.assign(defaultOptions, userOptions);
+
+    // Assert correct option spelling
+    assert(this.options.scriptLoading === 'defer' || this.options.scriptLoading === 'blocking', 'scriptLoading needs to be set to "defer" or "blocking');
+    assert(this.options.inject === true || this.options.inject === false || this.options.inject === 'head' || this.options.inject === 'body', 'inject needs to be set to true, false, "head" or "body');
 
     // Default metaOptions if no template is provided
     if (!userOptions.template && this.options.templateContent === false && this.options.meta) {
@@ -209,7 +214,8 @@ class HtmlWebpackPlugin {
           }))
           .then(({ assetTags }) => {
             // Inject scripts to body unless it set explicitly to head
-            const scriptTarget = self.options.inject === 'head' ? 'head' : 'body';
+            const scriptTarget = self.options.inject === 'head' ||
+                (self.options.inject !== 'body' && self.options.scriptLoading === 'defer') ? 'head' : 'body';
             // Group assets to `head` and `body` tag arrays
             const assetGroups = this.generateAssetGroups(assetTags, scriptTarget);
             // Allow third-party-plugin authors to reorder and change the assetTags once they are grouped
