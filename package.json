@@ -31,7 +31,7 @@
     "@types/loader-utils": "2.0.1",
     "@types/node": "11.13.9",
     "commitizen": "4.2.1",
-    "css-loader": "2.1.1",
+    "css-loader": "5.0.1",
     "cz-conventional-changelog": "2.1.0",
     "dir-compare": "1.7.2",
     "file-loader": "3.0.1",
