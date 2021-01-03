@@ -302,7 +302,7 @@ function hookIntoCompiler (compiler, options, plugin) {
             .then(({ assetTags }) => {
               // Inject scripts to body unless it set explicitly to head
               const scriptTarget = options.inject === 'head' ||
-                (options.inject === false && options.scriptLoading !== 'blocking') ? 'head' : 'body';
+                (options.inject !== 'body' && options.scriptLoading !== 'blocking') ? 'head' : 'body';
               // Group assets to `head` and `body` tag arrays
               const assetGroups = generateAssetGroups(assetTags, scriptTarget);
               // Allow third-party-plugin authors to reorder and change the assetTags once they are grouped
