@@ -843,6 +843,37 @@ describe('HtmlWebpackPlugin', () => {
     }, ['<script defer="defer" src="/assets/index_bundle.js"'], null, done);
   });
 
+  it('allows to set public path to an empty string', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'assets/index_bundle.js',
+        publicPath: ''
+      },
+      plugins: [new HtmlWebpackPlugin({
+        filename: 'foo/index.html'
+      })]
+    }, ['<script defer="defer" src="assets/index_bundle.js"'], 'foo/index.html', done);
+  });
+
+  it('allows to set the html-webpack-plugin public path to an empty string', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'assets/index_bundle.js',
+        publicPath: '/'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        filename: 'foo/index.html',
+        publicPath: ''
+      })]
+    }, ['<script defer="defer" src="assets/index_bundle.js"'], 'foo/index.html', done);
+  });
+
   it('handles subdirectories in the webpack output bundles along with a relative path', done => {
     testHtmlPlugin({
       mode: 'production',

@@ -565,8 +565,8 @@ function hookIntoCompiler (compiler, options, plugin) {
      */
     const webpackPublicPath = compilation.getAssetPath(compilation.outputOptions.publicPath, { hash: compilationHash });
 
-    // Webpack 5 introduced "auto" - however it can not be retrieved at compile time
-    const isPublicPathDefined = webpackPublicPath.trim() !== '' && webpackPublicPath !== 'auto';
+    // Webpack 5 introduced "auto" as default value
+    const isPublicPathDefined = webpackPublicPath !== 'auto';
 
     let publicPath =
       // If the html-webpack-plugin options contain a custom public path uset it
