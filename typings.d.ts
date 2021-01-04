@@ -7,6 +7,16 @@ export = HtmlWebpackPlugin;
 declare class HtmlWebpackPlugin {
   constructor(options?: HtmlWebpackPlugin.Options);
 
+  userOptions: HtmlWebpackPlugin.Options;
+
+  /** Current HtmlWebpackPlugin Major */
+  version: number;
+
+  /**
+   * Options after html-webpack-plugin has been initialized with defaults
+   */
+  options?: HtmlWebpackPlugin.ProcessedOptions;
+
   apply(compiler: Compiler): void;
 
   static getHooks(compilation: Compilation): HtmlWebpackPlugin.Hooks;
