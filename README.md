@@ -366,6 +366,7 @@ and the following options:
 ```js
 {
   collapseWhitespace: true,
+  keepClosingSlash: true,
   removeComments: true,
   removeRedundantAttributes: true,
   removeScriptTypeAttributes: true,
