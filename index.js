@@ -344,7 +344,8 @@ class HtmlWebpackPlugin {
       js: Array<string>,
       css: Array<string>,
       manifest?: string,
-      favicon?: string
+      favicon?: string,
+      entries: { [entry: string]: Array<string> }
     }} assets
    * @param {{
        headTags: HtmlTagObject[],
@@ -386,7 +387,8 @@ class HtmlWebpackPlugin {
       js: Array<string>,
       css: Array<string>,
       manifest?: string,
-      favicon?: string
+      favicon?: string,
+      entries: { [entry: string]: Array<string> }
     }} assets
    * @param {{
        headTags: HtmlTagObject[],
@@ -514,7 +516,8 @@ class HtmlWebpackPlugin {
       js: Array<string>,
       css: Array<string>,
       manifest?: string,
-      favicon?: string
+      favicon?: string,
+      entries: { [entry: string]: Array<string> }
     }} assets
    */
   isHotUpdateCompilation (assets) {
@@ -532,7 +535,8 @@ class HtmlWebpackPlugin {
       js: Array<string>,
       css: Array<string>,
       manifest?: string,
-      favicon?: string
+      favicon?: string,
+      entries: { [entry: string]: Array<string> }
     }}
    */
   htmlWebpackPluginAssets (compilation, childCompilationOutputName, entryNames, customPublicPath) {
@@ -574,7 +578,8 @@ class HtmlWebpackPlugin {
         js: Array<string>,
         css: Array<string>,
         manifest?: string,
-        favicon?: string
+        favicon?: string,
+        entries: { [entry: string]: Array<string> }
       }}
      */
     const assets = {
@@ -587,7 +592,9 @@ class HtmlWebpackPlugin {
       // Will contain the html5 appcache manifest files if it exists
       manifest: Object.keys(compilation.assets).find(assetFile => path.extname(assetFile) === '.appcache'),
       // Favicon
-      favicon: undefined
+      favicon: undefined,
+      // Will contain all entries along with their corresponding files
+      entries: {},
     };
 
     // Append a hash for cache busting
@@ -633,6 +640,10 @@ class HtmlWebpackPlugin {
         if (!extMatch) {
           return;
         }
+        if (!assets.entries[entryName]) {
+            assets.entries[entryName] = [];
+        }
+        assets.entries[entryName].push(entryPointPublicPath);
         // Skip if this file is already known
         // (e.g. because of common chunk optimizations)
         if (entryPointPublicPathMap[entryPointPublicPath]) {
@@ -1056,7 +1067,8 @@ class HtmlWebpackPlugin {
    js: Array<string>,
    css: Array<string>,
    manifest?: string,
-   favicon?: string
+   favicon?: string,
+   entries: { [entry: string]: Array<string> }
  }} assets
  * @param {{
      headTags: HtmlTagObject[],

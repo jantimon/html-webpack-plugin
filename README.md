@@ -276,7 +276,7 @@ The following variables are available in the template by default (you can extend
      </html>
      ```
   
-  - `htmlWebpackPlugin.files`: direct access to the files used during the compilation.
+  - `htmlWebpackPlugin.files`: direct access to the files used during the compilation. The `entries` property contains a mapping of entry names to the list of generated bundles required by that entry.
 
     ```typescript
     publicPath: string;
@@ -284,6 +284,7 @@ The following variables are available in the template by default (you can extend
     css: string[];
     manifest?: string;
     favicon?: string;
+    entries: { [entry: string]: Array<string> };
     ```
 
 
@@ -503,7 +504,8 @@ about which values are passed.
         js: Array<{string}>,
         css: Array<{string}>,
         favicon?: string | undefined,
-        manifest?: string | undefined
+        manifest?: string | undefined,
+        entries: { [entry: string]: Array<string> }
       },
       outputName: string,
       plugin: HtmlWebpackPlugin

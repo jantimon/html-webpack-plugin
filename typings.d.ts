@@ -140,6 +140,7 @@ declare namespace HtmlWebpackPlugin {
             css: Array<string>;
             manifest?: string;
             favicon?: string;
+            entries: { [entry: string]: Array<string> };
           },
           assetTags: {
             headTags: HtmlTagObject[];
@@ -181,6 +182,7 @@ declare namespace HtmlWebpackPlugin {
         css: Array<string>;
         manifest?: string;
         favicon?: string;
+        entries: { [entry: string]: Array<string> };
       };
       options: Options;
     };
@@ -220,6 +222,7 @@ declare namespace HtmlWebpackPlugin {
         css: Array<string>;
         favicon?: string;
         manifest?: string;
+        entries: { [entry: string]: Array<string> };
       };
       outputName: string;
       plugin: HtmlWebpackPlugin;
