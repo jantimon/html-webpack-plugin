@@ -91,7 +91,8 @@ class HtmlWebpackPlugin {
         : (entryName) => userOptionFilename.replace(/\[name\]/g, entryName);
 
       /** output filenames for the given entry names */
-      const outputFileNames = new Set(Object.keys(compiler.options.entry).map(filenameFunction));
+      const entryNames = Object.keys(compiler.options.entry);
+      const outputFileNames = new Set((entryNames.length ? entryNames : ['main']).map(filenameFunction));
 
       /** Option for every entry point */
       const entryOptions = Array.from(outputFileNames).map((filename) => ({

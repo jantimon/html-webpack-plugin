@@ -2667,4 +2667,19 @@ describe('HtmlWebpackPlugin', () => {
       ]
     }, ['<img src="/foo/assets/demo.png'], 'demo/index.js', done);
   });
+
+  it('generates an html file if entry is empty', done => {
+    testHtmlPlugin({
+      mode: 'development',
+      entry: {},
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js',
+        assetModuleFilename: 'assets/demo[ext]'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({})
+      ]
+    }, ['<body>'], null, done);
+  });
 });
