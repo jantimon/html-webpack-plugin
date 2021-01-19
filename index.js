@@ -312,6 +312,7 @@ function hookIntoCompiler (compiler, options, plugin) {
                 headTags: assetGroups.headTags,
                 bodyTags: assetGroups.bodyTags,
                 outputName: childCompilationOutputName,
+                publicPath: htmlPublicPath,
                 plugin: plugin
               });
             });

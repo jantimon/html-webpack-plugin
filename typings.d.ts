@@ -218,6 +218,7 @@ declare namespace HtmlWebpackPlugin {
       headTags: HtmlTagObject[];
       bodyTags: HtmlTagObject[];
       outputName: string;
+      publicPath: string,
       plugin: HtmlWebpackPlugin;
     }>;
 

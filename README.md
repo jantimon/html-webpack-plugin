@@ -533,6 +533,7 @@ about which values are passed.
     AsyncSeriesWaterfallHook<{
       headTags: Array<HtmlTagObject | HtmlTagObject>,
       bodyTags: Array<HtmlTagObject | HtmlTagObject>,
+      publicPath: string,
       outputName: string,
       plugin: HtmlWebpackPlugin
     }>
