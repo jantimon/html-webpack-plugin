@@ -521,6 +521,7 @@ about which values are passed.
         styles: Array<HtmlTagObject>,
         meta: Array<HtmlTagObject>,
       },
+      publicPath: string,
       outputName: string,
       plugin: HtmlWebpackPlugin
     }>

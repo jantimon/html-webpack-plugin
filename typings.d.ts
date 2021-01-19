@@ -209,6 +209,7 @@ declare namespace HtmlWebpackPlugin {
         styles: HtmlTagObject[];
         meta: HtmlTagObject[];
       };
+      publicPath: string,
       outputName: string;
       plugin: HtmlWebpackPlugin;
     }>;

@@ -298,6 +298,7 @@ function hookIntoCompiler (compiler, options, plugin) {
                 ]
               },
               outputName: childCompilationOutputName,
+              publicPath: htmlPublicPath,
               plugin: plugin
             }))
             .then(({ assetTags }) => {
