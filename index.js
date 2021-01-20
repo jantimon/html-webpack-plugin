@@ -717,6 +717,7 @@ function hookIntoCompiler (compiler, options, plugin) {
     return jsAssets.map(scriptAsset => ({
       tagName: 'script',
       voidTag: false,
+      meta: { plugin: 'html-webpack-plugin' },
       attributes: {
         defer: options.scriptLoading !== 'blocking',
         src: scriptAsset
@@ -733,6 +734,7 @@ function hookIntoCompiler (compiler, options, plugin) {
     return cssAssets.map(styleAsset => ({
       tagName: 'link',
       voidTag: true,
+      meta: { plugin: 'html-webpack-plugin' },
       attributes: {
         href: styleAsset,
         rel: 'stylesheet'
@@ -755,6 +757,7 @@ function hookIntoCompiler (compiler, options, plugin) {
       return [{
         tagName: 'base',
         voidTag: true,
+        meta: { plugin: 'html-webpack-plugin' },
         attributes: (typeof baseOption === 'string') ? {
           href: baseOption
         } : baseOption
@@ -797,6 +800,7 @@ function hookIntoCompiler (compiler, options, plugin) {
       return {
         tagName: 'meta',
         voidTag: true,
+        meta: { plugin: 'html-webpack-plugin' },
         attributes: metaTagAttributes
       };
     });
@@ -814,6 +818,7 @@ function hookIntoCompiler (compiler, options, plugin) {
     return [{
       tagName: 'link',
       voidTag: true,
+      meta: { plugin: 'html-webpack-plugin' },
       attributes: {
         rel: 'icon',
         href: faviconPath

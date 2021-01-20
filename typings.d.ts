@@ -278,5 +278,13 @@ declare namespace HtmlWebpackPlugin {
      * @see https://www.w3.org/TR/html5/syntax.html#void-elements
      */
     voidTag: boolean;
+    /**
+     * Meta information about the tag
+     * E.g. `{'plugin': 'html-webpack-plugin'}`
+     */
+    meta: {
+      plugin?: string,
+      [metaAttributeName: string]: any;
+    };
   }
 }
