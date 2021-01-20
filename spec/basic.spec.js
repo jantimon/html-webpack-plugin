@@ -12,6 +12,8 @@ const rimraf = require('rimraf');
 const _ = require('lodash');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpackMajorVersion = Number(require('webpack/package.json').version.split('.')[0]);
+const itUnixOnly = (process.platform === 'win32' || process.platform === 'win64') ? it.skip : it;
+
 if (isNaN(webpackMajorVersion)) {
   throw new Error('Cannot parse webpack major version');
 }
@@ -116,7 +118,7 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<body>[\s]*<script src="foo\/very%20fancy%2Bname.js"><\/script>[\s]*<\/body>/], null, done);
   });
 
-  it('properly encodes file names in emitted URIs but keeps the querystring', done => {
+  itUnixOnly('properly encodes file names in emitted URIs but keeps the querystring', done => {
     testHtmlPlugin({
       mode: 'production',
       entry: path.join(__dirname, 'fixtures/index.js'),

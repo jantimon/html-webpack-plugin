@@ -666,5 +666,5 @@ This project uses the [semistandard code style](https://github.com/Flet/semistan
 [deps]: https://david-dm.org/jantimon/html-webpack-plugin.svg
 [deps-url]: https://david-dm.org/jantimon/html-webpack-plugin
 
-[tests]: http://img.shields.io/travis/jantimon/html-webpack-plugin.svg
-[tests-url]: https://travis-ci.org/jantimon/html-webpack-plugin
+[tests]: https://github.com/jantimon/html-webpack-plugin/workflows/CI/badge.svg
+[tests-url]: https://github.com/jantimon/html-webpack-plugin/actions?query=workflow%3ACI
