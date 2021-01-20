@@ -28,8 +28,6 @@ const { assert } = require('console');
 const fsStatAsync = promisify(fs.stat);
 const fsReadFileAsync = promisify(fs.readFile);
 
-const webpackMajorVersion = Number(require('webpack/package.json').version.split('.')[0]);
-
 class HtmlWebpackPlugin {
   /**
    * @param {HtmlWebpackOptions} [options]
@@ -164,9 +162,7 @@ class HtmlWebpackPlugin {
           hash: templateResult.mainCompilationHash
         };
 
-        const childCompilationOutputName = webpackMajorVersion === 4
-          ? compilation.mainTemplate.getAssetPath(this.options.filename, compiledEntries)
-          : compilation.getAssetPath(this.options.filename, compiledEntries);
+        const childCompilationOutputName = compilation.getAssetPath(this.options.filename, compiledEntries);
 
         // If the child compilation was not executed during a previous main compile run
         // it is a cached result
@@ -543,14 +539,10 @@ class HtmlWebpackPlugin {
      * if a path publicPath is set in the current webpack config use it otherwise
      * fallback to a relative path
      */
-    const webpackPublicPath = webpackMajorVersion === 4
-      ? compilation.mainTemplate.getPublicPath({ hash: compilationHash })
-      : compilation.getAssetPath(compilation.outputOptions.publicPath, { hash: compilationHash });
+    const webpackPublicPath = compilation.getAssetPath(compilation.outputOptions.publicPath, { hash: compilationHash });
 
-    const isPublicPathDefined = webpackMajorVersion === 4
-      ? webpackPublicPath.trim() !== ''
-      // Webpack 5 introduced "auto" - however it can not be retrieved at runtime
-      : webpackPublicPath.trim() !== '' && webpackPublicPath !== 'auto';
+    // Webpack 5 introduced "auto" - however it can not be retrieved at compile time
+    const isPublicPathDefined = webpackPublicPath.trim() !== '' && webpackPublicPath !== 'auto';
 
     let publicPath =
       // If the html-webpack-plugin options contain a custom public path uset it
