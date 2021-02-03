@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.0.0](https://github.com/jantimon/html-webpack-plugin/compare/v4.5.1...v5.0.0) (2021-02-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* Drop support for `webpack` 4 and `node` <= 10 - For older webpack or node versions please use `html-webpack-plugin` 4.x
+* Entry javascript resources are now beeing loaded deferred in the `<head>` tag to improve the page load performance by default - You can set the `scriptLoading` option to `'blocking'` to keep the previous behaviour
+* Setting publicPath to `''` (an empty string) will no longer calculate a relative path from the html file to the assets anymore - You can set the `publicPath` option to `'auto'` to keep the previous behaviour
+* Plugins for `html-webpack-plugin` which add additional assetTags should provide a `meta` attribute
+* Drop support for `appcache-webpack-plugin`
+
+### Features
+
+* drop `webpack` 4 and `node` <= 10 support to make use of the latest APIs ([b7a9e8f](https://github.com/jantimon/html-webpack-plugin/commit/b7a9e8f2a3c146cfec8f5c42888abd6aa0cde0b9))
+* use the new webpack 5 APIs and create html files during the new `webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONS` compilation stage ([8964bc4](https://github.com/jantimon/html-webpack-plugin/commit/8964bc4182e41807a564d3000217a40bc5f93ad2), [b6895cb](https://github.com/jantimon/html-webpack-plugin/commit/b6895cb5b85b1e6e850f638470cf9b839d421516), [a97234e](https://github.com/jantimon/html-webpack-plugin/commit/a97234ead5ea2dbba07a6e6a70c5ddb6a5a3c288), [1b59e09](https://github.com/jantimon/html-webpack-plugin/commit/1b59e0944f561b264f11847ef245c9fc3f05b80f), [4fca596](https://github.com/jantimon/html-webpack-plugin/commit/4fca5965315c49f6706812d9fdf6c7284d23d75b), [ed64a6b](https://github.com/jantimon/html-webpack-plugin/commit/ed64a6b35fe9cdbc610e9b766700f3b2fc2b8e4c), [86245db](https://github.com/jantimon/html-webpack-plugin/commit/86245db670a9b3bdd0e2aba9f2031745a98434c7), [50b3bec](https://github.com/jantimon/html-webpack-plugin/commit/50b3bec51a43289d6d1b4e1e6439560eb791576f), [c697725](https://github.com/jantimon/html-webpack-plugin/commit/c697725e9f4dd990bd4b7927bbfa7b826d2f36f2))
+* allow generating one file per chunk with the new `'[name]'` placeholder for the `filename` option ([cd5bd2a](https://github.com/jantimon/html-webpack-plugin/commit/cd5bd2afc902bbe5a5ceec4756ef634a26aa1332), [3d9ff48](https://github.com/jantimon/html-webpack-plugin/commit/3d9ff48543d04d9f7c3440bfefb43751775a9e81))
+* the `filename` option can now be a function ([c5beb4b](https://github.com/jantimon/html-webpack-plugin/commit/c5beb4bd16e4916b5355c300abebf9d7d3c587da))
+* add support for `'auto'` public paths inside templates ([a059fcf](https://github.com/jantimon/html-webpack-plugin/commit/a059fcf32d94aaaa738359cedce0b0e4af68f0de), [b09b439](https://github.com/jantimon/html-webpack-plugin/commit/b09b439f50ecb75994acde2eb2967ad690ff1cf0))
+* use defer as default script loading mechanism ([35b6b87](https://github.com/jantimon/html-webpack-plugin/commit/35b6b878db17f0f5704a187b336a14fdd58cedfc))
+* allow to set publicPath to an empty string `''` ([5ea7de4](https://github.com/jantimon/html-webpack-plugin/commit/5ea7de4ba271813835be700316c8a1763b205d2d))
+* improve typings ([197ddd8](https://github.com/jantimon/html-webpack-plugin/commit/197ddd88f39a2e6e70863b6fed2385d33043d137))
+* provide public path to the alterAssetTagGroups hook ([1b54dfb](https://github.com/jantimon/html-webpack-plugin/commit/1b54dfbd62c0d0df10dd3d2be9937626142d518f))
+* provide public path to the alterAssetTags hook ([b754626](https://github.com/jantimon/html-webpack-plugin/commit/b75462653d11803a428b1d29479e259c3010163f))
+* use `thisCompilation` in child compiler for faster builds ([1d59e9a](https://github.com/jantimon/html-webpack-plugin/commit/1d59e9a71ddba1429168c42569a7bd9bdd363f4f))
+* export new major in static property ([8b692bd](https://github.com/jantimon/html-webpack-plugin/commit/8b692bd7cc0b75ddf55f47da317eed9bd19dab91))
+* reduce dependencies ([8c28aaa](https://github.com/jantimon/html-webpack-plugin/commit/8c28aaa2bed5a7147b397fef3801cfe8fb5c34b9), [56e633f](https://github.com/jantimon/html-webpack-plugin/commit/56e633fcb90909c2bbedbd63590ecaa825d8b31f))
+
+
+### Bug Fixes
+
+* emit files on every build to work properly with plugins like the 
+clean-webpack-plugin ([6b3d087](https://github.com/jantimon/html-webpack-plugin/commit/6b3d087cf17f63b596c298d70a42a7462dd0f881))
+* generate html files even if no webpack entry exists ([2693dfa](https://github.com/jantimon/html-webpack-plugin/commit/2693dfaf4c94625eab86afadfd0e4d8822092d6b))
+* keep binary format when adding assets ([7e2b208](https://github.com/jantimon/html-webpack-plugin/commit/7e2b208634e26299c509e0c6b3189e01e4c3d3df)), closes [#1537](https://github.com/jantimon/html-webpack-plugin/issues/1537)
+
 ### [4.5.1](https://github.com/jantimon/html-webpack-plugin/compare/v4.5.0...v4.5.1) (2021-01-03)
 
 
