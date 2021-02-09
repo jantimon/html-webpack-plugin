@@ -94,7 +94,7 @@ declare namespace HtmlWebpackPlugin {
      * blocking will result in <script src="..."></script>
      * defer will result in <script defer src="..."></script>
      *
-     * @default 'blocking'
+     * @default 'defer'
      */
     scriptLoading?: "blocking" | "defer";
     /**
