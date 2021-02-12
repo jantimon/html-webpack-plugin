@@ -1232,6 +1232,74 @@ describe('HtmlWebpackPlugin', () => {
     null, done, false, false);
   });
 
+  it('allows events to remove an attribute by setting it to null', done => {
+    const examplePlugin = {
+      apply: function (compiler) {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
+          HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('HtmlWebpackPluginTest', (pluginArgs, callback) => {
+            pluginArgs.assetTags.scripts = pluginArgs.assetTags.scripts.map(tag => {
+              if (tag.tagName === 'script') {
+                tag.attributes.async = null;
+              }
+              return tag;
+            });
+            callback(null, pluginArgs);
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    },
+    [/<script defer="defer" src="app_bundle.js"><\/script>[\s]*<\/head>/],
+    null, done, false, false);
+  });
+
+  it('allows events to remove an attribute by setting it to undefined', done => {
+    const examplePlugin = {
+      apply: function (compiler) {
+        compiler.hooks.compilation.tap('HtmlWebpackPlugin', compilation => {
+          HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('HtmlWebpackPluginTest', (pluginArgs, callback) => {
+            pluginArgs.assetTags.scripts = pluginArgs.assetTags.scripts.map(tag => {
+              if (tag.tagName === 'script') {
+                tag.attributes.async = undefined;
+              }
+              return tag;
+            });
+            callback(null, pluginArgs);
+          });
+        });
+      }
+    };
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin(),
+        examplePlugin
+      ]
+    },
+    [/<script defer="defer" src="app_bundle.js"><\/script>[\s]*<\/head>/],
+    null, done, false, false);
+  });
+
   it('provides the options to the afterEmit event', done => {
     let eventArgs;
     const examplePlugin = {
