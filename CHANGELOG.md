@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.1.0](https://github.com/jantimon/html-webpack-plugin/compare/v5.0.0...v5.1.0) (2021-02-12)
+
+
+### Features
+
+* omit html tag attribute with null/undefined/false value ([aa6e78d](https://github.com/jantimon/html-webpack-plugin/commit/aa6e78d1430c17d9cf05550b2c9f73a9a0c0166c)), closes [#1598](https://github.com/jantimon/html-webpack-plugin/issues/1598)
+
 ## [5.0.0](https://github.com/jantimon/html-webpack-plugin/compare/v4.5.1...v5.0.0) (2021-02-03)
 
 
