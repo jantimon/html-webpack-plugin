@@ -263,7 +263,7 @@ declare namespace HtmlWebpackPlugin {
      * E.g. `{'disabled': true, 'value': 'demo'}`
      */
     attributes: {
-      [attributeName: string]: string | boolean;
+      [attributeName: string]: string | boolean | null | undefined;
     };
     /**
      * The tag name e.g. `'div'`
