@@ -10,8 +10,10 @@ jobs:
       matrix:
         node: ['6.x', '12.x', '14.x']
         os: [ubuntu-latest, windows-latest]
-        webpack: ['4']
-
+        webpack: ['4', '5']
+        exclude:
+          - webpack: '5'
+            node: '6.x'
     steps:
       - name: LF
         run: git config --global core.autocrlf false
