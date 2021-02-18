@@ -133,10 +133,13 @@ class HtmlWebpackPlugin {
     // Evaluate code and cast to string
     let newSource;
     try {
-      newSource = vmScript.runInContext(vmContext);
+      // fix issue: https://github.com/jantimon/html-webpack-plugin/issues/1603
+      vmScript.runInContext(vmContext);
     } catch (e) {
       return Promise.reject(e);
     }
+    // see issue: https://github.com/jantimon/html-webpack-plugin/issues/1603
+    newSource = vmContext.HTML_WEBPACK_PLUGIN_RESULT;
     if (typeof newSource === 'object' && newSource.__esModule && newSource.default) {
       newSource = newSource.default;
     }
