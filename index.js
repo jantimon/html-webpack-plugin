@@ -316,8 +316,10 @@ class HtmlWebpackPlugin {
       return Promise.reject(new Error('The child compilation didn\'t provide a result'));
     }
     // The LibraryTemplatePlugin stores the template result in a local variable.
-    // Return the value from this variable
-    source += ';HTML_WEBPACK_PLUGIN_RESULT';
+    // Extract the value from this variable
+    if (source.indexOf('HTML_WEBPACK_PLUGIN_RESULT') >= 0) {
+      source += ';\nHTML_WEBPACK_PLUGIN_RESULT';
+    }
     const template = this.options.template.replace(/^.+!/, '').replace(/\?.+$/, '');
     const vmContext = vm.createContext(_.extend({ HTML_WEBPACK_PLUGIN: true, require: require, console: console }, global));
     const vmScript = new vm.Script(source, { filename: template });
