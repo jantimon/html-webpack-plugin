@@ -1,8 +1,17 @@
-# Changelog
+# Change Log
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [4.5.1](https://github.com/jantimon/html-webpack-plugin/compare/v4.5.0...v4.5.1) (2021-01-03)
+## [4.5.2](https://github.com/jantimon/html-webpack-plugin/compare/v4.5.1...v4.5.2) (2021-02-18)
+
+
+### Bug Fixes
+
+* more robust variable value extraction to add support for webpack >= 5.22.0 ([1aabaf9](https://github.com/jantimon/html-webpack-plugin/commit/1aabaf99820257cbe7d3efccb62b42254ad35e04))
+
+
+
+## [4.5.1](https://github.com/jantimon/html-webpack-plugin/compare/v4.5.0...v4.5.1) (2021-01-03)
 
 
 ### Bug Fixes
