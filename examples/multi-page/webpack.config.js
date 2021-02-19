@@ -16,7 +16,7 @@ module.exports = {
   module: {
     rules: [
       { test: /\.css$/, use: ['style-loader', 'css-loader'] },
-      { test: /\.png$/, loader: 'file-loader' }
+      { test: /\.png$/, type: 'asset/resource' }
     ]
   },
   plugins: [
