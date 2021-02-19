@@ -123,12 +123,20 @@ class HtmlWebpackPlugin {
       return Promise.reject(new Error('The child compilation didn\'t provide a result'));
     }
     // The LibraryTemplatePlugin stores the template result in a local variable.
-    // To extract the result during the evaluation this part has to be removed.
-    if (source && source.indexOf('HTML_WEBPACK_PLUGIN_RESULT') >= 0) {
+    // By adding it to the end the value gets extracted during evaluation
+    if (source.indexOf('HTML_WEBPACK_PLUGIN_RESULT') >= 0) {
       source += ';\nHTML_WEBPACK_PLUGIN_RESULT';
     }
     const templateWithoutLoaders = templateFilename.replace(/^.+!/, '').replace(/\?.+$/, '');
-    const vmContext = vm.createContext({ HTML_WEBPACK_PLUGIN: true, require: require, htmlWebpackPluginPublicPath: publicPath, ...global });
+    const vmContext = vm.createContext({
+      ...global,
+      HTML_WEBPACK_PLUGIN: true,
+      require: require,
+      htmlWebpackPluginPublicPath:
+      publicPath,
+      URL: require('url').URL,
+      __filename: templateWithoutLoaders
+    });
     const vmScript = new vm.Script(source, { filename: templateWithoutLoaders });
     // Evaluate code and cast to string
     let newSource;
@@ -147,7 +155,8 @@ class HtmlWebpackPlugin {
 }
 
 /**
- * apply is called by the webpack main compiler during the start phase
+ * connect the html-webpack-plugin to the webpack compiler lifecycle hooks
+ *
  * @param {import('webpack').Compiler} compiler
  * @param {ProcessedHtmlWebpackOptions} options
  * @param {HtmlWebpackPlugin} plugin
