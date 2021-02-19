@@ -14,7 +14,7 @@ module.exports = {
   module: {
     rules: [
       { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] },
-      { test: /\.png$/, loader: 'file-loader' },
+      { test: /\.png$/, type: 'asset/resource' },
       { test: /\.pug$/, loader: 'pug-loader' }
     ]
   },
