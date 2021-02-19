@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.2.0](https://github.com/jantimon/html-webpack-plugin/compare/v5.1.0...v5.2.0) (2021-02-19)
+
+
+### Features
+
+* improve ssr ([73d2a66](https://github.com/jantimon/html-webpack-plugin/commit/73d2a660b10b9ebf8a341f0ddb173bcaaf1e513c))
+
 ## [5.1.0](https://github.com/jantimon/html-webpack-plugin/compare/v5.0.0...v5.1.0) (2021-02-12)
 
 
