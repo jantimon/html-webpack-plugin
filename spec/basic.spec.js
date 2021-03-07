@@ -2750,4 +2750,36 @@ describe('HtmlWebpackPlugin', () => {
       ]
     }, ['<body>'], null, done);
   });
+
+  it('allows to set custom loader interpolation settings', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      module: {
+        rules: [
+          {
+            test: /\.html$/,
+            loader: require.resolve('../lib/loader.js'),
+            options: {
+              interpolate: /\{%=([\s\S]+?)%\}/g
+            }
+          }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          title: 'Interpolation Demo',
+          template: path.join(__dirname, 'fixtures/interpolation.html')
+        })
+      ]
+    }, ['Interpolation Demo'], null, () => {
+      done();
+    });
+  });
 });
