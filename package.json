@@ -34,7 +34,7 @@
     "css-loader": "5.0.1",
     "cz-conventional-changelog": "2.1.0",
     "dir-compare": "1.7.2",
-    "html-loader": "2.0.0",
+    "html-loader": "2.1.1",
     "jest": "26.5.3",
     "mini-css-extract-plugin": "1.0.0",
     "pug": "3.0.2",
@@ -52,7 +52,6 @@
   "dependencies": {
     "@types/html-minifier-terser": "^5.0.0",
     "html-minifier-terser": "^5.0.1",
-    "loader-utils": "^2.0.0",
     "lodash": "^4.17.20",
     "pretty-error": "^2.1.1",
     "tapable": "^2.0.0"
