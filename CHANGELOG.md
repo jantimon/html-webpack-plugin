@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.3.0](https://github.com/jantimon/html-webpack-plugin/compare/v5.2.0...v5.3.0) (2021-03-07)
+
+
+### Features
+
+* allow to modify the interpolation options in webpack config ([d654f5b](https://github.com/jantimon/html-webpack-plugin/commit/d654f5b90022304335b372d424ff4c08d3a9d341))
+* drop loader-utils dependency ([41d7a50](https://github.com/jantimon/html-webpack-plugin/commit/41d7a50516aefd1af2704e3837d5d41351c6199b))
+
 ## [5.2.0](https://github.com/jantimon/html-webpack-plugin/compare/v5.1.0...v5.2.0) (2021-02-19)
 
 
