@@ -187,13 +187,6 @@ function hookIntoCompiler (compiler, options, plugin) {
     options.filename = path.relative(outputPath, filename);
   }
 
-  // `contenthash` is introduced in webpack v4.3
-  // which conflicts with the plugin's existing `contenthash` method,
-  // hence it is renamed to `templatehash` to avoid conflicts
-  options.filename = options.filename.replace(/\[(?:(\w+):)?templatehash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, (match) => {
-    return match.replace('templatehash', 'contenthash');
-  });
-
   // Check if webpack is running in production mode
   // @see https://github.com/webpack/webpack/blob/3366421f1784c449f415cda5930a8e445086f688/lib/WebpackOptionsDefaulter.js#L12-L14
   const isProductionLikeMode = compiler.options.mode === 'production' || !compiler.options.mode;
