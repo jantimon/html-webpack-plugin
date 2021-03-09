@@ -969,8 +969,6 @@ describe('HtmlWebpackPlugin', () => {
   });
 
   it('should allow filename in the format of [contenthash:<length>]', done => {
-    const hash = require('crypto').createHash('sha256');
-
     testHtmlPlugin({
       mode: 'production',
       entry: {
