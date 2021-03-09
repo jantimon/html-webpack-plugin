@@ -951,7 +951,24 @@ describe('HtmlWebpackPlugin', () => {
     }, ['<script defer="defer" src="index_bundle.js"'], /test-\S+\.html$/, done);
   });
 
-  it('should allow filename in the format of [<hashType>:contenthash:<digestType>:<length>]', done => {
+  it('should work with hash options provided in output options', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: {
+        index: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js',
+        hashDigestLength: 16
+      },
+      plugins: [
+        new HtmlWebpackPlugin({ filename: 'index.[contenthash].html' })
+      ]
+    }, [], /index\.[a-z0-9]{16}\.html/, done);
+  });
+
+  it('should allow filename in the format of [contenthash:<length>]', done => {
     testHtmlPlugin({
       mode: 'production',
       entry: {
@@ -962,9 +979,9 @@ describe('HtmlWebpackPlugin', () => {
         filename: '[name]_bundle.js'
       },
       plugins: [
-        new HtmlWebpackPlugin({ filename: 'index.[sha256:contenthash:base32:32].html' })
+        new HtmlWebpackPlugin({ filename: 'index.[contenthash:4].html' })
       ]
-    }, [], /index\.[a-z0-9]{32}\.html/, done);
+    }, [], /index\.[a-z0-9]{4}\.html/, done);
   });
 
   it('will replace [contenthash] in the filename with a content hash of 32 hex characters', done => {
@@ -980,7 +997,7 @@ describe('HtmlWebpackPlugin', () => {
       plugins: [
         new HtmlWebpackPlugin({ filename: 'index.[contenthash].html' })
       ]
-    }, [], /index\.[a-f0-9]{32}\.html/, done);
+    }, [], /index\.[a-f0-9]{20}\.html/, done);
   });
 
   it('will replace [templatehash] in the filename with a content hash of 32 hex characters', done => {
@@ -996,7 +1013,7 @@ describe('HtmlWebpackPlugin', () => {
       plugins: [
         new HtmlWebpackPlugin({ filename: 'index.[templatehash].html' })
       ]
-    }, [], /index\.[a-f0-9]{32}\.html/, done);
+    }, [], /index\.[a-f0-9]{20}\.html/, done);
   });
 
   it('allows you to use an absolute output filename', done => {

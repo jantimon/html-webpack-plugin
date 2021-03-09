@@ -464,7 +464,7 @@ which will inject the element `<base href="http://example.com/some/page.html" ta
 
 ### Long Term Caching
 
-For long term caching add `contenthash/templatehash` to the filename.
+For long term caching add `contenthash` to the filename.
 
 **Example:**
 
@@ -476,15 +476,9 @@ plugins: [
 ]
 ```
 
-`contenthash/templatehash` is the hash of the content of the output file.
+`contenthash` is the hash of the content of the output file.
 
-Optionally, You can configure like `[<hashType>:contenthash:<digestType>:<length>]`
-
-* `hashType` - one of `sha1`, `md5`, `sha256`, `sha512`  or any other node.js supported hash type
-* `digestType` - one of `hex`, `base26`, `base32`, `base36`, `base49`, `base52`, `base58`, `base62`, `base64`
-* `maxlength` - maximum length of the generated hash in chars
-
-**Defaults:** `[md5:contenthash:hex:9999]`
+Refer webpack's [Template Strings](https://webpack.js.org/configuration/output/#template-strings) for more details
 
 ### Events
 
