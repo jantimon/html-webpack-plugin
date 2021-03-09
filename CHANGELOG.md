@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.3.1](https://github.com/jantimon/html-webpack-plugin/compare/v5.3.0...v5.3.1) (2021-03-09)
+
+
+### Bug Fixes
+
+* remove loader-utils from plugin core ([82d0ee8](https://github.com/jantimon/html-webpack-plugin/commit/82d0ee8ddf146f17d71e98c1b44b2f2ec7420051))
+
 ## [5.3.0](https://github.com/jantimon/html-webpack-plugin/compare/v5.2.0...v5.3.0) (2021-03-07)
 
 
