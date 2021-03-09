@@ -4,7 +4,7 @@
 [![deps][deps]][deps-url]
 [![tests][tests]][tests-url]
 [![Backers on Open Collective](https://opencollective.com/html-webpack-plugin/backers/badge.svg)](#backers)
- [![Sponsors on Open Collective](https://opencollective.com/html-webpack-plugin/sponsors/badge.svg)](#sponsors) 
+ [![Sponsors on Open Collective](https://opencollective.com/html-webpack-plugin/sponsors/badge.svg)](#sponsors)
 
 <div align="center">
   <img width="200" height="200" src="https://worldvectorlogo.com/logos/html5.svg">
@@ -59,11 +59,11 @@ your own template using `lodash` templates or use your own loader.
 <a href="https://opencollective.com/html-webpack-plugin/sponsor/8/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/html-webpack-plugin/sponsor/9/website" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/sponsor/9/avatar.svg"></a>
 
-Thanks for supporting the ongoing improvements to the html-webpack-plugin!  
+Thanks for supporting the ongoing improvements to the html-webpack-plugin!
 
 <h2 align="center">Zero Config</h2>
 
-The `html-webpack-plugin` works without configuration.  
+The `html-webpack-plugin` works without configuration.
 It's a great addition to the [⚙️ webpack-config-plugins](https://github.com/namics/webpack-config-plugins/blob/master/README.md#zero-config-webpack-dev-server-example).
 
 <h2 align="center">Plugins</h2>
@@ -73,7 +73,7 @@ The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webp
  * [webpack-subresource-integrity](https://www.npmjs.com/package/webpack-subresource-integrity) for enhanced asset security
  * [appcache-webpack-plugin](https://github.com/lettertwo/appcache-webpack-plugin) for iOS and Android offline usage
  * [favicons-webpack-plugin](https://github.com/jantimon/favicons-webpack-plugin) which generates favicons and icons for iOS, Android and desktop browsers
- * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin) can be used to always write to disk the html file, useful when webpack-dev-server / HMR are being used 
+ * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin) can be used to always write to disk the html file, useful when webpack-dev-server / HMR are being used
  * [html-webpack-inline-svg-plugin](https://github.com/thegc/html-webpack-inline-svg-plugin) to inline SVGs in the resulting HTML file.
  * [html-webpack-exclude-assets-plugin](https://github.com/jamesjieye/html-webpack-exclude-assets-plugin) for excluding assets using regular expressions
  * [html-webpack-include-assets-plugin](https://github.com/jharris4/html-webpack-include-assets-plugin) for including lists of js or css file paths (such as those copied by the copy-webpack-plugin).
@@ -84,7 +84,7 @@ The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webp
  * [html-webpack-inline-style-plugin](https://github.com/djaax/html-webpack-inline-style-plugin) for inlining styles to HTML elements using [juice](https://github.com/Automattic/juice). Useful for email generation automatisation.
  * [html-webpack-exclude-empty-assets-plugin](https://github.com/KnisterPeter/html-webpack-exclude-empty-assets-plugin) removes empty assets from being added to the html. This fixes some problems with extract-text-plugin with webpack 4.
  * [webpack-concat-plugin](https://github.com/hxlniada/webpack-concat-plugin) for concat and uglify files that needn't to be webpack bundles(for legacy files) and inject to html-webpack-plugin.
- * [html-webpack-link-type-plugin](https://github.com/steadyapp/html-webpack-link-type-plugin) adds a configurable mimetype to resources injected as links (such as adding type="text/css" to external stylesheets) for compatibility with "strict mode". 
+ * [html-webpack-link-type-plugin](https://github.com/steadyapp/html-webpack-link-type-plugin) adds a configurable mimetype to resources injected as links (such as adding type="text/css" to external stylesheets) for compatibility with "strict mode".
  * [csp-html-webpack-plugin](https://github.com/slackhq/csp-html-webpack-plugin) to add [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) meta tags to the HTML output
  * [webpack-nomodule-plugin](https://github.com/swimmadude66/webpack-nomodule-plugin) allows you to add a `nomodule` attribute to specific injected scripts, which prevents the scripts from being loaded by newer browsers. Good for limiting loads of polyfills.
   * [html-webpack-skip-assets-plugin](https://github.com/swimmadude66/html-webpack-skip-assets-plugin) Skip adding certain output files to the html file. Built as a drop-in replacement for [html-webpack-exclude-assets-plugin](https://www.npmjs.com/package/html-webpack-exclude-assets-plugin) and works with newer [html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin) versions
@@ -266,7 +266,7 @@ The following variables are available in the template by default (you can extend
      you can use this hash to pass arbitrary data through to your template.
 
   - `htmlWebpackPlugin.tags`: the prepared `headTags` and `bodyTags` Array to render the `<base>`, `<meta>`, `<script>` and `<link>` tags.
-     Can be used directly in templates and literals. For example: 
+     Can be used directly in templates and literals. For example:
      ```html
      <html>
        <head>
@@ -277,7 +277,7 @@ The following variables are available in the template by default (you can extend
        </body>
      </html>
      ```
-  
+
   - `htmlWebpackPlugin.files`: direct access to the files used during the compilation.
 
     ```typescript
@@ -298,7 +298,7 @@ The following variables are available in the template by default (you can extend
   (see [the inline template example](examples/inline/template.pug)).
 
 
-The template can also be directly inlined directly into the options object.  
+The template can also be directly inlined directly into the options object.
 ⚠️ **`templateContent` does not allow to use webpack loaders for your template and will not watch for template file changes**
 
 **webpack.config.js**
@@ -314,7 +314,7 @@ new HtmlWebpackPlugin({
 })
 ```
 
-The `templateContent` can also access all `templateParameters` values.  
+The `templateContent` can also access all `templateParameters` values.
 ⚠️ **`templateContent` does not allow to use webpack loaders for your template and will not watch for template file changes**
 
 **webpack.config.js**
@@ -384,14 +384,14 @@ To disable minification during production mode set the `minify` option to `false
 
 ### Meta Tags
 
-If the `meta` option is set the html-webpack-plugin will inject meta tags.  
+If the `meta` option is set the html-webpack-plugin will inject meta tags.
 For the default template the html-webpack-plugin will already provide a default for the `viewport` meta tag.
 
 Please take a look at this well maintained list of almost all [possible meta tags](https://github.com/joshbuchea/HEAD#meta).
 
-#### name/content meta tags 
+#### name/content meta tags
 
-Most meta tags are configured by setting a `name` and a `content` attribute.  
+Most meta tags are configured by setting a `name` and a `content` attribute.
 To add those use a key/value pair:
 
 **webpack.config.js**
@@ -410,7 +410,7 @@ plugins: [
 
 #### Simulate http response headers
 
-The **http-equiv** attribute is essentially used to simulate a HTTP response header.  
+The **http-equiv** attribute is essentially used to simulate a HTTP response header.
 This format is supported using an object notation which allows you to add any attribute:
 
 **webpack.config.js**
@@ -585,7 +585,7 @@ class MyPlugin {
     compiler.hooks.compilation.tap('MyPlugin', (compilation) => {
       console.log('The compiler is starting a new compilation...')
 
-      // Static Plugin interface |compilation |HOOK NAME | register listener 
+      // Static Plugin interface |compilation |HOOK NAME | register listener
       HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
         'MyPlugin', // <-- Set a meaningful name here for stacktraces
         (data, cb) => {
@@ -635,7 +635,7 @@ Note that the callback must be passed the HtmlWebpackPluginData in order to pass
 
 ## Backers
 
-Thank you to all our backers!  
+Thank you to all our backers!
 If you want to support the project as well [become a sponsor](https://opencollective.com/html-webpack-plugin#sponsor) or a [a backer](https://opencollective.com/html-webpack-plugin#backer).
 
 <a href="https://opencollective.com/html-webpack-plugin/backer/0/website?requireActive=false" target="_blank"><img src="https://opencollective.com/html-webpack-plugin/backer/0/avatar.svg?requireActive=false"></a>
