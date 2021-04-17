@@ -307,10 +307,10 @@ function hookIntoCompiler (compiler, options, plugin) {
 
               if (options.rootElement) {
                 assetGroups.bodyTags.push({
-                  tagName: options.rootElement.tag,
+                  tagName: options.rootElement.tag || 'div',
                   voidTag: false,
                   attributes: {
-                    id: options.rootElement.id
+                    id: options.rootElement.id || 'root'
                   },
                   meta: {}
                 });
