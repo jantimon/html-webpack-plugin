@@ -2810,7 +2810,6 @@ describe('HtmlWebpackPlugin', () => {
         filename: '[name]_bundle.js'
       },
       plugins: [new HtmlWebpackPlugin({
-        template: path.join(__dirname, 'fixtures/plain.html'),
         rootElement: {
           tag: 'div',
           id: 'app'
