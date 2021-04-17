@@ -2811,10 +2811,44 @@ describe('HtmlWebpackPlugin', () => {
       },
       plugins: [new HtmlWebpackPlugin({
         rootElement: {
-          tag: 'div',
+          tag: 'main',
+          id: 'app'
+        }
+      })]
+    }, ['<main id="app"></main>'], null, done);
+  });
+  it('provides a default tag', done => {
+    testHtmlPlugin({
+      mode: 'none',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        rootElement: {
           id: 'app'
         }
       })]
     }, ['<div id="app"></div>'], null, done);
+  });
+  it('provides a default id', done => {
+    testHtmlPlugin({
+      mode: 'none',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        rootElement: {
+          tag: 'div'
+        }
+      })]
+    }, ['<div id="root"></div>'], null, done);
   });
 });
