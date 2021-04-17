@@ -2799,4 +2799,23 @@ describe('HtmlWebpackPlugin', () => {
       done();
     });
   });
+  it('allows you to inject a custom root element', done => {
+    testHtmlPlugin({
+      mode: 'none',
+      entry: {
+        app: path.join(__dirname, 'fixtures/index.js')
+      },
+      output: {
+        path: OUTPUT_DIR,
+        filename: '[name]_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        template: path.join(__dirname, 'fixtures/plain.html'),
+        rootElement: {
+          tag: 'div',
+          id: 'app'
+        }
+      })]
+    }, ['<div id="app"></div>'], null, done);
+  });
 });
