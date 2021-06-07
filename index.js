@@ -131,9 +131,11 @@ class HtmlWebpackPlugin {
       ...global,
       HTML_WEBPACK_PLUGIN: true,
       require: require,
+      __non_webpack_require__: require,
       htmlWebpackPluginPublicPath: publicPath,
       URL: require('url').URL,
-      __filename: templateWithoutLoaders
+      __filename: templateWithoutLoaders,
+      __dirname: path.dirname(templateWithoutLoaders)
     });
     const vmScript = new vm.Script(source, { filename: templateWithoutLoaders });
     // Evaluate code and cast to string
