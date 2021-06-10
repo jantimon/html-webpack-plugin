@@ -131,7 +131,6 @@ class HtmlWebpackPlugin {
       ...global,
       HTML_WEBPACK_PLUGIN: true,
       require: require,
-      __non_webpack_require__: require,
       htmlWebpackPluginPublicPath: publicPath,
       URL: require('url').URL,
       __filename: templateWithoutLoaders,
