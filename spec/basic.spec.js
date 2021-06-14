@@ -2803,7 +2803,6 @@ describe('HtmlWebpackPlugin', () => {
   it('allows __dirname and __filename in requireExtensions', done => {
     testHtmlPlugin({
       mode: 'production',
-      target: 'electron-renderer',
       entry: path.join(__dirname, 'fixtures/index.js'),
       output: {
         path: OUTPUT_DIR,
