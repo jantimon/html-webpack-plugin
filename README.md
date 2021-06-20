@@ -89,7 +89,7 @@ The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webp
  * [webpack-nomodule-plugin](https://github.com/swimmadude66/webpack-nomodule-plugin) allows you to add a `nomodule` attribute to specific injected scripts, which prevents the scripts from being loaded by newer browsers. Good for limiting loads of polyfills.
   * [html-webpack-skip-assets-plugin](https://github.com/swimmadude66/html-webpack-skip-assets-plugin) Skip adding certain output files to the html file. Built as a drop-in replacement for [html-webpack-exclude-assets-plugin](https://www.npmjs.com/package/html-webpack-exclude-assets-plugin) and works with newer [html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin) versions
  * [html-webpack-inject-preload](https://github.com/principalstudio/html-webpack-inject-preload) allows to add preload links &lt;link rel='preload'> anywhere you want.
-
+ * [inject-body-webpack-plugin](https://github.com/Jaid/inject-body-webpack-plugin) is a simple method of injecting a custom HTML string into the body.
 
 
 <h2 align="center">Usage</h2>
