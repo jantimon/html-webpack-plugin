@@ -95,7 +95,7 @@ The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webp
 <h2 align="center">Usage</h2>
 
 The plugin will generate an HTML5 file for you that includes all your `webpack`
-bundles in the body using `script` tags. Just add the plugin to your `webpack`
+bundles in the head using `script` tags. Just add the plugin to your `webpack`
 config as follows:
 
 **webpack.config.js**
@@ -122,9 +122,9 @@ This will generate a file `dist/index.html` containing the following
   <head>
     <meta charset="utf-8">
     <title>Webpack App</title>
+    <script defer src="index_bundle.js"></script>
   </head>
   <body>
-    <script src="index_bundle.js"></script>
   </body>
 </html>
 ```
