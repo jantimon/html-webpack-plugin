@@ -96,7 +96,7 @@ declare namespace HtmlWebpackPlugin {
      *
      * @default 'defer'
      */
-    scriptLoading?: "blocking" | "defer";
+    scriptLoading?: "blocking" | "defer" | "module";
     /**
      * Inject meta tags
      */

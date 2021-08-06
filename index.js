@@ -70,7 +70,7 @@ class HtmlWebpackPlugin {
       this.options = options;
 
       // Assert correct option spelling
-      assert(options.scriptLoading === 'defer' || options.scriptLoading === 'blocking', 'scriptLoading needs to be set to "defer" or "blocking');
+      assert(options.scriptLoading === 'defer' || options.scriptLoading === 'blocking' || options.scriptLoading === 'module', 'scriptLoading needs to be set to "defer", "blocking" or "module"');
       assert(options.inject === true || options.inject === false || options.inject === 'head' || options.inject === 'body', 'inject needs to be set to true, false, "head" or "body');
 
       // Default metaOptions if no template is provided
@@ -741,7 +741,8 @@ function hookIntoCompiler (compiler, options, plugin) {
       voidTag: false,
       meta: { plugin: 'html-webpack-plugin' },
       attributes: {
-        defer: options.scriptLoading !== 'blocking',
+        defer: options.scriptLoading === 'defer',
+        type: options.scriptLoading === 'module' ? 'module' : undefined,
         src: scriptAsset
       }
     }));
