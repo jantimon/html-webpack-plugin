@@ -741,7 +741,7 @@ function hookIntoCompiler (compiler, options, plugin) {
       voidTag: false,
       meta: { plugin: 'html-webpack-plugin' },
       attributes: {
-        defer: options.scriptLoading !== 'blocking',
+        defer: options.scriptLoading !== 'blocking' && options.inject !== 'body',
         src: scriptAsset
       }
     }));
