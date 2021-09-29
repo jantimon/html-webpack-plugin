@@ -1041,12 +1041,12 @@ function hookIntoCompiler (compiler, options, plugin) {
    *
    * @param {string} html
    */
-  function minifyHtml (html) {
+  async function minifyHtml (html) {
     if (typeof options.minify !== 'object') {
       return html;
     }
     try {
-      return require('html-minifier-terser').minify(html, options.minify);
+      return await require('html-minifier-terser').minify(html, options.minify);
     } catch (e) {
       const isParseError = String(e.message).indexOf('Parse Error') === 0;
       if (isParseError) {
