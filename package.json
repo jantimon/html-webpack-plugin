@@ -49,8 +49,8 @@
     "webpack-recompilation-simulator": "3.2.0"
   },
   "dependencies": {
-    "@types/html-minifier-terser": "^5.0.0",
-    "html-minifier-terser": "^5.0.1",
+    "@types/html-minifier-terser": "^6.0.0",
+    "html-minifier-terser": "^6.0.2",
     "lodash": "^4.17.21",
     "pretty-error": "^3.0.4",
     "tapable": "^2.0.0"
