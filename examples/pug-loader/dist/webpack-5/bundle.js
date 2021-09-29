@@ -284,7 +284,7 @@ function pug_rethrow(err, filename, lineno, str) {
   }
   var context, lines, start, end;
   try {
-    str = str || __webpack_require__(672).readFileSync(filename, {encoding: 'utf8'});
+    str = str || __webpack_require__(993).readFileSync(filename, {encoding: 'utf8'});
     context = 3;
     lines = str.split('\n');
     start = Math.max(lineno - context, 0);
@@ -323,7 +323,7 @@ function pug_rethrow(err, filename, lineno, str) {
 
 /***/ }),
 
-/***/ 672:
+/***/ 993:
 /***/ (() => {
 
 /* (ignored) */
@@ -338,9 +338,8 @@ function pug_rethrow(err, filename, lineno, str) {
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
+/******/ 		if(__webpack_module_cache__[moduleId]) {
+/******/ 			return __webpack_module_cache__[moduleId].exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
