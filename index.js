@@ -1041,7 +1041,7 @@ function hookIntoCompiler (compiler, options, plugin) {
    *
    * @param {string} html
    */
-  async function minifyHtml (html) {
+  function minifyHtml (html) {
     if (typeof options.minify !== 'object') {
       return html;
     }
