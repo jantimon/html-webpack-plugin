@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.4.0](https://github.com/jantimon/html-webpack-plugin/compare/v5.3.2...v5.3.3) (2021-10-15)
+
+### Features
+
+* update terser ([9c7fba0](https://github.com/jantimon/html-webpack-plugin/pull/1688)
+
 ### [5.3.2](https://github.com/jantimon/html-webpack-plugin/compare/v5.3.1...v5.3.2) (2021-06-22)
 
 ### Bug Fixes
