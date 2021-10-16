@@ -1,5 +1,8 @@
 name: CI
-on: [push]
+  push:
+      branches: [main]
+  pull_request:
+      branches: [main]
 jobs:
   build:
     name: test Node ${{ matrix.node }} Webpack ${{ matrix.webpack }} ${{ matrix.os }}
