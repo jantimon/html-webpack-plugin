@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.5.0](https://github.com/jantimon/html-webpack-plugin/compare/v5.4.0...v5.5.0) (2021-10-25)
+
+
+### Features
+
+* Support type=module via scriptLoading option ([1e42625](https://github.com/jantimon/html-webpack-plugin/commit/1e4262528ff02a83e1fc7739b42472680fd205c2)), closes [#1663](https://github.com/jantimon/html-webpack-plugin/issues/1663)
+
 ### [5.4.0](https://github.com/jantimon/html-webpack-plugin/compare/v5.3.2...v5.3.3) (2021-10-15)
 
 ### Features
