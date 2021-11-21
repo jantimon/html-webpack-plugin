@@ -196,6 +196,7 @@ function hookIntoCompiler (compiler, options, plugin) {
     /** @type { import('html-minifier-terser').Options } */
     options.minify = {
       // https://www.npmjs.com/package/html-minifier-terser#options-quick-reference
+      collapseBooleanAttributes: true,
       collapseWhitespace: true,
       keepClosingSlash: true,
       removeComments: true,
