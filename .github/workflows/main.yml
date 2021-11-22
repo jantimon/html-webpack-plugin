@@ -31,10 +31,10 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Install Dependencies
-        run: npm install --ignore-scripts --force --legacy-peer-deps
+        run: npm install --ignore-scripts --legacy-peer-deps
 
       - name: Install Webpack ${{ matrix.webpack }}
-        run: npm install --ignore-scripts --force --legacy-peer-deps webpack@${{ matrix.webpack }}
+        run: npm install --ignore-scripts --legacy-peer-deps webpack@${{ matrix.webpack }}
 
       - name: Test
         run: npm test -- --forceExit || npm test -- --forceExit || npm test -- --forceExit
