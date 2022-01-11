@@ -15,7 +15,6 @@ const OUTPUT_DIR = path.join(__dirname, '../dist/caching-spec');
 
 jest.setTimeout(30000);
 process.on('unhandledRejection', r => console.log(r));
-process.traceDeprecation = true;
 
 function setUpCompiler (htmlWebpackPlugin) {
   jest.spyOn(htmlWebpackPlugin, 'evaluateCompilationResult');
@@ -103,7 +102,7 @@ describe('HtmlWebpackPluginCaching', () => {
         // Verify that no file was built
         expect(getCompiledModules(stats.toJson()))
           .toEqual([]);
-        // Verify that the html was processed only during the inital build
+        // Verify that the html was processed only during the initial build
         expect(htmlWebpackPlugin.evaluateCompilationResult.mock.calls.length)
           .toBe(1);
         // Verify that the child compilation was executed twice
@@ -131,7 +130,7 @@ describe('HtmlWebpackPluginCaching', () => {
         // Verify that only one file was built
         expect(getCompiledModuleCount(stats.toJson()))
           .toBe(1);
-        // Verify that the html was processed only during the inital build
+        // Verify that the html was processed only during the initial build
         expect(htmlWebpackPlugin.evaluateCompilationResult.mock.calls.length)
           .toBe(1);
         // Verify that the child compilation was executed only once
@@ -176,13 +175,11 @@ describe('HtmlWebpackPluginCaching', () => {
     const htmlWebpackPlugin = new HtmlWebpackPlugin({
       template: template
     });
-    let childCompilerHash;
     const compiler = setUpCompiler(htmlWebpackPlugin);
     compiler.addTestFile(template);
     compiler.run()
       // Change the template file and compile again
       .then(() => {
-        childCompilerHash = htmlWebpackPlugin.childCompilerHash;
         compiler.simulateFileChange(template, { footer: '<!-- 1 -->' });
         return compiler.run();
       })
@@ -195,9 +192,14 @@ describe('HtmlWebpackPluginCaching', () => {
         // Verify that the html was processed twice
         expect(htmlWebpackPlugin.evaluateCompilationResult.mock.calls.length)
           .toBe(2);
+
+        const [evaluateCompilationResultArgs1, evaluateCompilationResultArgs2] = htmlWebpackPlugin.evaluateCompilationResult.mock.calls;
+        const compiledSource = evaluateCompilationResultArgs1[0];
+        const compiledSourceSecondRun = evaluateCompilationResultArgs2[0];
+
         // Verify that the child compilation was executed twice
-        expect(htmlWebpackPlugin.childCompilerHash)
-          .not.toBe(childCompilerHash);
+        expect(compiledSource)
+          .not.toBe(compiledSourceSecondRun);
       })
       .then(done);
   });

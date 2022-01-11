@@ -1,11 +1,3 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is not neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -13,14 +5,27 @@
 /***/ ((module) => {
 
 "use strict";
-eval("// This file is used for frontend and backend\n\n\n// If compiled by the html-webpack-plugin\n// HTML_WEBPACK_PLUGIN is set to true:\nvar backend = typeof HTML_WEBPACK_PLUGIN !== 'undefined';\n\nmodule.exports = function () {\n  return 'Hello World from ' + (backend ? 'backend' : 'frontend');\n};\n\n\n//# sourceURL=webpack:///./universial.js?");
+// This file is used for frontend and backend
+
+
+// If compiled by the html-webpack-plugin
+// HTML_WEBPACK_PLUGIN is set to true:
+var backend = typeof HTML_WEBPACK_PLUGIN !== 'undefined';
+
+module.exports = function () {
+  return 'Hello World from ' + (backend ? 'backend' : 'frontend');
+};
+
 
 /***/ }),
 
 /***/ 636:
-/***/ (() => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("// extracted by mini-css-extract-plugin\n\n//# sourceURL=webpack:///./main.css?");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
 
 /***/ })
 
@@ -50,9 +55,29 @@ eval("// extracted by mini-css-extract-plugin\n\n//# sourceURL=webpack:///./main
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-eval("__webpack_require__(636);\n\nvar universal = __webpack_require__(184);\nvar h1 = document.createElement('h1');\nh1.innerHTML = universal();\n\ndocument.body.appendChild(h1);\n\n\n//# sourceURL=webpack:///./example.js?");
+__webpack_require__(636);
+
+var universal = __webpack_require__(184);
+var h1 = document.createElement('h1');
+h1.innerHTML = universal();
+
+document.body.appendChild(h1);
+
 })();
 
 /******/ })()

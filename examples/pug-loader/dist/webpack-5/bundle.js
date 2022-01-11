@@ -2,9 +2,12 @@
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 636:
-/***/ (() => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
 // extracted by mini-css-extract-plugin
+
 
 /***/ }),
 
@@ -13,7 +16,15 @@
 
 var pug = __webpack_require__(79);
 
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (time) {pug_html = pug_html + "\u003C!-- this partial is used for frontend and backend--\u003E\u003Cdiv class=\"time\"\u003E \u003Cb\u003ECurrent time\u003C\u002Fb\u003E\u003Cp\u003E" + (pug.escape(null == (pug_interp = time.toISOString()) ? "" : pug_interp)) + "\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cimg src=\"#{require('.\u002Flogo.png')}\"\u003E";}.call(this,"time" in locals_for_with?locals_for_with.time:typeof time!=="undefined"?time:undefined));;return pug_html;};
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;
+    var locals_for_with = (locals || {});
+    
+    (function (time) {
+      pug_html = pug_html + "\u003C!-- this partial is used for frontend and backend--\u003E\u003Cdiv class=\"time\"\u003E \u003Cb\u003ECurrent time\u003C\u002Fb\u003E\u003Cp\u003E" + (pug.escape(null == (pug_interp = time.toISOString()) ? "" : pug_interp)) + "\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cimg src=\"#{require('.\u002Flogo.png')}\"\u003E";
+    }.call(this, "time" in locals_for_with ?
+        locals_for_with.time :
+        typeof time !== 'undefined' ? time : undefined));
+    ;;return pug_html;};
 module.exports = template;
 
 /***/ }),
@@ -64,7 +75,7 @@ function pug_merge(a, b) {
   }
 
   return a;
-};
+}
 
 /**
  * Process array, object, or string as a string of classes delimited by a space.
@@ -85,7 +96,10 @@ function pug_merge(a, b) {
  */
 exports.classes = pug_classes;
 function pug_classes_array(val, escaping) {
-  var classString = '', className, padding = '', escapeEnabled = Array.isArray(escaping);
+  var classString = '',
+    className,
+    padding = '',
+    escapeEnabled = Array.isArray(escaping);
   for (var i = 0; i < val.length; i++) {
     className = pug_classes(val[i]);
     if (!className) continue;
@@ -96,7 +110,8 @@ function pug_classes_array(val, escaping) {
   return classString;
 }
 function pug_classes_object(val) {
-  var classString = '', padding = '';
+  var classString = '',
+    padding = '';
   for (var key in val) {
     if (key && val[key] && pug_has_own_property.call(val, key)) {
       classString = classString + padding + key;
@@ -137,7 +152,7 @@ function pug_style(val) {
   } else {
     return val + '';
   }
-};
+}
 
 /**
  * Render the given attribute.
@@ -150,25 +165,32 @@ function pug_style(val) {
  */
 exports.attr = pug_attr;
 function pug_attr(key, val, escaped, terse) {
-  if (val === false || val == null || !val && (key === 'class' || key === 'style')) {
+  if (
+    val === false ||
+    val == null ||
+    (!val && (key === 'class' || key === 'style'))
+  ) {
     return '';
   }
   if (val === true) {
     return ' ' + (terse ? key : key + '="' + key + '"');
   }
   var type = typeof val;
-  if ((type === 'object' || type === 'function') && typeof val.toJSON === 'function') {
+  if (
+    (type === 'object' || type === 'function') &&
+    typeof val.toJSON === 'function'
+  ) {
     val = val.toJSON();
   }
   if (typeof val !== 'string') {
     val = JSON.stringify(val);
     if (!escaped && val.indexOf('"') !== -1) {
-      return ' ' + key + '=\'' + val.replace(/'/g, '&#39;') + '\'';
+      return ' ' + key + "='" + val.replace(/'/g, '&#39;') + "'";
     }
   }
   if (escaped) val = pug_escape(val);
   return ' ' + key + '="' + val + '"';
-};
+}
 
 /**
  * Render the given attributes object.
@@ -178,7 +200,7 @@ function pug_attr(key, val, escaped, terse) {
  * @return {String}
  */
 exports.attrs = pug_attrs;
-function pug_attrs(obj, terse){
+function pug_attrs(obj, terse) {
   var attrs = '';
 
   for (var key in obj) {
@@ -198,7 +220,7 @@ function pug_attrs(obj, terse){
   }
 
   return attrs;
-};
+}
 
 /**
  * Escape the given string of `html`.
@@ -210,7 +232,7 @@ function pug_attrs(obj, terse){
 
 var pug_match_html = /["&<>]/;
 exports.escape = pug_escape;
-function pug_escape(_html){
+function pug_escape(_html) {
   var html = '' + _html;
   var regexResult = pug_match_html.exec(html);
   if (!regexResult) return _html;
@@ -219,11 +241,20 @@ function pug_escape(_html){
   var i, lastIndex, escape;
   for (i = regexResult.index, lastIndex = 0; i < html.length; i++) {
     switch (html.charCodeAt(i)) {
-      case 34: escape = '&quot;'; break;
-      case 38: escape = '&amp;'; break;
-      case 60: escape = '&lt;'; break;
-      case 62: escape = '&gt;'; break;
-      default: continue;
+      case 34:
+        escape = '&quot;';
+        break;
+      case 38:
+        escape = '&amp;';
+        break;
+      case 60:
+        escape = '&lt;';
+        break;
+      case 62:
+        escape = '&gt;';
+        break;
+      default:
+        continue;
     }
     if (lastIndex !== i) result += html.substring(lastIndex, i);
     lastIndex = i + 1;
@@ -231,7 +262,7 @@ function pug_escape(_html){
   }
   if (lastIndex !== i) return result + html.substring(lastIndex, i);
   else return result;
-};
+}
 
 /**
  * Re-throw the given `err` in context to the
@@ -245,37 +276,49 @@ function pug_escape(_html){
  */
 
 exports.rethrow = pug_rethrow;
-function pug_rethrow(err, filename, lineno, str){
+function pug_rethrow(err, filename, lineno, str) {
   if (!(err instanceof Error)) throw err;
   if ((typeof window != 'undefined' || !filename) && !str) {
     err.message += ' on line ' + lineno;
     throw err;
   }
+  var context, lines, start, end;
   try {
-    str = str || __webpack_require__(993).readFileSync(filename, 'utf8')
+    str = str || __webpack_require__(993).readFileSync(filename, {encoding: 'utf8'});
+    context = 3;
+    lines = str.split('\n');
+    start = Math.max(lineno - context, 0);
+    end = Math.min(lines.length, lineno + context);
   } catch (ex) {
-    pug_rethrow(err, null, lineno)
+    err.message +=
+      ' - could not read from ' + filename + ' (' + ex.message + ')';
+    pug_rethrow(err, null, lineno);
+    return;
   }
-  var context = 3
-    , lines = str.split('\n')
-    , start = Math.max(lineno - context, 0)
-    , end = Math.min(lines.length, lineno + context);
 
   // Error context
-  var context = lines.slice(start, end).map(function(line, i){
-    var curr = i + start + 1;
-    return (curr == lineno ? '  > ' : '    ')
-      + curr
-      + '| '
-      + line;
-  }).join('\n');
+  context = lines
+    .slice(start, end)
+    .map(function(line, i) {
+      var curr = i + start + 1;
+      return (curr == lineno ? '  > ' : '    ') + curr + '| ' + line;
+    })
+    .join('\n');
 
   // Alter exception message
   err.path = filename;
-  err.message = (filename || 'Pug') + ':' + lineno
-    + '\n' + context + '\n\n' + err.message;
+  try {
+    err.message =
+      (filename || 'Pug') +
+      ':' +
+      lineno +
+      '\n' +
+      context +
+      '\n\n' +
+      err.message;
+  } catch (e) {}
   throw err;
-};
+}
 
 
 /***/ }),
@@ -313,7 +356,20 @@ function pug_rethrow(err, filename, lineno, str){
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
 

@@ -21,12 +21,25 @@
 
 <h2 align="center">Install</h2>
 
+<h3>Webpack 5</h3>
+
 ```bash
   npm i --save-dev html-webpack-plugin
 ```
 
 ```bash
   yarn add --dev html-webpack-plugin
+```
+
+
+<h3>Webpack 4</h3>
+
+```bash
+  npm i --save-dev html-webpack-plugin@4
+```
+
+```bash
+  yarn add --dev html-webpack-plugin@4
 ```
 
 
@@ -60,18 +73,13 @@ The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webp
  * [webpack-subresource-integrity](https://www.npmjs.com/package/webpack-subresource-integrity) for enhanced asset security
  * [appcache-webpack-plugin](https://github.com/lettertwo/appcache-webpack-plugin) for iOS and Android offline usage
  * [favicons-webpack-plugin](https://github.com/jantimon/favicons-webpack-plugin) which generates favicons and icons for iOS, Android and desktop browsers
- * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin) can be used to always write to disk the html file, useful when webpack-dev-server / HMR are being used
- * [html-webpack-inline-source-plugin](https://github.com/DustinJackson/html-webpack-inline-source-plugin) to inline your assets in the resulting HTML file
+ * [html-webpack-harddisk-plugin](https://github.com/jantimon/html-webpack-harddisk-plugin) can be used to always write to disk the html file, useful when webpack-dev-server / HMR are being used 
  * [html-webpack-inline-svg-plugin](https://github.com/thegc/html-webpack-inline-svg-plugin) to inline SVGs in the resulting HTML file.
  * [html-webpack-exclude-assets-plugin](https://github.com/jamesjieye/html-webpack-exclude-assets-plugin) for excluding assets using regular expressions
  * [html-webpack-include-assets-plugin](https://github.com/jharris4/html-webpack-include-assets-plugin) for including lists of js or css file paths (such as those copied by the copy-webpack-plugin).
- * [script-ext-html-webpack-plugin](https://github.com/numical/script-ext-html-webpack-plugin) to add `async`, `defer` or `module` attributes to your `<script>` elements, or even inline them
- * [style-ext-html-webpack-plugin](https://github.com/numical/style-ext-html-webpack-plugin) to convert your `<link>`s to external stylesheets into `<style>` elements containing internal CSS
  * [html-webpack-injector](https://github.com/thearchitgarg/html-webpack-injector) to inject chunks in `head` or `body` (different locations ) of same html document.
  * [resource-hints-webpack-plugin](https://github.com/jantimon/resource-hints-webpack-plugin) to add resource hints for faster initial page loads using `<link rel='preload'>` and `<link rel='prefetch'>`
- * [preload-webpack-plugin](https://github.com/GoogleChrome/preload-webpack-plugin) for automatically wiring up asynchronous (and other types) of JavaScript chunks using `<link rel='preload'>` helping with lazy-loading
  * [link-media-html-webpack-plugin](https://github.com/yaycmyk/link-media-html-webpack-plugin) allows for injected stylesheet `<link />` tags to have their media attribute set automatically; useful for providing specific desktop/mobile/print etc. stylesheets that the browser will conditionally download
- * [inline-chunk-manifest-html-webpack-plugin](https://github.com/jouni-kantola/inline-chunk-manifest-html-webpack-plugin) for inlining webpack's chunk manifest. Default extracts manifest and inlines in `<head>`
  * [html-webpack-inline-style-plugin](https://github.com/djaax/html-webpack-inline-style-plugin) for inlining styles to HTML elements using [juice](https://github.com/Automattic/juice). Useful for email generation automatisation.
  * [html-webpack-exclude-empty-assets-plugin](https://github.com/KnisterPeter/html-webpack-exclude-empty-assets-plugin) removes empty assets from being added to the html. This fixes some problems with extract-text-plugin with webpack 4.
  * [webpack-concat-plugin](https://github.com/hxlniada/webpack-concat-plugin) for concat and uglify files that needn't to be webpack bundles(for legacy files) and inject to html-webpack-plugin.
@@ -79,12 +87,14 @@ The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webp
  * [csp-html-webpack-plugin](https://github.com/slackhq/csp-html-webpack-plugin) to add [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) meta tags to the HTML output
  * [webpack-nomodule-plugin](https://github.com/swimmadude66/webpack-nomodule-plugin) allows you to add a `nomodule` attribute to specific injected scripts, which prevents the scripts from being loaded by newer browsers. Good for limiting loads of polyfills.
   * [html-webpack-skip-assets-plugin](https://github.com/swimmadude66/html-webpack-skip-assets-plugin) Skip adding certain output files to the html file. Built as a drop-in replacement for [html-webpack-exclude-assets-plugin](https://www.npmjs.com/package/html-webpack-exclude-assets-plugin) and works with newer [html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin) versions
+ * [html-webpack-inject-preload](https://github.com/principalstudio/html-webpack-inject-preload) allows to add preload links &lt;link rel='preload'> anywhere you want.
+ * [inject-body-webpack-plugin](https://github.com/Jaid/inject-body-webpack-plugin) is a simple method of injecting a custom HTML string into the body.
 
 
 <h2 align="center">Usage</h2>
 
 The plugin will generate an HTML5 file for you that includes all your `webpack`
-bundles in the body using `script` tags. Just add the plugin to your `webpack`
+bundles in the head using `script` tags. Just add the plugin to your `webpack`
 config as follows:
 
 **webpack.config.js**
@@ -111,9 +121,9 @@ This will generate a file `dist/index.html` containing the following
   <head>
     <meta charset="utf-8">
     <title>Webpack App</title>
+    <script defer src="index_bundle.js"></script>
   </head>
   <body>
-    <script src="index_bundle.js"></script>
   </body>
 </html>
 ```
@@ -123,22 +133,23 @@ If you have multiple `webpack` entry points, they will all be included with `scr
 If you have any CSS assets in webpack's output (for example, CSS extracted with the [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin))
 then these will be included with `<link>` tags in the HTML head.
 
-If you have plugins that make use of it, `html-webpack-plugin` should be ordered first before any of the integrated plugins.
+If you have plugins that make use of it, `html-webpack-plugin` should be ordered first before any of the integrated Plugins.
 
 <h2 align="center">Options</h2>
 
 You can pass a hash of configuration options to `html-webpack-plugin`.
-Allowed values are as follows
+Allowed values are as follows:
 
 |Name|Type|Default|Description|
 |:--:|:--:|:-----:|:----------|
 |**`title`**|`{String}`|`Webpack App`|The title to use for the generated HTML document|
-|**`filename`**|`{String}`|`'index.html'`|The file to write the HTML to. Defaults to `index.html`. You can specify a subdirectory here too (eg: `assets/admin.html`)|
+|**`filename`**|`{String\|Function}`|`'index.html'`|The file to write the HTML to. Defaults to `index.html`. You can specify a subdirectory here too (eg: `assets/admin.html`). The `[name]` placeholder will be replaced with the entry name. Can also be a function e.g. `(entryName) => entryName + '.html'`. |
 |**`template`**|`{String}`|``|`webpack` relative or absolute path to the template. By default it will use `src/index.ejs` if it exists. Please see the [docs](https://github.com/jantimon/html-webpack-plugin/blob/master/docs/template-option.md) for details|
 |**`templateContent`**|`{string\|Function\|false}`|false| Can be used instead of `template` to provide an inline template - please read the [Writing Your Own Templates](https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates) section |
 |**`templateParameters`**|`{Boolean\|Object\|Function}`| `false`| Allows to overwrite the parameters used in the template - see [example](https://github.com/jantimon/html-webpack-plugin/tree/master/examples/template-parameters) |
-|**`inject`**|`{Boolean\|String}`|`true`|`true \|\| 'head' \|\| 'body' \|\| false` Inject all assets into the given `template` or `templateContent`. When passing `true` or `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element - see the [inject:false example](https://github.com/jantimon/html-webpack-plugin/tree/master/examples/custom-insertion-position)|
-|**`scriptLoading`**|`{'blocking'\|'defer'}`|`'blocking'`| Modern browsers support non blocking javascript loading (`'defer'`) to improve the page startup performance. |
+|**`inject`**|`{Boolean\|String}`|`true`|`true \|\| 'head' \|\| 'body' \|\| false` Inject all assets into the given `template` or `templateContent`. When passing `'body'` all javascript resources will be placed at the bottom of the body element. `'head'` will place the scripts in the head element. Passing `true` will add it to the head/body depending on the `scriptLoading` option. Passing `false` will disable automatic injections. - see the [inject:false example](https://github.com/jantimon/html-webpack-plugin/tree/master/examples/custom-insertion-position)|
+|**`publicPath`**|`{String\|'auto'}`|`'auto'`|The publicPath used for script and link tags|
+|**`scriptLoading`**|`{'blocking'\|'defer'\|'module'}`|`'defer'`| Modern browsers support non blocking javascript loading (`'defer'`) to improve the page startup performance. Setting to `'module'` adds attribute [`type="module"`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#applying_the_module_to_your_html). This also implies "defer", since modules are automatically deferred. |
 |**`favicon`**|`{String}`|``|Adds the given favicon path to the output HTML|
 |**`meta`**|`{Object}`|`{}`|Allows to inject `meta`-tags. E.g. `meta: {viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'}`|
 |**`base`**|`{Object\|String\|false}`|`false`|Inject a [`base`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) tag. E.g. `base: "https://example.com/path/page.html`|
@@ -356,6 +367,7 @@ and the following options:
 ```js
 {
   collapseWhitespace: true,
+  keepClosingSlash: true,
   removeComments: true,
   removeRedundantAttributes: true,
   removeScriptTypeAttributes: true,
@@ -451,7 +463,7 @@ which will inject the element `<base href="http://example.com/some/page.html" ta
 
 ### Long Term Caching
 
-For long term caching add `contenthash/templatehash` to the filename.
+For long term caching add `contenthash` to the filename.
 
 **Example:**
 
@@ -463,15 +475,9 @@ plugins: [
 ]
 ```
 
-`contenthash/templatehash` is the hash of the content of the output file.
+`contenthash` is the hash of the content of the output file.
 
-Optionally, You can configure like `[<hashType>:contenthash:<digestType>:<length>]`
-
-* `hashType` - one of `sha1`, `md5`, `sha256`, `sha512`  or any other node.js supported hash type
-* `digestType` - one of `hex`, `base26`, `base32`, `base36`, `base49`, `base52`, `base58`, `base62`, `base64`
-* `maxlength` - maximum length of the generated hash in chars
-
-**Defaults:** `[md5:contenthash:hex:9999]`
+Refer webpack's [Template Strings](https://webpack.js.org/configuration/output/#template-strings) for more details
 
 ### Events
 
@@ -508,6 +514,7 @@ about which values are passed.
         styles: Array<HtmlTagObject>,
         meta: Array<HtmlTagObject>,
       },
+      publicPath: string,
       outputName: string,
       plugin: HtmlWebpackPlugin
     }>
@@ -519,6 +526,7 @@ about which values are passed.
     AsyncSeriesWaterfallHook<{
       headTags: Array<HtmlTagObject | HtmlTagObject>,
       bodyTags: Array<HtmlTagObject | HtmlTagObject>,
+      publicPath: string,
       outputName: string,
       plugin: HtmlWebpackPlugin
     }>
@@ -655,5 +663,5 @@ This project uses the [semistandard code style](https://github.com/Flet/semistan
 [deps]: https://david-dm.org/jantimon/html-webpack-plugin.svg
 [deps-url]: https://david-dm.org/jantimon/html-webpack-plugin
 
-[tests]: http://img.shields.io/travis/jantimon/html-webpack-plugin.svg
-[tests-url]: https://travis-ci.org/jantimon/html-webpack-plugin
+[tests]: https://github.com/jantimon/html-webpack-plugin/workflows/CI/badge.svg
+[tests-url]: https://github.com/jantimon/html-webpack-plugin/actions?query=workflow%3ACI

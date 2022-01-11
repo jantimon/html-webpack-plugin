@@ -15,7 +15,6 @@ const webpackMajorVersion = require('webpack/package.json').version.split('.')[0
 const OUTPUT_DIR = path.resolve(__dirname, '../dist');
 
 jest.setTimeout(30000);
-process.traceDeprecation = true;
 
 function runExample (exampleName, done) {
   const examplePath = path.resolve(__dirname, '..', 'examples', exampleName);
@@ -60,10 +59,6 @@ function runExample (exampleName, done) {
 }
 
 describe('HtmlWebpackPlugin Examples', () => {
-  it('appcache example', done => {
-    runExample('appcache', done);
-  });
-
   it('custom-template example', done => {
     runExample('custom-template', done);
   });
@@ -98,6 +93,10 @@ describe('HtmlWebpackPlugin Examples', () => {
 
   it('sort manually example', done => {
     runExample('sort-manually', done);
+  });
+
+  it('multi-page example', done => {
+    runExample('multi-page', done);
   });
 
   it('template-parameters example', done => {

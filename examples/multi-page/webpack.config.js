@@ -4,11 +4,14 @@ var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
 
 module.exports = {
   context: __dirname,
-  entry: './example.js',
+  entry: {
+    first: './first.js',
+    second: './second.js'
+  },
   output: {
     path: path.join(__dirname, 'dist/webpack-' + webpackMajorVersion),
     publicPath: '',
-    filename: 'bundle.js'
+    filename: '[name].js'
   },
   module: {
     rules: [
@@ -17,6 +20,8 @@ module.exports = {
     ]
   },
   plugins: [
-    new HtmlWebpackPlugin()
+    new HtmlWebpackPlugin({
+      filename: '[name].html'
+    })
   ]
 };

@@ -1,0 +1,40 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    name: test Node ${{ matrix.node }} Webpack ${{ matrix.webpack }} ${{ matrix.os }}
+    timeout-minutes: 15
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node: ['10.x', '12.x', '14.x']
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        webpack: ['5']
+
+    steps:
+      - name: LF
+        run: git config --global core.autocrlf false
+
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Use Node ${{ matrix.node }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install Dependencies
+        run: npm install --ignore-scripts --force --legacy-peer-deps
+
+      - name: Install Webpack ${{ matrix.webpack }}
+        run: npm install --ignore-scripts --force --legacy-peer-deps webpack@${{ matrix.webpack }}
+
+      - name: Test
+        run: npm test -- --forceExit || npm test -- --forceExit || npm test -- --forceExit

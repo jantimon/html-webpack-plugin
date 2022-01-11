@@ -1,5 +1,5 @@
 // Webpack require:
-var partial = require('./partial.html');
+var partial = require('./partial.html').default;
 var universal = require('./universial.js');
 
 // Export a function / promise / or a string:
