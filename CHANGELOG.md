@@ -56,7 +56,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### ⚠ BREAKING CHANGES
 
 * Drop support for `webpack` 4 and `node` <= 10 - For older webpack or node versions please use `html-webpack-plugin` 4.x
-* Entry javascript resources are now beeing loaded deferred in the `<head>` tag to improve the page load performance by default - You can set the `scriptLoading` option to `'blocking'` to keep the previous behaviour
+* Entry javascript resources are now being loaded deferred in the `<head>` tag to improve the page load performance by default - You can set the `scriptLoading` option to `'blocking'` to keep the previous behaviour
 * Setting publicPath to `''` (an empty string) will no longer calculate a relative path from the html file to the assets anymore - You can set the `publicPath` option to `'auto'` to keep the previous behaviour
 * Plugins for `html-webpack-plugin` which add additional assetTags should provide a `meta` attribute
 * Drop support for `appcache-webpack-plugin`
