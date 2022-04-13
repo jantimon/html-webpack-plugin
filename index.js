@@ -36,7 +36,7 @@ class HtmlWebpackPlugin {
   }
 
   apply (compiler) {
-    // Wait for configuration preset plugions to apply all configure webpack defaults
+    // Wait for configuration preset plugins to apply all configure webpack defaults
     compiler.hooks.initialize.tap('HtmlWebpackPlugin', () => {
       const userOptions = this.userOptions;
 
