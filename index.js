@@ -16,6 +16,7 @@ const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
 const loaderUtils = require('loader-utils');
+const { RawSource } = require('webpack-sources')
 const { CachedChildCompilation } = require('./lib/cached-child-compiler');
 
 const { createHtmlTagObject, htmlTagObjectToString, HtmlTagArray } = require('./lib/html-tags');
@@ -94,6 +95,12 @@ class HtmlWebpackPlugin {
   apply (compiler) {
     const self = this;
 
+    /**
+     * store the previous generated asset to emit them even if the content did not change
+     * to support watch mode for third party plugins like the clean-webpack-plugin or the compression plugin
+     * @type {Array<{html: string, name: string}>}
+     */
+    const previousEmittedAssets = [];
     this.options.template = this.getFullTemplatePath(this.options.template, compiler.context);
 
     // Inject child compiler plugin
@@ -178,6 +185,9 @@ class HtmlWebpackPlugin {
         // If the template and the assets did not change we don't have to emit the html
         const assetJson = JSON.stringify(self.getAssetFiles(assets));
         if (isCompilationCached && self.options.cache && assetJson === self.assetJson) {
+          previousEmittedAssets.forEach(({ name, html }) => {
+            compilation.emitAsset(name, new RawSource(html));
+          });
           return callback();
         } else {
           self.assetJson = assetJson;
@@ -287,6 +297,7 @@ class HtmlWebpackPlugin {
               source: () => html,
               size: () => html.length
             };
+            previousEmittedAssets.push({ name: finalOutputName, html });
             return finalOutputName;
           })
           .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
