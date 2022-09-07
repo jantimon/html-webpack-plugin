@@ -2813,4 +2813,32 @@ describe('HtmlWebpackPlugin', () => {
       done();
     });
   });
+
+  it('allows __dirname and __filename in requireExtensions', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        {
+          apply (compiler) {
+            compiler.hooks.compilation.tap(
+              'some-require-hook-plugin',
+              (compilation) => {
+                compilation.mainTemplate.hooks.requireExtensions.tap(
+                  'some-require-hook',
+                  (source, chunk) => {
+                    return `const something = __dirname + __filename;`;
+                  }
+                );
+              }
+            );
+          }
+        },
+        new HtmlWebpackPlugin()]
+    }, [/<script defer="defer" src="index_bundle.js"><\/script>[\s]*<\/head>/], null, done);
+  });
 });
