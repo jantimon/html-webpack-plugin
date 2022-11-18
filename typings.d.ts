@@ -53,6 +53,7 @@ declare namespace HtmlWebpackPlugin {
     chunksSortMode?:
       | "auto"
       | "manual"
+      | "none"
       | ((entryNameA: string, entryNameB: string) => number);
     /**
      * List all entries which should not be injected
