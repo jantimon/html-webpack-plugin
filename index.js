@@ -227,10 +227,10 @@ function hookIntoCompiler (compiler, options, plugin) {
          * @param {(err?: Error) => void} callback
          */
         (compilationAssets, callback) => {
-          // Get all entry point names for this html file
-          const entryNames = Array.from(compilation.entrypoints.keys());
-          const filteredEntryNames = filterChunks(entryNames, options.chunks, options.excludeChunks);
-          const sortedEntryNames = sortEntryChunks(filteredEntryNames, options.chunksSortMode, compilation);
+          // Get all chunk names for this html file
+          const chunkNames = Array.from(compilation.namedChunks.keys());
+          const filteredChunkNames = filterChunks(chunkNames, options.chunks, options.excludeChunks);
+          const sortedChunkNames = sortChunks(filteredChunkNames, options.chunksSortMode, compilation);
 
           const templateResult = options.templateContent
             ? { mainCompilationHash: compilation.hash }
@@ -248,7 +248,7 @@ function hookIntoCompiler (compiler, options, plugin) {
           const htmlPublicPath = getPublicPath(compilation, options.filename, options.publicPath);
 
           /** Generated file paths from the entry point names */
-          const assets = htmlWebpackPluginAssets(compilation, sortedEntryNames, htmlPublicPath);
+          const assets = htmlWebpackPluginAssets(compilation, sortedChunkNames, htmlPublicPath);
 
           // If the template and the assets did not change we don't have to emit the html
           const newAssetJson = JSON.stringify(getAssetFiles(assets));
@@ -534,18 +534,18 @@ function hookIntoCompiler (compiler, options, plugin) {
 
   /**
    * Helper to sort chunks
-   * @param {string[]} entryNames
-   * @param {string|((entryNameA: string, entryNameB: string) => number)} sortMode
+   * @param {string[]} chunkNames
+   * @param {string|((chunkNameA: string, chunkNameB: string) => number)} sortMode
    * @param {WebpackCompilation} compilation
    */
-  function sortEntryChunks (entryNames, sortMode, compilation) {
+  function sortChunks (chunkNames, sortMode, compilation) {
     // Custom function
     if (typeof sortMode === 'function') {
-      return entryNames.sort(sortMode);
+      return chunkNames.sort(sortMode);
     }
     // Check if the given sort mode is a valid chunkSorter sort mode
     if (typeof chunkSorter[sortMode] !== 'undefined') {
-      return chunkSorter[sortMode](entryNames, compilation, options);
+      return chunkSorter[sortMode](chunkNames, compilation, options);
     }
     throw new Error('"' + sortMode + '" is not a valid chunk sort mode');
   }
@@ -616,7 +616,7 @@ function hookIntoCompiler (compiler, options, plugin) {
    * The htmlWebpackPluginAssets extracts the asset information of a webpack compilation
    * for all given entry names
    * @param {WebpackCompilation} compilation
-   * @param {string[]} entryNames
+   * @param {string[]} chunkNames
    * @param {string | 'auto'} publicPath
    * @returns {{
       publicPath: string,
@@ -626,7 +626,7 @@ function hookIntoCompiler (compiler, options, plugin) {
       favicon?: string
     }}
    */
-  function htmlWebpackPluginAssets (compilation, entryNames, publicPath) {
+  function htmlWebpackPluginAssets (compilation, chunkNames, publicPath) {
     const compilationHash = compilation.hash;
     /**
      * @type {{
@@ -656,14 +656,14 @@ function hookIntoCompiler (compiler, options, plugin) {
     }
 
     // Extract paths to .js, .mjs and .css files from the current compilation
-    const entryPointPublicPathMap = {};
+    const chunkPublicPathMap = {};
     const extensionRegexp = /\.(css|js|mjs)(\?|$)/;
-    for (let i = 0; i < entryNames.length; i++) {
-      const entryName = entryNames[i];
-      /** entryPointUnfilteredFiles - also includes hot module update files */
-      const entryPointUnfilteredFiles = compilation.entrypoints.get(entryName).getFiles();
+    for (let i = 0; i < chunkNames.length; i++) {
+      const chunkName = chunkNames[i];
+      /** chunkUnfilteredFiles - also includes hot module update files */
+      const chunkUnfilteredFiles = compilation.namedChunks.get(chunkName).files;
 
-      const entryPointFiles = entryPointUnfilteredFiles.filter((chunkFile) => {
+      const chunkFiles = chunkUnfilteredFiles.filter((chunkFile) => {
         // compilation.getAsset was introduced in webpack 4.4.0
         // once the support pre webpack 4.4.0 is dropped please
         // remove the following guard:
@@ -679,29 +679,29 @@ function hookIntoCompiler (compiler, options, plugin) {
       // Prepend the publicPath and append the hash depending on the
       // webpack.output.publicPath and hashOptions
       // E.g. bundle.js -> /bundle.js?hash
-      const entryPointPublicPaths = entryPointFiles
+      const chunkPublishPaths = chunkFiles
         .map(chunkFile => {
-          const entryPointPublicPath = publicPath + urlencodePath(chunkFile);
+          const chunkPublicPath = publicPath + urlencodePath(chunkFile);
           return options.hash
-            ? appendHash(entryPointPublicPath, compilationHash)
-            : entryPointPublicPath;
+            ? appendHash(chunkPublicPath, compilationHash)
+            : chunkPublicPath;
         });
 
-      entryPointPublicPaths.forEach((entryPointPublicPath) => {
-        const extMatch = extensionRegexp.exec(entryPointPublicPath);
+      chunkPublishPaths.forEach((chunkPublicPath) => {
+        const extMatch = extensionRegexp.exec(chunkPublicPath);
         // Skip if the public path is not a .css, .mjs or .js file
         if (!extMatch) {
           return;
         }
         // Skip if this file is already known
         // (e.g. because of common chunk optimizations)
-        if (entryPointPublicPathMap[entryPointPublicPath]) {
+        if (chunkPublicPathMap[chunkPublicPath]) {
           return;
         }
-        entryPointPublicPathMap[entryPointPublicPath] = true;
+        chunkPublicPathMap[chunkPublicPath] = true;
         // ext will contain .js or .css, because .mjs recognizes as .js
         const ext = extMatch[1] === 'mjs' ? 'js' : extMatch[1];
-        assets[ext].push(entryPointPublicPath);
+        assets[ext].push(chunkPublicPath);
       });
     }
     return assets;
