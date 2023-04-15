@@ -40,20 +40,24 @@ function runExample (exampleName, done) {
     }
 
     webpack(options, (err, stats) => {
-      expect(err).toBeFalsy();
-      expect(stats.compilation.errors).toEqual([]);
+      try {
+        expect(err).toBeFalsy();
+        expect(stats.compilation.errors).toEqual([]);
 
-      const dircompare = require('dir-compare');
-      const res = dircompare.compareSync(fixturePath, exampleOutput, { compareSize: true });
+        const dircompare = require('dir-compare');
+        const res = dircompare.compareSync(fixturePath, exampleOutput, { compareSize: true });
 
-      res.diffSet.filter(diff => diff.state === 'distinct').forEach(diff => {
-        const file1Contents = fs.readFileSync(path.join(diff.path1, diff.name1)).toString();
-        const file2Contents = fs.readFileSync(path.join(diff.path2, diff.name2)).toString();
-        expect(file1Contents).toEqual(file2Contents);
-      });
+        res.diffSet.filter(diff => diff.state === 'distinct').forEach(diff => {
+          const file1Contents = fs.readFileSync(path.join(diff.path1, diff.name1)).toString();
+          const file2Contents = fs.readFileSync(path.join(diff.path2, diff.name2)).toString();
+          expect(file1Contents).toEqual(file2Contents);
+        });
 
-      expect(res.same).toBe(true);
-      rimraf(exampleOutput, done);
+        expect(res.same).toBe(true);
+        rimraf(exampleOutput, done);
+      } catch (e) {
+        done(e);
+      }
     });
   });
 }
