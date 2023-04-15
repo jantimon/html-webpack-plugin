@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.5.1](https://github.com/jantimon/html-webpack-plugin/compare/v5.5.0...v5.5.1) (2023-04-15)
+
+
+### Bug Fixes
+
+* **perf:** defer loading of pretty-error to improve startup time ([#1789](https://github.com/jantimon/html-webpack-plugin/issues/1789)) ([988709d](https://github.com/jantimon/html-webpack-plugin/commit/988709d8b0142d1654f66a94bbde4e5f40172242))
+
 ## [5.5.0](https://github.com/jantimon/html-webpack-plugin/compare/v5.4.0...v5.5.0) (2021-10-25)
 
 
