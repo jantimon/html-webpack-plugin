@@ -553,19 +553,34 @@ function hookIntoCompiler (compiler, options, plugin) {
   /**
    * Return all chunks from the compilation result which match the exclude and include filters
    * @param {any} chunks
-   * @param {string[]|'all'} includedChunks
-   * @param {string[]} excludedChunks
+   * @param {string[]|{test(chunkName: string): boolean}|((chunkName: string) => boolean)|'all'} includedChunks
+   * @param {string[]|{test(chunkName: string): boolean}|((chunkName: string) => boolean)} excludedChunks
    */
   function filterChunks (chunks, includedChunks, excludedChunks) {
     return chunks.filter(chunkName => {
       // Skip if the chunks should be filtered and the given chunk was not added explicity
-      if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
+      if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) { // chunks: Array
         return false;
+      } else if (includedChunks instanceof RegExp) { // chunks: RegExp
+        return includedChunks.test(chunkName);
+      } else if (typeof includedChunks === 'function') { // chunks: Function
+        return includedChunks(chunkName);
       }
+      // if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
+      //   return false;
+      // }
+
       // Skip if the chunks should be filtered and the given chunk was excluded explicity
-      if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) {
+      if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) { // chunks: Array
         return false;
+      } else if (excludedChunks instanceof RegExp) { // chunks: RegExp
+        return !excludedChunks.test(chunkName);
+      } else if (typeof excludedChunks === 'function') { // chunks: Function
+        return excludedChunks(chunkName);
       }
+      // if (Array.isArray(excludedChunks) && excludedChunks.indexOf(chunkName) !== -1) {
+      //   return false;
+      // }
       // Add otherwise
       return true;
     });

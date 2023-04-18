@@ -158,9 +158,9 @@ Allowed values are as follows:
 |**`hash`**|`{Boolean}`|`false`|If `true` then append a unique `webpack` compilation hash to all included scripts and CSS files. This is useful for cache busting|
 |**`cache`**|`{Boolean}`|`true`|Emit the file only if it was changed|
 |**`showErrors`**|`{Boolean}`|`true`|Errors details will be written into the HTML page|
-|**`chunks`**|`{?}`|`?`|Allows you to add only some chunks (e.g only the unit-test chunk)|
-|**`chunksSortMode`**|`{String\|Function}`|`auto`|Allows to control how chunks should be sorted before they are included to the HTML. Allowed values are `'none' \| 'auto' \| 'manual' \| {Function}`|
-|**`excludeChunks`**|`{Array.<string>}`|``|Allows you to skip some chunks (e.g don't add the unit-test chunk)|
+|**`chunks`**|`{Array.<string>\|RegExp\|Function\|'all'}`|`?`|Allows you to add only some chunks (e.g only the unit-test chunk)|
+|**[`chunksSortMode`]**|`{String\|Function}`|`auto`|Allows to control how chunks should be sorted before they are included to the HTML. Allowed values are `'none' \| 'auto' \| 'dependency' \| 'manual' \| {Function}`|
+|**`excludeChunks`**|`{Array.<string>\|RegExp\|Function}`|``|Allows you to skip some chunks (e.g don't add the unit-test chunk)|
 |**`xhtml`**|`{Boolean}`|`false`|If `true` render the `link` tags as self-closing (XHTML compliant)|
 
 Here's an example webpack config illustrating how to use these options
