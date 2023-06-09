@@ -99,6 +99,13 @@ clean-webpack-plugin ([6b3d087](https://github.com/jantimon/html-webpack-plugin/
 * generate html files even if no webpack entry exists ([2693dfa](https://github.com/jantimon/html-webpack-plugin/commit/2693dfaf4c94625eab86afadfd0e4d8822092d6b))
 * keep binary format when adding assets ([7e2b208](https://github.com/jantimon/html-webpack-plugin/commit/7e2b208634e26299c509e0c6b3189e01e4c3d3df)), closes [#1537](https://github.com/jantimon/html-webpack-plugin/issues/1537)
 
+## [4.5.2](https://github.com/jantimon/html-webpack-plugin/compare/v4.5.1...v4.5.2) (2021-02-18)
+
+
+### Bug Fixes
+
+* more robust variable value extraction to add support for webpack >= 5.22.0 ([1aabaf9](https://github.com/jantimon/html-webpack-plugin/commit/1aabaf99820257cbe7d3efccb62b42254ad35e04))
+
 ### [4.5.1](https://github.com/jantimon/html-webpack-plugin/compare/v4.5.0...v4.5.1) (2021-01-03)
 
 
