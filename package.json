@@ -28,7 +28,7 @@
     ]
   },
   "devDependencies": {
-    "@types/node": "11.13.9",
+    "@types/node": "^20.2.5",
     "commitizen": "^4.2.4",
     "css-loader": "5.0.1",
     "cz-conventional-changelog": "2.1.0",
