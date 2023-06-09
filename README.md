@@ -1,13 +1,12 @@
 [![npm][npm]][npm-url]
 [![node][node]][node-url]
 ![npm](https://img.shields.io/npm/dw/html-webpack-plugin.svg)
-[![deps][deps]][deps-url]
 [![tests][tests]][tests-url]
 [![Backers on Open Collective](https://opencollective.com/html-webpack-plugin/backers/badge.svg)](#backers)
  [![Sponsors on Open Collective](https://opencollective.com/html-webpack-plugin/sponsors/badge.svg)](#sponsors) 
 
 <div align="center">
-  <img width="200" height="200" src="https://worldvectorlogo.com/logos/html5.svg">
+  <img width="200" height="200" src="https://www.w3.org/html/logo/downloads/HTML5_Badge.svg">
   <a href="https://github.com/webpack/webpack">
     <img width="200" height="200"
       src="https://webpack.js.org/assets/icon-square-big.svg">
@@ -660,9 +659,6 @@ This project uses the [semistandard code style](https://github.com/Flet/semistan
 
 [node]: https://img.shields.io/node/v/html-webpack-plugin.svg
 [node-url]: https://nodejs.org
-
-[deps]: https://david-dm.org/jantimon/html-webpack-plugin.svg
-[deps-url]: https://david-dm.org/jantimon/html-webpack-plugin
 
 [tests]: https://github.com/jantimon/html-webpack-plugin/workflows/CI/badge.svg
 [tests-url]: https://github.com/jantimon/html-webpack-plugin/actions?query=workflow%3ACI
