@@ -2302,6 +2302,23 @@ describe('HtmlWebpackPlugin', () => {
     }, ['templateParams keys: "compilation,webpackConfig,htmlWebpackPlugin"'], null, done);
   });
 
+  it('should add the webpack compilation object as a property of the templateParam object with cjs', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          template: path.join(__dirname, 'fixtures/templateParam.cjs'),
+          inject: false
+        })
+      ]
+    }, ['templateParams keys: "compilation,webpackConfig,htmlWebpackPlugin"'], null, done);
+  });
+
   it('should allow to disable template parameters', done => {
     testHtmlPlugin({
       mode: 'production',
