@@ -52,6 +52,8 @@ declare namespace HtmlWebpackPlugin {
      */
     chunksSortMode?:
       | "auto"
+      // `none` is deprecated and an alias for `auto` now.
+      | "none"
       | "manual"
       | ((entryNameA: string, entryNameB: string) => number);
     /**
