@@ -76,7 +76,8 @@ class HtmlWebpackPlugin {
       // Default metaOptions if no template is provided
       if (!userOptions.template && options.templateContent === false && options.meta) {
         const defaultMeta = {
-        // From https://developer.mozilla.org/en-US/docs/Mozilla/Mobile/Viewport_meta_tag
+          // TODO remove in the next major release
+          // From https://developer.mozilla.org/en-US/docs/Mozilla/Mobile/Viewport_meta_tag
           viewport: 'width=device-width, initial-scale=1'
         };
         options.meta = Object.assign({}, options.meta, defaultMeta, userOptions.meta);
@@ -966,8 +967,15 @@ function hookIntoCompiler (compiler, options, plugin) {
     const htmlRegExp = /(<html[^>]*>)/i;
     const headRegExp = /(<\/head\s*>)/i;
     const bodyRegExp = /(<\/body\s*>)/i;
+    const metaViewportRegExp = /<meta[^>]+name=["']viewport["'][^>]*>/i;
     const body = assetTags.bodyTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, options.xhtml));
-    const head = assetTags.headTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, options.xhtml));
+    const head = assetTags.headTags.filter((item) => {
+      if (item.tagName === 'meta' && item.attributes && item.attributes.name === 'viewport' && metaViewportRegExp.test(html)) {
+        return false;
+      }
+
+      return true;
+    }).map((assetTagObject) => htmlTagObjectToString(assetTagObject, options.xhtml));
 
     if (body.length) {
       if (bodyRegExp.test(html)) {
