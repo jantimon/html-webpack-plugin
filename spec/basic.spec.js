@@ -1958,6 +1958,21 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">/], null, done);
   });
 
+  it('avoid duplicate meta tags for default template', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      context: path.join(__dirname, 'fixtures'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [
+        new HtmlWebpackPlugin()
+      ]
+    }, [/<head><meta charset="utf-8"\/><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover"><title>src\/index\.ejs<\/title><script defer="defer" src="index_bundle.js"><\/script><\/head>/], null, done);
+  });
+
   it('adds a meta tag with short notation', done => {
     testHtmlPlugin({
       mode: 'production',
