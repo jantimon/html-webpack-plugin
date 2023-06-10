@@ -36,7 +36,7 @@ class HtmlWebpackPlugin {
   }
 
   apply (compiler) {
-    // Wait for configuration preset plugions to apply all configure webpack defaults
+    // Wait for configuration preset plugins to apply all configure webpack defaults
     compiler.hooks.initialize.tap('HtmlWebpackPlugin', () => {
       const userOptions = this.userOptions;
 
@@ -74,7 +74,7 @@ class HtmlWebpackPlugin {
       assert(options.inject === true || options.inject === false || options.inject === 'head' || options.inject === 'body', 'inject needs to be set to true, false, "head" or "body');
 
       // Default metaOptions if no template is provided
-      if (!userOptions.template && options.templateContent === false && options.meta) {
+      if (!userOptions.template && !isTemplateInDefaultLocation(compiler.context) && options.templateContent === false && options.meta) {
         const defaultMeta = {
         // From https://developer.mozilla.org/en-US/docs/Mozilla/Mobile/Viewport_meta_tag
           viewport: 'width=device-width, initial-scale=1'
@@ -198,6 +198,11 @@ class HtmlWebpackPlugin {
       ? Promise.resolve(newSource)
       : Promise.reject(new Error('The loader "' + templateWithoutLoaders + '" didn\'t return html.'));
   }
+}
+
+function isTemplateInDefaultLocation(context) {
+  const template = path.resolve(context, 'src/index.ejs');
+  return fs.existsSync(template);
 }
 
 /**
@@ -1063,8 +1068,9 @@ function hookIntoCompiler (compiler, options, plugin) {
    */
   function getFullTemplatePath (template, context) {
     if (template === 'auto') {
-      template = path.resolve(context, 'src/index.ejs');
-      if (!fs.existsSync(template)) {
+      if (isTemplateInDefaultLocation(context)) {
+        template = path.resolve(context, 'src/index.ejs');
+      } else {
         template = path.join(__dirname, 'default_index.ejs');
       }
     }

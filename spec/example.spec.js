@@ -71,6 +71,10 @@ describe('HtmlWebpackPlugin Examples', () => {
     runExample('default', done);
   });
 
+  it('default template location example', done => {
+    runExample('default-template-location', done);
+  });
+
   it('favicon example', done => {
     runExample('favicon', done);
   });
