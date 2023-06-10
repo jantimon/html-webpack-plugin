@@ -712,10 +712,7 @@ function hookIntoCompiler (compiler, options, plugin) {
       const entryPointUnfilteredFiles = compilation.entrypoints.get(entryName).getFiles();
 
       const entryPointFiles = entryPointUnfilteredFiles.filter((chunkFile) => {
-        // compilation.getAsset was introduced in webpack 4.4.0
-        // once the support pre webpack 4.4.0 is dropped please
-        // remove the following guard:
-        const asset = compilation.getAsset && compilation.getAsset(chunkFile);
+        const asset = compilation.getAsset(chunkFile);
         if (!asset) {
           return true;
         }
