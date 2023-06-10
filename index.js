@@ -62,7 +62,8 @@ class HtmlWebpackPlugin {
         meta: {},
         base: false,
         title: 'Webpack App',
-        xhtml: false
+        xhtml: false,
+        rootElement: false
       };
 
       /** @type {ProcessedHtmlWebpackOptions} */
@@ -80,6 +81,11 @@ class HtmlWebpackPlugin {
           viewport: 'width=device-width, initial-scale=1'
         };
         options.meta = Object.assign({}, options.meta, defaultMeta, userOptions.meta);
+      }
+
+      // Only adds the root element if it was set
+      if (options.rootElement) {
+        options.rootElement = userOptions.rootElement;
       }
 
       // entryName to fileName conversion function
@@ -346,6 +352,18 @@ function hookIntoCompiler (compiler, options, plugin) {
                 (options.inject !== 'body' && options.scriptLoading !== 'blocking') ? 'head' : 'body';
               // Group assets to `head` and `body` tag arrays
               const assetGroups = generateAssetGroups(assetTags, scriptTarget);
+
+              if (options.rootElement) {
+                assetGroups.bodyTags.push({
+                  tagName: options.rootElement.tag || 'div',
+                  voidTag: false,
+                  attributes: {
+                    id: options.rootElement.id || 'root'
+                  },
+                  meta: {}
+                });
+              }
+
               // Allow third-party-plugin authors to reorder and change the assetTags once they are grouped
               return getHtmlWebpackPluginHooks(compilation).alterAssetTagGroups.promise({
                 headTags: assetGroups.headTags,
