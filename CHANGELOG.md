@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.5.3](https://github.com/jantimon/html-webpack-plugin/compare/v5.5.2...v5.5.3) (2023-06-10)
+
+
+### Bug Fixes
+
+* don't add extra meta tag if it exists ([#1802](https://github.com/jantimon/html-webpack-plugin/issues/1802)) ([8f92788](https://github.com/jantimon/html-webpack-plugin/commit/8f927889a3a98d06472b662135954457385cc926))
+* pass all Node.js globals to templates ([#1796](https://github.com/jantimon/html-webpack-plugin/issues/1796)) ([f269fc0](https://github.com/jantimon/html-webpack-plugin/commit/f269fc01fe619c5a98388017770040dae6263928))
+* **types:** fix type for `chunkSortMode` ([#1798](https://github.com/jantimon/html-webpack-plugin/issues/1798)) ([6ad0e55](https://github.com/jantimon/html-webpack-plugin/commit/6ad0e556276da22b17747b15eb0e52bb9aa77c75))
+
 ### [5.5.2](https://github.com/jantimon/html-webpack-plugin/compare/v5.5.1...v5.5.2) (2023-06-08)
 
 
