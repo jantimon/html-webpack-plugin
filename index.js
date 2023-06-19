@@ -18,8 +18,8 @@ const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPlugin
 /** @typedef {import("./typings").Options} HtmlWebpackOptions */
 /** @typedef {import("./typings").ProcessedOptions} ProcessedHtmlWebpackOptions */
 /** @typedef {import("./typings").TemplateParameter} TemplateParameter */
-/** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
-/** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
+/** @typedef {import("webpack/lib/Compiler.js")} Compiler */
+/** @typedef {import("webpack/lib/Compilation.js")} Compilation */
 /** @typedef {Array<{ source: import('webpack').sources.Source, name: string }>} PreviousEmittedAssets */
 /** @typedef {{ publicPath: string, js: Array<string>, css: Array<string>, manifest?: string, favicon?: string }} AssetsInformationByGroups */
 
@@ -64,7 +64,8 @@ class HtmlWebpackPlugin {
 
   /**
    *
-   * @param {WebpackCompiler} compiler
+   * @param {Compiler} compiler
+   * @returns {void}
    */
   apply (compiler) {
     this.logger = compiler.getInfrastructureLogger('HtmlWebpackPlugin');
@@ -147,7 +148,7 @@ class HtmlWebpackPlugin {
    * @private
    * @param {string[]} entryNames
    * @param {string|((entryNameA: string, entryNameB: string) => number)} sortMode
-   * @param {WebpackCompilation} compilation
+   * @param {Compilation} compilation
    */
   sortEntryChunks (entryNames, sortMode, compilation) {
     // Custom function
@@ -240,7 +241,7 @@ class HtmlWebpackPlugin {
    * from within the html file - the publicPath
    *
    * @private
-   * @param {WebpackCompilation} compilation
+   * @param {Compilation} compilation
    * @param {string} childCompilationOutputName
    * @param {string | 'auto'} customPublicPath
    * @returns {string}
@@ -281,7 +282,7 @@ class HtmlWebpackPlugin {
    * The getAssetsForHTML extracts the asset information of a webpack compilation for all given entry names.
    *
    * @private
-   * @param {WebpackCompilation} compilation
+   * @param {Compilation} compilation
    * @param {string[]} entryNames
    * @param {string | 'auto'} publicPath
    * @returns {AssetsInformationByGroups}
@@ -363,9 +364,9 @@ class HtmlWebpackPlugin {
    * Converts a favicon file from disk to a webpack resource and returns the url to the resource
    *
    * @private
-   * @param {WebpackCompiler} compiler
+   * @param {Compiler} compiler
    * @param {string|false} favicon
-   * @param {WebpackCompilation} compilation
+   * @param {Compilation} compilation
    * @param {string} publicPath
    * @param {PreviousEmittedAssets} previousEmittedAssets
    * @returns {Promise<string|undefined>}
@@ -658,7 +659,7 @@ class HtmlWebpackPlugin {
        headTags: HtmlTagObject[],
        bodyTags: HtmlTagObject[]
      }} assetTags
-   * @param {WebpackCompilation} compilation
+   * @param {Compilation} compilation
    * @returns Promise<string>
    */
   executeTemplate (templateFunction, assetsInformationByGroups, assetTags, compilation) {
@@ -699,7 +700,7 @@ class HtmlWebpackPlugin {
    * Generate the template parameters for the template function
    *
    * @private
-   * @param {WebpackCompilation} compilation
+   * @param {Compilation} compilation
    * @param {AssetsInformationByGroups} assetsInformationByGroups
    * @param {{
        headTags: HtmlTagObject[],
@@ -739,7 +740,7 @@ class HtmlWebpackPlugin {
    * Html Post processing
    *
    * @private
-   * @param {WebpackCompiler} compiler The compiler instance
+   * @param {Compiler} compiler The compiler instance
    * @param {any} originalHtml The input html
    * @param {AssetsInformationByGroups} assetsInformationByGroups
    * @param {{headTags: HtmlTagObject[], bodyTags: HtmlTagObject[]}} assetTags The asset tags to inject
@@ -854,10 +855,10 @@ class HtmlWebpackPlugin {
    * @see https://survivejs.com/webpack/optimizing/adding-hashes-to-filenames/
    *
    * @private
-   * @param {WebpackCompiler} compiler
+   * @param {Compiler} compiler
    * @param {string} filename
    * @param {string|Buffer} fileContent
-   * @param {WebpackCompilation} compilation
+   * @param {Compilation} compilation
    * @returns {{ path: string, info: {} }}
    */
   replacePlaceholdersInFilename (compiler, filename, fileContent, compilation) {
@@ -898,7 +899,6 @@ class HtmlWebpackPlugin {
   }
 
   generateHtml (compiler, options) {
-    const webpack = compiler.webpack;
     // Instance variables to keep caching information
     // for multiple builds
     let assetJson;
@@ -913,6 +913,7 @@ class HtmlWebpackPlugin {
 
     // Inject child compiler plugin
     const childCompilerPlugin = new CachedChildCompilation(compiler);
+
     if (!options.templateContent) {
       childCompilerPlugin.addEntry(options.template);
     }
@@ -928,7 +929,7 @@ class HtmlWebpackPlugin {
     compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin',
       /**
        * Hook into the webpack compilation
-       * @param {WebpackCompilation} compilation
+       * @param {Compilation} compilation
        */
       (compilation) => {
         compilation.hooks.processAssets.tapAsync(
@@ -938,11 +939,11 @@ class HtmlWebpackPlugin {
             /**
              * Generate the html after minification and dev tooling is done
              */
-            webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE
+            compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE
           },
           /**
            * Hook into the process assets hook
-           * @param {WebpackCompilation} compilationAssets
+           * @param {Compilation} compilationAssets
            * @param {(err?: Error) => void} callback
            */
           (compilationAssets, callback) => {
@@ -1078,7 +1079,7 @@ class HtmlWebpackPlugin {
                   '[templatehash] is now [contenthash]')
                 );
                 const replacedFilename = this.replacePlaceholdersInFilename(compiler, filename, html, compilation);
-                const source = new webpack.sources.RawSource(html, false);
+                const source = new compiler.webpack.sources.RawSource(html, false);
 
                 // Add the evaluated html code to the webpack assets
                 compilation.emitAsset(replacedFilename.path, source, replacedFilename.info);
@@ -1109,7 +1110,7 @@ class HtmlWebpackPlugin {
  * Generate the template parameters
  *
  * Generate the template parameters for the template function
- * @param {WebpackCompilation} compilation
+ * @param {Compilation} compilation
  * @param {AssetsInformationByGroups} assets
  * @param {{
      headTags: HtmlTagObject[],
