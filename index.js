@@ -18,7 +18,8 @@ const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPlugin
 /** @typedef {import("./typings").Options} HtmlWebpackOptions */
 /** @typedef {import("./typings").ProcessedOptions} ProcessedHtmlWebpackOptions */
 /** @typedef {import("./typings").TemplateParameter} TemplateParameter */
-/** @typedef {import("webpack/lib/Compiler.js")} Compiler */
+/** @typedef {import("webpack").Compiler} Compiler */
+/** @typedef {ReturnType<Compiler["getInfrastructureLogger"]>} Logger */
 /** @typedef {import("webpack/lib/Compilation.js")} Compilation */
 /** @typedef {Array<{ source: import('webpack').sources.Source, name: string }>} PreviousEmittedAssets */
 /** @typedef {{ publicPath: string, js: Array<string>, css: Array<string>, manifest?: string, favicon?: string }} AssetsInformationByGroups */
@@ -76,11 +77,13 @@ class HtmlWebpackPlugin {
 
       // Assert correct option spelling
       if (options.scriptLoading !== 'defer' && options.scriptLoading !== 'blocking' && options.scriptLoading !== 'module') {
-        this.logger.error('The "scriptLoading" option need to be set to "defer", "blocking" or "module"');
+        /** @type {Logger} */
+        (this.logger).error('The "scriptLoading" option need to be set to "defer", "blocking" or "module"');
       }
 
       if (options.inject !== true && options.inject !== false && options.inject !== 'head' && options.inject !== 'body') {
-        this.logger.error('The `inject` option needs to be set to true, false, "head" or "body');
+        /** @type {Logger} */
+        (this.logger).error('The `inject` option needs to be set to true, false, "head" or "body');
       }
 
       if (
@@ -88,7 +91,8 @@ class HtmlWebpackPlugin {
         typeof this.options.templateParameters !== 'function' &&
         typeof this.options.templateParameters !== 'object'
       ) {
-        this.logger.error('The `templateParameters` has to be either a function or an object or false');
+        /** @type {Logger} */
+        (this.logger).error('The `templateParameters` has to be either a function or an object or false');
       }
 
       // Default metaOptions if no template is provided
@@ -365,7 +369,7 @@ class HtmlWebpackPlugin {
 
     // Append a hash for cache busting
     if (this.options.hash && assets.manifest) {
-      assets.manifest = this.appendHash(assets.manifest, compilation.hash);
+      assets.manifest = this.appendHash(assets.manifest, /** @type {string} */ (compilation.hash));
     }
 
     // Extract paths to .js, .mjs and .css files from the current compilation
@@ -756,7 +760,7 @@ class HtmlWebpackPlugin {
 
     return promisify(compilation.inputFileSystem.readFile)(filename)
       .then((buf) => {
-        const source = new compiler.webpack.sources.RawSource(buf, false);
+        const source = new compiler.webpack.sources.RawSource(/** @type {string | Buffer} */ (buf), false);
         const name = path.basename(filename);
 
         compilation.fileDependencies.add(filename);
@@ -766,7 +770,7 @@ class HtmlWebpackPlugin {
         const faviconPath = publicPath + name;
 
         if (this.options.hash) {
-          return this.appendHash(faviconPath, compilation.hash);
+          return this.appendHash(faviconPath, /** @type {string} */ (compilation.hash));
         }
 
         return faviconPath;
@@ -1133,7 +1137,8 @@ class HtmlWebpackPlugin {
         outputName: finalOutputName,
         plugin: this
       }).catch(err => {
-        this.logger.error(err);
+        /** @type {Logger} */
+        (this.logger).error(err);
         return null;
       }).then(() => null));
 
