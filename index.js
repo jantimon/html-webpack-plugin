@@ -824,12 +824,13 @@ class HtmlWebpackPlugin {
    * Html Post processing
    *
    * @private
+   * @param {WebpackCompiler} compiler The compiler instance
    * @param {any} html The input html
    * @param {any} assets
    * @param {{headTags: HtmlTagObject[], bodyTags: HtmlTagObject[]}} assetTags The asset tags to inject
    * @returns {Promise<string>}
    */
-  postProcessHtml (html, assets, assetTags) {
+  postProcessHtml (compiler, html, assets, assetTags) {
     if (typeof html !== 'string') {
       return Promise.reject(new Error('Expected html to be a string but got ' + JSON.stringify(html)));
     }
@@ -838,14 +839,32 @@ class HtmlWebpackPlugin {
       ? this.injectAssetsIntoHtml(html, assets, assetTags)
       : html;
 
-    if (typeof this.options.minify !== 'object') {
+    // Check if webpack is running in production mode
+    // @see https://github.com/webpack/webpack/blob/3366421f1784c449f415cda5930a8e445086f688/lib/WebpackOptionsDefaulter.js#L12-L14
+    const isProductionLikeMode = compiler.options.mode === 'production' || !compiler.options.mode;
+    const needMinify = this.options.minify === true || typeof this.options.minify === 'object' || (this.options.minify === 'auto' && isProductionLikeMode);
+
+    if (!needMinify) {
       return Promise.resolve(htmlAfterInjection);
     }
+
+    const minifyOptions = typeof this.options.minify === 'object'
+      ? this.options.minify
+      : {
+        // https://www.npmjs.com/package/html-minifier-terser#options-quick-reference
+        collapseWhitespace: true,
+        keepClosingSlash: true,
+        removeComments: true,
+        removeRedundantAttributes: true,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        useShortDoctype: true
+      };
 
     let htmlAfterMinification;
 
     try {
-      htmlAfterMinification = require('html-minifier-terser').minify(htmlAfterInjection, this.options.minify);
+      htmlAfterMinification = require('html-minifier-terser').minify(htmlAfterInjection, minifyOptions);
     } catch (e) {
       const isParseError = String(e.message).indexOf('Parse Error') === 0;
 
@@ -942,25 +961,6 @@ class HtmlWebpackPlugin {
     if (path.resolve(filename) === path.normalize(filename)) {
       const outputPath = /** @type {string} - Once initialized the path is always a string */(compiler.options.output.path);
       options.filename = path.relative(outputPath, filename);
-    }
-
-    // Check if webpack is running in production mode
-    // @see https://github.com/webpack/webpack/blob/3366421f1784c449f415cda5930a8e445086f688/lib/WebpackOptionsDefaulter.js#L12-L14
-    const isProductionLikeMode = compiler.options.mode === 'production' || !compiler.options.mode;
-
-    const minify = options.minify;
-    if (minify === true || (minify === 'auto' && isProductionLikeMode)) {
-      /** @type { import('html-minifier-terser').Options } */
-      options.minify = {
-        // https://www.npmjs.com/package/html-minifier-terser#options-quick-reference
-        collapseWhitespace: true,
-        keepClosingSlash: true,
-        removeComments: true,
-        removeRedundantAttributes: true,
-        removeScriptTypeAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        useShortDoctype: true
-      };
     }
 
     compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin',
@@ -1094,7 +1094,7 @@ class HtmlWebpackPlugin {
                 return getHtmlWebpackPluginHooks(compilation).afterTemplateExecution.promise(pluginArgs);
               })
               .then(({ html, headTags, bodyTags }) => {
-                return this.postProcessHtml(html, assets, { headTags, bodyTags });
+                return this.postProcessHtml(compiler, html, assets, { headTags, bodyTags });
               });
 
             const emitHtmlPromise = injectedHtmlPromise
