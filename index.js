@@ -1,11 +1,4 @@
 // @ts-check
-// Import types
-/** @typedef {import("./typings").HtmlTagObject} HtmlTagObject */
-/** @typedef {import("./typings").Options} HtmlWebpackOptions */
-/** @typedef {import("./typings").ProcessedOptions} ProcessedHtmlWebpackOptions */
-/** @typedef {import("./typings").TemplateParameter} TemplateParameter */
-/** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
-/** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
 'use strict';
 
 const promisify = require('util').promisify;
@@ -23,7 +16,14 @@ const chunkSorter = require('./lib/chunksorter.js');
 const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
 const { assert } = require('console');
 
-const fsReadFileAsync = promisify(fs.readFile);
+/** @typedef {import("./typings").HtmlTagObject} HtmlTagObject */
+/** @typedef {import("./typings").Options} HtmlWebpackOptions */
+/** @typedef {import("./typings").ProcessedOptions} ProcessedHtmlWebpackOptions */
+/** @typedef {import("./typings").TemplateParameter} TemplateParameter */
+/** @typedef {import("webpack/lib/Compiler.js")} WebpackCompiler */
+/** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
+/** @typedef {Array<{ source: import('webpack').sources.Source, name: string }>} PreviousEmittedAssets */
+
 
 class HtmlWebpackPlugin {
   /**
@@ -216,7 +216,7 @@ function hookIntoCompiler (compiler, options, plugin) {
   /**
    * store the previous generated asset to emit them even if the content did not change
    * to support watch mode for third party plugins like the clean-webpack-plugin or the compression plugin
-   * @type {Array<{html: string, name: string}>}
+   * @type {PreviousEmittedAssets}
    */
   let previousEmittedAssets = [];
 
@@ -302,8 +302,8 @@ function hookIntoCompiler (compiler, options, plugin) {
           // If the template and the assets did not change we don't have to emit the html
           const newAssetJson = JSON.stringify(getAssetFiles(assets));
           if (isCompilationCached && options.cache && assetJson === newAssetJson) {
-            previousEmittedAssets.forEach(({ name, html }) => {
-              compilation.emitAsset(name, new webpack.sources.RawSource(html, false));
+            previousEmittedAssets.forEach(({ name, source }) => {
+              compilation.emitAsset(name, source);
             });
             return callback();
           } else {
@@ -314,7 +314,7 @@ function hookIntoCompiler (compiler, options, plugin) {
           // The html-webpack plugin uses a object representation for the html-tags which will be injected
           // to allow altering them more easily
           // Just before they are converted a third-party-plugin author might change the order and content
-          const assetsPromise = getFaviconPublicPath(options.favicon, compilation, assets.publicPath)
+          const assetsPromise = generateFavicon(options.favicon, compilation, assets.publicPath, previousEmittedAssets)
             .then((faviconPath) => {
               assets.favicon = faviconPath;
               return getHtmlWebpackPluginHooks(compilation).beforeAssetTagGeneration.promise({
@@ -408,9 +408,12 @@ function hookIntoCompiler (compiler, options, plugin) {
                 '[templatehash] is now [contenthash]')
               );
               const replacedFilename = replacePlaceholdersInFilename(filename, html, compilation);
+              const source = new webpack.sources.RawSource(html, false);
+
               // Add the evaluated html code to the webpack assets
-              compilation.emitAsset(replacedFilename.path, new webpack.sources.RawSource(html, false), replacedFilename.info);
-              previousEmittedAssets.push({ name: replacedFilename.path, html });
+              compilation.emitAsset(replacedFilename.path, source, replacedFilename.info);
+              previousEmittedAssets.push({ name: replacedFilename.path, source });
+
               return replacedFilename.path;
             })
             .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
@@ -527,26 +530,6 @@ function hookIntoCompiler (compiler, options, plugin) {
       : html;
     const htmlAfterMinification = minifyHtml(htmlAfterInjection);
     return Promise.resolve(htmlAfterMinification);
-  }
-
-  /*
-   * Pushes the content of the given filename to the compilation assets
-   * @param {string} filename
-   * @param {WebpackCompilation} compilation
-   *
-   * @returns {string} file basename
-   */
-  function addFileToAssets (filename, compilation) {
-    filename = path.resolve(compilation.compiler.context, filename);
-    return fsReadFileAsync(filename)
-      .then(source => new webpack.sources.RawSource(source, false))
-      .catch(() => Promise.reject(new Error('HtmlWebpackPlugin: could not load file ' + filename)))
-      .then(rawSource => {
-        const basename = path.basename(filename);
-        compilation.fileDependencies.add(filename);
-        compilation.emitAsset(basename, rawSource);
-        return basename;
-      });
   }
 
   /**
@@ -757,23 +740,37 @@ function hookIntoCompiler (compiler, options, plugin) {
    * Converts a favicon file from disk to a webpack resource
    * and returns the url to the resource
    *
-   * @param {string|false} faviconFilePath
+   * @param {string|false} favicon
    * @param {WebpackCompilation} compilation
    * @param {string} publicPath
+   * @param {PreviousEmittedAssets} previousEmittedAssets
    * @returns {Promise<string|undefined>}
    */
-  function getFaviconPublicPath (faviconFilePath, compilation, publicPath) {
-    if (!faviconFilePath) {
+  function generateFavicon (favicon, compilation, publicPath, previousEmittedAssets) {
+    if (!favicon) {
       return Promise.resolve(undefined);
     }
-    return addFileToAssets(faviconFilePath, compilation)
-      .then((faviconName) => {
-        const faviconPath = publicPath + faviconName;
+
+    const filename = path.resolve(compilation.compiler.context, favicon);
+
+    return promisify(compilation.inputFileSystem.readFile)(filename)
+      .then((buf) => {
+        const source = new webpack.sources.RawSource(buf, false);
+        const name = path.basename(filename);
+
+        compilation.fileDependencies.add(filename);
+        compilation.emitAsset(name, source);
+        previousEmittedAssets.push({ name, source });
+
+        const faviconPath = publicPath + name;
+
         if (options.hash) {
           return appendHash(faviconPath, compilation.hash);
         }
+
         return faviconPath;
-      });
+      })
+      .catch(() => Promise.reject(new Error('HtmlWebpackPlugin: could not load file ' + filename)));
   }
 
   /**
