@@ -307,11 +307,11 @@ class HtmlWebpackPlugin {
    *
    * @private
    * @param {Compilation} compilation
-   * @param {string} childCompilationOutputName
+   * @param {string} filename
    * @param {string | 'auto'} customPublicPath
    * @returns {string}
    */
-  getPublicPath (compilation, childCompilationOutputName, customPublicPath) {
+  getPublicPath (compilation, filename, customPublicPath) {
     /**
      * @type {string} the configured public path to the asset root
      * if a path publicPath is set in the current webpack config use it otherwise
@@ -329,7 +329,7 @@ class HtmlWebpackPlugin {
           // If a hard coded public path exists use it
           ? webpackPublicPath
           // If no public path was set get a relative url path
-          : path.relative(path.resolve(compilation.options.output.path, path.dirname(childCompilationOutputName)), compilation.options.output.path)
+          : path.relative(path.resolve(compilation.options.output.path, path.dirname(filename)), compilation.options.output.path)
             .split(path.sep).join('/')
         );
 
@@ -345,12 +345,13 @@ class HtmlWebpackPlugin {
    *
    * @private
    * @param {Compilation} compilation
+   * @param {ProcessedHtmlWebpackOptions} options
    * @param {string[]} entryNames
    * @returns {AssetsInformationByGroups}
    */
-  getAssetsInformationByGroups (compilation, entryNames) {
+  getAssetsInformationByGroups (compilation, options, entryNames) {
     /** The public path used inside the html file */
-    const publicPath = this.getPublicPath(compilation, this.options.filename, this.options.publicPath);
+    const publicPath = this.getPublicPath(compilation, options.filename, options.publicPath);
     /**
      * @type {AssetsInformationByGroups}
      */
@@ -925,16 +926,19 @@ class HtmlWebpackPlugin {
       ],
       bodyTags: []
     };
+
     // Add script tags to head or body depending on
     // the htmlPluginOptions
     if (scriptTarget === 'body') {
       result.bodyTags.push(...assetTags.scripts);
     } else {
       // If script loading is blocking add the scripts to the end of the head
-      // If script loading is non-blocking add the scripts infront of the css files
+      // If script loading is non-blocking add the scripts in front of the css files
       const insertPosition = this.options.scriptLoading === 'blocking' ? result.headTags.length : assetTags.meta.length;
+
       result.headTags.splice(insertPosition, 0, ...assetTags.scripts);
     }
+
     return result;
   }
 
@@ -1014,7 +1018,7 @@ class HtmlWebpackPlugin {
     // it is a cached result
     const isCompilationCached = templateResult.mainCompilationHash !== compilation.hash;
     /** Generated file paths from the entry point names */
-    const assetsInformationByGroups = this.getAssetsInformationByGroups(compilation, sortedEntryNames);
+    const assetsInformationByGroups = this.getAssetsInformationByGroups(compilation, options, sortedEntryNames);
     // If the template and the assets did not change we don't have to emit the html
     const newAssetJson = JSON.stringify(this.getAssetFiles(assetsInformationByGroups));
 
