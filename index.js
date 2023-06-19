@@ -821,22 +821,34 @@ class HtmlWebpackPlugin {
   }
 
   /**
-   * Minify the given string using html-minifier-terser
+   * Html Post processing
    *
-   * As this is a breaking change to html-webpack-plugin 3.x
-   * provide an extended error message to explain how to get back
-   * to the old behaviour
-   *
-   * @param {string} html
+   * @private
+   * @param {any} html The input html
+   * @param {any} assets
+   * @param {{headTags: HtmlTagObject[], bodyTags: HtmlTagObject[]}} assetTags The asset tags to inject
+   * @returns {Promise<string>}
    */
-  minifyHtml (html) {
-    if (typeof this.options.minify !== 'object') {
-      return html;
+  postProcessHtml (html, assets, assetTags) {
+    if (typeof html !== 'string') {
+      return Promise.reject(new Error('Expected html to be a string but got ' + JSON.stringify(html)));
     }
+
+    const htmlAfterInjection = this.options.inject
+      ? this.injectAssetsIntoHtml(html, assets, assetTags)
+      : html;
+
+    if (typeof this.options.minify !== 'object') {
+      return Promise.resolve(htmlAfterInjection);
+    }
+
+    let htmlAfterMinification;
+
     try {
-      return require('html-minifier-terser').minify(html, this.options.minify);
+      htmlAfterMinification = require('html-minifier-terser').minify(htmlAfterInjection, this.options.minify);
     } catch (e) {
       const isParseError = String(e.message).indexOf('Parse Error') === 0;
+
       if (isParseError) {
         e.message = 'html-webpack-plugin could not minify the generated output.\n' +
           'In production mode the html minifcation is enabled by default.\n' +
@@ -848,30 +860,10 @@ class HtmlWebpackPlugin {
           'https://danielruf.github.io/html-minifier-terser/' +
           '\n' + e.message;
       }
-      throw e;
-    }
-  }
 
-  /**
-   * Html Post processing
-   *
-   * @private
-   * @param {any} html The input html
-   * @param {any} assets
-   * @param {{
-       headTags: HtmlTagObject[],
-       bodyTags: HtmlTagObject[]
-     }} assetTags The asset tags to inject
-   * @returns {Promise<string>}
-   */
-  postProcessHtml (html, assets, assetTags) {
-    if (typeof html !== 'string') {
-      return Promise.reject(new Error('Expected html to be a string but got ' + JSON.stringify(html)));
+      return Promise.reject(e);
     }
-    const htmlAfterInjection = this.options.inject
-      ? this.injectAssetsIntoHtml(html, assets, assetTags)
-      : html;
-    const htmlAfterMinification = this.minifyHtml(htmlAfterInjection);
+
     return Promise.resolve(htmlAfterMinification);
   }
 
