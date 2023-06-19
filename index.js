@@ -120,9 +120,85 @@ class HtmlWebpackPlugin {
 
       // Hook all options into the webpack compiler
       entryOptions.forEach((instanceOptions) => {
-        this.generateHtml(compiler, instanceOptions);
+        // Instance variables to keep caching information for multiple builds
+        const assetJson = { value: undefined };
+        /**
+         * store the previous generated asset to emit them even if the content did not change
+         * to support watch mode for third party plugins like the clean-webpack-plugin or the compression plugin
+         * @type {PreviousEmittedAssets}
+         */
+        let previousEmittedAssets = [];
+
+        instanceOptions.template = this.getTemplatePath(instanceOptions.template, compiler.context);
+
+        // Inject child compiler plugin
+        const childCompilerPlugin = new CachedChildCompilation(compiler);
+
+        if (!instanceOptions.templateContent) {
+          childCompilerPlugin.addEntry(instanceOptions.template);
+        }
+
+        // convert absolute filename into relative so that webpack can
+        // generate it at correct location
+        const filename = instanceOptions.filename;
+
+        if (path.resolve(filename) === path.normalize(filename)) {
+          const outputPath = /** @type {string} - Once initialized the path is always a string */(compiler.options.output.path);
+          instanceOptions.filename = path.relative(outputPath, filename);
+        }
+
+        compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin',
+          /**
+           * Hook into the webpack compilation
+           * @param {Compilation} compilation
+           */
+          (compilation) => {
+            compilation.hooks.processAssets.tapAsync(
+              {
+                name: 'HtmlWebpackPlugin',
+                stage:
+                /**
+                 * Generate the html after minification and dev tooling is done
+                 */
+                compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE
+              },
+              /**
+               * Hook into the process assets hook
+               * @param {any} _
+               * @param {(err?: Error) => void} callback
+               */
+              (_, callback) => {
+                this.generateHTML(compiler, compilation, childCompilerPlugin, previousEmittedAssets, assetJson, instanceOptions, callback);
+              });
+          });
       });
     });
+  }
+
+  /**
+   * Helper to return the absolute template path with a fallback loader
+   *
+   * @private
+   * @param {string} template The path to the template e.g. './index.html'
+   * @param {string} context The webpack base resolution path for relative paths e.g. process.cwd()
+   */
+  getTemplatePath (template, context) {
+    if (template === 'auto') {
+      template = path.resolve(context, 'src/index.ejs');
+      if (!fs.existsSync(template)) {
+        template = path.join(__dirname, 'default_index.ejs');
+      }
+    }
+
+    // If the template doesn't use a loader use the lodash template loader
+    if (template.indexOf('!') === -1) {
+      template = require.resolve('./lib/loader.js') + '!' + path.resolve(context, template);
+    }
+
+    // Resolve template path
+    return template.replace(
+      /([!])([^/\\][^!?]+|[^/\\!?])($|\?[^!?\n]+$)/,
+      (match, prefix, filepath, postfix) => prefix + path.resolve(filepath) + postfix);
   }
 
   /**
@@ -133,7 +209,7 @@ class HtmlWebpackPlugin {
    * @param {string[]|'all'} includedChunks
    * @param {string[]} excludedChunks
    */
-  filterChunks (chunks, includedChunks, excludedChunks) {
+  filterEntryChunks (chunks, includedChunks, excludedChunks) {
     return chunks.filter(chunkName => {
       // Skip if the chunks should be filtered and the given chunk was not added explicity
       if (Array.isArray(includedChunks) && includedChunks.indexOf(chunkName) === -1) {
@@ -171,44 +247,6 @@ class HtmlWebpackPlugin {
   }
 
   /**
-   * Helper to return the absolute template path with a fallback loader
-   *
-   * @private
-   * @param {string} template The path to the template e.g. './index.html'
-   * @param {string} context The webpack base resolution path for relative paths e.g. process.cwd()
-   */
-  getFullTemplatePath (template, context) {
-    if (template === 'auto') {
-      template = path.resolve(context, 'src/index.ejs');
-      if (!fs.existsSync(template)) {
-        template = path.join(__dirname, 'default_index.ejs');
-      }
-    }
-    // If the template doesn't use a loader use the lodash template loader
-    if (template.indexOf('!') === -1) {
-      template = require.resolve('./lib/loader.js') + '!' + path.resolve(context, template);
-    }
-    // Resolve template path
-    return template.replace(
-      /([!])([^/\\][^!?]+|[^/\\!?])($|\?[^!?\n]+$)/,
-      (match, prefix, filepath, postfix) => prefix + path.resolve(filepath) + postfix);
-  }
-
-  /**
-   * Appends a cache busting hash to the query string of the url
-   * E.g. http://localhost:8080/ -> http://localhost:8080/?50c9096ba6183fd728eeb065a26ec175
-   * @private
-   * @param {string} url
-   * @param {string} hash
-   */
-  appendHash (url, hash) {
-    if (!url) {
-      return url;
-    }
-    return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
-  }
-
-  /**
    * Encode each path component using `encodeURIComponent` as files can contain characters
    * which needs special encoding in URLs like `+ `.
    *
@@ -242,6 +280,21 @@ class HtmlWebpackPlugin {
     // Encode all parts except '/' which are not part of the querystring:
     const encodedUrlPath = urlPath.split('/').map(encodeURIComponent).join('/');
     return encodedUrlPath + queryString;
+  }
+
+  /**
+   * Appends a cache busting hash to the query string of the url
+   * E.g. http://localhost:8080/ -> http://localhost:8080/?50c9096ba6183fd728eeb065a26ec175
+   *
+   * @private
+   * @param {string} url
+   * @param {string} hash
+   */
+  appendHash (url, hash) {
+    if (!url) {
+      return url;
+    }
+    return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
   }
 
   /**
@@ -370,6 +423,317 @@ class HtmlWebpackPlugin {
     }
 
     return assets;
+  }
+
+  /**
+   * Once webpack is done with compiling the template into a NodeJS code this function
+   * evaluates it to generate the html result
+   *
+   * The evaluateCompilationResult is only a class function to allow spying during testing.
+   * Please change that in a further refactoring
+   *
+   * @param {string} source
+   * @param {string} publicPath
+   * @param {string} templateFilename
+   * @returns {Promise<string | (() => string | Promise<string>)>}
+   */
+  evaluateCompilationResult (source, publicPath, templateFilename) {
+    if (!source) {
+      return Promise.reject(new Error('The child compilation didn\'t provide a result'));
+    }
+
+    // The LibraryTemplatePlugin stores the template result in a local variable.
+    // By adding it to the end the value gets extracted during evaluation
+    if (source.indexOf('HTML_WEBPACK_PLUGIN_RESULT') >= 0) {
+      source += ';\nHTML_WEBPACK_PLUGIN_RESULT';
+    }
+
+    const templateWithoutLoaders = templateFilename.replace(/^.+!/, '').replace(/\?.+$/, '');
+    const vmContext = vm.createContext({
+      ...global,
+      HTML_WEBPACK_PLUGIN: true,
+      require: require,
+      htmlWebpackPluginPublicPath: publicPath,
+      __filename: templateWithoutLoaders,
+      __dirname: path.dirname(templateWithoutLoaders),
+      AbortController: global.AbortController,
+      AbortSignal: global.AbortSignal,
+      Blob: global.Blob,
+      Buffer: global.Buffer,
+      ByteLengthQueuingStrategy: global.ByteLengthQueuingStrategy,
+      BroadcastChannel: global.BroadcastChannel,
+      CompressionStream: global.CompressionStream,
+      CountQueuingStrategy: global.CountQueuingStrategy,
+      Crypto: global.Crypto,
+      CryptoKey: global.CryptoKey,
+      CustomEvent: global.CustomEvent,
+      DecompressionStream: global.DecompressionStream,
+      Event: global.Event,
+      EventTarget: global.EventTarget,
+      File: global.File,
+      FormData: global.FormData,
+      Headers: global.Headers,
+      MessageChannel: global.MessageChannel,
+      MessageEvent: global.MessageEvent,
+      MessagePort: global.MessagePort,
+      PerformanceEntry: global.PerformanceEntry,
+      PerformanceMark: global.PerformanceMark,
+      PerformanceMeasure: global.PerformanceMeasure,
+      PerformanceObserver: global.PerformanceObserver,
+      PerformanceObserverEntryList: global.PerformanceObserverEntryList,
+      PerformanceResourceTiming: global.PerformanceResourceTiming,
+      ReadableByteStreamController: global.ReadableByteStreamController,
+      ReadableStream: global.ReadableStream,
+      ReadableStreamBYOBReader: global.ReadableStreamBYOBReader,
+      ReadableStreamBYOBRequest: global.ReadableStreamBYOBRequest,
+      ReadableStreamDefaultController: global.ReadableStreamDefaultController,
+      ReadableStreamDefaultReader: global.ReadableStreamDefaultReader,
+      Response: global.Response,
+      Request: global.Request,
+      SubtleCrypto: global.SubtleCrypto,
+      DOMException: global.DOMException,
+      TextDecoder: global.TextDecoder,
+      TextDecoderStream: global.TextDecoderStream,
+      TextEncoder: global.TextEncoder,
+      TextEncoderStream: global.TextEncoderStream,
+      TransformStream: global.TransformStream,
+      TransformStreamDefaultController: global.TransformStreamDefaultController,
+      URL: global.URL,
+      URLSearchParams: global.URLSearchParams,
+      WebAssembly: global.WebAssembly,
+      WritableStream: global.WritableStream,
+      WritableStreamDefaultController: global.WritableStreamDefaultController,
+      WritableStreamDefaultWriter: global.WritableStreamDefaultWriter
+    });
+
+    const vmScript = new vm.Script(source, { filename: templateWithoutLoaders });
+
+    // Evaluate code and cast to string
+    let newSource;
+
+    try {
+      newSource = vmScript.runInContext(vmContext);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+
+    if (typeof newSource === 'object' && newSource.__esModule && newSource.default) {
+      newSource = newSource.default;
+    }
+
+    return typeof newSource === 'string' || typeof newSource === 'function'
+      ? Promise.resolve(newSource)
+      : Promise.reject(new Error('The loader "' + templateWithoutLoaders + '" didn\'t return html.'));
+  }
+
+  /**
+   * Add toString methods for easier rendering inside the template
+   *
+   * @private
+   * @param {Array<HtmlTagObject>} assetTagGroup
+   * @returns {Array<HtmlTagObject>}
+   */
+  prepareAssetTagGroupForRendering (assetTagGroup) {
+    const xhtml = this.options.xhtml;
+    return HtmlTagArray.from(assetTagGroup.map((assetTag) => {
+      const copiedAssetTag = Object.assign({}, assetTag);
+      copiedAssetTag.toString = function () {
+        return htmlTagObjectToString(this, xhtml);
+      };
+      return copiedAssetTag;
+    }));
+  }
+
+  /**
+   * Generate the template parameters for the template function
+   *
+   * @private
+   * @param {Compilation} compilation
+   * @param {AssetsInformationByGroups} assetsInformationByGroups
+   * @param {{
+       headTags: HtmlTagObject[],
+       bodyTags: HtmlTagObject[]
+     }} assetTags
+   * @returns {Promise<{[key: any]: any}>}
+   */
+  getTemplateParameters (compilation, assetsInformationByGroups, assetTags) {
+    const templateParameters = this.options.templateParameters;
+
+    if (templateParameters === false) {
+      return Promise.resolve({});
+    }
+
+    if (typeof templateParameters !== 'function' && typeof templateParameters !== 'object') {
+      throw new Error('templateParameters has to be either a function or an object');
+    }
+
+    const templateParameterFunction = typeof templateParameters === 'function'
+      // A custom function can overwrite the entire template parameter preparation
+      ? templateParameters
+      // If the template parameters is an object merge it with the default values
+      : (compilation, assetsInformationByGroups, assetTags, options) => Object.assign({},
+        templateParametersGenerator(compilation, assetsInformationByGroups, assetTags, options),
+        templateParameters
+      );
+    const preparedAssetTags = {
+      headTags: this.prepareAssetTagGroupForRendering(assetTags.headTags),
+      bodyTags: this.prepareAssetTagGroupForRendering(assetTags.bodyTags)
+    };
+    return Promise
+      .resolve()
+      .then(() => templateParameterFunction(compilation, assetsInformationByGroups, preparedAssetTags, this.options));
+  }
+
+  /**
+   * This function renders the actual html by executing the template function
+   *
+   * @private
+   * @param {(templateParameters) => string | Promise<string>} templateFunction
+   * @param {AssetsInformationByGroups} assetsInformationByGroups
+   * @param {{
+       headTags: HtmlTagObject[],
+       bodyTags: HtmlTagObject[]
+     }} assetTags
+   * @param {Compilation} compilation
+   * @returns Promise<string>
+   */
+  executeTemplate (templateFunction, assetsInformationByGroups, assetTags, compilation) {
+    // Template processing
+    const templateParamsPromise = this.getTemplateParameters(compilation, assetsInformationByGroups, assetTags);
+
+    return templateParamsPromise.then((templateParams) => {
+      try {
+        // If html is a promise return the promise
+        // If html is a string turn it into a promise
+        return templateFunction(templateParams);
+      } catch (e) {
+        compilation.errors.push(new Error('Template execution failed: ' + e));
+        return Promise.reject(e);
+      }
+    });
+  }
+
+  /**
+   * Html Post processing
+   *
+   * @private
+   * @param {Compiler} compiler The compiler instance
+   * @param {any} originalHtml The input html
+   * @param {AssetsInformationByGroups} assetsInformationByGroups
+   * @param {{headTags: HtmlTagObject[], bodyTags: HtmlTagObject[]}} assetTags The asset tags to inject
+   * @returns {Promise<string>}
+   */
+  postProcessHtml (compiler, originalHtml, assetsInformationByGroups, assetTags) {
+    let html = originalHtml;
+
+    if (typeof html !== 'string') {
+      return Promise.reject(new Error('Expected html to be a string but got ' + JSON.stringify(html)));
+    }
+
+    if (this.options.inject) {
+      const htmlRegExp = /(<html[^>]*>)/i;
+      const headRegExp = /(<\/head\s*>)/i;
+      const bodyRegExp = /(<\/body\s*>)/i;
+      const metaViewportRegExp = /<meta[^>]+name=["']viewport["'][^>]*>/i;
+      const body = assetTags.bodyTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
+      const head = assetTags.headTags.filter((item) => {
+        if (item.tagName === 'meta' && item.attributes && item.attributes.name === 'viewport' && metaViewportRegExp.test(html)) {
+          return false;
+        }
+
+        return true;
+      }).map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
+
+      if (body.length) {
+        if (bodyRegExp.test(html)) {
+          // Append assets to body element
+          html = html.replace(bodyRegExp, match => body.join('') + match);
+        } else {
+          // Append scripts to the end of the file if no <body> element exists:
+          html += body.join('');
+        }
+      }
+
+      if (head.length) {
+        // Create a head tag if none exists
+        if (!headRegExp.test(html)) {
+          if (!htmlRegExp.test(html)) {
+            html = '<head></head>' + html;
+          } else {
+            html = html.replace(htmlRegExp, match => match + '<head></head>');
+          }
+        }
+
+        // Append assets to head element
+        html = html.replace(headRegExp, match => head.join('') + match);
+      }
+
+      // Inject manifest into the opening html tag
+      if (assetsInformationByGroups.manifest) {
+        html = html.replace(/(<html[^>]*)(>)/i, (match, start, end) => {
+          // Append the manifest only if no manifest was specified
+          if (/\smanifest\s*=/.test(match)) {
+            return match;
+          }
+          return start + ' manifest="' + assetsInformationByGroups.manifest + '"' + end;
+        });
+      }
+    }
+
+    // TODO avoid this logic and use https://github.com/webpack-contrib/html-minimizer-webpack-plugin under the hood in the next major version
+    // Check if webpack is running in production mode
+    // @see https://github.com/webpack/webpack/blob/3366421f1784c449f415cda5930a8e445086f688/lib/WebpackOptionsDefaulter.js#L12-L14
+    const isProductionLikeMode = compiler.options.mode === 'production' || !compiler.options.mode;
+    const needMinify = this.options.minify === true || typeof this.options.minify === 'object' || (this.options.minify === 'auto' && isProductionLikeMode);
+
+    if (!needMinify) {
+      return Promise.resolve(html);
+    }
+
+    const minifyOptions = typeof this.options.minify === 'object'
+      ? this.options.minify
+      : {
+        // https://www.npmjs.com/package/html-minifier-terser#options-quick-reference
+        collapseWhitespace: true,
+        keepClosingSlash: true,
+        removeComments: true,
+        removeRedundantAttributes: true,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        useShortDoctype: true
+      };
+
+    try {
+      html = require('html-minifier-terser').minify(html, minifyOptions);
+    } catch (e) {
+      const isParseError = String(e.message).indexOf('Parse Error') === 0;
+
+      if (isParseError) {
+        e.message = 'html-webpack-plugin could not minify the generated output.\n' +
+          'In production mode the html minifcation is enabled by default.\n' +
+          'If you are not generating a valid html output please disable it manually.\n' +
+          'You can do so by adding the following setting to your HtmlWebpackPlugin config:\n|\n|' +
+          '    minify: false\n|\n' +
+          'See https://github.com/jantimon/html-webpack-plugin#options for details.\n\n' +
+          'For parser dedicated bugs please create an issue here:\n' +
+          'https://danielruf.github.io/html-minifier-terser/' +
+          '\n' + e.message;
+      }
+
+      return Promise.reject(e);
+    }
+
+    return Promise.resolve(html);
+  }
+
+  /**
+   * Helper to return a sorted unique array of all asset files out of the asset object
+   * @private
+   */
+  getAssetFiles (assets) {
+    const files = _.uniq(Object.keys(assets).filter(assetType => assetType !== 'chunks' && assets[assetType]).reduce((files, assetType) => files.concat(assets[assetType]), []));
+    files.sort();
+    return files;
   }
 
   /**
@@ -571,307 +935,6 @@ class HtmlWebpackPlugin {
   }
 
   /**
-   * Once webpack is done with compiling the template into a NodeJS code this function
-   * evaluates it to generate the html result
-   *
-   * The evaluateCompilationResult is only a class function to allow spying during testing.
-   * Please change that in a further refactoring
-   *
-   * @param {string} source
-   * @param {string} publicPath
-   * @param {string} templateFilename
-   * @returns {Promise<string | (() => string | Promise<string>)>}
-   */
-  evaluateCompilationResult (source, publicPath, templateFilename) {
-    if (!source) {
-      return Promise.reject(new Error('The child compilation didn\'t provide a result'));
-    }
-
-    // The LibraryTemplatePlugin stores the template result in a local variable.
-    // By adding it to the end the value gets extracted during evaluation
-    if (source.indexOf('HTML_WEBPACK_PLUGIN_RESULT') >= 0) {
-      source += ';\nHTML_WEBPACK_PLUGIN_RESULT';
-    }
-
-    const templateWithoutLoaders = templateFilename.replace(/^.+!/, '').replace(/\?.+$/, '');
-    const vmContext = vm.createContext({
-      ...global,
-      HTML_WEBPACK_PLUGIN: true,
-      require: require,
-      htmlWebpackPluginPublicPath: publicPath,
-      __filename: templateWithoutLoaders,
-      __dirname: path.dirname(templateWithoutLoaders),
-      AbortController: global.AbortController,
-      AbortSignal: global.AbortSignal,
-      Blob: global.Blob,
-      Buffer: global.Buffer,
-      ByteLengthQueuingStrategy: global.ByteLengthQueuingStrategy,
-      BroadcastChannel: global.BroadcastChannel,
-      CompressionStream: global.CompressionStream,
-      CountQueuingStrategy: global.CountQueuingStrategy,
-      Crypto: global.Crypto,
-      CryptoKey: global.CryptoKey,
-      CustomEvent: global.CustomEvent,
-      DecompressionStream: global.DecompressionStream,
-      Event: global.Event,
-      EventTarget: global.EventTarget,
-      File: global.File,
-      FormData: global.FormData,
-      Headers: global.Headers,
-      MessageChannel: global.MessageChannel,
-      MessageEvent: global.MessageEvent,
-      MessagePort: global.MessagePort,
-      PerformanceEntry: global.PerformanceEntry,
-      PerformanceMark: global.PerformanceMark,
-      PerformanceMeasure: global.PerformanceMeasure,
-      PerformanceObserver: global.PerformanceObserver,
-      PerformanceObserverEntryList: global.PerformanceObserverEntryList,
-      PerformanceResourceTiming: global.PerformanceResourceTiming,
-      ReadableByteStreamController: global.ReadableByteStreamController,
-      ReadableStream: global.ReadableStream,
-      ReadableStreamBYOBReader: global.ReadableStreamBYOBReader,
-      ReadableStreamBYOBRequest: global.ReadableStreamBYOBRequest,
-      ReadableStreamDefaultController: global.ReadableStreamDefaultController,
-      ReadableStreamDefaultReader: global.ReadableStreamDefaultReader,
-      Response: global.Response,
-      Request: global.Request,
-      SubtleCrypto: global.SubtleCrypto,
-      DOMException: global.DOMException,
-      TextDecoder: global.TextDecoder,
-      TextDecoderStream: global.TextDecoderStream,
-      TextEncoder: global.TextEncoder,
-      TextEncoderStream: global.TextEncoderStream,
-      TransformStream: global.TransformStream,
-      TransformStreamDefaultController: global.TransformStreamDefaultController,
-      URL: global.URL,
-      URLSearchParams: global.URLSearchParams,
-      WebAssembly: global.WebAssembly,
-      WritableStream: global.WritableStream,
-      WritableStreamDefaultController: global.WritableStreamDefaultController,
-      WritableStreamDefaultWriter: global.WritableStreamDefaultWriter
-    });
-
-    const vmScript = new vm.Script(source, { filename: templateWithoutLoaders });
-
-    // Evaluate code and cast to string
-    let newSource;
-
-    try {
-      newSource = vmScript.runInContext(vmContext);
-    } catch (e) {
-      return Promise.reject(e);
-    }
-
-    if (typeof newSource === 'object' && newSource.__esModule && newSource.default) {
-      newSource = newSource.default;
-    }
-
-    return typeof newSource === 'string' || typeof newSource === 'function'
-      ? Promise.resolve(newSource)
-      : Promise.reject(new Error('The loader "' + templateWithoutLoaders + '" didn\'t return html.'));
-  }
-
-  /**
-   * Generate the template parameters for the template function
-   *
-   * @private
-   * @param {Compilation} compilation
-   * @param {AssetsInformationByGroups} assetsInformationByGroups
-   * @param {{
-       headTags: HtmlTagObject[],
-       bodyTags: HtmlTagObject[]
-     }} assetTags
-   * @returns {Promise<{[key: any]: any}>}
-   */
-  getTemplateParameters (compilation, assetsInformationByGroups, assetTags) {
-    const templateParameters = this.options.templateParameters;
-
-    if (templateParameters === false) {
-      return Promise.resolve({});
-    }
-
-    if (typeof templateParameters !== 'function' && typeof templateParameters !== 'object') {
-      throw new Error('templateParameters has to be either a function or an object');
-    }
-
-    const templateParameterFunction = typeof templateParameters === 'function'
-      // A custom function can overwrite the entire template parameter preparation
-      ? templateParameters
-      // If the template parameters is an object merge it with the default values
-      : (compilation, assetsInformationByGroups, assetTags, options) => Object.assign({},
-        templateParametersGenerator(compilation, assetsInformationByGroups, assetTags, options),
-        templateParameters
-      );
-    const preparedAssetTags = {
-      headTags: this.prepareAssetTagGroupForRendering(assetTags.headTags),
-      bodyTags: this.prepareAssetTagGroupForRendering(assetTags.bodyTags)
-    };
-    return Promise
-      .resolve()
-      .then(() => templateParameterFunction(compilation, assetsInformationByGroups, preparedAssetTags, this.options));
-  }
-
-  /**
-   * This function renders the actual html by executing the template function
-   *
-   * @private
-   * @param {(templateParameters) => string | Promise<string>} templateFunction
-   * @param {AssetsInformationByGroups} assetsInformationByGroups
-   * @param {{
-       headTags: HtmlTagObject[],
-       bodyTags: HtmlTagObject[]
-     }} assetTags
-   * @param {Compilation} compilation
-   * @returns Promise<string>
-   */
-  executeTemplate (templateFunction, assetsInformationByGroups, assetTags, compilation) {
-    // Template processing
-    const templateParamsPromise = this.getTemplateParameters(compilation, assetsInformationByGroups, assetTags);
-
-    return templateParamsPromise.then((templateParams) => {
-      try {
-        // If html is a promise return the promise
-        // If html is a string turn it into a promise
-        return templateFunction(templateParams);
-      } catch (e) {
-        compilation.errors.push(new Error('Template execution failed: ' + e));
-        return Promise.reject(e);
-      }
-    });
-  }
-
-  /**
-   * Add toString methods for easier rendering inside the template
-   *
-   * @private
-   * @param {Array<HtmlTagObject>} assetTagGroup
-   * @returns {Array<HtmlTagObject>}
-   */
-  prepareAssetTagGroupForRendering (assetTagGroup) {
-    const xhtml = this.options.xhtml;
-    return HtmlTagArray.from(assetTagGroup.map((assetTag) => {
-      const copiedAssetTag = Object.assign({}, assetTag);
-      copiedAssetTag.toString = function () {
-        return htmlTagObjectToString(this, xhtml);
-      };
-      return copiedAssetTag;
-    }));
-  }
-
-  /**
-   * Html Post processing
-   *
-   * @private
-   * @param {Compiler} compiler The compiler instance
-   * @param {any} originalHtml The input html
-   * @param {AssetsInformationByGroups} assetsInformationByGroups
-   * @param {{headTags: HtmlTagObject[], bodyTags: HtmlTagObject[]}} assetTags The asset tags to inject
-   * @returns {Promise<string>}
-   */
-  postProcessHtml (compiler, originalHtml, assetsInformationByGroups, assetTags) {
-    let html = originalHtml;
-
-    if (typeof html !== 'string') {
-      return Promise.reject(new Error('Expected html to be a string but got ' + JSON.stringify(html)));
-    }
-
-    if (this.options.inject) {
-      const htmlRegExp = /(<html[^>]*>)/i;
-      const headRegExp = /(<\/head\s*>)/i;
-      const bodyRegExp = /(<\/body\s*>)/i;
-      const metaViewportRegExp = /<meta[^>]+name=["']viewport["'][^>]*>/i;
-      const body = assetTags.bodyTags.map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
-      const head = assetTags.headTags.filter((item) => {
-        if (item.tagName === 'meta' && item.attributes && item.attributes.name === 'viewport' && metaViewportRegExp.test(html)) {
-          return false;
-        }
-
-        return true;
-      }).map((assetTagObject) => htmlTagObjectToString(assetTagObject, this.options.xhtml));
-
-      if (body.length) {
-        if (bodyRegExp.test(html)) {
-          // Append assets to body element
-          html = html.replace(bodyRegExp, match => body.join('') + match);
-        } else {
-          // Append scripts to the end of the file if no <body> element exists:
-          html += body.join('');
-        }
-      }
-
-      if (head.length) {
-        // Create a head tag if none exists
-        if (!headRegExp.test(html)) {
-          if (!htmlRegExp.test(html)) {
-            html = '<head></head>' + html;
-          } else {
-            html = html.replace(htmlRegExp, match => match + '<head></head>');
-          }
-        }
-
-        // Append assets to head element
-        html = html.replace(headRegExp, match => head.join('') + match);
-      }
-
-      // Inject manifest into the opening html tag
-      if (assetsInformationByGroups.manifest) {
-        html = html.replace(/(<html[^>]*)(>)/i, (match, start, end) => {
-          // Append the manifest only if no manifest was specified
-          if (/\smanifest\s*=/.test(match)) {
-            return match;
-          }
-          return start + ' manifest="' + assetsInformationByGroups.manifest + '"' + end;
-        });
-      }
-    }
-
-    // TODO avoid this logic and use https://github.com/webpack-contrib/html-minimizer-webpack-plugin under the hood in the next major version
-    // Check if webpack is running in production mode
-    // @see https://github.com/webpack/webpack/blob/3366421f1784c449f415cda5930a8e445086f688/lib/WebpackOptionsDefaulter.js#L12-L14
-    const isProductionLikeMode = compiler.options.mode === 'production' || !compiler.options.mode;
-    const needMinify = this.options.minify === true || typeof this.options.minify === 'object' || (this.options.minify === 'auto' && isProductionLikeMode);
-
-    if (!needMinify) {
-      return Promise.resolve(html);
-    }
-
-    const minifyOptions = typeof this.options.minify === 'object'
-      ? this.options.minify
-      : {
-        // https://www.npmjs.com/package/html-minifier-terser#options-quick-reference
-        collapseWhitespace: true,
-        keepClosingSlash: true,
-        removeComments: true,
-        removeRedundantAttributes: true,
-        removeScriptTypeAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        useShortDoctype: true
-      };
-
-    try {
-      html = require('html-minifier-terser').minify(html, minifyOptions);
-    } catch (e) {
-      const isParseError = String(e.message).indexOf('Parse Error') === 0;
-
-      if (isParseError) {
-        e.message = 'html-webpack-plugin could not minify the generated output.\n' +
-          'In production mode the html minifcation is enabled by default.\n' +
-          'If you are not generating a valid html output please disable it manually.\n' +
-          'You can do so by adding the following setting to your HtmlWebpackPlugin config:\n|\n|' +
-          '    minify: false\n|\n' +
-          'See https://github.com/jantimon/html-webpack-plugin#options for details.\n\n' +
-          'For parser dedicated bugs please create an issue here:\n' +
-          'https://danielruf.github.io/html-minifier-terser/' +
-          '\n' + e.message;
-      }
-
-      return Promise.reject(e);
-    }
-
-    return Promise.resolve(html);
-  }
-
-  /**
    * Replace [contenthash] in filename
    *
    * @see https://survivejs.com/webpack/optimizing/adding-hashes-to-filenames/
@@ -911,214 +974,174 @@ class HtmlWebpackPlugin {
   }
 
   /**
-   * Helper to return a sorted unique array of all asset files out of the asset object
+   * Function to generate HTML file.
+   *
    * @private
+   * @param {Compiler} compiler
+   * @param {Compilation} compilation
+   * @param {CachedChildCompilation} childCompilerPlugin
+   * @param {PreviousEmittedAssets} previousEmittedAssets
+   * @param {{ value: string | undefined }} assetJson
+   * @param {ProcessedHtmlWebpackOptions} options
+   * @param {(err?: Error) => void} callback
    */
-  getAssetFiles (assets) {
-    const files = _.uniq(Object.keys(assets).filter(assetType => assetType !== 'chunks' && assets[assetType]).reduce((files, assetType) => files.concat(assets[assetType]), []));
-    files.sort();
-    return files;
-  }
+  generateHTML (
+    compiler,
+    compilation,
+    childCompilerPlugin,
+    previousEmittedAssets,
+    assetJson,
+    options,
+    callback
+  ) {
+    // Get all entry point names for this html file
+    const entryNames = Array.from(compilation.entrypoints.keys());
+    const filteredEntryNames = this.filterEntryChunks(entryNames, options.chunks, options.excludeChunks);
+    const sortedEntryNames = this.sortEntryChunks(filteredEntryNames, options.chunksSortMode, compilation);
+    const templateResult = options.templateContent
+      ? { mainCompilationHash: compilation.hash }
+      : childCompilerPlugin.getCompilationEntryResult(options.template);
 
-  generateHtml (compiler, options) {
-    // Instance variables to keep caching information
-    // for multiple builds
-    let assetJson;
-    /**
-     * store the previous generated asset to emit them even if the content did not change
-     * to support watch mode for third party plugins like the clean-webpack-plugin or the compression plugin
-     * @type {PreviousEmittedAssets}
-     */
-    let previousEmittedAssets = [];
-
-    options.template = this.getFullTemplatePath(options.template, compiler.context);
-
-    // Inject child compiler plugin
-    const childCompilerPlugin = new CachedChildCompilation(compiler);
-
-    if (!options.templateContent) {
-      childCompilerPlugin.addEntry(options.template);
+    if ('error' in templateResult) {
+      compilation.errors.push(prettyError(templateResult.error, compiler.context).toString());
     }
 
-    // convert absolute filename into relative so that webpack can
-    // generate it at correct location
-    const filename = options.filename;
-    if (path.resolve(filename) === path.normalize(filename)) {
-      const outputPath = /** @type {string} - Once initialized the path is always a string */(compiler.options.output.path);
-      options.filename = path.relative(outputPath, filename);
-    }
+    // If the child compilation was not executed during a previous main compile run
+    // it is a cached result
+    const isCompilationCached = templateResult.mainCompilationHash !== compilation.hash;
+    /** Generated file paths from the entry point names */
+    const assetsInformationByGroups = this.getAssetsInformationByGroups(compilation, sortedEntryNames);
+    // If the template and the assets did not change we don't have to emit the html
+    const newAssetJson = JSON.stringify(this.getAssetFiles(assetsInformationByGroups));
 
-    compiler.hooks.thisCompilation.tap('HtmlWebpackPlugin',
-      /**
-       * Hook into the webpack compilation
-       * @param {Compilation} compilation
-       */
-      (compilation) => {
-        compilation.hooks.processAssets.tapAsync(
-          {
-            name: 'HtmlWebpackPlugin',
-            stage:
-            /**
-             * Generate the html after minification and dev tooling is done
-             */
-            compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE
-          },
-          /**
-           * Hook into the process assets hook
-           * @param {Compilation} compilationAssets
-           * @param {(err?: Error) => void} callback
-           */
-          (compilationAssets, callback) => {
-            // Get all entry point names for this html file
-            const entryNames = Array.from(compilation.entrypoints.keys());
-            const filteredEntryNames = this.filterChunks(entryNames, options.chunks, options.excludeChunks);
-            const sortedEntryNames = this.sortEntryChunks(filteredEntryNames, options.chunksSortMode, compilation);
-            const templateResult = options.templateContent
-              ? { mainCompilationHash: compilation.hash }
-              : childCompilerPlugin.getCompilationEntryResult(options.template);
-
-            if ('error' in templateResult) {
-              compilation.errors.push(prettyError(templateResult.error, compiler.context).toString());
-            }
-
-            // If the child compilation was not executed during a previous main compile run
-            // it is a cached result
-            const isCompilationCached = templateResult.mainCompilationHash !== compilation.hash;
-            /** Generated file paths from the entry point names */
-            const assetsInformationByGroups = this.getAssetsInformationByGroups(compilation, sortedEntryNames);
-            // If the template and the assets did not change we don't have to emit the html
-            const newAssetJson = JSON.stringify(this.getAssetFiles(assetsInformationByGroups));
-
-            if (isCompilationCached && options.cache && assetJson === newAssetJson) {
-              previousEmittedAssets.forEach(({ name, source }) => {
-                compilation.emitAsset(name, source);
-              });
-              return callback();
-            } else {
-              previousEmittedAssets = [];
-              assetJson = newAssetJson;
-            }
-
-            // The html-webpack plugin uses a object representation for the html-tags which will be injected
-            // to allow altering them more easily
-            // Just before they are converted a third-party-plugin author might change the order and content
-            const assetsPromise = this.generateFavicon(compiler, options.favicon, compilation, assetsInformationByGroups.publicPath, previousEmittedAssets)
-              .then((faviconPath) => {
-                assetsInformationByGroups.favicon = faviconPath;
-                return getHtmlWebpackPluginHooks(compilation).beforeAssetTagGeneration.promise({
-                  assets: assetsInformationByGroups,
-                  outputName: options.filename,
-                  plugin: this
-                });
-              });
-
-            // Turn the js and css paths into grouped HtmlTagObjects
-            const assetTagGroupsPromise = assetsPromise
-              // And allow third-party-plugin authors to reorder and change the assetTags before they are grouped
-              .then(({ assets }) => getHtmlWebpackPluginHooks(compilation).alterAssetTags.promise({
-                assetTags: {
-                  scripts: this.generatedScriptTags(assets.js),
-                  styles: this.generateStyleTags(assets.css),
-                  meta: [
-                    ...this.generateBaseTag(options.base),
-                    ...this.generatedMetaTags(options.meta),
-                    ...this.generateFaviconTag(assets.favicon)
-                  ]
-                },
-                outputName: options.filename,
-                publicPath: assetsInformationByGroups.publicPath,
-                plugin: this
-              }))
-              .then(({ assetTags }) => {
-                // Inject scripts to body unless it set explicitly to head
-                const scriptTarget = options.inject === 'head' ||
-                (options.inject !== 'body' && options.scriptLoading !== 'blocking') ? 'head' : 'body';
-                // Group assets to `head` and `body` tag arrays
-                const assetGroups = this.groupAssetsByElements(assetTags, scriptTarget);
-                // Allow third-party-plugin authors to reorder and change the assetTags once they are grouped
-                return getHtmlWebpackPluginHooks(compilation).alterAssetTagGroups.promise({
-                  headTags: assetGroups.headTags,
-                  bodyTags: assetGroups.bodyTags,
-                  outputName: options.filename,
-                  publicPath: assetsInformationByGroups.publicPath,
-                  plugin: this
-                });
-              });
-
-            // Turn the compiled template into a nodejs function or into a nodejs string
-            const templateEvaluationPromise = Promise.resolve()
-              .then(() => {
-                if ('error' in templateResult) {
-                  return options.showErrors ? prettyError(templateResult.error, compiler.context).toHtml() : 'ERROR';
-                }
-                // Allow to use a custom function / string instead
-                if (options.templateContent !== false) {
-                  return options.templateContent;
-                }
-                // Once everything is compiled evaluate the html factory
-                // and replace it with its content
-                return ('compiledEntry' in templateResult)
-                  ? this.evaluateCompilationResult(templateResult.compiledEntry.content, assetsInformationByGroups.publicPath, options.template)
-                  : Promise.reject(new Error('Child compilation contained no compiledEntry'));
-              });
-            const templateExectutionPromise = Promise.all([assetsPromise, assetTagGroupsPromise, templateEvaluationPromise])
-              // Execute the template
-              .then(([assetsHookResult, assetTags, compilationResult]) => typeof compilationResult !== 'function'
-                ? compilationResult
-                : this.executeTemplate(compilationResult, assetsHookResult.assets, { headTags: assetTags.headTags, bodyTags: assetTags.bodyTags }, compilation));
-
-            const injectedHtmlPromise = Promise.all([assetTagGroupsPromise, templateExectutionPromise])
-              // Allow plugins to change the html before assets are injected
-              .then(([assetTags, html]) => {
-                const pluginArgs = { html, headTags: assetTags.headTags, bodyTags: assetTags.bodyTags, plugin: this, outputName: options.filename };
-                return getHtmlWebpackPluginHooks(compilation).afterTemplateExecution.promise(pluginArgs);
-              })
-              .then(({ html, headTags, bodyTags }) => {
-                return this.postProcessHtml(compiler, html, assetsInformationByGroups, { headTags, bodyTags });
-              });
-
-            const emitHtmlPromise = injectedHtmlPromise
-              // Allow plugins to change the html after assets are injected
-              .then((html) => {
-                const pluginArgs = { html, plugin: this, outputName: options.filename };
-                return getHtmlWebpackPluginHooks(compilation).beforeEmit.promise(pluginArgs)
-                  .then(result => result.html);
-              })
-              .catch(err => {
-                // In case anything went wrong the promise is resolved
-                // with the error message and an error is logged
-                compilation.errors.push(prettyError(err, compiler.context).toString());
-                return options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
-              })
-              .then(html => {
-                const filename = options.filename.replace(/\[templatehash([^\]]*)\]/g, require('util').deprecate(
-                  (match, options) => `[contenthash${options}]`,
-                  '[templatehash] is now [contenthash]')
-                );
-                const replacedFilename = this.replacePlaceholdersInFilename(compiler, filename, html, compilation);
-                const source = new compiler.webpack.sources.RawSource(html, false);
-
-                // Add the evaluated html code to the webpack assets
-                compilation.emitAsset(replacedFilename.path, source, replacedFilename.info);
-                previousEmittedAssets.push({ name: replacedFilename.path, source });
-
-                return replacedFilename.path;
-              })
-              .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
-                outputName: finalOutputName,
-                plugin: this
-              }).catch(err => {
-                this.logger.error(err);
-                return null;
-              }).then(() => null));
-
-            // Once all files are added to the webpack compilation
-            // let the webpack compiler continue
-            emitHtmlPromise.then(() => {
-              callback();
-            });
-          });
+    if (isCompilationCached && options.cache && assetJson.value === newAssetJson) {
+      previousEmittedAssets.forEach(({ name, source }) => {
+        compilation.emitAsset(name, source);
       });
+      return callback();
+    } else {
+      previousEmittedAssets = [];
+      assetJson.value = newAssetJson;
+    }
+
+    // The html-webpack plugin uses a object representation for the html-tags which will be injected
+    // to allow altering them more easily
+    // Just before they are converted a third-party-plugin author might change the order and content
+    const assetsPromise = this.generateFavicon(compiler, options.favicon, compilation, assetsInformationByGroups.publicPath, previousEmittedAssets)
+      .then((faviconPath) => {
+        assetsInformationByGroups.favicon = faviconPath;
+        return getHtmlWebpackPluginHooks(compilation).beforeAssetTagGeneration.promise({
+          assets: assetsInformationByGroups,
+          outputName: options.filename,
+          plugin: this
+        });
+      });
+
+    // Turn the js and css paths into grouped HtmlTagObjects
+    const assetTagGroupsPromise = assetsPromise
+      // And allow third-party-plugin authors to reorder and change the assetTags before they are grouped
+      .then(({ assets }) => getHtmlWebpackPluginHooks(compilation).alterAssetTags.promise({
+        assetTags: {
+          scripts: this.generatedScriptTags(assets.js),
+          styles: this.generateStyleTags(assets.css),
+          meta: [
+            ...this.generateBaseTag(options.base),
+            ...this.generatedMetaTags(options.meta),
+            ...this.generateFaviconTag(assets.favicon)
+          ]
+        },
+        outputName: options.filename,
+        publicPath: assetsInformationByGroups.publicPath,
+        plugin: this
+      }))
+      .then(({ assetTags }) => {
+        // Inject scripts to body unless it set explicitly to head
+        const scriptTarget = options.inject === 'head' ||
+        (options.inject !== 'body' && options.scriptLoading !== 'blocking') ? 'head' : 'body';
+        // Group assets to `head` and `body` tag arrays
+        const assetGroups = this.groupAssetsByElements(assetTags, scriptTarget);
+        // Allow third-party-plugin authors to reorder and change the assetTags once they are grouped
+        return getHtmlWebpackPluginHooks(compilation).alterAssetTagGroups.promise({
+          headTags: assetGroups.headTags,
+          bodyTags: assetGroups.bodyTags,
+          outputName: options.filename,
+          publicPath: assetsInformationByGroups.publicPath,
+          plugin: this
+        });
+      });
+
+    // Turn the compiled template into a nodejs function or into a nodejs string
+    const templateEvaluationPromise = Promise.resolve()
+      .then(() => {
+        if ('error' in templateResult) {
+          return options.showErrors ? prettyError(templateResult.error, compiler.context).toHtml() : 'ERROR';
+        }
+        // Allow to use a custom function / string instead
+        if (options.templateContent !== false) {
+          return options.templateContent;
+        }
+        // Once everything is compiled evaluate the html factory
+        // and replace it with its content
+        return ('compiledEntry' in templateResult)
+          ? this.evaluateCompilationResult(templateResult.compiledEntry.content, assetsInformationByGroups.publicPath, options.template)
+          : Promise.reject(new Error('Child compilation contained no compiledEntry'));
+      });
+    const templateExectutionPromise = Promise.all([assetsPromise, assetTagGroupsPromise, templateEvaluationPromise])
+      // Execute the template
+      .then(([assetsHookResult, assetTags, compilationResult]) => typeof compilationResult !== 'function'
+        ? compilationResult
+        : this.executeTemplate(compilationResult, assetsHookResult.assets, { headTags: assetTags.headTags, bodyTags: assetTags.bodyTags }, compilation));
+
+    const injectedHtmlPromise = Promise.all([assetTagGroupsPromise, templateExectutionPromise])
+      // Allow plugins to change the html before assets are injected
+      .then(([assetTags, html]) => {
+        const pluginArgs = { html, headTags: assetTags.headTags, bodyTags: assetTags.bodyTags, plugin: this, outputName: options.filename };
+        return getHtmlWebpackPluginHooks(compilation).afterTemplateExecution.promise(pluginArgs);
+      })
+      .then(({ html, headTags, bodyTags }) => {
+        return this.postProcessHtml(compiler, html, assetsInformationByGroups, { headTags, bodyTags });
+      });
+
+    const emitHtmlPromise = injectedHtmlPromise
+      // Allow plugins to change the html after assets are injected
+      .then((html) => {
+        const pluginArgs = { html, plugin: this, outputName: options.filename };
+        return getHtmlWebpackPluginHooks(compilation).beforeEmit.promise(pluginArgs)
+          .then(result => result.html);
+      })
+      .catch(err => {
+        // In case anything went wrong the promise is resolved
+        // with the error message and an error is logged
+        compilation.errors.push(prettyError(err, compiler.context).toString());
+        return options.showErrors ? prettyError(err, compiler.context).toHtml() : 'ERROR';
+      })
+      .then(html => {
+        const filename = options.filename.replace(/\[templatehash([^\]]*)\]/g, require('util').deprecate(
+          (match, options) => `[contenthash${options}]`,
+          '[templatehash] is now [contenthash]')
+        );
+        const replacedFilename = this.replacePlaceholdersInFilename(compiler, filename, html, compilation);
+        const source = new compiler.webpack.sources.RawSource(html, false);
+
+        // Add the evaluated html code to the webpack assets
+        compilation.emitAsset(replacedFilename.path, source, replacedFilename.info);
+        previousEmittedAssets.push({ name: replacedFilename.path, source });
+
+        return replacedFilename.path;
+      })
+      .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
+        outputName: finalOutputName,
+        plugin: this
+      }).catch(err => {
+        this.logger.error(err);
+        return null;
+      }).then(() => null));
+
+    // Once all files are added to the webpack compilation
+    // let the webpack compiler continue
+    emitHtmlPromise.then(() => {
+      callback();
+    });
   }
 }
 
