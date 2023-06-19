@@ -10,11 +10,9 @@ const path = require('path');
 const { CachedChildCompilation } = require('./lib/cached-child-compiler');
 
 const { createHtmlTagObject, htmlTagObjectToString, HtmlTagArray } = require('./lib/html-tags');
-
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
 const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
-const { assert } = require('console');
 
 /** @typedef {import("./typings").HtmlTagObject} HtmlTagObject */
 /** @typedef {import("./typings").Options} HtmlWebpackOptions */
@@ -35,6 +33,8 @@ class HtmlWebpackPlugin {
   }
 
   apply (compiler) {
+    this.logger = compiler.getInfrastructureLogger('HtmlWebpackPlugin');
+
     // Wait for configuration preset plugions to apply all configure webpack defaults
     compiler.hooks.initialize.tap('HtmlWebpackPlugin', () => {
       const userOptions = this.userOptions;
@@ -69,8 +69,13 @@ class HtmlWebpackPlugin {
       this.options = options;
 
       // Assert correct option spelling
-      assert(options.scriptLoading === 'defer' || options.scriptLoading === 'blocking' || options.scriptLoading === 'module', 'scriptLoading needs to be set to "defer", "blocking" or "module"');
-      assert(options.inject === true || options.inject === false || options.inject === 'head' || options.inject === 'body', 'inject needs to be set to true, false, "head" or "body');
+      if (options.scriptLoading !== 'defer' && options.scriptLoading !== 'blocking' && options.scriptLoading !== 'module') {
+        this.logger.error('The "scriptLoading" option need to be set to "defer", "blocking" or "module"');
+      }
+
+      if (options.inject !== true && options.inject !== false && options.inject !== 'head' && options.inject !== 'body') {
+        this.logger.error('The `inject` option needs to be set to true, false, "head" or "body');
+      }
 
       // Default metaOptions if no template is provided
       if (!userOptions.template && options.templateContent === false && options.meta) {
@@ -419,7 +424,7 @@ function hookIntoCompiler (compiler, options, plugin) {
               outputName: finalOutputName,
               plugin: plugin
             }).catch(err => {
-              console.error(err);
+              plugin.logger.error(err);
               return null;
             }).then(() => null));
 
