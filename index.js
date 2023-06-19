@@ -24,7 +24,6 @@ const { assert } = require('console');
 /** @typedef {import("webpack/lib/Compilation.js")} WebpackCompilation */
 /** @typedef {Array<{ source: import('webpack').sources.Source, name: string }>} PreviousEmittedAssets */
 
-
 class HtmlWebpackPlugin {
   /**
    * @param {HtmlWebpackOptions} [options]
