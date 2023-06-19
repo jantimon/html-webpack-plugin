@@ -83,6 +83,14 @@ class HtmlWebpackPlugin {
         this.logger.error('The `inject` option needs to be set to true, false, "head" or "body');
       }
 
+      if (
+        this.options.templateParameters !== false &&
+        typeof this.options.templateParameters !== 'function' &&
+        typeof this.options.templateParameters !== 'object'
+      ) {
+        this.logger.error('The `templateParameters` has to be either a function or an object or false');
+      }
+
       // Default metaOptions if no template is provided
       if (!this.userOptions.template && options.templateContent === false && options.meta) {
         const defaultMeta = {
@@ -247,15 +255,12 @@ class HtmlWebpackPlugin {
    * @returns {string}
    */
   getPublicPath (compilation, childCompilationOutputName, customPublicPath) {
-    const compilationHash = compilation.hash;
-
     /**
      * @type {string} the configured public path to the asset root
      * if a path publicPath is set in the current webpack config use it otherwise
      * fallback to a relative path
      */
-    const webpackPublicPath = compilation.getAssetPath(compilation.outputOptions.publicPath, { hash: compilationHash });
-
+    const webpackPublicPath = compilation.getAssetPath(compilation.outputOptions.publicPath, { hash: compilation.hash });
     // Webpack 5 introduced "auto" as default value
     const isPublicPathDefined = webpackPublicPath !== 'auto';
 
@@ -284,11 +289,11 @@ class HtmlWebpackPlugin {
    * @private
    * @param {Compilation} compilation
    * @param {string[]} entryNames
-   * @param {string | 'auto'} publicPath
    * @returns {AssetsInformationByGroups}
    */
-  getAssetsInformationByGroups (compilation, entryNames, publicPath) {
-    const compilationHash = compilation.hash;
+  getAssetsInformationByGroups (compilation, entryNames) {
+    /** The public path used inside the html file */
+    const publicPath = this.getPublicPath(compilation, this.options.filename, this.options.publicPath);
     /**
      * @type {AssetsInformationByGroups}
      */
@@ -307,27 +312,29 @@ class HtmlWebpackPlugin {
 
     // Append a hash for cache busting
     if (this.options.hash && assets.manifest) {
-      assets.manifest = this.appendHash(assets.manifest, compilationHash);
+      assets.manifest = this.appendHash(assets.manifest, compilation.hash);
     }
 
     // Extract paths to .js, .mjs and .css files from the current compilation
     const entryPointPublicPathMap = {};
     const extensionRegexp = /\.(css|js|mjs)(\?|$)/;
+
     for (let i = 0; i < entryNames.length; i++) {
       const entryName = entryNames[i];
       /** entryPointUnfilteredFiles - also includes hot module update files */
       const entryPointUnfilteredFiles = compilation.entrypoints.get(entryName).getFiles();
-
       const entryPointFiles = entryPointUnfilteredFiles.filter((chunkFile) => {
         const asset = compilation.getAsset(chunkFile);
+
         if (!asset) {
           return true;
         }
+
         // Prevent hot-module files from being included:
         const assetMetaInformation = asset.info || {};
+
         return !(assetMetaInformation.hotModuleReplacement || assetMetaInformation.development);
       });
-
       // Prepend the publicPath and append the hash depending on the
       // webpack.output.publicPath and hashOptions
       // E.g. bundle.js -> /bundle.js?hash
@@ -335,24 +342,29 @@ class HtmlWebpackPlugin {
         .map(chunkFile => {
           const entryPointPublicPath = publicPath + this.urlencodePath(chunkFile);
           return this.options.hash
-            ? this.appendHash(entryPointPublicPath, compilationHash)
+            ? this.appendHash(entryPointPublicPath, compilation.hash)
             : entryPointPublicPath;
         });
 
       entryPointPublicPaths.forEach((entryPointPublicPath) => {
         const extMatch = extensionRegexp.exec(entryPointPublicPath);
+
         // Skip if the public path is not a .css, .mjs or .js file
         if (!extMatch) {
           return;
         }
+
         // Skip if this file is already known
         // (e.g. because of common chunk optimizations)
         if (entryPointPublicPathMap[entryPointPublicPath]) {
           return;
         }
+
         entryPointPublicPathMap[entryPointPublicPath] = true;
+
         // ext will contain .js or .css, because .mjs recognizes as .js
         const ext = extMatch[1] === 'mjs' ? 'js' : extMatch[1];
+
         assets[ext].push(entryPointPublicPath);
       });
     }
@@ -470,6 +482,7 @@ class HtmlWebpackPlugin {
     if (metaOptions === false) {
       return [];
     }
+
     // Make tags self-closing in case of xhtml
     // Turn { "viewport" : "width=500, initial-scale=1" } into
     // [{ name:"viewport" content:"width=500, initial-scale=1" }]
@@ -482,6 +495,7 @@ class HtmlWebpackPlugin {
         } : metaTagContent;
       })
       .filter((attribute) => attribute !== false);
+
     // Turn [{ name:"viewport" content:"width=500, initial-scale=1" }] into
     // the html-webpack-plugin tag structure
     return metaTagAttributeObjects.map((metaTagAttributes) => {
@@ -508,6 +522,7 @@ class HtmlWebpackPlugin {
     if (!faviconPath) {
       return [];
     }
+
     return [{
       tagName: 'link',
       voidTag: true,
@@ -571,11 +586,13 @@ class HtmlWebpackPlugin {
     if (!source) {
       return Promise.reject(new Error('The child compilation didn\'t provide a result'));
     }
+
     // The LibraryTemplatePlugin stores the template result in a local variable.
     // By adding it to the end the value gets extracted during evaluation
     if (source.indexOf('HTML_WEBPACK_PLUGIN_RESULT') >= 0) {
       source += ';\nHTML_WEBPACK_PLUGIN_RESULT';
     }
+
     const templateWithoutLoaders = templateFilename.replace(/^.+!/, '').replace(/\?.+$/, '');
     const vmContext = vm.createContext({
       ...global,
@@ -633,20 +650,65 @@ class HtmlWebpackPlugin {
       WritableStreamDefaultController: global.WritableStreamDefaultController,
       WritableStreamDefaultWriter: global.WritableStreamDefaultWriter
     });
+
     const vmScript = new vm.Script(source, { filename: templateWithoutLoaders });
+
     // Evaluate code and cast to string
     let newSource;
+
     try {
       newSource = vmScript.runInContext(vmContext);
     } catch (e) {
       return Promise.reject(e);
     }
+
     if (typeof newSource === 'object' && newSource.__esModule && newSource.default) {
       newSource = newSource.default;
     }
+
     return typeof newSource === 'string' || typeof newSource === 'function'
       ? Promise.resolve(newSource)
       : Promise.reject(new Error('The loader "' + templateWithoutLoaders + '" didn\'t return html.'));
+  }
+
+  /**
+   * Generate the template parameters for the template function
+   *
+   * @private
+   * @param {Compilation} compilation
+   * @param {AssetsInformationByGroups} assetsInformationByGroups
+   * @param {{
+       headTags: HtmlTagObject[],
+       bodyTags: HtmlTagObject[]
+     }} assetTags
+   * @returns {Promise<{[key: any]: any}>}
+   */
+  getTemplateParameters (compilation, assetsInformationByGroups, assetTags) {
+    const templateParameters = this.options.templateParameters;
+
+    if (templateParameters === false) {
+      return Promise.resolve({});
+    }
+
+    if (typeof templateParameters !== 'function' && typeof templateParameters !== 'object') {
+      throw new Error('templateParameters has to be either a function or an object');
+    }
+
+    const templateParameterFunction = typeof templateParameters === 'function'
+      // A custom function can overwrite the entire template parameter preparation
+      ? templateParameters
+      // If the template parameters is an object merge it with the default values
+      : (compilation, assetsInformationByGroups, assetTags, options) => Object.assign({},
+        templateParametersGenerator(compilation, assetsInformationByGroups, assetTags, options),
+        templateParameters
+      );
+    const preparedAssetTags = {
+      headTags: this.prepareAssetTagGroupForRendering(assetTags.headTags),
+      bodyTags: this.prepareAssetTagGroupForRendering(assetTags.bodyTags)
+    };
+    return Promise
+      .resolve()
+      .then(() => templateParameterFunction(compilation, assetsInformationByGroups, preparedAssetTags, this.options));
   }
 
   /**
@@ -694,46 +756,6 @@ class HtmlWebpackPlugin {
       };
       return copiedAssetTag;
     }));
-  }
-
-  /**
-   * Generate the template parameters for the template function
-   *
-   * @private
-   * @param {Compilation} compilation
-   * @param {AssetsInformationByGroups} assetsInformationByGroups
-   * @param {{
-       headTags: HtmlTagObject[],
-       bodyTags: HtmlTagObject[]
-     }} assetTags
-   * @returns {Promise<{[key: any]: any}>}
-   */
-  getTemplateParameters (compilation, assetsInformationByGroups, assetTags) {
-    const templateParameters = this.options.templateParameters;
-
-    if (templateParameters === false) {
-      return Promise.resolve({});
-    }
-
-    if (typeof templateParameters !== 'function' && typeof templateParameters !== 'object') {
-      throw new Error('templateParameters has to be either a function or an object');
-    }
-
-    const templateParameterFunction = typeof templateParameters === 'function'
-      // A custom function can overwrite the entire template parameter preparation
-      ? templateParameters
-      // If the template parameters is an object merge it with the default values
-      : (compilation, assetsInformationByGroups, assetTags, options) => Object.assign({},
-        templateParametersGenerator(compilation, assetsInformationByGroups, assetTags, options),
-        templateParameters
-      );
-    const preparedAssetTags = {
-      headTags: this.prepareAssetTagGroupForRendering(assetTags.headTags),
-      bodyTags: this.prepareAssetTagGroupForRendering(assetTags.bodyTags)
-    };
-    return Promise
-      .resolve()
-      .then(() => templateParameterFunction(compilation, assetsInformationByGroups, preparedAssetTags, this.options));
   }
 
   /**
@@ -951,7 +973,6 @@ class HtmlWebpackPlugin {
             const entryNames = Array.from(compilation.entrypoints.keys());
             const filteredEntryNames = this.filterChunks(entryNames, options.chunks, options.excludeChunks);
             const sortedEntryNames = this.sortEntryChunks(filteredEntryNames, options.chunksSortMode, compilation);
-
             const templateResult = options.templateContent
               ? { mainCompilationHash: compilation.hash }
               : childCompilerPlugin.getCompilationEntryResult(options.template);
@@ -963,15 +984,11 @@ class HtmlWebpackPlugin {
             // If the child compilation was not executed during a previous main compile run
             // it is a cached result
             const isCompilationCached = templateResult.mainCompilationHash !== compilation.hash;
-
-            /** The public path used inside the html file */
-            const htmlPublicPath = this.getPublicPath(compilation, options.filename, options.publicPath);
-
             /** Generated file paths from the entry point names */
-            const assetsInformationByGroups = this.getAssetsInformationByGroups(compilation, sortedEntryNames, htmlPublicPath);
-
+            const assetsInformationByGroups = this.getAssetsInformationByGroups(compilation, sortedEntryNames);
             // If the template and the assets did not change we don't have to emit the html
             const newAssetJson = JSON.stringify(this.getAssetFiles(assetsInformationByGroups));
+
             if (isCompilationCached && options.cache && assetJson === newAssetJson) {
               previousEmittedAssets.forEach(({ name, source }) => {
                 compilation.emitAsset(name, source);
@@ -1009,7 +1026,7 @@ class HtmlWebpackPlugin {
                   ]
                 },
                 outputName: options.filename,
-                publicPath: htmlPublicPath,
+                publicPath: assetsInformationByGroups.publicPath,
                 plugin: this
               }))
               .then(({ assetTags }) => {
@@ -1023,7 +1040,7 @@ class HtmlWebpackPlugin {
                   headTags: assetGroups.headTags,
                   bodyTags: assetGroups.bodyTags,
                   outputName: options.filename,
-                  publicPath: htmlPublicPath,
+                  publicPath: assetsInformationByGroups.publicPath,
                   plugin: this
                 });
               });
@@ -1041,7 +1058,7 @@ class HtmlWebpackPlugin {
                 // Once everything is compiled evaluate the html factory
                 // and replace it with its content
                 return ('compiledEntry' in templateResult)
-                  ? this.evaluateCompilationResult(templateResult.compiledEntry.content, htmlPublicPath, options.template)
+                  ? this.evaluateCompilationResult(templateResult.compiledEntry.content, assetsInformationByGroups.publicPath, options.template)
                   : Promise.reject(new Error('Child compilation contained no compiledEntry'));
               });
             const templateExectutionPromise = Promise.all([assetsPromise, assetTagGroupsPromise, templateEvaluationPromise])
