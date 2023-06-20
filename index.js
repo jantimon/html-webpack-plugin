@@ -786,14 +786,17 @@ class HtmlWebpackPlugin {
    * @returns {Array<HtmlTagObject>}
    */
   generatedScriptTags (jsAssets) {
-    return jsAssets.map(scriptAsset => {
-      const attributes = { src: scriptAsset };
+    // @ts-ignore
+    return jsAssets.map(src => {
+      const attributes = {};
 
-      if (this.options.scriptLoading === 'module') {
-        attributes.type = 'module';
-      } else if (this.options.scriptLoading === 'defer') {
+      if (this.options.scriptLoading === 'defer') {
         attributes.defer = true;
+      } else if (this.options.scriptLoading === 'module') {
+        attributes.type = 'module';
       }
+
+      attributes.src = src;
 
       return {
         tagName: 'script',
@@ -826,23 +829,19 @@ class HtmlWebpackPlugin {
   /**
    * Generate an optional base tag
    *
-   * @param {false | string | {[attributeName: string]: string}} baseOption
+   * @param {string | {[attributeName: string]: string}} base
    * @returns {Array<HtmlTagObject>}
    */
-  generateBaseTag (baseOption) {
-    if (baseOption === false) {
-      return [];
-    } else {
-      return [{
-        tagName: 'base',
-        voidTag: true,
-        meta: { plugin: 'html-webpack-plugin' },
-        // attributes e.g. { href:"http://example.com/page.html" target:"_blank" }
-        attributes: (typeof baseOption === 'string') ? {
-          href: baseOption
-        } : baseOption
-      }];
-    }
+  generateBaseTag (base) {
+    return [{
+      tagName: 'base',
+      voidTag: true,
+      meta: { plugin: 'html-webpack-plugin' },
+      // attributes e.g. { href:"http://example.com/page.html" target:"_blank" }
+      attributes: typeof base === 'string' ? {
+        href: base
+      } : base
+    }];
   }
 
   /**
@@ -889,21 +888,17 @@ class HtmlWebpackPlugin {
    * Generate a favicon tag for the given file path
    *
    * @private
-   * @param {string| undefined} faviconPath
+   * @param {string} favicon
    * @returns {Array<HtmlTagObject>}
    */
-  generateFaviconTag (faviconPath) {
-    if (!faviconPath) {
-      return [];
-    }
-
+  generateFaviconTag (favicon) {
     return [{
       tagName: 'link',
       voidTag: true,
       meta: { plugin: 'html-webpack-plugin' },
       attributes: {
         rel: 'icon',
-        href: faviconPath
+        href: favicon
       }
     }];
   }
@@ -1058,9 +1053,9 @@ class HtmlWebpackPlugin {
           scripts: this.generatedScriptTags(assets.js),
           styles: this.generateStyleTags(assets.css),
           meta: [
-            ...this.generateBaseTag(this.options.base),
+            ...(this.options.base !== false ? this.generateBaseTag(this.options.base) : []),
             ...this.generatedMetaTags(this.options.meta),
-            ...this.generateFaviconTag(assets.favicon)
+            ...(assets.favicon ? this.generateFaviconTag(assets.favicon) : [])
           ]
         },
         outputName,
