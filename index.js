@@ -786,16 +786,22 @@ class HtmlWebpackPlugin {
    * @returns {Array<HtmlTagObject>}
    */
   generatedScriptTags (jsAssets) {
-    return jsAssets.map(scriptAsset => ({
-      tagName: 'script',
-      voidTag: false,
-      meta: { plugin: 'html-webpack-plugin' },
-      attributes: {
-        defer: this.options.scriptLoading === 'defer',
-        type: this.options.scriptLoading === 'module' ? 'module' : undefined,
-        src: scriptAsset
+    return jsAssets.map(scriptAsset => {
+      const attributes = { src: scriptAsset };
+
+      if (this.options.scriptLoading === 'module') {
+        attributes.type = 'module';
+      } else if (this.options.scriptLoading === 'defer') {
+        attributes.defer = true;
       }
-    }));
+
+      return {
+        tagName: 'script',
+        voidTag: false,
+        meta: { plugin: 'html-webpack-plugin' },
+        attributes
+      };
+    });
   }
 
   /**
