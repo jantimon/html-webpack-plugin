@@ -155,7 +155,7 @@ Allowed values are as follows:
 |**`meta`**|`{Object}`|`{}`|Allows to inject `meta`-tags. E.g. `meta: {viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no'}`|
 |**`base`**|`{Object\|String\|false}`|`false`|Inject a [`base`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) tag. E.g. `base: "https://example.com/path/page.html`|
 |**`minify`**|`{Boolean\|Object}`|`true` if `mode` is `'production'`, otherwise `false`|Controls if and in what ways the output should be minified. See [minification](#minification) below for more details.|
-|**`hash`**|`{Boolean}`|`false`|If `true` then append a unique `webpack` compilation hash to all included scripts and CSS files. This is useful for cache busting|
+|**`hash`**|`{Boolean}`|`false`|If `true` then append a unique `webpack` compilation hash to all included scripts and CSS files (i.e. `main.js?hash=compilation_hash`). This is useful for cache busting|
 |**`cache`**|`{Boolean}`|`true`|Emit the file only if it was changed|
 |**`showErrors`**|`{Boolean}`|`true`|Errors details will be written into the HTML page|
 |**`chunks`**|`{?}`|`?`|Allows you to add only some chunks (e.g only the unit-test chunk)|
