@@ -88,7 +88,7 @@ describe('HtmlWebpackPluginHMR', () => {
   });
 
   it('should re-emit favicon and assets from a loader if watch is active', () => {
-    const template = path.join(__dirname, "./fixtures/html-template-with-image.html");
+    const template = path.join(__dirname, './fixtures/html-template-with-image.html');
     const config = {
       mode: 'development',
       entry: path.join(__dirname, 'fixtures/index.js'),
@@ -106,7 +106,7 @@ describe('HtmlWebpackPluginHMR', () => {
       },
       plugins: [
         new HtmlWebpackPlugin({
-          favicon: path.join(__dirname, "./fixtures/favicon.ico"),
+          favicon: path.join(__dirname, './fixtures/favicon.ico'),
           template
         })
       ]
@@ -115,7 +115,7 @@ describe('HtmlWebpackPluginHMR', () => {
     const templateContent = fs.readFileSync(template, 'utf-8');
     const compiler = new WebpackRecompilationSimulator(webpack(config));
     const jsFileTempPath = compiler.addTestFile(path.join(__dirname, 'fixtures/index.js'));
-    const expected = ["logo.png", "main.js", "favicon.ico", "index.html"];
+    const expected = ['logo.png', 'main.js', 'favicon.ico', 'index.html'];
 
     return compiler.startWatching()
       // Change the template file and compile again
@@ -148,13 +148,13 @@ describe('HtmlWebpackPluginHMR', () => {
   });
 
   it('should re-emit favicon and assets from a loader if watch is active and clean enabled', () => {
-    const expected = ["logo.png", "main.js", "favicon.ico", "index.html"];
+    const expected = ['logo.png', 'main.js', 'favicon.ico', 'index.html'];
 
     class MyPlugin {
-      apply(compiler) {
+      apply (compiler) {
         compiler.hooks.thisCompilation.tap({ name: this.constructor.name }, (compilation) => {
           return compilation.hooks.processAssets.tap(
-            { name: this.constructor.name, stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ANALYSE, },
+            { name: this.constructor.name, stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ANALYSE },
             (assets) => {
               expect(expected.every(val => Object.keys(assets).includes(val))).toBe(true);
             }
@@ -163,7 +163,7 @@ describe('HtmlWebpackPluginHMR', () => {
       }
     }
 
-    const template = path.join(__dirname, "./fixtures/html-template-with-image.html");
+    const template = path.join(__dirname, './fixtures/html-template-with-image.html');
     const config = {
       mode: 'development',
       entry: path.join(__dirname, 'fixtures/index.js'),
@@ -182,7 +182,7 @@ describe('HtmlWebpackPluginHMR', () => {
       },
       plugins: [
         new HtmlWebpackPlugin({
-          favicon: path.join(__dirname, "./fixtures/favicon.ico"),
+          favicon: path.join(__dirname, './fixtures/favicon.ico'),
           template
         }),
         new MyPlugin()
