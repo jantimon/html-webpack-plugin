@@ -20,6 +20,7 @@ const DEFAULT_LOADER = require.resolve('../lib/loader.js') + '?force';
 const DEFAULT_TEMPLATE = DEFAULT_LOADER + '!' + require.resolve('../default_index.ejs');
 
 jest.setTimeout(30000);
+
 process.on('unhandledRejection', r => console.log(r));
 
 describe('HtmlWebpackPluginHMR', () => {
@@ -82,6 +83,142 @@ describe('HtmlWebpackPluginHMR', () => {
         expect(hotUpdateJsFileNames.length).toEqual(1);
         const hotUpdateFileSize = stats.compilation.assets[hotUpdateJsFileNames[0]].size();
         expect(hotUpdateFileSize).not.toEqual(0);
+      })
+      .then(() => compiler.stopWatching());
+  });
+
+  it('should re-emit favicon and assets from a loader if watch is active', () => {
+    const template = path.join(__dirname, './fixtures/html-template-with-image.html');
+    const config = {
+      mode: 'development',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        assetModuleFilename: '[name][ext]',
+        path: OUTPUT_DIR
+      },
+      module: {
+        rules: [
+          {
+            test: /\.html$/,
+            loader: 'html-loader'
+          }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          favicon: path.join(__dirname, './fixtures/favicon.ico'),
+          template
+        })
+      ]
+    };
+
+    const templateContent = fs.readFileSync(template, 'utf-8');
+    const compiler = new WebpackRecompilationSimulator(webpack(config));
+    const jsFileTempPath = compiler.addTestFile(path.join(__dirname, 'fixtures/index.js'));
+    const expected = ['logo.png', 'main.js', 'favicon.ico', 'index.html'];
+
+    return compiler.startWatching()
+      // Change the template file and compile again
+      .then((stats) => {
+        expect(expected.every(val => Object.keys(stats.compilation.assets).includes(val))).toBe(true);
+        expect(stats.compilation.errors).toEqual([]);
+        expect(stats.compilation.warnings).toEqual([]);
+
+        fs.writeFileSync(jsFileTempPath, 'module.exports = function calc(a, b){ return a - b };');
+
+        return compiler.waitForWatchRunComplete();
+      })
+      .then(stats => {
+        expect(expected.every(val => Object.keys(stats.compilation.assets).includes(val))).toBe(true);
+        expect(stats.compilation.errors).toEqual([]);
+        expect(stats.compilation.warnings).toEqual([]);
+
+        fs.writeFileSync(template, templateContent.replace(/Some unique text/, 'Some other unique text'));
+
+        return compiler.waitForWatchRunComplete();
+      })
+      .then((stats) => {
+        expect(expected.every(val => Object.keys(stats.compilation.assets).includes(val))).toBe(true);
+        expect(stats.compilation.errors).toEqual([]);
+        expect(stats.compilation.warnings).toEqual([]);
+
+        fs.writeFileSync(template, templateContent);
+      })
+      .then(() => compiler.stopWatching());
+  });
+
+  it('should re-emit favicon and assets from a loader if watch is active and clean enabled', () => {
+    const expected = ['logo.png', 'main.js', 'favicon.ico', 'index.html'];
+
+    class MyPlugin {
+      apply (compiler) {
+        compiler.hooks.thisCompilation.tap({ name: this.constructor.name }, (compilation) => {
+          return compilation.hooks.processAssets.tap(
+            { name: this.constructor.name, stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ANALYSE },
+            (assets) => {
+              expect(expected.every(val => Object.keys(assets).includes(val))).toBe(true);
+            }
+          );
+        });
+      }
+    }
+
+    const template = path.join(__dirname, './fixtures/html-template-with-image.html');
+    const config = {
+      mode: 'development',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        clean: true,
+        assetModuleFilename: '[name][ext]',
+        path: OUTPUT_DIR
+      },
+      module: {
+        rules: [
+          {
+            test: /\.html$/,
+            loader: 'html-loader'
+          }
+        ]
+      },
+      plugins: [
+        new HtmlWebpackPlugin({
+          favicon: path.join(__dirname, './fixtures/favicon.ico'),
+          template
+        }),
+        new MyPlugin()
+      ]
+    };
+
+    const templateContent = fs.readFileSync(template, 'utf-8');
+    const compiler = new WebpackRecompilationSimulator(webpack(config));
+    const jsFileTempPath = compiler.addTestFile(path.join(__dirname, 'fixtures/index.js'));
+
+    return compiler.startWatching()
+      // Change the template file and compile again
+      .then((stats) => {
+        expect(expected.every(val => Object.keys(stats.compilation.assets).includes(val))).toBe(true);
+        expect(stats.compilation.errors).toEqual([]);
+        expect(stats.compilation.warnings).toEqual([]);
+
+        fs.writeFileSync(jsFileTempPath, 'module.exports = function calc(a, b){ return a - b };');
+
+        return compiler.waitForWatchRunComplete();
+      })
+      .then(stats => {
+        expect(expected.every(val => Object.keys(stats.compilation.assets).includes(val))).toBe(true);
+        expect(stats.compilation.errors).toEqual([]);
+        expect(stats.compilation.warnings).toEqual([]);
+
+        fs.writeFileSync(template, templateContent.replace(/Some unique text/, 'Some other unique text'));
+
+        return compiler.waitForWatchRunComplete();
+      })
+      .then((stats) => {
+        expect(expected.every(val => Object.keys(stats.compilation.assets).includes(val))).toBe(true);
+        expect(stats.compilation.errors).toEqual([]);
+        expect(stats.compilation.warnings).toEqual([]);
+
+        fs.writeFileSync(template, templateContent);
       })
       .then(() => compiler.stopWatching());
   });
