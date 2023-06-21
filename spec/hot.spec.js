@@ -148,6 +148,21 @@ describe('HtmlWebpackPluginHMR', () => {
   });
 
   it('should re-emit favicon and assets from a loader if watch is active and clean enabled', () => {
+    const expected = ["logo.png", "main.js", "favicon.ico", "index.html"];
+
+    class MyPlugin {
+      apply(compiler) {
+        compiler.hooks.thisCompilation.tap({ name: this.constructor.name }, (compilation) => {
+          return compilation.hooks.processAssets.tap(
+            { name: this.constructor.name, stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ANALYSE, },
+            (assets) => {
+              expect(expected.every(val => Object.keys(assets).includes(val))).toBe(true);
+            }
+          );
+        });
+      }
+    }
+
     const template = path.join(__dirname, "./fixtures/html-template-with-image.html");
     const config = {
       mode: 'development',
@@ -169,14 +184,14 @@ describe('HtmlWebpackPluginHMR', () => {
         new HtmlWebpackPlugin({
           favicon: path.join(__dirname, "./fixtures/favicon.ico"),
           template
-        })
+        }),
+        new MyPlugin()
       ]
     };
 
     const templateContent = fs.readFileSync(template, 'utf-8');
     const compiler = new WebpackRecompilationSimulator(webpack(config));
     const jsFileTempPath = compiler.addTestFile(path.join(__dirname, 'fixtures/index.js'));
-    const expected = ["logo.png", "main.js", "favicon.ico", "index.html"];
 
     return compiler.startWatching()
       // Change the template file and compile again
