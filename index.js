@@ -131,7 +131,7 @@ class HtmlWebpackPlugin {
          * to support watch mode for third party plugins like the clean-webpack-plugin or the compression plugin
          * @type {PreviousEmittedAssets}
          */
-        let previousEmittedAssets = [];
+        const previousEmittedAssets = [];
 
         // Inject child compiler plugin
         const childCompilerPlugin = new CachedChildCompilation(compiler);
@@ -1028,7 +1028,7 @@ class HtmlWebpackPlugin {
       });
       return callback();
     } else {
-      previousEmittedAssets = [];
+      previousEmittedAssets.length = 0;
       assetJson.value = newAssetJson;
     }
 
