@@ -21,7 +21,7 @@ const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPlugin
 /** @typedef {import("webpack").Compiler} Compiler */
 /** @typedef {ReturnType<Compiler["getInfrastructureLogger"]>} Logger */
 /** @typedef {import("webpack/lib/Compilation.js")} Compilation */
-/** @typedef {Array<{ source: import('webpack').sources.Source, name: string }>} PreviousEmittedAssets */
+/** @typedef {Array<{ name: string, source: import('webpack').sources.Source, info?: import('webpack').AssetInfo }>} PreviousEmittedAssets */
 /** @typedef {{ publicPath: string, js: Array<string>, css: Array<string>, manifest?: string, favicon?: string }} AssetsInformationByGroups */
 
 class HtmlWebpackPlugin {
@@ -1023,8 +1023,8 @@ class HtmlWebpackPlugin {
     const newAssetJson = JSON.stringify(this.getAssetFiles(assetsInformationByGroups));
 
     if (isCompilationCached && this.options.cache && assetJson.value === newAssetJson) {
-      previousEmittedAssets.forEach(({ name, source }) => {
-        compilation.emitAsset(name, source);
+      previousEmittedAssets.forEach(({ name, source, info }) => {
+        compilation.emitAsset(name, source, info);
       });
       return callback();
     } else {
@@ -1084,15 +1084,26 @@ class HtmlWebpackPlugin {
         if ('error' in templateResult) {
           return this.options.showErrors ? prettyError(templateResult.error, compiler.context).toHtml() : 'ERROR';
         }
+
         // Allow to use a custom function / string instead
         if (this.options.templateContent !== false) {
           return this.options.templateContent;
         }
-        // Once everything is compiled evaluate the html factory
-        // and replace it with its content
-        return ('compiledEntry' in templateResult)
-          ? this.evaluateCompilationResult(templateResult.compiledEntry.content, assetsInformationByGroups.publicPath, this.options.template)
-          : Promise.reject(new Error('Child compilation contained no compiledEntry'));
+
+        // Once everything is compiled evaluate the html factory and replace it with its content
+        if ('compiledEntry' in templateResult) {
+          const compiledEntry = templateResult.compiledEntry;
+          const assets = compiledEntry.assets;
+
+          // Store assets from child compiler to reemit them later
+          for (const name in assets) {
+            previousEmittedAssets.push({ name, source: assets[name].source, info: assets[name].info });
+          }
+
+          return this.evaluateCompilationResult(compiledEntry.content, assetsInformationByGroups.publicPath, this.options.template);
+        }
+
+        return Promise.reject(new Error('Child compilation contained no compiledEntry'));
       });
     const templateExectutionPromise = Promise.all([assetsPromise, assetTagGroupsPromise, templateEvaluationPromise])
       // Execute the template
