@@ -2572,6 +2572,20 @@ describe('HtmlWebpackPlugin', () => {
     }, [/<script type="module" src="index_bundle.js"><\/script>.+<body>/], null, done);
   });
 
+  it('should allow to inject scripts with a type="systemjs-module" attribute', done => {
+    testHtmlPlugin({
+      mode: 'production',
+      entry: path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: OUTPUT_DIR,
+        filename: 'index_bundle.js'
+      },
+      plugins: [new HtmlWebpackPlugin({
+        scriptLoading: 'systemjs-module'
+      })]
+    }, [/<script type="systemjs-module" src="index_bundle.js"><\/script>.+<body>/], null, done);
+  });
+
   it('should allow to inject scripts with a defer="defer" attribute to the body', done => {
     testHtmlPlugin({
       mode: 'production',

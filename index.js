@@ -78,9 +78,9 @@ class HtmlWebpackPlugin {
       options.template = this.getTemplatePath(this.options.template, compiler.context);
 
       // Assert correct option spelling
-      if (options.scriptLoading !== 'defer' && options.scriptLoading !== 'blocking' && options.scriptLoading !== 'module') {
+      if (options.scriptLoading !== 'defer' && options.scriptLoading !== 'blocking' && options.scriptLoading !== 'module' && options.scriptLoading !== 'systemjs-module') {
         /** @type {Logger} */
-        (this.logger).error('The "scriptLoading" option need to be set to "defer", "blocking" or "module"');
+        (this.logger).error('The "scriptLoading" option need to be set to "defer", "blocking" or "module" or "systemjs-module"');
       }
 
       if (options.inject !== true && options.inject !== false && options.inject !== 'head' && options.inject !== 'body') {
@@ -794,6 +794,8 @@ class HtmlWebpackPlugin {
         attributes.defer = true;
       } else if (this.options.scriptLoading === 'module') {
         attributes.type = 'module';
+      } else if (this.options.scriptLoading === 'systemjs-module') {
+        attributes.type = 'systemjs-module';
       }
 
       attributes.src = src;
