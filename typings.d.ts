@@ -35,7 +35,22 @@ declare class HtmlWebpackPlugin {
 
 declare namespace HtmlWebpackPlugin {
   type MinifyOptions = HtmlMinifierOptions;
-
+  enum Stage {
+    PROCESS_ASSETS_STAGE_ADDITIONAL=Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
+    PROCESS_ASSETS_STAGE_PRE_PROCESS=Compilation.PROCESS_ASSETS_STAGE_PRE_PROCESS,
+    PROCESS_ASSETS_STAGE_DERIVED=Compilation.PROCESS_ASSETS_STAGE_DERIVED,
+    PROCESS_ASSETS_STAGE_ADDITIONS=Compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
+    PROCESS_ASSETS_STAGE_OPTIMIZE=Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE,
+    PROCESS_ASSETS_STAGE_OPTIMIZE_COUNT=Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_COUNT,
+    PROCESS_ASSETS_STAGE_OPTIMIZE_COMPATIBILITY=Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_COMPATIBILITY,
+    PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE=Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
+    PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE=Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE,
+    PROCESS_ASSETS_STAGE_SUMMARIZE=Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE,
+    PROCESS_ASSETS_STAGE_OPTIMIZE_HASH=Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_HASH,
+    PROCESS_ASSETS_STAGE_OPTIMIZE_TRANSFER=Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_TRANSFER,
+    PROCESS_ASSETS_STAGE_ANALYSE=Compilation.PROCESS_ASSETS_STAGE_ANALYSE,
+    PROCESS_ASSETS_STAGE_REPORT=Compilation.PROCESS_ASSETS_STAGE_REPORT,
+  } 
   interface Options {
     /**
      * Emit the file only if it was changed.
@@ -166,6 +181,10 @@ declare namespace HtmlWebpackPlugin {
      * Enforce self closing tags e.g. <link />
      */
     xhtml?: boolean;
+    /**
+     * the webpack Compilation stage process,default is PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE <link />
+     */
+    processStage?: Stage;
     /**
      * In addition to the options actually used by this plugin, you can use this hash to pass arbitrary data through
      * to your template.
