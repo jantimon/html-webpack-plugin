@@ -2,7 +2,7 @@
 'use strict';
 
 const promisify = require('util').promisify;
-
+const { Stage } = require('./typings');
 const vm = require('vm');
 const fs = require('fs');
 const _ = require('lodash');
@@ -56,7 +56,8 @@ class HtmlWebpackPlugin {
       meta: {},
       base: false,
       title: 'Webpack App',
-      xhtml: false
+      xhtml: false,
+      processStage: Stage.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE
     };
 
     /** @type {ProcessedHtmlWebpackOptions} */
@@ -163,7 +164,7 @@ class HtmlWebpackPlugin {
                 /**
                  * Generate the html after minification and dev tooling is done
                  */
-                compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE
+                this.options.processStage
               },
               /**
                * Hook into the process assets hook
