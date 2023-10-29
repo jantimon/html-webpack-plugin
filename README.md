@@ -91,6 +91,7 @@ The `html-webpack-plugin` provides [hooks](https://github.com/jantimon/html-webp
  * [inject-body-webpack-plugin](https://github.com/Jaid/inject-body-webpack-plugin) is a simple method of injecting a custom HTML string into the body.
  * [html-webpack-plugin-django](https://github.com/TommasoAmici/html-webpack-plugin-django) a Webpack plugin to inject Django static tags.
  * [html-webpack-inject-attributes-plugin](https://github.com/dyw934854565/html-webpack-inject-attributes-plugin) add extra attributes to inject assetTags.
+ * [js-entry-webpack-plugin](https://github.com/liam61/html-webpack-plugin) creates webpack bundles into your js entry
 
 <h2 align="center">Usage</h2>
 
