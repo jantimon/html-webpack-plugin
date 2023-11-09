@@ -56,17 +56,26 @@
     "tapable": "^2.0.0"
   },
   "peerDependencies": {
+    "@rspack/core": "0.x || 1.x",
     "webpack": "^5.20.0"
   },
+  "peerDependenciesMeta": {
+    "@rspack/core": {
+      "optional": true
+    },
+    "webpack": {
+      "optional": true
+    }
+  },
   "keywords": [
-    "webpack",
+    "rspack",
     "plugin",
     "html",
-    "html-webpack-plugin"
+    "html-rspack-plugin"
   ],
-  "bugs": "https://github.com/jantimon/html-webpack-plugin/issues",
-  "homepage": "https://github.com/jantimon/html-webpack-plugin",
-  "repository": "https://github.com/jantimon/html-webpack-plugin.git",
+  "bugs": "https://github.com/rspack-contrib/html-rspack-plugin/issues",
+  "homepage": "https://github.com/rspack-contrib/html-rspack-plugin",
+  "repository": "https://github.com/rspack-contrib/html-rspack-plugin.git",
   "engines": {
     "node": ">=10.13.0"
   },
