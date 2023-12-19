@@ -98,7 +98,7 @@ declare namespace HtmlWebpackPlugin {
      *
      * @default 'defer'
      */
-    scriptLoading?: "blocking" | "defer" | "module";
+    scriptLoading?: "blocking" | "defer" | "module" | "systemjs-module";
     /**
      * Inject meta tags
      */
