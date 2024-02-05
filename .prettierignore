@@ -1,0 +1,6 @@
+/coverage
+/dist
+/node_modules
+/spec/fixtures
+CHANGELOG.md
+examples/*/dist

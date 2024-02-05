@@ -1,0 +1,13 @@
+<i> [webpack-dev-server] Project is running at:
+<i> [webpack-dev-server] Loopback: http://localhost:8080/
+<i> [webpack-dev-server] On Your Network (IPv4): http://172.20.10.2:8080/
+<i> [webpack-dev-server] Content not from webpack is served from '/home/akait/IdeaProjects/html-webpack-plugin/dist' directory
+/home/akait/IdeaProjects/html-webpack-plugin/node_modules/image-minimizer-webpack-plugin/dist/loader.js:43
+  loaderContext.request = request.replace(".png", ".webp");
+                          ^
+
+ReferenceError: request is not defined
+    at changeResource (/home/akait/IdeaProjects/html-webpack-plugin/node_modules/image-minimizer-webpack-plugin/dist/loader.js:43:27)
+    at Object.loader (/home/akait/IdeaProjects/html-webpack-plugin/node_modules/image-minimizer-webpack-plugin/dist/loader.js:191:5)
+
+Node.js v18.15.0

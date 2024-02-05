@@ -8,73 +8,74 @@ As of 2.x the `inject` options is set to true by default which means that all yo
 
 The default template has changed according to the inject option - but should behave like the previous version did.
 
-
 ```js
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+var HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    // ...
-    plugins: [
-        new HtmlWebpackPlugin()
-    ]
+  // ...
+  plugins: [new HtmlWebpackPlugin()],
 };
 ```
 
 ## Custom template
 
-This inject feature aims to simpify your custom templates:
+This inject feature aims to simplify your custom templates:
 https://github.com/ampedandwired/html-webpack-plugin/tree/master/examples/custom-template
 
 ```js
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+var HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    // ...
-    plugins: [
-        new HtmlWebpackPlugin({
-          template: 'template.html'
-        })
-    ]
+  // ...
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "template.html",
+    }),
+  ],
 };
 ```
 
 ```html
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Webpack App</title>
-</head>
-<body>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <title>Webpack App</title>
+  </head>
+  <body></body>
 </html>
 ```
 
 Although we did not specify any script tags or link tags they will be injected automatically and the result will be:
+
 ```html
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Webpack App</title>
-  <link href="styles.css" rel="stylesheet">
-</head>
-<body>
-<script src="bundle.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <title>Webpack App</title>
+    <link href="styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <script src="bundle.js"></script>
+  </body>
 </html>
 ```
 
 ## Templating and variables
 
 As of 2.x blueimp was replaced by lodash/underscore/ejs templates as they are more common.
-This also removes the `o` in template variables. ` <body class="{%= o.htmlWebpackPlugin.options.environment %}">` becomes `<body class="<%= htmlWebpackPlugin.options.environment %>">` it also allows to escape variables by using `<%-` instead of `<%=` to prevent unexpected behaviours: `<body class="<%- htmlWebpackPlugin.options.environment %>">` 
+This also removes the `o` in template variables. ` <body class="{%= o.htmlWebpackPlugin.options.environment %}">` becomes `<body class="<%= htmlWebpackPlugin.options.environment %>">` it also allows to escape variables by using `<%-` instead of `<%=` to prevent unexpected behaviours: `<body class="<%- htmlWebpackPlugin.options.environment %>">`
 
 # Loaders in templates
+
 Loaders may now be used inside the template the same way as you would expect in your javascript files.
 
 ```html
-<link rel="apple-touch-icon" href="<%- require('../images/favicons/apple-icon-60x60.png') %>">
+<link
+  rel="apple-touch-icon"
+  href="<%- require('../images/favicons/apple-icon-60x60.png') %>"
+/>
 <%= require('partial.html') %>
 ```
 
@@ -83,18 +84,17 @@ For the above example you would have to configure a [html](https://github.com/we
 ```js
 module: {
   rules: [
-    { test: /\.png$/, type: 'asset/resource' },
+    { test: /\.png$/, type: "asset/resource" },
     {
       test: /\.html$/,
       exclude: /index\.html$/, // you need to exclude your base template (unless you do not want this plugin own templating feature)
-      loader: "html"
-    }
-  ]
+      loader: "html",
+    },
+  ];
 }
 ```
 
 This configuration allows you to require partial html from your main `index.html` without being itself parsed by the html-loader instead of this html-webpack-plugin.
-
 
 ## Custom template engines
 
@@ -103,15 +103,15 @@ With 2.x you can use the webpack loaders either once only for the template as in
 where we use pug (requires the [pug-loader](https://github.com/webpack/pug-loader)):
 
 ```js
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+var HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    // ...
-    plugins: [
-        new HtmlWebpackPlugin({
-          template: 'pug-loader!template.pug'
-        })
-    ]
+  // ...
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "pug-loader!template.pug",
+    }),
+  ],
 };
 ```
 
@@ -121,15 +121,13 @@ or by configuring webpack to handle all `.pug` files:
 module.exports = {
   // ...
   module: {
-    rules: [
-      { test: /\.pug$/, loader: 'pug-loader' }
-    ]
+    rules: [{ test: /\.pug$/, loader: "pug-loader" }],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'template.pug'
-    })
-  ]
+      template: "template.pug",
+    }),
+  ],
 };
 ```
 
@@ -145,28 +143,36 @@ module.exports = {
   // ...
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'template.js'
-    })
-  ]
+      template: "template.js",
+    }),
+  ],
 };
 ```
+
 Simple template.js
+
 ```js
-module.exports = '<html>...</html>';
+module.exports = "<html>...</html>";
 ```
+
 More advanced template.js
+
 ```js
-  module.exports = function(templateParams) {
-      return '<html>..</html>';
-  };
+module.exports = function (templateParams) {
+  return "<html>..</html>";
+};
 ```
+
 Using loaders inside a template.js
+
 ```js
-  // This function has to return a string or promised string:
-  module.exports = function(templateParams) {
-      // Play around with the arguments and then use the webpack pug loader to load the pug:
-      return require('./template.pug')({assets: templateParams.htmlWebpackPlugin.files});
-  };
+// This function has to return a string or promised string:
+module.exports = function (templateParams) {
+  // Play around with the arguments and then use the webpack pug loader to load the pug:
+  return require("./template.pug")({
+    assets: templateParams.htmlWebpackPlugin.files,
+  });
+};
 ```
 
 Unfortunately `__dirname` does not work correctly.

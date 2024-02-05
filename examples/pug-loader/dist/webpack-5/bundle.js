@@ -379,9 +379,9 @@ __webpack_require__(268);
 var template = __webpack_require__(384);
 
 setInterval(function () {
-  var div = document.getElementById('main');
+  var div = document.getElementById("main");
   div.innerHTML = template({ time: new Date() });
-  div.style.color = 'navy';
+  div.style.color = "navy";
 }, 1000);
 
 })();

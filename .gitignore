@@ -4,3 +4,6 @@
 npm-debug.*.log
 yarn.lock
 npm-debug.log.*
+/.idea/
+.eslintcache
+.cspellcache

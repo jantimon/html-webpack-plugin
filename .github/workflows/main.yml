@@ -7,34 +7,86 @@ on:
     branches:
       - main
 jobs:
+  lint:
+    name: Lint - ${{ matrix.os }} - Node v${{ matrix.node-version }}
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [lts/*]
+
+    runs-on: ${{ matrix.os }}
+
+    concurrency:
+      group: lint-${{ matrix.os }}-v${{ matrix.node-version }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Security audit
+        run: npm run security -- --only=prod
+
+      - name: Check commit message
+        uses: wagoid/commitlint-github-action@v5
+
   build:
     name: test Node ${{ matrix.node }} Webpack ${{ matrix.webpack }} ${{ matrix.os }}
     timeout-minutes: 15
 
     runs-on: ${{ matrix.os }}
+
+    concurrency:
+      group: test-${{ matrix.os }}-v${{ matrix.node-version }}-${{ matrix.webpack-version }}-${{ github.ref }}
+      cancel-in-progress: true
+
     strategy:
       matrix:
-        node: ['10.x', '12.x', '14.x', '16.x', '18.x', '20.x']
+        node: ["10.x", "12.x", "14.x", "16.x", "18.x", "20.x"]
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        webpack: ['5']
+        webpack: [latest]
 
     steps:
-      - name: LF
-        run: git config --global core.autocrlf false
+      - name: Setup Git
+        if: matrix.os == 'windows-latest'
+        run: git config --global core.autocrlf input
 
-      - name: Checkout repo
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Use Node ${{ matrix.node }}
-        uses: actions/setup-node@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
 
-      - name: Install Dependencies
-        run: npm install --ignore-scripts --force --legacy-peer-deps
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Install Webpack ${{ matrix.webpack }}
-        run: npm install --ignore-scripts --force --legacy-peer-deps webpack@${{ matrix.webpack }}
+      - name: Install webpack ${{ matrix.webpack-version }}
+        if: matrix.webpack-version != 'latest'
+        run: npm i webpack@${{ matrix.webpack-version }}
 
-      - name: Test
-        run: npm test -- --forceExit || npm test -- --forceExit || npm test -- --forceExit
+      - name: Run tests for webpack version ${{ matrix.webpack-version }}
+        run: npm run test:coverage -- --ci
+
+      - name: Submit coverage data to codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
