@@ -12,7 +12,7 @@ const { CachedChildCompilation } = require('./lib/cached-child-compiler');
 const { createHtmlTagObject, htmlTagObjectToString, HtmlTagArray } = require('./lib/html-tags');
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
-const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPluginHooks;
+const {AsyncSeriesWaterfallHook} = require("tapable");
 
 /** @typedef {import("./typings").HtmlTagObject} HtmlTagObject */
 /** @typedef {import("./typings").Options} HtmlWebpackOptions */
@@ -20,11 +20,95 @@ const getHtmlWebpackPluginHooks = require('./lib/hooks.js').getHtmlWebpackPlugin
 /** @typedef {import("./typings").TemplateParameter} TemplateParameter */
 /** @typedef {import("webpack").Compiler} Compiler */
 /** @typedef {ReturnType<Compiler["getInfrastructureLogger"]>} Logger */
-/** @typedef {import("webpack/lib/Compilation.js")} Compilation */
 /** @typedef {Array<{ name: string, source: import('webpack').sources.Source, info?: import('webpack').AssetInfo }>} PreviousEmittedAssets */
 /** @typedef {{ publicPath: string, js: Array<string>, css: Array<string>, manifest?: string, favicon?: string }} AssetsInformationByGroups */
+/** @typedef {import("webpack").Compilation} Compilation */
+/** @typedef {import("./typings").Hooks} HtmlWebpackPluginHooks */
+/**
+ * @type {WeakMap<Compilation, HtmlWebpackPluginHooks>}}
+ */
+const compilationHooksMap = new WeakMap();
 
 class HtmlWebpackPlugin {
+  // The following is the API definition for all available hooks
+  // For the TypeScript definition, see the Hooks type in typings.d.ts
+  /**
+   beforeAssetTagGeneration:
+   AsyncSeriesWaterfallHook<{
+      assets: {
+        publicPath: string,
+        js: Array<string>,
+        css: Array<string>,
+        favicon?: string | undefined,
+        manifest?: string | undefined
+      },
+      outputName: string,
+      plugin: HtmlWebpackPlugin
+    }>,
+   alterAssetTags:
+   AsyncSeriesWaterfallHook<{
+      assetTags: {
+        scripts: Array<HtmlTagObject>,
+        styles: Array<HtmlTagObject>,
+        meta: Array<HtmlTagObject>,
+      },
+      publicPath: string,
+      outputName: string,
+      plugin: HtmlWebpackPlugin
+    }>,
+   alterAssetTagGroups:
+   AsyncSeriesWaterfallHook<{
+      headTags: Array<HtmlTagObject | HtmlTagObject>,
+      bodyTags: Array<HtmlTagObject | HtmlTagObject>,
+      publicPath: string,
+      outputName: string,
+      plugin: HtmlWebpackPlugin
+    }>,
+   afterTemplateExecution:
+   AsyncSeriesWaterfallHook<{
+      html: string,
+      headTags: Array<HtmlTagObject | HtmlTagObject>,
+      bodyTags: Array<HtmlTagObject | HtmlTagObject>,
+      outputName: string,
+      plugin: HtmlWebpackPlugin,
+    }>,
+   beforeEmit:
+   AsyncSeriesWaterfallHook<{
+      html: string,
+      outputName: string,
+      plugin: HtmlWebpackPlugin,
+    }>,
+   afterEmit:
+   AsyncSeriesWaterfallHook<{
+      outputName: string,
+      plugin: HtmlWebpackPlugin
+    }>
+   */
+
+  /**
+   * Returns all public hooks of the html webpack plugin for the given compilation
+   *
+   * @param {Compilation} compilation
+   * @returns {HtmlWebpackPluginHooks}
+   */
+  static getCompilationHooks(compilation) {
+    let hooks = compilationHooksMap.get(compilation);
+
+    if (!hooks) {
+      hooks = {
+        beforeAssetTagGeneration: new AsyncSeriesWaterfallHook(['pluginArgs']),
+        alterAssetTags: new AsyncSeriesWaterfallHook(['pluginArgs']),
+        alterAssetTagGroups: new AsyncSeriesWaterfallHook(['pluginArgs']),
+        afterTemplateExecution: new AsyncSeriesWaterfallHook(['pluginArgs']),
+        beforeEmit: new AsyncSeriesWaterfallHook(['pluginArgs']),
+        afterEmit: new AsyncSeriesWaterfallHook(['pluginArgs'])
+      };
+      compilationHooksMap.set(compilation, hooks);
+    }
+
+    return hooks;
+  }
+
   /**
    * @param {HtmlWebpackOptions} [options]
    */
@@ -1040,7 +1124,7 @@ class HtmlWebpackPlugin {
     const assetsPromise = this.generateFavicon(compiler, this.options.favicon, compilation, assetsInformationByGroups.publicPath, previousEmittedAssets)
       .then((faviconPath) => {
         assetsInformationByGroups.favicon = faviconPath;
-        return getHtmlWebpackPluginHooks(compilation).beforeAssetTagGeneration.promise({
+        return HtmlWebpackPlugin.getCompilationHooks(compilation).beforeAssetTagGeneration.promise({
           assets: assetsInformationByGroups,
           outputName,
           plugin: this
@@ -1050,7 +1134,7 @@ class HtmlWebpackPlugin {
     // Turn the js and css paths into grouped HtmlTagObjects
     const assetTagGroupsPromise = assetsPromise
       // And allow third-party-plugin authors to reorder and change the assetTags before they are grouped
-      .then(({ assets }) => getHtmlWebpackPluginHooks(compilation).alterAssetTags.promise({
+      .then(({ assets }) => HtmlWebpackPlugin.getCompilationHooks(compilation).alterAssetTags.promise({
         assetTags: {
           scripts: this.generatedScriptTags(assets.js),
           styles: this.generateStyleTags(assets.css),
@@ -1071,7 +1155,7 @@ class HtmlWebpackPlugin {
         // Group assets to `head` and `body` tag arrays
         const assetGroups = this.groupAssetsByElements(assetTags, scriptTarget);
         // Allow third-party-plugin authors to reorder and change the assetTags once they are grouped
-        return getHtmlWebpackPluginHooks(compilation).alterAssetTagGroups.promise({
+        return HtmlWebpackPlugin.getCompilationHooks(compilation).alterAssetTagGroups.promise({
           headTags: assetGroups.headTags,
           bodyTags: assetGroups.bodyTags,
           outputName,
@@ -1117,7 +1201,7 @@ class HtmlWebpackPlugin {
       // Allow plugins to change the html before assets are injected
       .then(([assetTags, html]) => {
         const pluginArgs = { html, headTags: assetTags.headTags, bodyTags: assetTags.bodyTags, plugin: this, outputName };
-        return getHtmlWebpackPluginHooks(compilation).afterTemplateExecution.promise(pluginArgs);
+        return HtmlWebpackPlugin.getCompilationHooks(compilation).afterTemplateExecution.promise(pluginArgs);
       })
       .then(({ html, headTags, bodyTags }) => {
         return this.postProcessHtml(compiler, html, assetsInformationByGroups, { headTags, bodyTags });
@@ -1127,7 +1211,7 @@ class HtmlWebpackPlugin {
       // Allow plugins to change the html after assets are injected
       .then((html) => {
         const pluginArgs = { html, plugin: this, outputName };
-        return getHtmlWebpackPluginHooks(compilation).beforeEmit.promise(pluginArgs)
+        return HtmlWebpackPlugin.getCompilationHooks(compilation).beforeEmit.promise(pluginArgs)
           .then(result => result.html);
       })
       .catch(err => {
@@ -1150,7 +1234,7 @@ class HtmlWebpackPlugin {
 
         return replacedFilename.path;
       })
-      .then((finalOutputName) => getHtmlWebpackPluginHooks(compilation).afterEmit.promise({
+      .then((finalOutputName) => HtmlWebpackPlugin.getCompilationHooks(compilation).afterEmit.promise({
         outputName: finalOutputName,
         plugin: this
       }).catch(err => {
@@ -1204,7 +1288,8 @@ HtmlWebpackPlugin.version = 5;
  *
  * Usage: HtmlWebpackPlugin.getHooks(compilation).HOOK_NAME.tapAsync('YourPluginName', () => { ... });
  */
-HtmlWebpackPlugin.getHooks = getHtmlWebpackPluginHooks;
+// TODO remove me in the next major release in favor getCompilationHooks
+HtmlWebpackPlugin.getHooks = HtmlWebpackPlugin.getCompilationHooks;
 HtmlWebpackPlugin.createHtmlTagObject = createHtmlTagObject;
 
 module.exports = HtmlWebpackPlugin;
