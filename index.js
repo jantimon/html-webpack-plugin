@@ -19,10 +19,12 @@ const { AsyncSeriesWaterfallHook } = require('tapable');
 /** @typedef {import("./typings").ProcessedOptions} ProcessedHtmlWebpackOptions */
 /** @typedef {import("./typings").TemplateParameter} TemplateParameter */
 /** @typedef {import("webpack").Compiler} Compiler */
+/** @typedef {import("webpack").Compilation} Compilation */
+/** @typedef {Required<Compilation["outputOptions"]["publicPath"]>} PublicPath */
 /** @typedef {ReturnType<Compiler["getInfrastructureLogger"]>} Logger */
+/** @typedef {Compilation["entrypoints"] extends Map<string, infer I> ? I : never} Entrypoint */
 /** @typedef {Array<{ name: string, source: import('webpack').sources.Source, info?: import('webpack').AssetInfo }>} PreviousEmittedAssets */
 /** @typedef {{ publicPath: string, js: Array<string>, css: Array<string>, manifest?: string, favicon?: string }} AssetsInformationByGroups */
-/** @typedef {import("webpack").Compilation} Compilation */
 /** @typedef {import("./typings").Hooks} HtmlWebpackPluginHooks */
 /**
  * @type {WeakMap<Compilation, HtmlWebpackPluginHooks>}}
@@ -374,13 +376,14 @@ class HtmlWebpackPlugin {
    * E.g. http://localhost:8080/ -> http://localhost:8080/?50c9096ba6183fd728eeb065a26ec175
    *
    * @private
-   * @param {string} url
+   * @param {string | undefined} url
    * @param {string} hash
    */
   appendHash (url, hash) {
     if (!url) {
       return url;
     }
+
     return url + (url.indexOf('?') === -1 ? '?' : '&') + hash;
   }
 
@@ -400,7 +403,10 @@ class HtmlWebpackPlugin {
      * if a path publicPath is set in the current webpack config use it otherwise
      * fallback to a relative path
      */
-    const webpackPublicPath = compilation.getAssetPath(compilation.outputOptions.publicPath, { hash: compilation.hash });
+    const webpackPublicPath = compilation.getAssetPath(
+      /** @type {NonNullable<Compilation["outputOptions"]["publicPath"]>} */ (compilation.outputOptions.publicPath),
+      { hash: compilation.hash }
+    );
     // Webpack 5 introduced "auto" as default value
     const isPublicPathDefined = webpackPublicPath !== 'auto';
 
@@ -412,7 +418,7 @@ class HtmlWebpackPlugin {
           // If a hard coded public path exists use it
           ? webpackPublicPath
           // If no public path was set get a relative url path
-          : path.relative(path.resolve(compilation.options.output.path, path.dirname(filename)), compilation.options.output.path)
+          : path.relative(path.resolve(/** @type {string} */ (compilation.options.output.path), path.dirname(filename)), /** @type {string} */ (compilation.options.output.path))
             .split(path.sep).join('/')
         );
 
@@ -463,7 +469,7 @@ class HtmlWebpackPlugin {
     for (let i = 0; i < entryNames.length; i++) {
       const entryName = entryNames[i];
       /** entryPointUnfilteredFiles - also includes hot module update files */
-      const entryPointUnfilteredFiles = compilation.entrypoints.get(entryName).getFiles();
+      const entryPointUnfilteredFiles = /** @type {Entrypoint} */ (compilation.entrypoints.get(entryName)).getFiles();
       const entryPointFiles = entryPointUnfilteredFiles.filter((chunkFile) => {
         const asset = compilation.getAsset(chunkFile);
 
@@ -483,12 +489,12 @@ class HtmlWebpackPlugin {
         .map(chunkFile => {
           const entryPointPublicPath = publicPath + this.urlencodePath(chunkFile);
           return this.options.hash
-            ? this.appendHash(entryPointPublicPath, compilation.hash)
+            ? this.appendHash(entryPointPublicPath, /** @type {string} */ (compilation.hash))
             : entryPointPublicPath;
         });
 
       entryPointPublicPaths.forEach((entryPointPublicPath) => {
-        const extMatch = extensionRegexp.exec(entryPointPublicPath);
+        const extMatch = extensionRegexp.exec(/** @type {string} */ (entryPointPublicPath));
 
         // Skip if the public path is not a .css, .mjs or .js file
         if (!extMatch) {
@@ -695,6 +701,7 @@ class HtmlWebpackPlugin {
         // If html is a string turn it into a promise
         return templateFunction(templateParams);
       } catch (e) {
+        // @ts-ignore
         compilation.errors.push(new Error('Template execution failed: ' + e));
         return Promise.reject(e);
       }
@@ -1053,7 +1060,7 @@ class HtmlWebpackPlugin {
       hash.update(compilation.outputOptions.hashSalt);
     }
 
-    const contentHash = hash.digest(compilation.outputOptions.hashDigest).slice(0, compilation.outputOptions.hashDigestLength);
+    const contentHash = /** @type {string} */ (hash.digest(compilation.outputOptions.hashDigest).slice(0, compilation.outputOptions.hashDigestLength));
 
     return compilation.getPathWithInfo(
       filename,
@@ -1061,6 +1068,7 @@ class HtmlWebpackPlugin {
         contentHash,
         chunk: {
           hash: contentHash,
+          // @ts-ignore
           contentHash
         }
       }
