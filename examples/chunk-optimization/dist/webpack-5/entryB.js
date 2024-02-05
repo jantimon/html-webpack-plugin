@@ -6,8 +6,8 @@
 
 __webpack_require__(488);
 var multiply = __webpack_require__(540);
-var h1 = document.createElement('h1');
-h1.innerHTML = 'Hello world from Entry ' + multiply(1, 2);
+var h1 = document.createElement("h1");
+h1.innerHTML = "Hello world from Entry " + multiply(1, 2);
 document.body.appendChild(h1);
 
 

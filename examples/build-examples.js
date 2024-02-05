@@ -4,12 +4,12 @@
  * You could do the same by going into each example and execute
  * `webpack`
  */
-var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
+var webpackMajorVersion = require("webpack/package.json").version.split(".")[0];
 
-var fs = require('fs');
-var path = require('path');
-var rimraf = require('rimraf');
-var webpack = require('webpack');
+var fs = require("fs");
+var path = require("path");
+var rimraf = require("rimraf");
+var webpack = require("webpack");
 
 var examples = fs.readdirSync(__dirname).filter(function (file) {
   return fs.statSync(path.join(__dirname, file)).isDirectory();
@@ -17,21 +17,23 @@ var examples = fs.readdirSync(__dirname).filter(function (file) {
 
 examples.forEach(function (exampleName) {
   var examplePath = path.join(__dirname, exampleName);
-  var configFile = path.join(examplePath, 'webpack.config.js');
+  var configFile = path.join(examplePath, "webpack.config.js");
 
   var config = require(configFile);
   if (Number(webpackMajorVersion) >= 4) {
-    config.plugins.unshift(new webpack.LoaderOptionsPlugin({
-      options: {
-        context: process.cwd() // or the same value as `context`
-      }
-    }));
-    config.mode = 'production';
+    config.plugins.unshift(
+      new webpack.LoaderOptionsPlugin({
+        options: {
+          context: process.cwd(), // or the same value as `context`
+        },
+      }),
+    );
+    config.mode = "production";
     config.optimization = config.optimization || {};
     config.optimization.minimizer = [];
   }
 
-  rimraf.sync(path.join(examplePath, 'dist', 'webpack-' + webpackMajorVersion));
+  rimraf.sync(path.join(examplePath, "dist", "webpack-" + webpackMajorVersion));
   webpack(config, function (err, stats) {
     if (err) {
       console.error(err.stack || err);

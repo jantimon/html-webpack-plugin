@@ -4,19 +4,18 @@
 
 - We realize there is a lot of data requested here. We ask only that you do your best to provide as much information as possible so we can better help you.
 - Support questions are better asked in one of the following locations:
-	- [Stack Overflow](http://stackoverflow.com/questions/tagged/html-webpack-plugin)
+  - [Stack Overflow](http://stackoverflow.com/questions/tagged/html-webpack-plugin)
 - Ensure the issue isn't already reported.
 - Should be reproducible with the latest version of `html-webpack-plugin`.
-	- (Ensure `npm ls html-webpack-plugin` matches ![](https://img.shields.io/npm/v/html-webpack-plugin.svg))
+  - (Ensure `npm ls html-webpack-plugin` matches ![](https://img.shields.io/npm/v/html-webpack-plugin.svg))
 
-*Delete the above section and the instructions in the sections below before submitting*
-
+_Delete the above section and the instructions in the sections below before submitting_
 
 ## Description
 
 If this is a feature request, explain why it should be added. Specific use-cases are best.
 
-For bug reports, please provide as much *relevant* info as possible.
+For bug reports, please provide as much _relevant_ info as possible.
 
 ### Error Message & Stack Trace
 
@@ -50,22 +49,19 @@ module.exports = {
 Copy your template file:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html>
-    <head>
-        <title>My App</title>
-    </head>
-    <body>
-    </body>
+  <head>
+    <title>My App</title>
+  </head>
+  <body></body>
 </html>
 ```
-
 
 ## Relevant Links
 
 - If your project is public, link to the repo so we can investigate directly.
 - **BONUS POINTS:** Create a [minimal reproduction](http://stackoverflow.com/help/mcve) and upload it to GitHub. This will get you the fastest support.
-
 
 ## Environment
 

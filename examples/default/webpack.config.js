@@ -1,22 +1,20 @@
-var path = require('path');
-var HtmlWebpackPlugin = require('../..');
-var webpackMajorVersion = require('webpack/package.json').version.split('.')[0];
+var path = require("path");
+var HtmlWebpackPlugin = require("../..");
+var webpackMajorVersion = require("webpack/package.json").version.split(".")[0];
 
 module.exports = {
   context: __dirname,
-  entry: './example.js',
+  entry: "./example.js",
   output: {
-    path: path.join(__dirname, 'dist/webpack-' + webpackMajorVersion),
-    publicPath: '',
-    filename: 'bundle.js'
+    path: path.join(__dirname, "dist/webpack-" + webpackMajorVersion),
+    publicPath: "",
+    filename: "bundle.js",
   },
   module: {
     rules: [
-      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
-      { test: /\.png$/, type: 'asset/resource' }
-    ]
+      { test: /\.css$/, use: ["style-loader", "css-loader"] },
+      { test: /\.png$/, type: "asset/resource" },
+    ],
   },
-  plugins: [
-    new HtmlWebpackPlugin()
-  ]
+  plugins: [new HtmlWebpackPlugin()],
 };

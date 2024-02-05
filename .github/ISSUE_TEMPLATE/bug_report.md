@@ -1,7 +1,6 @@
 ---
 name: Bug report
 about: Create a 🕷 report to help us improve
-
 ---
 
 <!-- If you deleting this template this issue is very likely to be closed -->
@@ -19,8 +18,8 @@ about: Create a 🕷 report to help us improve
 <!--
 
 Please provide a minimal example how to reproduce your problem..
-Delete all plugins which are unrelated   
-Delete all loaders which are unrelated  
+Delete all plugins which are unrelated
+Delete all loaders which are unrelated
 Delete the production webpack config if your bug happens on develop
 Delete the develop webpack config if your bug happens only on production
 
@@ -30,7 +29,7 @@ Feel free to use this codebox template as a starting point: https://codesandbox.
 ## Environment 🖥
 
 <!--
-To help you we need to know which versions you using otherwise it is impossible to help you.  
+To help you we need to know which versions you using otherwise it is impossible to help you.
 Please run the following commands to see your current versions:
 
 ```
@@ -40,4 +39,3 @@ npm ls webpack
 npm ls html-webpack-plugin
 ```
 -->
-

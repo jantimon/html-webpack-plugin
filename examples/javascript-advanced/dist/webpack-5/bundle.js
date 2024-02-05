@@ -12,7 +12,7 @@
 /***/ 968:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("__webpack_require__(268);\n\nvar universal = __webpack_require__(180);\nvar h1 = document.createElement('h1');\nh1.innerHTML = universal();\n\ndocument.body.appendChild(h1);\n\n\n//# sourceURL=webpack:///./example.js?");
+eval("__webpack_require__(268);\n\nvar universal = __webpack_require__(180);\nvar h1 = document.createElement(\"h1\");\nh1.innerHTML = universal();\n\ndocument.body.appendChild(h1);\n\n\n//# sourceURL=webpack:///./example.js?");
 
 /***/ }),
 
@@ -20,7 +20,7 @@ eval("__webpack_require__(268);\n\nvar universal = __webpack_require__(180);\nva
 /***/ ((module) => {
 
 "use strict";
-eval("// This file is used for frontend and backend\n\n\n// If compiled by the html-webpack-plugin\n// HTML_WEBPACK_PLUGIN is set to true:\nvar backend = typeof HTML_WEBPACK_PLUGIN !== 'undefined';\n\nmodule.exports = function () {\n  return 'Hello World from ' + (backend ? 'backend' : 'frontend');\n};\n\n\n//# sourceURL=webpack:///./universial.js?");
+eval("// This file is used for frontend and backend\n\n\n// If compiled by the html-webpack-plugin\n// HTML_WEBPACK_PLUGIN is set to true:\nvar backend = typeof HTML_WEBPACK_PLUGIN !== \"undefined\";\n\nmodule.exports = function () {\n  return \"Hello World from \" + (backend ? \"backend\" : \"frontend\");\n};\n\n\n//# sourceURL=webpack:///./universial.js?");
 
 /***/ }),
 

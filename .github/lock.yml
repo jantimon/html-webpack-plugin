@@ -11,4 +11,3 @@ lockComment: false
 
 # Number of days of inactivity before a closed issue or pull request is locked
 daysUntilLock: 30
-

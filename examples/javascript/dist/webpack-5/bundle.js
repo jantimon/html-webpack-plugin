@@ -10,10 +10,10 @@
 
 // If compiled by the html-webpack-plugin
 // HTML_WEBPACK_PLUGIN is set to true:
-var backend = typeof HTML_WEBPACK_PLUGIN !== 'undefined';
+var backend = typeof HTML_WEBPACK_PLUGIN !== "undefined";
 
 module.exports = function () {
-  return 'Hello World from ' + (backend ? 'backend' : 'frontend');
+  return "Hello World from " + (backend ? "backend" : "frontend");
 };
 
 
@@ -74,7 +74,7 @@ var __webpack_exports__ = {};
 __webpack_require__(268);
 
 var universal = __webpack_require__(180);
-var h1 = document.createElement('h1');
+var h1 = document.createElement("h1");
 h1.innerHTML = universal();
 
 document.body.appendChild(h1);

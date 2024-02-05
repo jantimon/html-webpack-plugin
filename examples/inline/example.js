@@ -1,4 +1,4 @@
-'use strict';
-require('./main.css');
+"use strict";
+require("./main.css");
 
-console.log('Hello World');
+console.log("Hello World");

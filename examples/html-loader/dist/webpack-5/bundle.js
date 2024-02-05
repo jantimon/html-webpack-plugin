@@ -54,8 +54,8 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 __webpack_require__(268);
-var h1 = document.createElement('h1');
-h1.innerHTML = 'Hello world!';
+var h1 = document.createElement("h1");
+h1.innerHTML = "Hello world!";
 document.body.appendChild(h1);
 
 })();

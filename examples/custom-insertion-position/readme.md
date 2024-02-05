@@ -17,7 +17,7 @@ The example is using the template parameters `headTags` and `bodyTags`
   .tags
   .headTags
   .filter((tag) => tag.tagName === 'meta')
-  .join('') 
+  .join('')
 %>
 ```
 

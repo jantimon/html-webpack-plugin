@@ -7,8 +7,8 @@
 __webpack_require__(488);
 var multiply = __webpack_require__(540);
 var concat = __webpack_require__(280);
-var h1 = document.createElement('h1');
-h1.innerHTML = concat('Hello world from Entry ', multiply(1, 1));
+var h1 = document.createElement("h1");
+h1.innerHTML = concat("Hello world from Entry ", multiply(1, 1));
 document.body.appendChild(h1);
 
 

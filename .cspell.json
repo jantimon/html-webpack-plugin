@@ -1,0 +1,43 @@
+{
+  "version": "0.2",
+  "language": "en,en-gb",
+  "words": [
+    "commitlint",
+    "chunkhash",
+    "concat",
+    "systemjs",
+    "tapable",
+    "templatehash",
+    "blueimp",
+    "selfclosed",
+    "nocheck",
+    "iife",
+    "appcache",
+    "subresource",
+    "startuml",
+    "autonumber",
+    "enduml",
+    "chunksorter",
+    "urlencode",
+    "sortmode",
+    "harddisk",
+    "Sileghem",
+    "Bname",
+    "Bfile",
+    "webpackconfig",
+    "specialattribute",
+    "dircompare"
+  ],
+  "ignorePaths": [
+    "CHANGELOG.md",
+    "coverage",
+    "package.json",
+    "**/dist/**",
+    "**/__snapshots__/**",
+    "**/fixtures/**",
+    "package-lock.json",
+    "node_modules",
+    "coverage",
+    "*.log"
+  ]
+}
