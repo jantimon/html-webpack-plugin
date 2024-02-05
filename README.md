@@ -581,7 +581,7 @@ class MyPlugin {
       console.log('The compiler is starting a new compilation...')
 
       // Static Plugin interface |compilation |HOOK NAME | register listener 
-      HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
+      HtmlWebpackPlugin.getCompilationHooks(compilation).beforeEmit.tapAsync(
         'MyPlugin', // <-- Set a meaningful name here for stacktraces
         (data, cb) => {
           // Manipulate the content

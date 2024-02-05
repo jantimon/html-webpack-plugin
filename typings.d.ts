@@ -20,6 +20,7 @@ declare class HtmlWebpackPlugin {
   apply(compiler: Compiler): void;
 
   static getHooks(compilation: Compilation): HtmlWebpackPlugin.Hooks;
+  static getCompilationHooks(compilation: Compilation): HtmlWebpackPlugin.Hooks;
 
   /**
    * Static helper to create a tag object to be get injected into the dom
