@@ -12,7 +12,7 @@ const { CachedChildCompilation } = require('./lib/cached-child-compiler');
 const { createHtmlTagObject, htmlTagObjectToString, HtmlTagArray } = require('./lib/html-tags');
 const prettyError = require('./lib/errors.js');
 const chunkSorter = require('./lib/chunksorter.js');
-const {AsyncSeriesWaterfallHook} = require("tapable");
+const { AsyncSeriesWaterfallHook } = require('tapable');
 
 /** @typedef {import("./typings").HtmlTagObject} HtmlTagObject */
 /** @typedef {import("./typings").Options} HtmlWebpackOptions */
@@ -91,7 +91,7 @@ class HtmlWebpackPlugin {
    * @param {Compilation} compilation
    * @returns {HtmlWebpackPluginHooks}
    */
-  static getCompilationHooks(compilation) {
+  static getCompilationHooks (compilation) {
     let hooks = compilationHooksMap.get(compilation);
 
     if (!hooks) {
