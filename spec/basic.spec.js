@@ -9,7 +9,7 @@ const path = require("path");
 const fs = require("fs");
 const webpack = require("webpack");
 const rimraf = require("rimraf");
-const _ = require("lodash");
+const _extend = require("lodash/extend");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const webpackMajorVersion = Number(
   require("webpack/package.json").version.split(".")[0],
@@ -2167,7 +2167,7 @@ describe("HtmlWebpackPlugin", () => {
             compilation,
           ).beforeEmit.tapAsync("HtmlWebpackPluginTest", (object, callback) => {
             eventFiredForFirstPlugin = true;
-            const result = _.extend(object, {
+            const result = _extend(object, {
               html: object.html + "Injected by first plugin",
             });
             callback(null, result);
@@ -2224,7 +2224,7 @@ describe("HtmlWebpackPlugin", () => {
             compilation,
           ).beforeEmit.tapAsync("HtmlWebpackPluginTest", (object, callback) => {
             eventFiredForFirstPlugin = true;
-            const result = _.extend(object, {
+            const result = _extend(object, {
               html: object.html + "Injected by first plugin",
             });
             callback(null, result);
@@ -2239,7 +2239,7 @@ describe("HtmlWebpackPlugin", () => {
             compilation,
           ).beforeEmit.tapAsync("HtmlWebpackPluginTest", (object, callback) => {
             eventFiredForSecondPlugin = true;
-            const result = _.extend(object, {
+            const result = _extend(object, {
               html: object.html + " Injected by second plugin",
             });
             callback(null, result);
