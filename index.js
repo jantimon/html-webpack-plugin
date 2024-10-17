@@ -232,7 +232,7 @@ class HtmlWebpackPlugin {
       typeof userOptionFilename === "function"
         ? userOptionFilename
         : // Replace '[name]' with entry name
-        (entryName) => userOptionFilename.replace(/\[name\]/g, entryName);
+          (entryName) => userOptionFilename.replace(/\[name\]/g, entryName);
 
     /** output filenames for the given entry names */
     const entryNames = Object.keys(compiler.options.entry);
@@ -265,8 +265,8 @@ class HtmlWebpackPlugin {
       if (path.resolve(filename) === path.normalize(filename)) {
         const outputPath =
           /** @type {string} - Once initialized the path is always a string */ (
-          compiler.options.output.path
-        );
+            compiler.options.output.path
+          );
 
         filename = path.relative(outputPath, filename);
       }
@@ -282,11 +282,11 @@ class HtmlWebpackPlugin {
             {
               name: "HtmlWebpackPlugin",
               stage:
-              /**
-               * Generate the html after minification and dev tooling is done
-               */
-              compiler.webpack.Compilation
-                .PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE,
+                /**
+                 * Generate the html after minification and dev tooling is done
+                 */
+                compiler.webpack.Compilation
+                  .PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE,
             },
             /**
              * Hook into the process assets hook
