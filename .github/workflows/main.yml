@@ -54,7 +54,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     concurrency:
-      group: test-${{ matrix.os }}-v${{ matrix.node-version }}-${{ matrix.webpack-version }}-${{ github.ref }}
+      group: ${{ github.workflow }}-${{ matrix.os }}-v${{ matrix.node }}-${{ matrix.webpack }}-${{ github.ref }}
       cancel-in-progress: true
 
     strategy:
