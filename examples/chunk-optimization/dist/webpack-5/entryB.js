@@ -1,11 +1,11 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 304:
+/***/ 123:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-__webpack_require__(488);
-var multiply = __webpack_require__(540);
+__webpack_require__(192);
+var multiply = __webpack_require__(199);
 var h1 = document.createElement("h1");
 h1.innerHTML = "Hello world from Entry " + multiply(1, 2);
 document.body.appendChild(h1);
@@ -123,7 +123,7 @@ document.body.appendChild(h1);
 /******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
 /******/ 		var installedChunks = {
-/******/ 			758: 0
+/******/ 			761: 0
 /******/ 		};
 /******/ 		
 /******/ 		// no chunk on demand loading
@@ -178,7 +178,7 @@ document.body.appendChild(h1);
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
-/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, [288,980,488], () => (__webpack_require__(304)))
+/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, [646,461,192], () => (__webpack_require__(123)))
 /******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
 /******/ 	
 /******/ })()

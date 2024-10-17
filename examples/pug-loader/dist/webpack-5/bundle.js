@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 268:
+/***/ 969:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -11,10 +11,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ 384:
+/***/ 487:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-var pug = __webpack_require__(548);
+var pug = __webpack_require__(355);
 
 function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;
     var locals_for_with = (locals || {});
@@ -29,7 +29,7 @@ module.exports = template;
 
 /***/ }),
 
-/***/ 548:
+/***/ 355:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
@@ -284,7 +284,7 @@ function pug_rethrow(err, filename, lineno, str) {
   }
   var context, lines, start, end;
   try {
-    str = str || (__webpack_require__(236).readFileSync)(filename, {encoding: 'utf8'});
+    str = str || (__webpack_require__(900).readFileSync)(filename, {encoding: 'utf8'});
     context = 3;
     lines = str.split('\n');
     start = Math.max(lineno - context, 0);
@@ -323,7 +323,7 @@ function pug_rethrow(err, filename, lineno, str) {
 
 /***/ }),
 
-/***/ 236:
+/***/ 900:
 /***/ (() => {
 
 /* (ignored) */
@@ -374,9 +374,9 @@ var __webpack_exports__ = {};
 (() => {
 "use strict";
 
-__webpack_require__(268);
+__webpack_require__(969);
 // Use the same template for the frontend code
-var template = __webpack_require__(384);
+var template = __webpack_require__(487);
 
 setInterval(function () {
   var div = document.getElementById("main");
