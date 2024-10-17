@@ -81,7 +81,7 @@ jobs:
 
       - name: Install webpack ${{ matrix.webpack-version }}
         if: matrix.webpack-version != 'latest'
-        run: npm i webpack@${{ matrix.webpack-version }}
+        run: npm i webpack@${{ matrix.webpack-version }} --legacy-peer-deps
 
       - name: Run tests for webpack version ${{ matrix.webpack-version }}
         run: npm run test:coverage -- --ci
