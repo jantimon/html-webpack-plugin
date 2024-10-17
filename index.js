@@ -164,152 +164,149 @@ class HtmlWebpackPlugin {
   apply(compiler) {
     this.logger = compiler.getInfrastructureLogger("HtmlWebpackPlugin");
 
-    // Wait for configuration preset plugins to apply all configure webpack defaults
-    compiler.hooks.initialize.tap("HtmlWebpackPlugin", () => {
-      const options = this.options;
+    const options = this.options;
 
-      options.template = this.getTemplatePath(
-        this.options.template,
-        compiler.context,
+    options.template = this.getTemplatePath(
+      this.options.template,
+      compiler.context,
+    );
+
+    // Assert correct option spelling
+    if (
+      options.scriptLoading !== "defer" &&
+      options.scriptLoading !== "blocking" &&
+      options.scriptLoading !== "module" &&
+      options.scriptLoading !== "systemjs-module"
+    ) {
+      /** @type {Logger} */
+      (this.logger).error(
+        'The "scriptLoading" option need to be set to "defer", "blocking" or "module" or "systemjs-module"',
       );
+    }
 
-      // Assert correct option spelling
-      if (
-        options.scriptLoading !== "defer" &&
-        options.scriptLoading !== "blocking" &&
-        options.scriptLoading !== "module" &&
-        options.scriptLoading !== "systemjs-module"
-      ) {
-        /** @type {Logger} */
-        (this.logger).error(
-          'The "scriptLoading" option need to be set to "defer", "blocking" or "module" or "systemjs-module"',
-        );
-      }
-
-      if (
-        options.inject !== true &&
-        options.inject !== false &&
-        options.inject !== "head" &&
-        options.inject !== "body"
-      ) {
-        /** @type {Logger} */
-        (this.logger).error(
-          'The `inject` option needs to be set to true, false, "head" or "body',
-        );
-      }
-
-      if (
-        this.options.templateParameters !== false &&
-        typeof this.options.templateParameters !== "function" &&
-        typeof this.options.templateParameters !== "object"
-      ) {
-        /** @type {Logger} */
-        (this.logger).error(
-          "The `templateParameters` has to be either a function or an object or false",
-        );
-      }
-
-      // Default metaOptions if no template is provided
-      if (
-        !this.userOptions.template &&
-        options.templateContent === false &&
-        options.meta
-      ) {
-        options.meta = Object.assign(
-          {},
-          options.meta,
-          {
-            // TODO remove in the next major release
-            // From https://developer.mozilla.org/en-US/docs/Mozilla/Mobile/Viewport_meta_tag
-            viewport: "width=device-width, initial-scale=1",
-          },
-          this.userOptions.meta,
-        );
-      }
-
-      // entryName to fileName conversion function
-      const userOptionFilename =
-        this.userOptions.filename || this.options.filename;
-      const filenameFunction =
-        typeof userOptionFilename === "function"
-          ? userOptionFilename
-          : // Replace '[name]' with entry name
-            (entryName) => userOptionFilename.replace(/\[name\]/g, entryName);
-
-      /** output filenames for the given entry names */
-      const entryNames = Object.keys(compiler.options.entry);
-      const outputFileNames = new Set(
-        (entryNames.length ? entryNames : ["main"]).map(filenameFunction),
+    if (
+      options.inject !== true &&
+      options.inject !== false &&
+      options.inject !== "head" &&
+      options.inject !== "body"
+    ) {
+      /** @type {Logger} */
+      (this.logger).error(
+        'The `inject` option needs to be set to true, false, "head" or "body',
       );
+    }
 
-      // Hook all options into the webpack compiler
-      outputFileNames.forEach((outputFileName) => {
-        // Instance variables to keep caching information for multiple builds
-        const assetJson = { value: undefined };
+    if (
+      this.options.templateParameters !== false &&
+      typeof this.options.templateParameters !== "function" &&
+      typeof this.options.templateParameters !== "object"
+    ) {
+      /** @type {Logger} */
+      (this.logger).error(
+        "The `templateParameters` has to be either a function or an object or false",
+      );
+    }
+
+    // Default metaOptions if no template is provided
+    if (
+      !this.userOptions.template &&
+      options.templateContent === false &&
+      options.meta
+    ) {
+      options.meta = Object.assign(
+        {},
+        options.meta,
+        {
+          // TODO remove in the next major release
+          // From https://developer.mozilla.org/en-US/docs/Mozilla/Mobile/Viewport_meta_tag
+          viewport: "width=device-width, initial-scale=1",
+        },
+        this.userOptions.meta,
+      );
+    }
+
+    // entryName to fileName conversion function
+    const userOptionFilename =
+      this.userOptions.filename || this.options.filename;
+    const filenameFunction =
+      typeof userOptionFilename === "function"
+        ? userOptionFilename
+        : // Replace '[name]' with entry name
+        (entryName) => userOptionFilename.replace(/\[name\]/g, entryName);
+
+    /** output filenames for the given entry names */
+    const entryNames = Object.keys(compiler.options.entry);
+    const outputFileNames = new Set(
+      (entryNames.length ? entryNames : ["main"]).map(filenameFunction),
+    );
+
+    // Hook all options into the webpack compiler
+    outputFileNames.forEach((outputFileName) => {
+      // Instance variables to keep caching information for multiple builds
+      const assetJson = { value: undefined };
+      /**
+       * store the previous generated asset to emit them even if the content did not change
+       * to support watch mode for third party plugins like the clean-webpack-plugin or the compression plugin
+       * @type {PreviousEmittedAssets}
+       */
+      const previousEmittedAssets = [];
+
+      // Inject child compiler plugin
+      const childCompilerPlugin = new CachedChildCompilation(compiler);
+
+      if (!this.options.templateContent) {
+        childCompilerPlugin.addEntry(this.options.template);
+      }
+
+      // convert absolute filename into relative so that webpack can
+      // generate it at correct location
+      let filename = outputFileName;
+
+      if (path.resolve(filename) === path.normalize(filename)) {
+        const outputPath =
+          /** @type {string} - Once initialized the path is always a string */ (
+          compiler.options.output.path
+        );
+
+        filename = path.relative(outputPath, filename);
+      }
+
+      compiler.hooks.thisCompilation.tap(
+        "HtmlWebpackPlugin",
         /**
-         * store the previous generated asset to emit them even if the content did not change
-         * to support watch mode for third party plugins like the clean-webpack-plugin or the compression plugin
-         * @type {PreviousEmittedAssets}
+         * Hook into the webpack compilation
+         * @param {Compilation} compilation
          */
-        const previousEmittedAssets = [];
-
-        // Inject child compiler plugin
-        const childCompilerPlugin = new CachedChildCompilation(compiler);
-
-        if (!this.options.templateContent) {
-          childCompilerPlugin.addEntry(this.options.template);
-        }
-
-        // convert absolute filename into relative so that webpack can
-        // generate it at correct location
-        let filename = outputFileName;
-
-        if (path.resolve(filename) === path.normalize(filename)) {
-          const outputPath =
-            /** @type {string} - Once initialized the path is always a string */ (
-              compiler.options.output.path
-            );
-
-          filename = path.relative(outputPath, filename);
-        }
-
-        compiler.hooks.thisCompilation.tap(
-          "HtmlWebpackPlugin",
-          /**
-           * Hook into the webpack compilation
-           * @param {Compilation} compilation
-           */
-          (compilation) => {
-            compilation.hooks.processAssets.tapAsync(
-              {
-                name: "HtmlWebpackPlugin",
-                stage:
-                  /**
-                   * Generate the html after minification and dev tooling is done
-                   */
-                  compiler.webpack.Compilation
-                    .PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE,
-              },
+        (compilation) => {
+          compilation.hooks.processAssets.tapAsync(
+            {
+              name: "HtmlWebpackPlugin",
+              stage:
               /**
-               * Hook into the process assets hook
-               * @param {any} _
-               * @param {(err?: Error) => void} callback
+               * Generate the html after minification and dev tooling is done
                */
-              (_, callback) => {
-                this.generateHTML(
-                  compiler,
-                  compilation,
-                  filename,
-                  childCompilerPlugin,
-                  previousEmittedAssets,
-                  assetJson,
-                  callback,
-                );
-              },
-            );
-          },
-        );
-      });
+              compiler.webpack.Compilation
+                .PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE,
+            },
+            /**
+             * Hook into the process assets hook
+             * @param {any} _
+             * @param {(err?: Error) => void} callback
+             */
+            (_, callback) => {
+              this.generateHTML(
+                compiler,
+                compilation,
+                filename,
+                childCompilerPlugin,
+                previousEmittedAssets,
+                assetJson,
+                callback,
+              );
+            },
+          );
+        },
+      );
     });
   }
 
