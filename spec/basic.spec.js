@@ -3789,7 +3789,7 @@ describe("HtmlWebpackPlugin", () => {
         },
         plugins: [
           new HtmlWebpackPlugin({
-            template: path.join(__dirname, "fixtures/empty.html")
+            template: path.join(__dirname, "fixtures/empty.html"),
           }),
         ],
       },
