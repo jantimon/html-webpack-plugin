@@ -3775,4 +3775,27 @@ describe("HtmlWebpackPlugin", () => {
       },
     );
   });
+
+  it("allows you to use empty HTML template file", (done) => {
+    testHtmlPlugin(
+      {
+        mode: "production",
+        entry: {
+          app: path.join(__dirname, "fixtures/index.js"),
+        },
+        output: {
+          path: OUTPUT_DIR,
+          filename: "[name]_bundle.js",
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            template: path.join(__dirname, "fixtures/empty.html")
+          }),
+        ],
+      },
+      ['<script defer="defer" src="app_bundle.js'],
+      null,
+      done,
+    );
+  });
 });
