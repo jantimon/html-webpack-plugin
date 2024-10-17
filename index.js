@@ -705,7 +705,7 @@ class HtmlWebpackPlugin {
     if (
       typeof newSource === "object" &&
       newSource.__esModule &&
-      newSource.default
+      newSource.default !== undefined
     ) {
       newSource = newSource.default;
     }
