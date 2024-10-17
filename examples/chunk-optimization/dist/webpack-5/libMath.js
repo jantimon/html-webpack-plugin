@@ -1,9 +1,9 @@
-(self["webpackChunk"] = self["webpackChunk"] || []).push([[288],{
+(self["webpackChunk"] = self["webpackChunk"] || []).push([[646],{
 
-/***/ 540:
+/***/ 199:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-var sum = __webpack_require__(636);
+var sum = __webpack_require__(16);
 module.exports = function multiply(a, b) {
   var m = 0;
   for (var i = 0; i < a; i = sum(i, 1)) {
@@ -15,7 +15,7 @@ module.exports = function multiply(a, b) {
 
 /***/ }),
 
-/***/ 636:
+/***/ 16:
 /***/ ((module) => {
 
 module.exports = function sum(a, b) {

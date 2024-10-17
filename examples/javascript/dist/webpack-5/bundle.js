@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 612:
+/***/ 48:
 /***/ ((module) => {
 
 "use strict";
@@ -19,7 +19,7 @@ module.exports = function () {
 
 /***/ }),
 
-/***/ 268:
+/***/ 969:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -69,17 +69,13 @@ __webpack_require__.r(__webpack_exports__);
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-(() => {
-__webpack_require__(268);
+__webpack_require__(969);
 
-var universal = __webpack_require__(612);
+var universal = __webpack_require__(48);
 var h1 = document.createElement("h1");
 h1.innerHTML = universal();
 
 document.body.appendChild(h1);
-
-})();
 
 /******/ })()
 ;

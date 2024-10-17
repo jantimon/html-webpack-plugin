@@ -36,7 +36,7 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Lint
         run: npm run lint
@@ -54,7 +54,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     concurrency:
-      group: test-${{ matrix.os }}-v${{ matrix.node-version }}-${{ matrix.webpack-version }}-${{ github.ref }}
+      group: ${{ github.workflow }}-${{ matrix.os }}-v${{ matrix.node }}-${{ matrix.webpack }}-${{ github.ref }}
       cancel-in-progress: true
 
     strategy:
@@ -77,11 +77,11 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Install webpack ${{ matrix.webpack-version }}
         if: matrix.webpack-version != 'latest'
-        run: npm i webpack@${{ matrix.webpack-version }}
+        run: npm i webpack@${{ matrix.webpack-version }} --legacy-peer-deps
 
       - name: Run tests for webpack version ${{ matrix.webpack-version }}
         run: npm run test:coverage -- --ci

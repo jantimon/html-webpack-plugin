@@ -9,14 +9,14 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 968:
+/***/ 695:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("__webpack_require__(268);\n\nvar universal = __webpack_require__(612);\nvar h1 = document.createElement(\"h1\");\nh1.innerHTML = universal();\n\ndocument.body.appendChild(h1);\n\n\n//# sourceURL=webpack:///./example.js?");
+eval("__webpack_require__(969);\n\nvar universal = __webpack_require__(48);\nvar h1 = document.createElement(\"h1\");\nh1.innerHTML = universal();\n\ndocument.body.appendChild(h1);\n\n\n//# sourceURL=webpack:///./example.js?");
 
 /***/ }),
 
-/***/ 612:
+/***/ 48:
 /***/ ((module) => {
 
 "use strict";
@@ -24,7 +24,7 @@ eval("// This file is used for frontend and backend\n\n\n// If compiled by the h
 
 /***/ }),
 
-/***/ 268:
+/***/ 969:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -75,7 +75,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n// extracted by mini-css-extr
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	var __webpack_exports__ = __webpack_require__(968);
+/******/ 	var __webpack_exports__ = __webpack_require__(695);
 /******/ 	
 /******/ })()
 ;
