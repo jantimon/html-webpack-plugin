@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.6.1](https://github.com/jantimon/html-webpack-plugin/compare/v5.6.0...v5.6.1) (2024-10-17)
+
+
+### Bug Fixes
+
+* avoid importing all of lodash ([#1864](https://github.com/jantimon/html-webpack-plugin/issues/1864)) ([2caf5db](https://github.com/jantimon/html-webpack-plugin/commit/2caf5db9641d487e07439f96d2840b940800aff5))
+* don't use `initialize` hooks to allow dynamic plugin injection ([ae85878](https://github.com/jantimon/html-webpack-plugin/commit/ae85878c3812b72d891ce368d81ce05b72c3748e))
+* handle `childCompilation.errors` being an iterator rather than array ([#1863](https://github.com/jantimon/html-webpack-plugin/issues/1863)) ([4c0c894](https://github.com/jantimon/html-webpack-plugin/commit/4c0c8943903e99ba01c7a50477ed5457513ba122))
+
 ## [5.6.0](https://github.com/jantimon/html-webpack-plugin/compare/v5.5.4...v5.6.0) (2023-12-19)
 
 
