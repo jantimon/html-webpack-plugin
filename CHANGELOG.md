@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.6.3](https://github.com/jantimon/html-webpack-plugin/compare/v5.6.2...v5.6.3) (2024-10-23)
+
+
+### Bug Fixes
+
+* hooks file for old plugins ([#1867](https://github.com/jantimon/html-webpack-plugin/issues/1867)) ([0585a36](https://github.com/jantimon/html-webpack-plugin/commit/0585a364b2868a456713593540f738fe266d0028))
+
 ### [5.6.2](https://github.com/jantimon/html-webpack-plugin/compare/v5.6.1...v5.6.2) (2024-10-17)
 
 
