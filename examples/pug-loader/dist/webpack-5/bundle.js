@@ -1,34 +1,6 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 969:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-// extracted by mini-css-extract-plugin
-
-
-/***/ }),
-
-/***/ 487:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var pug = __webpack_require__(355);
-
-function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;
-    var locals_for_with = (locals || {});
-    
-    (function (time) {
-      pug_html = pug_html + "\u003C!-- this partial is used for frontend and backend--\u003E\u003Cdiv class=\"time\"\u003E \u003Cb\u003ECurrent time\u003C\u002Fb\u003E\u003Cp\u003E" + (pug.escape(null == (pug_interp = time.toISOString()) ? "" : pug_interp)) + "\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cimg src=\"#{require('.\u002Flogo.png')}\"\u003E";
-    }.call(this, "time" in locals_for_with ?
-        locals_for_with.time :
-        typeof time !== 'undefined' ? time : undefined));
-    ;;return pug_html;};
-module.exports = template;
-
-/***/ }),
-
 /***/ 355:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -323,10 +295,38 @@ function pug_rethrow(err, filename, lineno, str) {
 
 /***/ }),
 
+/***/ 487:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var pug = __webpack_require__(355);
+
+function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;
+    var locals_for_with = (locals || {});
+    
+    (function (time) {
+      pug_html = pug_html + "\u003C!-- this partial is used for frontend and backend--\u003E\u003Cdiv class=\"time\"\u003E \u003Cb\u003ECurrent time\u003C\u002Fb\u003E\u003Cp\u003E" + (pug.escape(null == (pug_interp = time.toISOString()) ? "" : pug_interp)) + "\u003C\u002Fp\u003E\u003C\u002Fdiv\u003E\u003Cimg src=\"#{require('.\u002Flogo.png')}\"\u003E";
+    }.call(this, "time" in locals_for_with ?
+        locals_for_with.time :
+        typeof time !== 'undefined' ? time : undefined));
+    ;;return pug_html;};
+module.exports = template;
+
+/***/ }),
+
 /***/ 900:
 /***/ (() => {
 
 /* (ignored) */
+
+/***/ }),
+
+/***/ 969:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
 
 /***/ })
 
@@ -370,7 +370,7 @@ function pug_rethrow(err, filename, lineno, str) {
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
 (() => {
 "use strict";
 
