@@ -3798,4 +3798,32 @@ describe("HtmlWebpackPlugin", () => {
       done,
     );
   });
+
+  it("allow you to use custom HTML tag attributes in templates", (done) => {
+    testHtmlPlugin(
+      {
+        mode: "production",
+        entry: path.join(__dirname, "fixtures/index.js"),
+        output: {
+          path: OUTPUT_DIR,
+          filename: "index_bundle.js",
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            template: path.join(__dirname, "fixtures/template.ejs"),
+            baseHref: "/",
+            minify: false,
+            appMountIds: ["react-app", "portal-root"],
+            favicon: path.join(__dirname, "fixtures/favicon.ico"),
+            inject: false,
+          }),
+        ],
+      },
+      [
+        /<script src="index_bundle.js" type="text\/javascript" nonce="NONCE"><\/script>/,
+      ],
+      null,
+      done,
+    );
+  });
 });
