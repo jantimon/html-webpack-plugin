@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <div id="react-app"></div>
+    <% for (item of htmlWebpackPlugin.files.js) { %>
+      <% if (typeof item === 'string' || item instanceof String) {
+        item = { src: item, type: 'text/javascript' }
+      } %>
+      <script<% for (key in item) { %> <%= key %>="<%= item[key] %>"<% } %> nonce="NONCE"></script>
+    <% } %>
+  </body>
+</html>
