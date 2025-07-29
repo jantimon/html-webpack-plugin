@@ -9,18 +9,18 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 695:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-eval("__webpack_require__(969);\n\nvar universal = __webpack_require__(48);\nvar h1 = document.createElement(\"h1\");\nh1.innerHTML = universal();\n\ndocument.body.appendChild(h1);\n\n\n//# sourceURL=webpack:///./example.js?");
-
-/***/ }),
-
 /***/ 48:
 /***/ ((module) => {
 
 "use strict";
-eval("// This file is used for frontend and backend\n\n\n// If compiled by the html-webpack-plugin\n// HTML_WEBPACK_PLUGIN is set to true:\nvar backend = typeof HTML_WEBPACK_PLUGIN !== \"undefined\";\n\nmodule.exports = function () {\n  return \"Hello World from \" + (backend ? \"backend\" : \"frontend\");\n};\n\n\n//# sourceURL=webpack:///./universal.js?");
+eval("{// This file is used for frontend and backend\n\n\n// If compiled by the html-webpack-plugin\n// HTML_WEBPACK_PLUGIN is set to true:\nvar backend = typeof HTML_WEBPACK_PLUGIN !== \"undefined\";\n\nmodule.exports = function () {\n  return \"Hello World from \" + (backend ? \"backend\" : \"frontend\");\n};\n\n\n//# sourceURL=webpack:///./universal.js?\n}");
+
+/***/ }),
+
+/***/ 695:
+/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("{__webpack_require__(969);\n\nvar universal = __webpack_require__(48);\nvar h1 = document.createElement(\"h1\");\nh1.innerHTML = universal();\n\ndocument.body.appendChild(h1);\n\n\n//# sourceURL=webpack:///./example.js?\n}");
 
 /***/ }),
 
@@ -28,7 +28,7 @@ eval("// This file is used for frontend and backend\n\n\n// If compiled by the h
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n// extracted by mini-css-extract-plugin\n\n\n//# sourceURL=webpack:///./main.css?");
+eval("{__webpack_require__.r(__webpack_exports__);\n// extracted by mini-css-extract-plugin\n\n\n//# sourceURL=webpack:///./main.css?\n}");
 
 /***/ })
 
