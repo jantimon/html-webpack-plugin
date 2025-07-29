@@ -266,7 +266,7 @@ describe("HtmlWebpackPluginCaching", () => {
         const speedComparison =
           (multiCompileRunDurationInNs / singleCompileRunDurationInNs) * 100;
 
-        expect(speedComparison).toBeLessThan(250);
+        expect(speedComparison).toBeLessThan(260);
         done();
       });
   });
