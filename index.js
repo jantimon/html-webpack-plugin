@@ -1307,7 +1307,9 @@ class HtmlWebpackPlugin {
 
     if ("error" in templateResult) {
       compilation.errors.push(
-        prettyError(templateResult.error, compiler.context).toString(),
+        new Error(
+          prettyError(templateResult.error, compiler.context).toString(),
+        ),
       );
     }
 
@@ -1497,7 +1499,9 @@ class HtmlWebpackPlugin {
       .catch((err) => {
         // In case anything went wrong the promise is resolved
         // with the error message and an error is logged
-        compilation.errors.push(prettyError(err, compiler.context).toString());
+        compilation.errors.push(
+          new Error(prettyError(err, compiler.context).toString()),
+        );
         return this.options.showErrors
           ? prettyError(err, compiler.context).toHtml()
           : "ERROR";
