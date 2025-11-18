@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.6.5](https://github.com/jantimon/html-webpack-plugin/compare/v5.6.4...v5.6.5) (2025-11-18)
+
+
+### Bug Fixes
+
+* localStorage exception in Node 25+ ([#1880](https://github.com/jantimon/html-webpack-plugin/issues/1880)) ([a25aa2e](https://github.com/jantimon/html-webpack-plugin/commit/a25aa2e0202fa35bbecf35cc45327dfc34ef938b))
+
 ### [5.6.4](https://github.com/jantimon/html-webpack-plugin/compare/v5.6.3...v5.6.4) (2025-08-14)
 
 

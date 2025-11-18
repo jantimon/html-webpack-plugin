@@ -1,6 +1,6 @@
 {
   "name": "html-webpack-plugin",
-  "version": "5.6.4",
+  "version": "5.6.5",
   "license": "MIT",
   "description": "Simplifies creation of HTML files to serve your webpack bundles",
   "author": "Jan Nicklas <j.nicklas@me.com> (https://github.com/jantimon)",
