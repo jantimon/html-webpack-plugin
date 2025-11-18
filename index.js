@@ -632,62 +632,23 @@ class HtmlWebpackPlugin {
     const templateWithoutLoaders = templateFilename
       .replace(/^.+!/, "")
       .replace(/\?.+$/, "");
-    const vmContext = vm.createContext({
-      ...global,
-      HTML_WEBPACK_PLUGIN: true,
-      require: require,
-      htmlWebpackPluginPublicPath: publicPath,
-      __filename: templateWithoutLoaders,
-      __dirname: path.dirname(templateWithoutLoaders),
-      AbortController: global.AbortController,
-      AbortSignal: global.AbortSignal,
-      Blob: global.Blob,
-      Buffer: global.Buffer,
-      ByteLengthQueuingStrategy: global.ByteLengthQueuingStrategy,
-      BroadcastChannel: global.BroadcastChannel,
-      CompressionStream: global.CompressionStream,
-      CountQueuingStrategy: global.CountQueuingStrategy,
-      Crypto: global.Crypto,
-      CryptoKey: global.CryptoKey,
-      CustomEvent: global.CustomEvent,
-      DecompressionStream: global.DecompressionStream,
-      Event: global.Event,
-      EventTarget: global.EventTarget,
-      File: global.File,
-      FormData: global.FormData,
-      Headers: global.Headers,
-      MessageChannel: global.MessageChannel,
-      MessageEvent: global.MessageEvent,
-      MessagePort: global.MessagePort,
-      PerformanceEntry: global.PerformanceEntry,
-      PerformanceMark: global.PerformanceMark,
-      PerformanceMeasure: global.PerformanceMeasure,
-      PerformanceObserver: global.PerformanceObserver,
-      PerformanceObserverEntryList: global.PerformanceObserverEntryList,
-      PerformanceResourceTiming: global.PerformanceResourceTiming,
-      ReadableByteStreamController: global.ReadableByteStreamController,
-      ReadableStream: global.ReadableStream,
-      ReadableStreamBYOBReader: global.ReadableStreamBYOBReader,
-      ReadableStreamBYOBRequest: global.ReadableStreamBYOBRequest,
-      ReadableStreamDefaultController: global.ReadableStreamDefaultController,
-      ReadableStreamDefaultReader: global.ReadableStreamDefaultReader,
-      Response: global.Response,
-      Request: global.Request,
-      SubtleCrypto: global.SubtleCrypto,
-      DOMException: global.DOMException,
-      TextDecoder: global.TextDecoder,
-      TextDecoderStream: global.TextDecoderStream,
-      TextEncoder: global.TextEncoder,
-      TextEncoderStream: global.TextEncoderStream,
-      TransformStream: global.TransformStream,
-      TransformStreamDefaultController: global.TransformStreamDefaultController,
-      URL: global.URL,
-      URLSearchParams: global.URLSearchParams,
-      WebAssembly: global.WebAssembly,
-      WritableStream: global.WritableStream,
-      WritableStreamDefaultController: global.WritableStreamDefaultController,
-      WritableStreamDefaultWriter: global.WritableStreamDefaultWriter,
-    });
+    const globalClone = Object.create(
+      Object.getPrototypeOf(global),
+      Object.getOwnPropertyDescriptors(global),
+    );
+    // Presence of `eval` breaks template's explicit `eval` call, might be a bug in Node
+    delete globalClone.eval;
+    // Not using `...global` as it throws when localStorage is not explicitly enabled in Node 25+
+    const vmContext = vm.createContext(
+      Object.assign(globalClone, {
+        HTML_WEBPACK_PLUGIN: true,
+        // Copying nonstandard globals like `require` explicitly as they may be absent from `global`
+        require: require,
+        htmlWebpackPluginPublicPath: publicPath,
+        __filename: templateWithoutLoaders,
+        __dirname: path.dirname(templateWithoutLoaders),
+      }),
+    );
 
     const vmScript = new vm.Script(source, {
       filename: templateWithoutLoaders,
