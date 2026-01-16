@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Demo</title>
+  </head>
+  <body>
+    <p>Some unique text</p>
+    {{> template-partial }}
+    {{#each htmlWebpackPlugin.files.js}}
+      <script src="{{this}}"></script>
+    {{/each}}
+  </body>
+</html>

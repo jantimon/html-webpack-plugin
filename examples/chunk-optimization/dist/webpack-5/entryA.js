@@ -1,8 +1,8 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 910:
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
+/***/ 910
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 __webpack_require__(192);
 var multiply = __webpack_require__(199);
@@ -12,7 +12,7 @@ h1.innerHTML = concat("Hello world from Entry ", multiply(1, 1));
 document.body.appendChild(h1);
 
 
-/***/ })
+/***/ }
 
 /******/ 	});
 /************************************************************************/

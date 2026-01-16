@@ -25,16 +25,17 @@ jest.setTimeout(30000);
 process.on("unhandledRejection", (r) => console.log(r));
 
 describe("HtmlWebpackPluginHMR", () => {
-  beforeEach((done) => {
+  afterAll((done) => {
     rimraf(OUTPUT_DIR, done);
   });
 
   it("should not cause errors for the main compilation if hot-reload is active", () => {
+    const outputPath = path.join(OUTPUT_DIR, "one");
     const config = {
       mode: "development",
       entry: path.join(__dirname, "fixtures/index.js"),
       output: {
-        path: OUTPUT_DIR,
+        path: outputPath,
       },
       plugins: [
         new webpack.HotModuleReplacementPlugin(),
@@ -42,6 +43,7 @@ describe("HtmlWebpackPluginHMR", () => {
       ],
     };
     const compiler = new WebpackRecompilationSimulator(webpack(config));
+    fs.mkdirSync(outputPath, { recursive: true });
     const jsFileTempPath = compiler.addTestFile(
       path.join(__dirname, "fixtures/index.js"),
     );
@@ -68,12 +70,13 @@ describe("HtmlWebpackPluginHMR", () => {
   });
 
   it("should not cause missing hot-reloaded code of the main compilation", () => {
+    const outputPath = path.join(OUTPUT_DIR, "two");
     const config = {
       mode: "development",
       entry: path.join(__dirname, "fixtures/index.js"),
       target: "node",
       output: {
-        path: OUTPUT_DIR,
+        path: outputPath,
       },
       plugins: [
         new webpack.HotModuleReplacementPlugin(),
@@ -81,6 +84,7 @@ describe("HtmlWebpackPluginHMR", () => {
       ],
     };
     const compiler = new WebpackRecompilationSimulator(webpack(config));
+    fs.mkdirSync(outputPath, { recursive: true });
     const jsFileTempPath = compiler.addTestFile(
       path.join(__dirname, "fixtures/index.js"),
     );
@@ -108,6 +112,7 @@ describe("HtmlWebpackPluginHMR", () => {
   });
 
   it("should re-emit favicon and assets from a loader if watch is active", () => {
+    const outputPath = path.join(OUTPUT_DIR, "three");
     const template = path.join(
       __dirname,
       "./fixtures/html-template-with-image.html",
@@ -117,7 +122,7 @@ describe("HtmlWebpackPluginHMR", () => {
       entry: path.join(__dirname, "fixtures/index.js"),
       output: {
         assetModuleFilename: "[name][ext]",
-        path: OUTPUT_DIR,
+        path: outputPath,
       },
       module: {
         rules: [
@@ -137,6 +142,7 @@ describe("HtmlWebpackPluginHMR", () => {
 
     const templateContent = fs.readFileSync(template, "utf-8");
     const compiler = new WebpackRecompilationSimulator(webpack(config));
+    fs.mkdirSync(outputPath, { recursive: true });
     const jsFileTempPath = compiler.addTestFile(
       path.join(__dirname, "fixtures/index.js"),
     );
@@ -220,6 +226,7 @@ describe("HtmlWebpackPluginHMR", () => {
       }
     }
 
+    const outputPath = path.join(OUTPUT_DIR, "four");
     const template = path.join(
       __dirname,
       "./fixtures/html-template-with-image.html",
@@ -230,7 +237,7 @@ describe("HtmlWebpackPluginHMR", () => {
       output: {
         clean: true,
         assetModuleFilename: "[name][ext]",
-        path: OUTPUT_DIR,
+        path: outputPath,
       },
       module: {
         rules: [
@@ -251,6 +258,7 @@ describe("HtmlWebpackPluginHMR", () => {
 
     const templateContent = fs.readFileSync(template, "utf-8");
     const compiler = new WebpackRecompilationSimulator(webpack(config));
+    fs.mkdirSync(outputPath, { recursive: true });
     const jsFileTempPath = compiler.addTestFile(
       path.join(__dirname, "fixtures/index.js"),
     );

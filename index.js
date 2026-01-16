@@ -636,8 +636,10 @@ class HtmlWebpackPlugin {
       Object.getPrototypeOf(global),
       Object.getOwnPropertyDescriptors(global),
     );
-    // Presence of `eval` breaks template's explicit `eval` call, might be a bug in Node
+    // Presence of `eval` and `Function` breaks template's explicit `eval` call
+    // Ref: https://github.com/nodejs/help/issues/2880
     delete globalClone.eval;
+    delete globalClone.Function;
     // Not using `...global` as it throws when localStorage is not explicitly enabled in Node 25+
     const vmContext = vm.createContext(
       Object.assign(globalClone, {

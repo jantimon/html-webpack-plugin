@@ -246,7 +246,7 @@ describe("HtmlWebpackPlugin", () => {
     );
   });
 
-  it("uses a custom loader from webpack config", (done) => {
+  it("uses a custom loader from webpack config (pug)", (done) => {
     testHtmlPlugin(
       {
         mode: "production",
@@ -264,6 +264,33 @@ describe("HtmlWebpackPlugin", () => {
           new HtmlWebpackPlugin({
             inject: false,
             template: path.join(__dirname, "fixtures/template.pug"),
+          }),
+        ],
+      },
+      ['<script src="app_bundle.js', "Some unique text"],
+      null,
+      done,
+    );
+  });
+
+  it("uses a custom loader from webpack config (handlebars)", (done) => {
+    testHtmlPlugin(
+      {
+        mode: "production",
+        entry: {
+          app: path.join(__dirname, "fixtures/index.js"),
+        },
+        module: {
+          rules: [{ test: /\.hbs$/, loader: "handlebars-loader" }],
+        },
+        output: {
+          path: OUTPUT_DIR,
+          filename: "[name]_bundle.js",
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            inject: false,
+            template: path.join(__dirname, "fixtures/template.hbs"),
           }),
         ],
       },

@@ -1,8 +1,8 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 355:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ 355
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -293,10 +293,10 @@ function pug_rethrow(err, filename, lineno, str) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ 487:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ 487
+(module, __unused_webpack_exports, __webpack_require__) {
 
 var pug = __webpack_require__(355);
 
@@ -311,24 +311,24 @@ function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;
     ;;return pug_html;};
 module.exports = template;
 
-/***/ }),
+/***/ },
 
-/***/ 900:
-/***/ (() => {
+/***/ 900
+() {
 
 /* (ignored) */
 
-/***/ }),
+/***/ },
 
-/***/ 969:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ 969
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 // extracted by mini-css-extract-plugin
 
 
-/***/ })
+/***/ }
 
 /******/ 	});
 /************************************************************************/
