@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.6.6](https://github.com/jantimon/html-webpack-plugin/compare/v5.6.5...v5.6.6) (2026-01-16)
+
+
+### Bug Fixes
+
+* compatibility with handlebars-loader ([#1882](https://github.com/jantimon/html-webpack-plugin/issues/1882)) ([a8e563b](https://github.com/jantimon/html-webpack-plugin/commit/a8e563b9872e98193ebca75a886fc2657711e722))
+
 ### [5.6.5](https://github.com/jantimon/html-webpack-plugin/compare/v5.6.4...v5.6.5) (2025-11-18)
 
 
