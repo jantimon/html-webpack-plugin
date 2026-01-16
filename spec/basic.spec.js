@@ -273,7 +273,7 @@ describe("HtmlWebpackPlugin", () => {
     );
   });
 
-  it.only("uses a custom loader from webpack config (handlebars)", (done) => {
+  it("uses a custom loader from webpack config (handlebars)", (done) => {
     testHtmlPlugin(
       {
         mode: "production",
