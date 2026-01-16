@@ -25,7 +25,7 @@ jest.setTimeout(30000);
 process.on("unhandledRejection", (r) => console.log(r));
 
 describe("HtmlWebpackPluginHMR", () => {
-  beforeEach((done) => {
+  afterAll((done) => {
     rimraf(OUTPUT_DIR, done);
   });
 
@@ -34,7 +34,7 @@ describe("HtmlWebpackPluginHMR", () => {
       mode: "development",
       entry: path.join(__dirname, "fixtures/index.js"),
       output: {
-        path: OUTPUT_DIR,
+        path: path.join(OUTPUT_DIR, "one"),
       },
       plugins: [
         new webpack.HotModuleReplacementPlugin(),
@@ -73,7 +73,7 @@ describe("HtmlWebpackPluginHMR", () => {
       entry: path.join(__dirname, "fixtures/index.js"),
       target: "node",
       output: {
-        path: OUTPUT_DIR,
+        path: path.join(OUTPUT_DIR, "two"),
       },
       plugins: [
         new webpack.HotModuleReplacementPlugin(),
@@ -117,7 +117,7 @@ describe("HtmlWebpackPluginHMR", () => {
       entry: path.join(__dirname, "fixtures/index.js"),
       output: {
         assetModuleFilename: "[name][ext]",
-        path: OUTPUT_DIR,
+        path: path.join(OUTPUT_DIR, "three"),
       },
       module: {
         rules: [
@@ -230,7 +230,7 @@ describe("HtmlWebpackPluginHMR", () => {
       output: {
         clean: true,
         assetModuleFilename: "[name][ext]",
-        path: OUTPUT_DIR,
+        path: path.join(OUTPUT_DIR, "four"),
       },
       module: {
         rules: [
