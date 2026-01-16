@@ -29,7 +29,7 @@ describe("HtmlWebpackPluginHMR", () => {
     rimraf(OUTPUT_DIR, done);
   });
 
-  it.only("should not cause errors for the main compilation if hot-reload is active", () => {
+  it("should not cause errors for the main compilation if hot-reload is active", () => {
     const outputPath = path.join(OUTPUT_DIR, "one");
     const config = {
       mode: "development",
