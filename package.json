@@ -44,6 +44,7 @@
     "cz-conventional-changelog": "2.1.0",
     "dir-compare": "^3.3.0",
     "eslint": "^8.56.0",
+    "handlebars-loader": "^1.7.3",
     "html-loader": "2.1.1",
     "husky": "^9.0.10",
     "jest": "^27.2.5",

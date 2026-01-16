@@ -640,7 +640,7 @@ class HtmlWebpackPlugin {
     delete globalClone.eval;
     // Not using `...global` as it throws when localStorage is not explicitly enabled in Node 25+
     const vmContext = vm.createContext(
-      Object.assign(globalClone, {
+      Object.assign({}, globalClone, {
         HTML_WEBPACK_PLUGIN: true,
         // Copying nonstandard globals like `require` explicitly as they may be absent from `global`
         require: require,
