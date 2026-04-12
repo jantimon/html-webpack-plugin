@@ -5,7 +5,6 @@ const promisify = require("util").promisify;
 
 const vm = require("vm");
 const fs = require("fs");
-const _uniq = require("lodash/uniq");
 const path = require("path");
 const { CachedChildCompilation } = require("./lib/cached-child-compiler");
 
@@ -950,11 +949,13 @@ class HtmlWebpackPlugin {
    * @private
    */
   getAssetFiles(assets) {
-    const files = _uniq(
-      Object.keys(assets)
-        .filter((assetType) => assetType !== "chunks" && assets[assetType])
-        .reduce((files, assetType) => files.concat(assets[assetType]), []),
-    );
+    const files = [
+      ...new Set(
+        Object.keys(assets)
+          .filter((assetType) => assetType !== "chunks" && assets[assetType])
+          .reduce((files, assetType) => files.concat(assets[assetType]), []),
+      ),
+    ];
     files.sort();
     return files;
   }
