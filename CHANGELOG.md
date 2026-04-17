@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.6.7](https://github.com/jantimon/html-webpack-plugin/compare/v5.6.6...v5.6.7) (2026-04-17)
+
+
+### Bug Fixes
+
+* provide module/exports in VM sandbox for Node.js 25+ compatibility ([#1889](https://github.com/jantimon/html-webpack-plugin/issues/1889)) ([c862830](https://github.com/jantimon/html-webpack-plugin/commit/c8628300e57cc49d754019a3ed05353a987abe87)), closes [#1880](https://github.com/jantimon/html-webpack-plugin/issues/1880) [facebook/docusaurus#11545](https://github.com/facebook/docusaurus/issues/11545)
+
 ### [5.6.6](https://github.com/jantimon/html-webpack-plugin/compare/v5.6.5...v5.6.6) (2026-01-16)
 
 
