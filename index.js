@@ -640,11 +640,17 @@ class HtmlWebpackPlugin {
     delete globalClone.eval;
     delete globalClone.Function;
     // Not using `...global` as it throws when localStorage is not explicitly enabled in Node 25+
+    // Provide a CommonJS-style `module`/`exports` pair so templates compiled as CommonJS
+    // (e.g. Rspack's child compilation output, which wraps the result in `module.exports = ...`)
+    // can assign to them instead of failing with `module is not defined`.
+    const sandboxModule = { exports: {} };
     const vmContext = vm.createContext(
       Object.assign(globalClone, {
         HTML_WEBPACK_PLUGIN: true,
         // Copying nonstandard globals like `require` explicitly as they may be absent from `global`
         require: require,
+        module: sandboxModule,
+        exports: sandboxModule.exports,
         htmlWebpackPluginPublicPath: publicPath,
         __filename: templateWithoutLoaders,
         __dirname: path.dirname(templateWithoutLoaders),
