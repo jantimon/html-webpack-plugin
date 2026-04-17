@@ -28,7 +28,8 @@
     "specialattribute",
     "dircompare",
     "wagoid",
-    "autocrlf"
+    "autocrlf",
+    "Rspack"
   ],
   "ignorePaths": [
     "CHANGELOG.md",

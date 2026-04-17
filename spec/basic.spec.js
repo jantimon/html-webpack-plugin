@@ -3853,4 +3853,16 @@ describe("HtmlWebpackPlugin", () => {
       done,
     );
   });
+
+  describe("evaluateCompilationResult", () => {
+    it("evaluates templates wrapped in a CommonJS `module.exports = ...` expression", () => {
+      const plugin = new HtmlWebpackPlugin();
+      const source = 'module.exports = "<!DOCTYPE html><title>ok</title>";';
+      return plugin
+        .evaluateCompilationResult(source, "", "template.js")
+        .then((result) => {
+          expect(result).toBe("<!DOCTYPE html><title>ok</title>");
+        });
+    });
+  });
 });
