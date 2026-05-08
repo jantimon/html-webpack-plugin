@@ -3048,6 +3048,60 @@ describe("HtmlWebpackPlugin", () => {
     );
   });
 
+  it("throws an error if a specified chunk in the chunks option is not found", (done) => {
+    testHtmlPlugin(
+      {
+        mode: "production",
+        entry: {
+          app: path.join(__dirname, "fixtures/index.js"),
+        },
+        output: {
+          path: OUTPUT_DIR,
+          filename: "[name]_bundle.js",
+        },
+        optimization: {
+          emitOnErrors: true,
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            chunks: ["app", "non_existent_chunk"],
+          }),
+        ],
+      },
+      [],
+      null,
+      done,
+      true,
+    );
+  });
+
+  it("throws an error if a specified chunk in the excludeChunks option is not found", (done) => {
+    testHtmlPlugin(
+      {
+        mode: "production",
+        entry: {
+          app: path.join(__dirname, "fixtures/index.js"),
+        },
+        output: {
+          path: OUTPUT_DIR,
+          filename: "[name]_bundle.js",
+        },
+        optimization: {
+          emitOnErrors: true,
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            excludeChunks: ["non_existent_chunk"],
+          }),
+        ],
+      },
+      [],
+      null,
+      done,
+      true,
+    );
+  });
+
   it("should add the webpack compilation object as a property of the templateParam object", (done) => {
     testHtmlPlugin(
       {
