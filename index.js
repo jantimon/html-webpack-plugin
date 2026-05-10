@@ -1203,23 +1203,19 @@ class HtmlWebpackPlugin {
   validateOptions(allChunkNames) {
     const validationErrors = [];
     if (this.options.chunks !== "all") {
-      const chunksErr = validateChunkNames(
+      const chunksErrors = validateChunkNames(
         allChunkNames,
         this.options.chunks,
         "chunks",
       );
-      if (chunksErr) {
-        validationErrors.push(chunksErr);
-      }
+      validationErrors.push(...chunksErrors);
     }
-    const excludeChunksErr = validateChunkNames(
+    const excludeChunksErrors = validateChunkNames(
       allChunkNames,
       this.options.excludeChunks,
       "excludeChunks",
     );
-    if (excludeChunksErr) {
-      validationErrors.push(excludeChunksErr);
-    }
+    validationErrors.push(...excludeChunksErrors);
 
     return validationErrors;
   }
@@ -1296,7 +1292,8 @@ class HtmlWebpackPlugin {
 
     const validationErrors = this.validateOptions(allChunkNames);
     if (validationErrors.length) {
-      compilation.errors.push(...validationErrors);
+      // TODO throw error in the next major release
+      compilation.warnings.push(...validationErrors);
     }
 
     const filteredEntryNames = this.filterEntryChunks(
