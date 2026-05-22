@@ -1,6 +1,6 @@
 import { AsyncSeriesWaterfallHook } from "tapable";
 import { Compiler, Compilation } from "webpack";
-import { Options as HtmlMinifierOptions } from "html-minifier-terser";
+import { Options as HtmlMinifierOptions } from "html-minifier-next";
 
 export = HtmlWebpackPlugin;
 
@@ -112,11 +112,11 @@ declare namespace HtmlWebpackPlugin {
             | { [attributeName: string]: string | boolean }; // custom properties e.g. { name:"viewport" content:"width=500, initial-scale=1" }
         };
     /**
-     * HTML Minification options accepts the following values:
+     * HTML Minification options accept the following values:
      * - Set to `false` to disable minification
      * - Set to `'auto'` to enable minification only for production mode
      * - Set to custom minification according to
-     * {@link https://github.com/kangax/html-minifier#options-quick-reference}
+     * {@link https://github.com/j9t/html-minifier-next#options-quick-reference}
      */
     minify?: "auto" | boolean | MinifyOptions;
     /**

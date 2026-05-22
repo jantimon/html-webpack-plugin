@@ -4,6 +4,7 @@
     "allowJs": true /* Allow javascript files to be compiled. */,
     "checkJs": true /* Report errors in .js files. */,
     "noEmit": true /* Do not emit outputs. */,
+    "target": "es2017",
     "lib": ["es2017"],
 
     /* Strict Type-Checking Options */
