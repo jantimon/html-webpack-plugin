@@ -644,7 +644,7 @@ describe("HtmlWebpackPlugin", () => {
         },
         plugins: [new HtmlWebpackPlugin()],
       },
-      ['<script defer src="index_bundle.js"'],
+      ['<script defer="defer" src="index_bundle.js"'],
       null,
       done,
     );
