@@ -65,7 +65,7 @@
   },
   "dependencies": {
     "@types/html-minifier-terser": "^6.0.0",
-    "html-minifier-terser": "^6.0.2",
+    "html-minifier-terser": "^7.0.0",
     "lodash": "^4.17.21",
     "pretty-error": "^4.0.0",
     "tapable": "^2.0.0"
