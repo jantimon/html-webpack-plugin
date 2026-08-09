@@ -1,5 +1,5 @@
 "use strict";
-(self["webpackChunk"] = self["webpackChunk"] || []).push([[192],{
+(globalThis["webpackChunk"] = globalThis["webpackChunk"] || []).push([[192],{
 
 /***/ 192
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {

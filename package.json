@@ -58,14 +58,13 @@
     "rimraf": "2.6.3",
     "standard-version": "^9.3.0",
     "style-loader": "2.0.0",
-    "typescript": "4.9.4",
+    "typescript": "4.9.5",
     "webpack": "^5.104.1",
     "webpack-cli": "4.5.0",
     "webpack-recompilation-simulator": "3.2.0"
   },
   "dependencies": {
-    "@types/html-minifier-terser": "^6.0.0",
-    "html-minifier-terser": "^6.0.2",
+    "html-minifier-next": "^6.2.7",
     "lodash": "^4.17.21",
     "pretty-error": "^4.0.0",
     "tapable": "^2.0.0"

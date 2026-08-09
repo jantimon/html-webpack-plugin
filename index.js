@@ -915,7 +915,7 @@ class HtmlWebpackPlugin {
       typeof this.options.minify === "object"
         ? this.options.minify
         : {
-            // https://www.npmjs.com/package/html-minifier-terser#options-quick-reference
+            // https://www.npmjs.com/package/html-minifier-next#options-quick-reference
             collapseWhitespace: true,
             keepClosingSlash: true,
             removeComments: true,
@@ -926,7 +926,7 @@ class HtmlWebpackPlugin {
           };
 
     try {
-      html = require("html-minifier-terser").minify(html, minifyOptions);
+      html = require("html-minifier-next").minify(html, minifyOptions);
     } catch (e) {
       const isParseError = String(e.message).indexOf("Parse Error") === 0;
 
@@ -1033,7 +1033,7 @@ class HtmlWebpackPlugin {
       const attributes = {};
 
       if (this.options.scriptLoading === "defer") {
-        attributes.defer = true;
+        attributes.defer = "defer";
       } else if (this.options.scriptLoading === "module") {
         attributes.type = "module";
       } else if (this.options.scriptLoading === "systemjs-module") {

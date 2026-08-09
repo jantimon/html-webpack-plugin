@@ -1,4 +1,4 @@
-(self["webpackChunk"] = self["webpackChunk"] || []).push([[646],{
+(globalThis["webpackChunk"] = globalThis["webpackChunk"] || []).push([[646],{
 
 /***/ 16
 (module) {

@@ -29,6 +29,7 @@
     "dircompare",
     "wagoid",
     "autocrlf",
+    "Minifier",
     "Rspack"
   ],
   "ignorePaths": [
