@@ -814,7 +814,7 @@ class HtmlWebpackPlugin {
    * @param {{headTags: HtmlTagObject[], bodyTags: HtmlTagObject[]}} assetTags The asset tags to inject
    * @returns {Promise<string>}
    */
-  postProcessHtml(
+  async postProcessHtml(
     compiler,
     originalHtml,
     assetsInformationByGroups,
@@ -823,10 +823,8 @@ class HtmlWebpackPlugin {
     let html = originalHtml;
 
     if (typeof html !== "string") {
-      return Promise.reject(
-        new Error(
-          "Expected html to be a string but got " + JSON.stringify(html),
-        ),
+      throw new Error(
+        "Expected html to be a string but got " + JSON.stringify(html),
       );
     }
 
@@ -908,7 +906,7 @@ class HtmlWebpackPlugin {
       (this.options.minify === "auto" && isProductionLikeMode);
 
     if (!needMinify) {
-      return Promise.resolve(html);
+      return html;
     }
 
     const minifyOptions =
@@ -926,7 +924,7 @@ class HtmlWebpackPlugin {
           };
 
     try {
-      html = require("html-minifier-terser").minify(html, minifyOptions);
+      html = await require("html-minifier-terser").minify(html, minifyOptions);
     } catch (e) {
       const isParseError = String(e.message).indexOf("Parse Error") === 0;
 
@@ -944,10 +942,10 @@ class HtmlWebpackPlugin {
           e.message;
       }
 
-      return Promise.reject(e);
+      throw e;
     }
 
-    return Promise.resolve(html);
+    return html;
   }
 
   /**
@@ -1518,9 +1516,7 @@ class HtmlWebpackPlugin {
 
     // Once all files are added to the webpack compilation
     // let the webpack compiler continue
-    emitHtmlPromise.then(() => {
-      callback();
-    });
+    emitHtmlPromise.then(() => callback(), callback);
   }
 }
 
