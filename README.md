@@ -18,6 +18,14 @@
   <p>Plugin that simplifies creation of HTML files to serve your bundles</p>
 </div>
 
+> [!WARNING]
+>
+> **`html-webpack-plugin` is deprecated** — webpack scaffolds the HTML around your bundles itself and no longer needs it.
+>
+> Read the [Native HTML guide](https://webpack.js.org/guides/native-html/) and follow its [migration guide](https://webpack.js.org/guides/native-html/#migrating-from-html-webpack-plugin).
+>
+> Existing setups keep working: webpack only emits a page when you ask for one with [`output.html`](https://webpack.js.org/configuration/output/#outputhtml), so this plugin keeps owning your HTML until you migrate.
+
 <h2 align="center">Install</h2>
 
 <h3>Webpack 5</h3>
