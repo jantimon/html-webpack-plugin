@@ -10,9 +10,6 @@ jobs:
   lint:
     name: Lint - ${{ matrix.os }} - Node v${{ matrix.node-version }}
 
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     strategy:
       matrix:
         os: [ubuntu-latest]
