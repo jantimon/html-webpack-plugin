@@ -86,6 +86,60 @@ describe("HtmlWebpackPluginCaching", () => {
     rimraf(OUTPUT_DIR, done);
   });
 
+  it("waits for the child compilation snapshot before optimizing", async () => {
+    let snapshotCreated = false;
+    const delaySnapshotPlugin = {
+      apply(compiler) {
+        compiler.hooks.thisCompilation.tap(
+          "DelayChildCompilationSnapshotPlugin",
+          (compilation) => {
+            const createSnapshot =
+              compilation.fileSystemInfo.createSnapshot.bind(
+                compilation.fileSystemInfo,
+              );
+
+            compilation.fileSystemInfo.createSnapshot = (...args) => {
+              if (args[4] !== null) {
+                return createSnapshot(...args);
+              }
+
+              const callback = args[args.length - 1];
+              setTimeout(() => {
+                snapshotCreated = true;
+                callback(null, {});
+              }, 100);
+            };
+
+            compilation.hooks.optimizeTree.tap(
+              {
+                name: "VerifyChildCompilationSnapshotPlugin",
+                stage: Number.MAX_SAFE_INTEGER,
+              },
+              () => {
+                if (!snapshotCreated) {
+                  throw new Error(
+                    "Child compilation continued before its snapshot completed",
+                  );
+                }
+              },
+            );
+          },
+        );
+      },
+    };
+    const compiler = setUpCompiler(
+      new HtmlWebpackPlugin({
+        template: path.join(__dirname, "fixtures/plain.html"),
+      }),
+      delaySnapshotPlugin,
+    );
+    compiler.addTestFile(path.join(__dirname, "fixtures/index.js"));
+
+    await compiler.run();
+
+    expect(snapshotCreated).toBe(true);
+  });
+
   it("should compile nothing if no file was changed", (done) => {
     const template = path.join(__dirname, "fixtures/plain.html");
     const htmlWebpackPlugin = new HtmlWebpackPlugin({
