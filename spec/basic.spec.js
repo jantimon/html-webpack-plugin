@@ -47,7 +47,7 @@ function testHtmlPlugin(
     }
     const compilationWarnings = (stats.compilation.warnings || []).join("\n");
     if (expectWarnings) {
-      expect(compilationWarnings).not.toBe("");
+      expect(compilationWarnings).toMatch(expectWarnings);
     } else {
       expect(compilationWarnings).toBe("");
     }
@@ -3045,6 +3045,62 @@ describe("HtmlWebpackPlugin", () => {
       ],
       null,
       done,
+    );
+  });
+
+  it("adds a warning if a specified chunk in the chunks option is not found", (done) => {
+    testHtmlPlugin(
+      {
+        mode: "production",
+        entry: {
+          app: path.join(__dirname, "fixtures/index.js"),
+        },
+        output: {
+          path: OUTPUT_DIR,
+          filename: "[name]_bundle.js",
+        },
+        optimization: {
+          emitOnErrors: true,
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            chunks: ["app", "non_existent_chunk"],
+          }),
+        ],
+      },
+      [],
+      null,
+      done,
+      false,
+      /HtmlWebpackPlugin: The chunk 'non_existent_chunk' provided in the 'options.chunks' option was not found in the compilation results/,
+    );
+  });
+
+  it("adds a warning if a specified chunk in the excludeChunks option is not found", (done) => {
+    testHtmlPlugin(
+      {
+        mode: "production",
+        entry: {
+          app: path.join(__dirname, "fixtures/index.js"),
+        },
+        output: {
+          path: OUTPUT_DIR,
+          filename: "[name]_bundle.js",
+        },
+        optimization: {
+          emitOnErrors: true,
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            excludeChunks: ["non_existent_chunk"],
+          }),
+        ],
+      },
+      [],
+      null,
+      done,
+      false,
+      /HtmlWebpackPlugin: The chunk 'non_existent_chunk' provided in the 'options.excludeChunks' option was not found in the compilation results/,
     );
   });
 

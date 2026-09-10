@@ -15,6 +15,7 @@ const {
 } = require("./lib/html-tags");
 const prettyError = require("./lib/errors.js");
 const chunkSorter = require("./lib/chunksorter.js");
+const validateChunkNames = require("./lib/validators");
 const { AsyncSeriesWaterfallHook } = require("tapable");
 
 /** @typedef {import("./typings").HtmlTagObject} HtmlTagObject */
@@ -1196,6 +1197,30 @@ class HtmlWebpackPlugin {
   }
 
   /**
+   * @param {(string | null | undefined)[]} allChunkNames - all compilation chunk names
+   * @returns {Error[]} validation errors
+   */
+  validateOptions(allChunkNames) {
+    const validationErrors = [];
+    if (this.options.chunks !== "all") {
+      const chunksErrors = validateChunkNames(
+        allChunkNames,
+        this.options.chunks,
+        "chunks",
+      );
+      validationErrors.push(...chunksErrors);
+    }
+    const excludeChunksErrors = validateChunkNames(
+      allChunkNames,
+      this.options.excludeChunks,
+      "excludeChunks",
+    );
+    validationErrors.push(...excludeChunksErrors);
+
+    return validationErrors;
+  }
+
+  /**
    * Replace [contenthash] in filename
    *
    * @see https://survivejs.com/webpack/optimizing/adding-hashes-to-filenames/
@@ -1261,6 +1286,16 @@ class HtmlWebpackPlugin {
   ) {
     // Get all entry point names for this html file
     const entryNames = Array.from(compilation.entrypoints.keys());
+
+    // Get all chunk names
+    const allChunkNames = Array.from(compilation.chunks).map((c) => c.name);
+
+    const validationErrors = this.validateOptions(allChunkNames);
+    if (validationErrors.length) {
+      // TODO throw error in the next major release
+      compilation.warnings.push(...validationErrors);
+    }
+
     const filteredEntryNames = this.filterEntryChunks(
       entryNames,
       this.options.chunks,
