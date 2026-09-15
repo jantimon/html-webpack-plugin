@@ -29,10 +29,8 @@ const { AsyncSeriesWaterfallHook } = require("tapable");
 /** @typedef {Array<{ name: string, source: import('webpack').sources.Source, info?: import('webpack').AssetInfo }>} PreviousEmittedAssets */
 /** @typedef {{ publicPath: string, js: Array<string>, css: Array<string>, manifest?: string, favicon?: string }} AssetsInformationByGroups */
 /** @typedef {import("./typings").Hooks} HtmlWebpackPluginHooks */
-/**
- * @type {WeakMap<Compilation, HtmlWebpackPluginHooks>}}
- */
-const compilationHooksMap = new WeakMap();
+
+const compilationHooksSymbol = Symbol.for('html-webpack-plugin/compilation-hooks');
 
 class HtmlWebpackPlugin {
   // The following is the API definition for all available hooks
@@ -97,7 +95,7 @@ class HtmlWebpackPlugin {
    * @returns {HtmlWebpackPluginHooks}
    */
   static getCompilationHooks(compilation) {
-    let hooks = compilationHooksMap.get(compilation);
+    let hooks = compilation[compilationHooksSymbol];
 
     if (!hooks) {
       hooks = {
@@ -108,7 +106,9 @@ class HtmlWebpackPlugin {
         beforeEmit: new AsyncSeriesWaterfallHook(["pluginArgs"]),
         afterEmit: new AsyncSeriesWaterfallHook(["pluginArgs"]),
       };
-      compilationHooksMap.set(compilation, hooks);
+      Object.defineProperty(compilation, compilationHooksSymbol, {
+        value: hooks,
+      })
     }
 
     return hooks;
